@@ -1,0 +1,1 @@
+Generic Software/Hardware Connection API for Embedded Devices

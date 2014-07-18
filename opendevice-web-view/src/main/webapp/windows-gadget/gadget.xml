@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<gadget>
+  <name>OpenHouse Gadget</name>
+  <version>1.0.0.0</version>
+  <author name="CriativaSoft">
+    <info url="openhouse.criativasoft.com.br" />
+  </author>
+  <copyright>&#169; CriativaSoft Corporation.</copyright>
+  <description>"OpenHouse" Sidebar gadget sample.</description>
+  <hosts>
+    <host name="sidebar">
+      <base type="HTML" apiVersion="1.0.0" src="OpenHouseGadget.html" />
+      <permissions>Full</permissions>
+      <platform minPlatformVersion="1.0" />
+    </host>
+  </hosts>
+</gadget>

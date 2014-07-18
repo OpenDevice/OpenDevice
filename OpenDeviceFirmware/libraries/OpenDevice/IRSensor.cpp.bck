@@ -1,0 +1,47 @@
+/*
+ * IRSensor.cpp
+ *
+ *  Created on: 29/04/2013
+ *  Author: Ricardo JL Rufino
+ */
+
+#ifndef ENERGIA // Bypass on Stellaris
+
+#include "DeviceManager.h"
+#include "IRSensor.h"
+
+IRSensor::IRSensor()  {}
+
+
+IRSensor::IRSensor(uint8_t iid, uint8_t ipin, Stream * Serial) : Sensor(iid, ipin, 0){
+	irrecv = &IRrecv(ipin);
+	sdebug = Serial;
+}
+
+
+IRSensor::~IRSensor() {
+}
+
+void IRSensor::init(){
+	irrecv->enableIRIn();
+}
+
+bool IRSensor::hasChanged(){
+	if (irrecv->decode(&results)){
+		currentValue = results.value;
+
+//		sdebug->print("DB:IR:");
+//		sdebug->print(results.value);
+//		sdebug->print(" -> ");
+//		sdebug->print(results.value, HEX);
+//		sdebug->println();
+
+		irrecv->resume();
+		return true;
+	}
+
+
+	return false;
+}
+
+#endif

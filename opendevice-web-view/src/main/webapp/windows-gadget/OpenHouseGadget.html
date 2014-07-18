@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Hello World</title>
+        
+        <style type="text/css">
+        body
+        {
+            margin: 0;
+            width: 130px;
+            height: 200px;
+            font-family: verdana;
+            font-weight: bold;
+            font-size: 10px;
+/*             background-image: url(images/background.png);  */
+/*             background-repeat: no-repeat; */
+        }
+        #gadgetContent
+        {
+            margin-top: 5px;
+            width: 130px;
+            vertical-align: middle;
+            text-align: center;
+            overflow: hidden;
+        }
+        
+        .device{
+            width: 130px;
+            height: 32px;
+            font-size: 10px; 
+            cursor: pointer;   
+            background-repeat: no-repeat;
+        	padding-left: 35px;
+        	padding-top: 8px;   	
+        }
+         
+        .device:hover{
+        	color: red;
+        }
+        
+        .lamp.state-on{
+        	background-image: url(images/lightbulb.png);
+        }
+        
+        .lamp.state-off{
+        	background-image: url(images/lightbulb_off.png);
+        }
+        
+        </style>
+        <script src="jquery-latest.js" type="text/javascript"></script> 
+        
+        <script type="text/jscript" language="jscript">
+
+            function init() {
+
+            }
+            
+            function toogleDevice(id, dev){
+				var $dev = $(dev);
+
+            	if($dev.hasClass('state-on')){
+            		$dev.removeClass('state-on');
+            		$dev.addClass('state-off');
+            		send(id, 0);
+            	}else{
+            		$dev.removeClass('state-off');
+            		$dev.addClass('state-on');
+            		send(id, 1);
+            	}            	
+            }
+             
+            function send(id, value){
+            	$("#gadgetContent").html('Change Value = ' + value);
+				// Using JSON.P Request.
+            	$.ajax('http://127.0.0.1:9191/device/'+id+'/setvalue/' + value + ".jsonp",  
+            	  {dataType:'jsonp',scriptCharset: "utf-8", success:function(data, textStatus, jqXHR){  
+            	     $("#gadgetContent").empty().append(String(data));  
+            	  }}
+            	); 
+            }
+        </script>
+    </head>
+	
+    <body onload="init()">
+    <g:background id="imgBackground">
+            <div class="device lamp state-on" onclick="toogleDevice(1, this)">Luz 1</div>
+            <div class="device lamp state-off " onclick="toogleDevice(2, this)">Luz 2</div>
+            <div class="device lamp state-off " onclick="toogleDevice(3, this)">Luz 3</div>
+            <span id="gadgetContent">Devices</span>
+    </g:background>
+    </body>
+</html>

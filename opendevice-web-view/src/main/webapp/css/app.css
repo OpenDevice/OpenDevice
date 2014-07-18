@@ -1,0 +1,87 @@
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+}
+
+
+.device-view-container {
+    width: 100%;
+    margin-bottom: 24px
+}
+
+.device-view {
+    width: 18% !important;
+    min-width: 167px;
+    margin: 8px 1%;
+    height: 80px;
+    float: left;
+    cursor: pointer;
+    display: block;
+    text-decoration: none;
+    color: #323232;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background: #fff url(../../images/core/mws-report-bg.png) repeat-x;
+    border: 1px solid #ccc;
+    -webkit-border-radius: 6px;
+    -o-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -khtml-border-radius: 6px;
+    border-radius: 6px;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.device-view:hover {
+    background-color: #d0f6ff
+}
+
+.device-view:active {
+    background-image: none;
+    -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    -o-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    -moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    -khtml-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5)
+}
+
+.device-view .device-view-icon {
+    width: 48px;
+    height: 100%;
+    float: left;
+    display: block;
+    border-right: 1px solid #ccc;
+    background-position: center center
+}
+
+.device-view .device-view-content {
+    margin-left: 49px;
+    display: block;
+    padding: 8px 10px
+}
+
+.device-view .device-view-content .device-view-title {
+    white-space: nowrap;
+    display: block
+}
+
+.device-view .device-view-content .device-view-value {
+    font-size: 32px;
+    font-weight: bold;
+    display: inline-block
+}
+
+.device-view .device-view-content .device-view-value.on {
+    padding-right: 24px;
+    color: #64a303
+}
+
+.device-view .device-view-content .device-view-value.off {
+    padding-right: 24px;
+    color: #f53809
+}

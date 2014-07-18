@@ -1,0 +1,82 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>br.com.criativasoft.opendevice</groupId>
+        <artifactId>opendevice-pom</artifactId>
+        <version>0.1.2-SNAPSHOT</version>
+    </parent>
+
+	<artifactId>opendevice-connection</artifactId>
+	<packaging>pom</packaging>
+
+	<name>opendevice-connection</name>
+	<url>https://github.com/CriativaSoft/opendevice-connection</url>
+
+	<modules>
+		<module>opendevice-connection-api</module>
+		<module>opendevice-connection-stream</module>
+		<module>opendevice-connection-samples</module>
+		<!--<module>opendevice-connection-lighthttp</module>-->
+		<!--<module>opendevice-connection-socketio</module>-->
+        <!--<module>opendevice-connection-rest</module>-->
+        <!--<module>opendevice-connection-atmospherews</module>-->
+        <!--<module>../opendevice-connectio/opendevice-connection-webclient</module>-->
+    </modules>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>opendevice-connection-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
+    <dependencies>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.6.1</version>
+            <scope>test</scope>
+        </dependency>
+	</dependencies>
+</project>
+

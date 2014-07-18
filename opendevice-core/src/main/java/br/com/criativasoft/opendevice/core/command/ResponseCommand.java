@@ -1,0 +1,45 @@
+/*
+ * ******************************************************************************
+ *  Copyright (c) 2013-2014 CriativaSoft (www.criativasoft.com.br)
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Ricardo JL Rufino - Initial API and Implementation
+ * *****************************************************************************
+ */
+
+package br.com.criativasoft.opendevice.core.command;
+
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.UUID;
+
+
+@XmlRootElement
+public class ResponseCommand extends Command {
+	
+	private static final long serialVersionUID = 1891204618345540528L;
+	
+	private ResponseCommandStatus statusReponse = ResponseCommandStatus.SUCCESS;
+
+    public ResponseCommand(){
+        super(CommandType.DEVICE_COMMAND_RESPONSE);
+    }
+
+	public ResponseCommand(CommandType type, String connectionUUID) {
+		this(type, connectionUUID, null);
+	}
+	
+	public ResponseCommand(CommandType type, String connectionUUID, ResponseCommandStatus statusReponse) {
+		super(type, UUID.randomUUID().toString(), connectionUUID);
+		this.statusReponse = statusReponse;
+	}
+	
+	public ResponseCommandStatus getStatusReponse() {
+		return statusReponse;
+	}
+
+
+}

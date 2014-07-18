@@ -1,0 +1,131 @@
+div#mws-login-bg
+{
+	background:url(../../images/core/mws-container-bg.png);
+	height:100%;
+	width:100%;
+}
+
+div#mws-login-wrapper
+{
+	position:absolute;
+	top:50%;
+	margin-top:-146px;
+	width:320px;
+	left:50%;
+	margin-left:-160px;
+}
+
+div#mws-login
+{
+	background:url(../../images/core/mws-dark-bg.png);
+	position:relative;
+	padding:12px 16px;
+	
+	border:1px solid #c0c0c0;
+	border-top:2px solid #535353;
+	
+	/* CSS 3 */
+	-webkit-border-radius:6px;
+	-moz-border-radius:6px;
+	-o-border-radius:6px;
+	-khtml-border-radius:6px;
+	border-radius:6px;
+	
+	-webkit-box-shadow:0 2px 3px rgba(0, 0, 0, 0.25);
+	-moz-box-shadow:0 2px 3px rgba(0, 0, 0, 0.25);
+	-o-box-shadow:0 2px 3px rgba(0, 0, 0, 0.25);
+	-khtml-box-shadow:0 2px 3px rgba(0, 0, 0, 0.25);
+	box-shadow:0 2px 3px rgba(0, 0, 0, 0.25);
+}
+
+div#mws-login h1
+{
+	color:#ffffff;
+	padding:0 8px 8px 8px;
+	font-size:18px;
+	margin:0;
+	position:relative;
+	background:url(../../images/core/mws-login-stitch.png) repeat-x left bottom;
+}
+
+div#mws-login .mws-login-lock
+{
+	background:url(../../images/core/mws-login-circle.png) no-repeat center center;
+	position:absolute;
+	padding:8px;
+	right:-10px;
+	top:-10px;
+	
+	/* CSS 3 */
+	
+	-webkit-border-radius:20px;
+	-khtml-border-radius:20px;
+	-o-border-radius:20px;
+	-moz-border-radius:20px;
+	border-radius:20px;	
+}
+
+div#mws-login form
+{
+	background:url(../../images/core/mws-login-stitch.png) repeat-x left bottom;
+	position:relative;
+}
+
+div#mws-login-error
+{
+	position:absolute;
+	z-index:-11;
+	display:none;
+	top:-49px; left:0; right:0;
+	
+	-webkit-transform:rotate(-90deg);
+	-webkit-transform-origin:right bottom;
+}
+
+div#mws-login .mws-form-row.mws-inset
+{
+	padding:4px !important;
+	font-size:0.9em;
+	color:#ffffff;
+}
+
+div#mws-login .mws-form-row
+{
+	padding-left:0;
+	padding-right:0;
+}
+
+div#mws-login input.mws-login-username
+{
+	background-image:url(../icons/16/user.png);
+	background-repeat:no-repeat;
+	background-position:8px center;
+}
+
+div#mws-login input.mws-login-password
+{
+	background-image:url(../icons/16/key.png);
+	background-repeat:no-repeat;
+	background-position:8px center;
+}
+
+div#mws-login input.mws-login-username, 
+div#mws-login input.mws-login-password
+{
+	padding:8px 8px 8px 32px;
+	border:1px solid #323232;
+	
+	/* CSS 3 */
+	
+	-webkit-box-shadow:inset 0 0 8px rgba(0, 0, 0, 0.15);
+	-moz-box-shadow:inset 0 0 8px rgba(0, 0, 0, 0.15);
+	-o-box-shadow:inset 0 0 8px rgba(0, 0, 0, 0.15);
+	-khtml-box-shadow:inset 0 0 8px rgba(0, 0, 0, 0.15);
+	box-shadow:inset 0 0 8px rgba(0, 0, 0, 0.15);	
+}
+
+div#mws-login input.mws-login-button
+{
+	width:100%;
+	border:1px solid #284609;
+}

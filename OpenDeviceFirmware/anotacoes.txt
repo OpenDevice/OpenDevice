@@ -1,0 +1,30 @@
+
+[] IR no Lauchpad
+- Com algumas das adaptações feitas por um cara, pode ser possível usar no Lauchpad.
+Modificações:
+Use pin change interrupts instead of timer based polling for input
+->https://github.com/microtherion/Arduino-IRremote/commit/ed15c82ac3d6c5243945c818b437ae4df2beb4cd
+Add support for ATtiny85/45
+->https://github.com/microtherion/Arduino-IRremote/commit/7ed941966328e44b147407fcdac548480d79e7d3
+Isso pode ajudar
+->Stellaris Launchpad PWM Tutorial
+http://codeandlife.com/2012/10/30/stellaris-launchpad-pwm-tutorial/
+-> http://chess.eecs.berkeley.edu/eecs149/sp09/docs/an01241.pdf (interrupcao com GPIO, lendo teclado PS2)
+
+NOTA: Parece que é complicado mesmo reabalhar com interrupções no Lauchpad.
+
+
+[] Criar uma idéia de Drivers, paralidar com os Perifericos
+   [] Display , seria 2 : LedDisplay e LCDDisplay.
+
+
+[] Criar uma especie de Commandhandler, que seria reponsavel por lidar com as 
+interfaces de recebimentos de comandos;
+  Ex: InfraRed , SMS , Wifi
+  De modo que esses possal ser autonomos, sem precisar de um Servidor para decidir o
+  que deve ser feito com aqueles comandos
+  
+[] IRDevice - Dispositivo para enviar comandos IR.  
+
+[] Sensor poderia extender Device.. !!!
+  

@@ -1,0 +1,139 @@
+div#mws-themer
+{
+	position:fixed;
+	bottom:0;
+	right:-250px;
+	font-size:12px;
+	z-index:3;
+}
+
+.colorpicker
+{
+	z-index:4;
+}
+
+div#mws-themer #mws-themer-toggle
+{
+	background:url(../icons/24/bended-arrow-left.png) no-repeat center center;
+	height:32px; width:32px;
+	position:absolute;
+	left:13px; bottom:8px;
+	cursor:pointer;
+	border:1px solid #666666;
+}
+
+div#mws-themer #mws-themer-toggle.opened
+{
+	background-image:url(../icons/24/bended-arrow-right.png);
+}
+
+div#mws-themer #mws-themer-css-dialog
+{
+	display:none;
+}
+
+#mws-themer-css-dialog textarea
+{
+	height:20em !important;
+	font-family:"Courier New", Courier, monospace;
+}
+
+div#mws-themer #mws-themer-content
+{
+	float:right;
+	padding:4px 6px 4px 58px;
+	position:relative;
+	border:1px solid #666666;
+	background:#35353a url(../../images/core/mws-dark-bg.png);
+	
+	/* CSS 3 */
+	
+	-webkit-border-radius:4px 0 0 0;
+	-moz-border-radius:4px 0 0 0;
+	-o-border-radius:4px 0 0 0;
+	-khtml-border-radius:4px 0 0 0;
+	border-radius:4px 0 0 0;
+}
+
+div#mws-themer #mws-themer-ribbon
+{
+	background:url(../../images/core/themer.png) no-repeat;
+	width:53px;
+	height:109px;
+	position:absolute;
+	left:4px;
+	top:-10px;
+}
+
+div#mws-themer #mws-themer-content .mws-themer-separator
+{
+	width:100%;
+	border-top:1px solid #323232;
+	border-bottom:1px solid #666666;
+}
+
+div#mws-themer #mws-themer-content .mws-themer-section
+{
+	margin:7px 0;
+	padding:0 12px;
+	display:block;
+}
+
+div#mws-themer #mws-themer-content ul, 
+div#mws-themer #mws-themer-content ul li
+{
+	margin:0;
+	list-style:none;
+}
+
+div#mws-themer #mws-themer-content ul li
+{
+	display:block;
+	margin:16px 0;
+	color:#ffffff;
+}
+
+div#mws-themer #mws-themer-content ul li span
+{
+	width:120px;
+	float:left;
+}
+
+div#mws-themer #mws-themer-content ul li ul
+{
+	display:block;
+	clear:both;
+}
+
+div#mws-themer #mws-themer-content ul li .mws-cp-trigger, 
+div#mws-themer #mws-themer-content ul li #mws-textglow-op, 
+div#mws-themer #mws-themer-content ul li #mws-theme-presets
+{
+	float:left;
+}
+
+div#mws-themer #mws-themer-content label
+{
+	color:#ffffff;
+}
+
+div#mws-themer #mws-themer-content #mws-theme-presets
+{
+	margin-left:8px;
+}
+
+div#mws-themer #mws-themer-content ul li #mws-textglow-op
+{
+	width:100px;
+	margin-top:6px;
+}
+
+div#mws-themer #mws-themer-content ul li .mws-cp-trigger
+{
+	width:15px;
+	height:15px;
+	border:1px solid #666666;
+	display:block;
+	background:#c5d52b;
+	cursor:pointer;
+}

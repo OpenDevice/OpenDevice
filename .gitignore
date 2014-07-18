@@ -1,0 +1,13 @@
+*.iml
+.classpath
+.project
+.settings/
+target/
+bin/
+/Workspace/
+/WorkspaceIDEA/
+/opendevice-unity/
+/IntelliHouse-DesktopServer/
+/openhouse-desktop-server/
+/OLD/
+/IntelliHouse-Android/

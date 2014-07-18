@@ -1,0 +1,1 @@
+Put this folder in: %USERPROFILE%\AppData\Local\Microsoft\Windows Sidebar\Gadgets

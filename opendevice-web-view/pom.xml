@@ -1,0 +1,166 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>br.com.criativasoft.opendevice</groupId>
+        <artifactId>opendevice-pom</artifactId>
+        <version>0.1.2-SNAPSHOT</version>
+    </parent>
+    
+	<artifactId>opendevice-web-view</artifactId>
+	<packaging>jar</packaging>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/webapp</directory>
+				<targetPath>webapp</targetPath>
+			</resource>
+		</resources>
+
+		<plugins>
+		    
+		    
+<!-- 			<plugin> -->
+<!-- 				<groupId>com.samaxes.maven</groupId> -->
+<!-- 				<artifactId>minify-maven-plugin</artifactId> -->
+<!-- 				<version>1.7</version> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<id>default-minify</id> -->
+<!-- 						<phase>process-resources</phase> -->
+<!-- 						<configuration> -->
+<!-- 						    <cssFinalFile>style-min.css</cssFinalFile> -->
+<!-- 						    <cssSourceDir>css</cssSourceDir> -->
+<!-- 							<cssSourceIncludes> -->
+<!-- 								<cssSourceInclude>**/styles/**</cssSourceInclude> -->
+<!-- 							</cssSourceIncludes> -->
+<!-- 	 						<cssSourceExcludes> -->
+<!-- 		                		<cssSourceExclude>**/jquery.ui.theme.css</cssSourceExclude> -->
+<!-- 		                		<cssSourceExclude>**/jquery.ui.base.css</cssSourceExclude> -->
+<!-- 	              			</cssSourceExcludes> -->
+<!-- 							<cssSourceFiles> -->
+<!-- 								<cssSourceFile>webapp/css/jui/styles/jquery.ui.accordion.css</cssSourceFile> -->
+<!-- 								<cssSourceFile>css/jui/styles/jquery.ui.accordion.css</cssSourceFile> -->
+<!-- 							</cssSourceFiles> -->
+<!-- 						</configuration> -->
+<!-- 						<goals> -->
+<!-- 							<goal>minify</goal> -->
+<!-- 						</goals> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
+<!-- 		</plugins> -->
+
+			<!-- RUN: yuicompressor:compress -->
+			<plugin>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>yuicompressor-maven-plugin</artifactId>
+				<version>1.3.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compress</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+<!-- 					<skip>true</skip> -->
+					<excludes>
+						<exclude>*/*</exclude>
+					</excludes>
+					<force>true</force>
+					<nosuffix>true</nosuffix>
+					<aggregations>
+						<!-- <aggregation> -->
+						<!-- <insertNewLine>true</insertNewLine> -->
+						<!-- <output>${project.basedir}/src/main/webapp/js/all.js</output> -->
+						<!-- <includes> -->
+						<!-- <include>${project.build.directory}/classes/js/file1.js</include> -->
+						<!-- <include>${project.build.directory}/classes/js/file2.js</include> -->
+						<!-- </aggregation> -->
+						
+<!-- 						<aggregation> -->
+<!-- 							<insertNewLine>true</insertNewLine> -->
+<!-- 							<output>${project.basedir}/src/main/webapp/css/jui/jquery.ui-all-min.css</output> -->
+<!-- 							<includes> -->
+<!-- 								<include>**/jui/styles/*.css</include> -->
+<!-- 								<include>${project.build.directory}/classes/webapp/css/jui/styles/jquery.ui.core.css</include> -->
+<!-- 								<include>${project.build.directory}/classes/webapp/css/jui/styles/jquery.ui.resizable.css</include> -->
+<!-- 								<include>${project.build.directory}/classes/webapp/css/jui/styles/jquery.ui.accordion.css</include> -->
+<!-- 								<include>${project.build.directory}/classes/webapp/css/jui/styles/jquery.ui.autocomplete.css</include> -->
+<!-- 								<include>${project.build.directory}/classes/webapp/css/jui/styles/jquery.ui.dialog.css</include> -->
+<!-- 								<include>${project.build.directory}/classes/webapp/css/jui/styles/jquery.ui.slider.css</include> -->
+<!-- 								<include>${project.build.directory}/classes/webapp/css/jui/styles/jquery.ui.tabs.css</include> -->
+<!-- 								<include>${project.build.directory}/classes/webapp/css/jui/styles/jquery.ui.datepicker.css</include> -->
+<!-- 								<include>${project.build.directory}/classes/webapp/css/jui/styles/jquery.ui.progressbar.css</include> -->
+<!-- 							</includes> -->
+							
+<!-- 						</aggregation> -->
+						
+						<aggregation>
+							<insertNewLine>true</insertNewLine>
+							<output>${project.basedir}/src/main/webapp/css/core/mws.styles-all-min.css</output>
+							<includes>
+<!-- 								<include>**/jui/styles/*.css</include> -->
+								<include>${project.build.directory}/classes/webapp/css/core/button.css</include>
+								<include>${project.build.directory}/classes/webapp/css/core/core.css</include>
+								<include>${project.build.directory}/classes/webapp/css/core/panels.css</include>
+								<include>${project.build.directory}/classes/webapp/css/core/report.css</include>
+								<include>${project.build.directory}/classes/webapp/css/core/misc.css</include>
+								<include>${project.build.directory}/classes/webapp/css/core/themer.css</include>
+								
+							</includes>
+							
+						</aggregation>						
+					</aggregations>
+				</configuration>
+			</plugin>
+        </plugins>
+
+		<pluginManagement>
+			<plugins>
+				<!-- This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>com.samaxes.maven</groupId>
+										<artifactId>minify-maven-plugin</artifactId>
+										<versionRange>[1.7,)</versionRange>
+										<goals>
+											<goal>minify</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>net.alchim31.maven</groupId>
+										<artifactId>yuicompressor-maven-plugin</artifactId>
+										<versionRange>[1.3,)</versionRange>
+										<goals>
+											<goal>compress</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>

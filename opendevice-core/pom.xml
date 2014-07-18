@@ -1,0 +1,84 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>br.com.criativasoft.opendevice</groupId>
+        <artifactId>opendevice-pom</artifactId>
+        <version>0.1.2-SNAPSHOT</version>
+    </parent>
+
+	<artifactId>opendevice-core</artifactId>
+    <packaging>pom</packaging>
+
+    <name>opendevice-core</name>
+
+	<distributionManagement>
+		<repository>
+			<id>criativasoft-ftp</id>
+			<url>sftp://criativasoft.com.br/home/mavenpublic/maven2</url>
+		</repository>
+	</distributionManagement>
+
+	<developers>
+		<developer>
+			<id>ricardojlrufino</id>
+			<name>Ricardo JL Rufino</name>
+			<email>ricardo.jl.rufino@gmail.com</email>
+		</developer>
+	</developers>
+
+	<dependencies>
+			
+		<dependency>
+			<groupId>br.com.criativasoft.opendevice</groupId>
+			<artifactId>opendevice-connection-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.3.3</version>
+        </dependency>
+
+        <dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.6.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+
+	<build>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+
+		</plugins>
+
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>2.4</version>
+			</extension>
+		</extensions>
+	</build>
+</project>

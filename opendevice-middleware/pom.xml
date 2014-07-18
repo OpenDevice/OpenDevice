@@ -1,0 +1,274 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>br.com.criativasoft.opendevice</groupId>
+        <artifactId>opendevice-pom</artifactId>
+        <version>0.1.2-SNAPSHOT</version>
+    </parent>
+
+	<artifactId>opendevice-middleware</artifactId>
+	<packaging>jar</packaging>
+	<url>https://github.com/CriativaSoft</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+	<profiles>
+
+		<profile>
+			<id>build-android-compined</id>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>2.1</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+								<configuration>
+									<shadedArtifactAttached>true</shadedArtifactAttached>
+<!-- 									<minimizeJar>true</minimizeJar> -->
+									<shadedClassifierName>combined</shadedClassifierName>
+									<artifactSet>
+										<excludes>
+											<exclude>log4j:log4j:jar:</exclude>
+											<exclude>org.slf4j:slf4j-api</exclude>
+											<exclude>org.slf4j:slf4j-log4j12</exclude>
+											<exclude>net.sf.bluecove:*</exclude>
+											<exclude>com.strategicgains:*</exclude>
+<!-- 											<exclude>com.fasterxml.jackson.core:jackson-databind:jar:</exclude> -->
+<!-- 											<exclude>com.fasterxml.jackson.core:jackson-annotations:jar:</exclude> -->
+<!-- 											<exclude>com.fasterxml.jackson.core:*</exclude> -->
+											<exclude>com.thoughtworks.xstream:*</exclude>
+<!-- 											<exclude>br.com.criativasoft:arduino-connection</exclude> -->
+											<!-- <exclude>br.com.criativasoft:opendevice-api</exclude> -->
+										</excludes>
+									</artifactSet>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+
+			</build>
+		</profile>
+
+		<profile>
+			<id>build-standalone</id>
+			<build>
+				<finalName>opendevice-server</finalName>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>2.3</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+								<configuration>
+									<shadedArtifactAttached>true</shadedArtifactAttached>
+									<!-- <shadedClassifierName>combined</shadedClassifierName> -->
+									<!-- <promoteTransitiveDependencies>true</promoteTransitiveDependencies> -->
+									<finalName>${project.artifactId}-standalone</finalName>
+									<transformers>
+										<transformer
+											implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+											<mainClass>br.com.criativasoft.opendevice.server.Main</mainClass>
+										</transformer>
+									</transformers>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>br.com.criativasoft.opendevice</groupId>
+			<artifactId>opendevice-core</artifactId>
+			<version>${opendevice-version}</version>
+		</dependency>
+
+        <dependency>
+            <groupId>br.com.criativasoft.opendevice</groupId>
+            <artifactId>opendevice-atmosphere-server</artifactId>
+            <version>${opendevice-version}</version>
+        </dependency>
+
+        <dependency>
+			<groupId>br.com.criativasoft.opendevice</groupId>
+			<artifactId>opendevice-connection-stream</artifactId>
+            <version>${opendevice-version}</version>
+		</dependency>
+
+        <dependency>
+            <groupId>br.com.criativasoft.opendevice</groupId>
+            <artifactId>opendevice-web-view</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!--<dependency>-->
+            <!--<groupId>br.com.criativasoft.opendevice</groupId>-->
+            <!--<artifactId>opendevice-connection-rest</artifactId>-->
+            <!--<version>${opendevice-version}</version>-->
+            <!--&lt;!&ndash; Evict conflicts with Socket.IO &ndash;&gt;-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>jackson-core</artifactId>-->
+                    <!--<groupId>com.fasterxml.jackson.core</groupId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>jackson-databind</artifactId>-->
+                    <!--<groupId>com.fasterxml.jackson.core</groupId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>jackson-annotations</artifactId>-->
+                    <!--<groupId>com.fasterxml.jackson.core</groupId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        <!--</dependency>-->
+
+
+        <!-- arduino-connection DEPENDENCES: TODO: remover foi colocado pq o shade, não colocava dentro do JAR final -->
+		<dependency>
+			<groupId>net.sf.bluecove</groupId>
+			<artifactId>bluecove</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sf.bluecove</groupId>
+			<artifactId>bluecove-gpl</artifactId>
+			<version>2.1.0</version>
+		</dependency>	
+		<!-- //END:arduino-connection DEPENDENCE  -->	
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<finalName>opendevice-server</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<mainClass>br.com.criativasoft.opendevice.server.Main</mainClass>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.3</version>
+				<configuration>
+					<webResources>
+						<resource>
+							<!-- this is relative to the pom.xml directory -->
+							<directory>/media/Ricardo/Codigos/Java/Projetos/opendevice/opensourse-web-view</directory>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
+
+			<!-- <plugin> -->
+			<!-- <artifactId>maven-assembly-plugin</artifactId> -->
+			<!-- <configuration> -->
+			<!-- <archive> -->
+			<!-- <manifest> -->
+			<!-- <mainClass>br.com.criativasoft.opendevice.server.Main</mainClass> -->
+			<!-- </manifest> -->
+			<!-- </archive> -->
+			<!-- <descriptors> -->
+			<!-- <descriptor>src/main/resources/view-assembly.xml</descriptor> -->
+			<!-- </descriptors> -->
+			<!-- <descriptorRefs> -->
+			<!-- <descriptorRef>jar-with-dependencies</descriptorRef> -->
+			<!-- </descriptorRefs> -->
+			<!-- </configuration> -->
+			<!-- <executions> -->
+			<!-- <execution> -->
+			<!-- <id>make-assembly</id> this is used for inheritance merges -->
+			<!-- <phase>package</phase> bind to the packaging phase -->
+			<!-- <goals> -->
+			<!-- <goal>single</goal> -->
+			<!-- </goals> -->
+			<!-- </execution> -->
+			<!-- </executions> -->
+			<!-- </plugin> -->
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>wagon-maven-plugin</artifactId>
+				<version>1.0-beta-4</version>
+				<executions>
+					<execution>
+						<id>default-cli</id>
+						<goals>
+							<goal>upload-single</goal>
+						</goals>
+						<configuration>
+							<fromFile>${project.build.directory}/${project.artifactId}-standalone.jar</fromFile>
+							<toFile>${project.artifactId}-standalone.jar</toFile>
+							<url>scp://ec2-user@ec2-54-242-64-153.compute-1.amazonaws.com:/home/ec2-user</url>
+							<serverId>amazom</serverId>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
+		</plugins>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>2.4</version>
+			</extension>
+		</extensions>
+	</build>
+</project>

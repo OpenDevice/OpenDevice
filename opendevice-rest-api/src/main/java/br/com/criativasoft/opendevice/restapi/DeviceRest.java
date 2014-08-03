@@ -15,10 +15,7 @@ package br.com.criativasoft.opendevice.restapi;
 
 
 import br.com.criativasoft.opendevice.connection.DeviceConnection;
-import br.com.criativasoft.opendevice.core.command.CommandType;
-import br.com.criativasoft.opendevice.core.command.DeviceCommand;
-import br.com.criativasoft.opendevice.core.command.ResponseCommand;
-import br.com.criativasoft.opendevice.core.command.ResponseCommandStatus;
+import br.com.criativasoft.opendevice.core.command.*;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceVO;
 import br.com.criativasoft.opendevice.core.model.DeviceCategory;
 import br.com.criativasoft.opendevice.core.model.DeviceType;
@@ -60,7 +57,7 @@ public class DeviceRest implements DeviceService {
         connection.notifyListeners(command);
 
         String connectionUUID = ""; // this resource
-        ResponseCommand response = new ResponseCommand(command.getType(), connectionUUID, ResponseCommandStatus.SUCCESS);
+        ResponseCommand response = new ResponseCommand(CommandStatus.DELIVERED, connectionUUID);
 
         return response;
     }
@@ -84,10 +81,10 @@ public class DeviceRest implements DeviceService {
     @Produces(MediaType.APPLICATION_JSON)
     public List<DeviceVO> list(){
 
-        DeviceVO device1 = new DeviceVO(1,"Device 1", DeviceType.DIGITAL, DeviceCategory.LAMP, 1);
+        DeviceVO device1 = new DeviceVO(1,"Device 1", DeviceType.DIGITAL, DeviceCategory.LAMP, 0);
         DeviceVO device2 = new DeviceVO(2,"Device 2", DeviceType.DIGITAL, DeviceCategory.POWER_SOURCE, 0);
         DeviceVO device3 = new DeviceVO(3,"Device 3", DeviceType.DIGITAL, DeviceCategory.LAMP, 0);
-        DeviceVO device4 = new DeviceVO(4,"Device 4", DeviceType.DIGITAL, DeviceCategory.POWER_SOURCE, 1);
+        DeviceVO device4 = new DeviceVO(4,"Device 4", DeviceType.DIGITAL, DeviceCategory.POWER_SOURCE, 0);
 
         List<DeviceVO> devices = new LinkedList<DeviceVO>();
         devices.add(device1);

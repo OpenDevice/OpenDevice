@@ -16,6 +16,7 @@
 
     <modules>
         <module>opendevice-atmosphere-server</module>
+        <module>opendevice-nanohttp-server</module>
         <!--<module>opendevice-rest-server</module> &lt;!&ndash; real implementation: opendevice-atmosphere-server &ndash;&gt;-->
         <!--<module>opendevice-websocket-server</module> &lt;!&ndash; real implementation: opendevice-atmosphere-server &ndash;&gt;-->
     </modules>

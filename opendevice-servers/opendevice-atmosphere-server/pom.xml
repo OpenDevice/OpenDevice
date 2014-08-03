@@ -5,7 +5,7 @@
 
     <parent>
         <groupId>br.com.criativasoft.opendevice</groupId>
-        <artifactId>opendevice-connection</artifactId>
+        <artifactId>opendevice-servers</artifactId>
         <version>0.1.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -15,7 +15,7 @@
     <properties>
         <jersey-version>1.18.1</jersey-version>
         <jaxb-version>2.1</jaxb-version>
-        <nettosphere-version>2.2.0-SNAPSHOT</nettosphere-version>
+        <nettosphere-version>2.2.0-RC1</nettosphere-version>
         <atmosphere-version>2.2.0-SNAPSHOT</atmosphere-version>
         <wasync-version>1.4.0-SNAPSHOT</wasync-version>
     </properties>

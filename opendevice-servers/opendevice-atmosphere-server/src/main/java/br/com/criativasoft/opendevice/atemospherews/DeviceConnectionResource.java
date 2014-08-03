@@ -15,12 +15,11 @@ package br.com.criativasoft.opendevice.atemospherews;
 
 import br.com.criativasoft.opendevice.atemospherews.io.EventsLogger;
 import br.com.criativasoft.opendevice.connection.DeviceConnection;
-import br.com.criativasoft.opendevice.core.command.CommandType;
-import br.com.criativasoft.opendevice.core.command.DeviceCommand;
+import br.com.criativasoft.opendevice.core.command.Command;
+import br.com.criativasoft.opendevice.core.command.CommandStatus;
 import br.com.criativasoft.opendevice.core.command.ResponseCommand;
-import br.com.criativasoft.opendevice.core.command.ResponseCommandStatus;
-import br.com.criativasoft.opendevice.core.metamodel.CommandVO;
 import org.atmosphere.annotation.Suspend;
+import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.Broadcaster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
 
 /**
  * TODO: PENDING DOC
@@ -45,6 +43,8 @@ public class DeviceConnectionResource {
 
     private @PathParam("topic") Broadcaster topic;
 
+    private @Context AtmosphereResource resource;
+
     @Inject
     private DeviceConnection connection;
 
@@ -58,48 +58,23 @@ public class DeviceConnectionResource {
     @POST
     // @Broadcast(writeEntity = true)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseCommand publish(CommandVO params, @Context HttpHeaders headers) {
+    public ResponseCommand publish(Command command, @Context HttpHeaders headers) {
 
-        if(log.isTraceEnabled()) log.trace("Command receivend in {} -> {}", topic.getID(), params);
+        if(log.isTraceEnabled()) log.trace("Command receivend in topic:{} -> {}", topic.getID(), command);
 
-        // TODO: Verificar autenticação....
+        // TODO: Verificar autenticação.... (basicamente teve enviar um comando de AUTH com o Login, e isso é registrado com resource.uuid())
+        // Se não tiver autenticado a respota deve ser AuthRespose(subtype: AUTH_REQUIRED)
 
         ResponseCommand response = null;
 
         // Find caller ID.
-        String connectionUUID = null;
-        List<String> header = headers.getRequestHeader("connectionUUID");
-        if(header == null || header.isEmpty()){
-            header = headers.getRequestHeader("X-Atmosphere-tracking-id");
-        }
-        if(header!= null && !header.isEmpty()) connectionUUID = header.iterator().next();
+        if(command.getConnectionUUID() == null)   command.setConnectionUUID(resource.uuid());
+        command.setClientID(topic.getID()); // This is APPLICATION ID TOKEN !
 
-        // not found in header
-        if(connectionUUID == null || connectionUUID.length() == 0 || connectionUUID.equals("0")){
-            connectionUUID = params.getConnectionUUID();
-        }
-
-        System.out.println(" >> connectionUUID =" + connectionUUID);
-
-        CommandType type = CommandType.getByCode(params.getType());
-
-        if(CommandType.isDeviceCommand(type)){
-            long value = Long.parseLong(params.getValue());
-            DeviceCommand command = new DeviceCommand(type, params.getDeviceID(), value);
-            command.setConnectionUUID(connectionUUID);
-            command.setClientID(topic.getID());
-
-            connection.notifyListeners(command); // broadcast to all clients (browser/android/desktop)
-
-            response = new ResponseCommand(type, connectionUUID, ResponseCommandStatus.SUCCESS);
-        }
-
-        System.out.println("CommandParams = " + params);
-
-        response=  new ResponseCommand(type, connectionUUID, ResponseCommandStatus.NOT_IMPLEMENTED);
+        connection.notifyListeners(command); // broadcast to all clients (browser/android/desktop)
 
         // return new Broadcastable(params, response, topic);
-        return response;
+        return  new ResponseCommand(CommandStatus.DELIVERED,  command.getConnectionUUID());
     }
 
 //    @POST

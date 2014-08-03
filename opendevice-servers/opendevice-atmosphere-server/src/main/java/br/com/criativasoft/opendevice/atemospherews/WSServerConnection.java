@@ -222,7 +222,7 @@ public class WSServerConnection extends AbstractConnection implements Atmosphere
 
                 // Don't broadcast to yourself
                 if(!atmosphereResource.uuid().equals(cmd.getConnectionUUID())){
-                    System.out.println("BroadCast" + atmosphereResource.uuid());
+                    System.out.println("BroadCast to -> " + atmosphereResource.uuid());
                     broadcaster.broadcast(message, atmosphereResource);
                 }
 

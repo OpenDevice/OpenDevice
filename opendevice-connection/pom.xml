@@ -2,27 +2,19 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+    <artifactId>opendevice-connection</artifactId>
+    <packaging>pom</packaging>
+
     <parent>
         <groupId>br.com.criativasoft.opendevice</groupId>
         <artifactId>opendevice-pom</artifactId>
         <version>0.1.2-SNAPSHOT</version>
     </parent>
 
-	<artifactId>opendevice-connection</artifactId>
-	<packaging>pom</packaging>
-
-	<name>opendevice-connection</name>
-	<url>https://github.com/CriativaSoft/opendevice-connection</url>
-
 	<modules>
 		<module>opendevice-connection-api</module>
 		<module>opendevice-connection-stream</module>
 		<module>opendevice-connection-samples</module>
-		<!--<module>opendevice-connection-lighthttp</module>-->
-		<!--<module>opendevice-connection-socketio</module>-->
-        <!--<module>opendevice-connection-rest</module>-->
-        <!--<module>opendevice-connection-atmospherews</module>-->
-        <!--<module>../opendevice-connectio/opendevice-connection-webclient</module>-->
     </modules>
 
 	<build>
@@ -69,7 +61,6 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>1.6.1</version>
 		</dependency>
-
 
         <dependency>
             <groupId>org.slf4j</groupId>

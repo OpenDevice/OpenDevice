@@ -21,6 +21,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.Socket;
 
+/**
+ * TCP Socket bases connection
+ */
 public class TCPConnection extends AbstractStreamConnection{
 	
 	private static final Logger log = LoggerFactory.getLogger(TCPConnection.class);
@@ -28,7 +31,10 @@ public class TCPConnection extends AbstractStreamConnection{
 	private String deviceURI;
 
     private Socket connection;
-	
+
+    /**
+     * @param deviceURI - (Ex.: 192.168.0.101:1234)
+     */
 	public TCPConnection(String deviceURI) {
 		super();
         this.deviceURI = deviceURI;

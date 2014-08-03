@@ -22,11 +22,11 @@
 			<version>${project.version}</version>
 		</dependency>
 
-        <dependency>
-            <groupId>br.com.criativasoft.opendevice</groupId>
-            <artifactId>opendevice-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>br.com.criativasoft.opendevice</groupId>-->
+            <!--<artifactId>opendevice-core</artifactId>-->
+            <!--<version>${project.version}</version>-->
+        <!--</dependency>-->
 
 		<dependency>
 			<groupId>org.slf4j</groupId>

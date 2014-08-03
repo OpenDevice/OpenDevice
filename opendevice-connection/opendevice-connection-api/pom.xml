@@ -9,16 +9,4 @@
         <version>0.1.2-SNAPSHOT</version>
     </parent>
 
-
-    <distributionManagement>
-        <repository>
-            <id>criativa-github-releases</id>
-            <url>https://github.com/CriativaSoft/maven-repo/raw/master/releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>criativa-github-snapshots</id>
-            <url>https://github.com/CriativaSoft/maven-repo/raw/master/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-
 </project>

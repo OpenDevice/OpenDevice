@@ -36,7 +36,7 @@ public class OnOffController  implements ConnectionListener {
 		// connection = StreamConnectionFactory.createUsb("/dev/ttyACM0"); //
 		
 		//USE: samples/arduino/BluetoothConnection
-		connection = StreamConnectionFactory.createBluetooth("20:13:01:24:01:93");
+		// connection = StreamConnectionFactory.createBluetooth("20:13:01:24:01:93");
 
 
 		connection.addListener(this);

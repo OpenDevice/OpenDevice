@@ -22,24 +22,22 @@ public class ResponseCommand extends Command {
 	
 	private static final long serialVersionUID = 1891204618345540528L;
 	
-	private ResponseCommandStatus statusReponse = ResponseCommandStatus.SUCCESS;
-
     public ResponseCommand(){
         super(CommandType.DEVICE_COMMAND_RESPONSE);
     }
 
-	public ResponseCommand(CommandType type, String connectionUUID) {
-		this(type, connectionUUID, null);
-	}
-	
-	public ResponseCommand(CommandType type, String connectionUUID, ResponseCommandStatus statusReponse) {
-		super(type, UUID.randomUUID().toString(), connectionUUID);
-		this.statusReponse = statusReponse;
-	}
-	
-	public ResponseCommandStatus getStatusReponse() {
-		return statusReponse;
+	public ResponseCommand(CommandStatus status) {
+		this(CommandType.DEVICE_COMMAND_RESPONSE, status, null);
 	}
 
+    public ResponseCommand(CommandStatus status, String connectionUUID) {
+        this(CommandType.DEVICE_COMMAND_RESPONSE, status, connectionUUID);
+    }
+	
+	public ResponseCommand(CommandType type, CommandStatus status, String connectionUUID) {
+		super(type, UUID.randomUUID().toString(), connectionUUID);
+		this.setStatus(status);
+	}
+	
 
 }

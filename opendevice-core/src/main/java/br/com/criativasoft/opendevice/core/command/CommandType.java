@@ -67,6 +67,9 @@ public enum CommandType implements EnumCode {
 	}
 
     public static final boolean isDeviceCommand(CommandType type){
+
+        if(type == null) return false;
+
         switch (type) {
             case ON_OFF:
                 return true;

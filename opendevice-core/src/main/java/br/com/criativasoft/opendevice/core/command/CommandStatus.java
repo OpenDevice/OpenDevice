@@ -13,8 +13,34 @@
 
 package br.com.criativasoft.opendevice.core.command;
 
-public enum CommandStatus {
+import br.com.criativasoft.opendevice.core.metamodel.EnumCode;
+
+public enum CommandStatus implements EnumCode {
 	
-	CREATED, DELIVERED, RECEIVED, FAIL
+	CREATED(1), DELIVERED(2), RECEIVED(3), FAIL(4);
+
+    private int code;
+
+    /**
+     * @param code - Device type code. MAX 127.
+     */
+    private CommandStatus(int code) {
+        this.code = (byte) code;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public static CommandStatus getByCode(int code){
+        EnumCode[] values = CommandStatus.values();
+        for (EnumCode enumCode : values) {
+            if(enumCode.getCode() == code){
+                return (CommandStatus) enumCode;
+            }
+        }
+
+        return null;
+    }
 
 }

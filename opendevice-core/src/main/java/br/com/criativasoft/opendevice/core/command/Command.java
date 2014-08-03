@@ -36,7 +36,11 @@ public abstract class Command implements Message{
 	private CommandType type;
 	private Date timestamp;
 	private CommandStatus status = CommandStatus.CREATED;
-	
+
+    public Command() {
+        this(CommandType.ON_OFF, UUID.randomUUID().toString(), null);
+    }
+
 	public Command(CommandType type) {
 		this(type, UUID.randomUUID().toString(), null);
 	}

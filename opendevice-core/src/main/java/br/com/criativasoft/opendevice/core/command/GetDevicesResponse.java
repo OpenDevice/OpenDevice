@@ -26,7 +26,7 @@ public class GetDevicesResponse extends ResponseCommand {
 	private static final long serialVersionUID = -1023397181880070237L;
 
 	public GetDevicesResponse(Collection<Device> devices, String connectionUUID) {
-		super(TYPE, connectionUUID);
+		super(TYPE, CommandStatus.CREATED, connectionUUID);
 		this.devices = devices;
 	}
 

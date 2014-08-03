@@ -51,7 +51,7 @@ public class CommandFactory {
 			String id = split[1];
 			int status = Integer.parseInt(split[3]);	// Command.value
 			
-			command = new ResponseCommand(type, id, ResponseCommandStatus.getByCode(status));
+			command = new ResponseCommand(CommandStatus.getByCode(status)); // TODO: pode ser necessário o connection UUID
 
         // Received: GET_DEVICES_RESPONSE;ID;[ID, PIN, VALUE, TARGET, SENSOR?, TYPE];[ID, PIN, VALUE, TARGET, SENSOR?, TYPE];....
         }else if(type == CommandType.GET_DEVICES_RESPONSE){ // Returned list of devices.

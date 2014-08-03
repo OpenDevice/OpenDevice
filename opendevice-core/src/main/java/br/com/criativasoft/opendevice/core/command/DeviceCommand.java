@@ -14,6 +14,10 @@
 package br.com.criativasoft.opendevice.core.command;
 
 public class DeviceCommand extends Command {
+
+    public DeviceCommand(){
+        super();
+    }
 	
 	public DeviceCommand(CommandType type, int deviceID, long value) {
 		super(type);

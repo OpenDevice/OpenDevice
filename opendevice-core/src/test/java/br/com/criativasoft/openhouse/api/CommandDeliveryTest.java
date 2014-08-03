@@ -6,10 +6,7 @@ import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.core.CommandDelivery;
-import br.com.criativasoft.opendevice.core.command.Command;
-import br.com.criativasoft.opendevice.core.command.CommandType;
-import br.com.criativasoft.opendevice.core.command.DeviceCommand;
-import br.com.criativasoft.opendevice.core.command.ResponseCommand;
+import br.com.criativasoft.opendevice.core.command.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +82,7 @@ public class CommandDeliveryTest {
 						
 						log.debug("wait finish: " + message);
 						
-						ResponseCommand responseCommand = new ResponseCommand(CommandType.DEVICE_COMMAND_RESPONSE, command.getConnectionUUID());
+						ResponseCommand responseCommand = new ResponseCommand(CommandStatus.RECEIVED, command.getConnectionUUID());
 						
 						notifyListeners(responseCommand);
 						

@@ -15,16 +15,11 @@ package br.com.criativasoft.opendevice.core.json;
 
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.CommandType;
-import br.com.criativasoft.opendevice.core.command.GetDevicesCommand;
-import br.com.criativasoft.opendevice.core.command.ResponseCommand;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Jackson Configuration for Commands
@@ -51,14 +46,23 @@ public class CommandJacksonMapper  {
             module.addDeserializer(CommandType.class, new EnumCodeDeserialize.CommandTypeDeserialize());
             mapper.registerModule(module);
 
-            List<Class<? extends  Command>> classList = new ArrayList<Class<? extends Command>>();
-            classList.add(Command.class);
-            classList.add(ResponseCommand.class);
-            classList.add(GetDevicesCommand.class);
+            module.addDeserializer(Command.class, new CommandDeserialize());
 
-            for (Class<? extends Command> aClass : classList) {
-                mapper.addMixInAnnotations(aClass, JsonCommand.class);
-            }
+            //mapper.enableDefaultTyping();
+            //mapper.setDefaultTyping(new ObjectMapper.DefaultTypeResolverBuilder());
+
+
+//
+//            List<Class<? extends  Command>> classList = new ArrayList<Class<? extends Command>>();
+//            classList.add(Command.class);
+//            classList.add(ResponseCommand.class);
+//            classList.add(GetDevicesCommand.class);
+//
+//            for (Class<? extends Command> aClass : classList) {
+//                mapper.addMixInAnnotations(aClass, JsonCommand.class);
+//            }
+
+
             //mapper.getSubtypeResolver().registerSubtypes(new NamedType());
         }
         return mapper;

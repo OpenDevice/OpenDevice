@@ -122,9 +122,11 @@ od.DeviceConnection = function(config){
     };
 
     this.send = function(data){
-        // FIX: bug no atmophera que não enviar os headers da primeira conexao // TODO: registrar ticket
+        // FIX: bug no atmophere que não enviar os headers da primeira conexao // TODO: registrar ticket
         // Somente na re-conexao ele passa a enviar...
-        data["connectionUUID"] = serverConnection.getUUID();
+        // NOTA: Isso já foi RESOLVIDO! injetando o "@Context AtmosphereResource", mas de qualquer maneira continua
+        // existindo esse problema no atmophere
+        // data["connectionUUID"] = serverConnection.getUUID();
 
         serverConnection.push(JSON.stringify(data));
 

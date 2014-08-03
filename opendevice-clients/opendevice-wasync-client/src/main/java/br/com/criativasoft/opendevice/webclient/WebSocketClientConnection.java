@@ -18,8 +18,13 @@ import br.com.criativasoft.opendevice.connection.ConnectionStatus;
 import br.com.criativasoft.opendevice.connection.ReconnectionSupport;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
+import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.webclient.io.CommandEncoderDecoder;
 import org.atmosphere.wasync.*;
+import org.atmosphere.wasync.impl.DefaultOptions;
+import org.atmosphere.wasync.impl.DefaultOptionsBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -31,6 +36,9 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
 
     private String url;
     private Socket connection;
+    private RequestBuilder request;
+
+    private static final Logger log = LoggerFactory.getLogger(WebSocketClientConnection.class);
 
     public WebSocketClientConnection(String url) {
         this.url = url;
@@ -40,15 +48,14 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
     public void connect() throws ConnectionException {
         try {
             log.debug("connecting...");
+
             if(!isConnected()){
 
                 initConnection(); // Setup
 
-                // server.start();
-                log.debug("internal socket server [ok]");
+                connection.open(request.build());
 
-                setStatus(ConnectionStatus.CONNECTED);
-
+                // setStatus(ConnectionStatus.CONNECTED); NOTE: is fired in Events
 
             }
 
@@ -71,14 +78,20 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
 
     @Override
     public void disconnect() throws ConnectionException {
-        log.debug("disconnecting... (isConnected: + "+isConnected()+")");
+        log.debug("disconnecting... (isConnected: "+isConnected()+")");
 
-        if(connection != null && isConnected()){
-            connection.close();  // will fire event on 'conection'
+        if(isConnected()){
+            connection.close();  // will fire event CLOSE on 'wrapped connection'
             setStatus(ConnectionStatus.DISCONNECTING);
         }else{ // set 'disconnected' in case of previous connection fail.
             setStatus(ConnectionStatus.DISCONNECTED);
+            // connection = null;
         }
+    }
+
+    @Override
+    public boolean isConnected() {
+        return connection != null && (connection.status() == Socket.STATUS.OPEN || connection.status() == Socket.STATUS.REOPENED);
     }
 
     @Override
@@ -95,20 +108,24 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
             // AtmosphereClient client = ClientFactory.getDefault().newClient(AtmosphereClient.class);
             Client client = ClientFactory.getDefault().newClient();
 
-            RequestBuilder request = client.newRequestBuilder()
+            request = client.newRequestBuilder()
                     .method(Request.METHOD.GET)
                     .uri(url)
                     // .trackMessageLength(true)
-                    .transport(Request.TRANSPORT.WEBSOCKET);
+                    .transport(Request.TRANSPORT.WEBSOCKET)
+                    .transport(Request.TRANSPORT.LONG_POLLING);
 
             CommandEncoderDecoder jacksonSerializer = new CommandEncoderDecoder();
             request.encoder(jacksonSerializer);
             request.decoder(jacksonSerializer);
 
-            connection = client.create();
-            initEvents(connection);
-            connection.open(request.build());
+            OptionsBuilder<DefaultOptions, DefaultOptionsBuilder> clientOptions = client.newOptionsBuilder()
+                    .reconnect(true)
+                    .reconnectAttempts(10)
+                    .pauseBeforeReconnectInSeconds(5);
 
+            connection = client.create(clientOptions.build());
+            initEvents(connection);
         }
     }
 
@@ -116,19 +133,31 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
 
         connection.on(Event.CLOSE, new Function<String>() {
             public void on(String t) {
-                setStatus(ConnectionStatus.DISCONNECTED);
+                try {
+                    disconnect();
+                } catch (ConnectionException e) {}
             }
-        }).on(Event.REOPENED, new Function<String>() {
+        });
+        connection.on(Event.REOPENED, new Function<String>() {
             public void on(String t) {
                 setStatus(ConnectionStatus.CONNECTED);
             }
-        }).on(new Function<IOException>() {
+        });
+        connection.on(Event.OPEN, new Function<String>() {
+            public void on(String t) {
+                setStatus(ConnectionStatus.CONNECTED);
+            }
+        });
+
+        connection.on(new Function<IOException>() {
             public void on(IOException ioe) {
                 ioe.printStackTrace();
             }
-        }).on(Event.OPEN, new Function<String>() {
-            public void on(String t) {
-                setStatus(ConnectionStatus.CONNECTED);
+        });
+
+        connection.on(Event.MESSAGE, new Function<Command>() {
+            public void on(Command cmd) {
+                notifyListeners(cmd);
             }
         });
     }

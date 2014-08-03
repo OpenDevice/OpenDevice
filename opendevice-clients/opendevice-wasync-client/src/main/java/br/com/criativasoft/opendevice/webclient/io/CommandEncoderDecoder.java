@@ -14,9 +14,7 @@
 package br.com.criativasoft.opendevice.webclient.io;
 
 import br.com.criativasoft.opendevice.core.command.Command;
-import br.com.criativasoft.opendevice.core.command.DeviceCommand;
 import br.com.criativasoft.opendevice.core.json.CommandJacksonMapper;
-import br.com.criativasoft.opendevice.core.metamodel.CommandVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.wasync.Decoder;
 import org.atmosphere.wasync.Encoder;
@@ -49,13 +47,14 @@ public class CommandEncoderDecoder implements Encoder<Command, String>, Decoder<
 
         System.out.println("e = " + e + " -> " + s);
 
-//        if(e == Event.MESSAGE){
-//            try {
-//                return getMapper().readValue(s, Command.class);
-//            } catch (IOException e1) {
-//                e1.printStackTrace();
-//            }
-//        }
+        if(e == Event.MESSAGE){
+            try {
+                Command command = getMapper().readValue(s, Command.class);
+                return command;
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
 
         return null;
     }
@@ -63,14 +62,8 @@ public class CommandEncoderDecoder implements Encoder<Command, String>, Decoder<
     @Override
     public String encode(Command cmd) {
 
-        CommandVO vo = new CommandVO();
-        DeviceCommand deviceCommand = (DeviceCommand) cmd;
-        vo.setDeviceID(deviceCommand.getDeviceID());
-        vo.setValue(""+deviceCommand.getValue());
-        vo.setType(deviceCommand.getType().getCode());
-
         try {
-            return getMapper().writeValueAsString(vo);
+            return getMapper().writeValueAsString(cmd);
         } catch (IOException e) {
             e.printStackTrace();
         }

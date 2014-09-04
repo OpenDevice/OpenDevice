@@ -56,7 +56,7 @@ public class DeviceRest implements DeviceService {
         command.setClientID(clientUUID);
         connection.notifyListeners(command);
 
-        String connectionUUID = ""; // this resource
+        String connectionUUID = connection.getUID();
         ResponseCommand response = new ResponseCommand(CommandStatus.DELIVERED, connectionUUID);
 
         return response;

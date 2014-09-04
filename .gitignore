@@ -5,6 +5,7 @@
 .settings/
 target/
 bin/
+/site/
 /Workspace/
 /WorkspaceIDEA/
 /opendevice-unity/
@@ -12,3 +13,4 @@ bin/
 /openhouse-desktop-server/
 /OLD/
 /IntelliHouse-Android/
+/.gradle/

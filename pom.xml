@@ -16,13 +16,14 @@
     </properties>
 
     <modules>
-        <module>opendevice-connection</module> 
+        <module>opendevice-connection</module>
         <module>opendevice-core</module>
         <module>opendevice-rest-api</module>
-        <module>opendevice-middleware</module>
         <module>opendevice-clients</module>
         <module>opendevice-servers</module>
         <module>opendevice-web-view</module>
+        <module>opendevice-middleware</module>
+        <module>opendevice-samples</module>
     </modules>
 
     <build>

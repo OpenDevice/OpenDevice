@@ -10,7 +10,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>opendevice-atmosphere-server</artifactId>
+    <artifactId>opendevice-rest-ws-server</artifactId>
 
     <properties>
         <jersey-version>1.18.1</jersey-version>

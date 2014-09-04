@@ -17,15 +17,13 @@ import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.server.impl.inject.InjectableValuesProvider;
 import com.sun.jersey.server.impl.model.method.dispatch.AbstractResourceMethodDispatchProvider;
 
-import javax.ws.rs.ext.Provider;
-
 /**
  * TODO: PENDING DOC
  *
  * @autor Ricardo JL Rufino
  * @date 05/07/14.
  */
-@Provider
+// @Provider (disabled for now)
 public class DispatchProvider extends AbstractResourceMethodDispatchProvider{
 
     @Override

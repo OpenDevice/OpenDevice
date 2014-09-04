@@ -24,22 +24,25 @@
 </head>
 
 <body>
-    <div class="container">
-        <h1>OpenDevice Rest Sample</h1>
+<div class="container">
+    <h1>OpenDevice Rest Sample</h1>
 
-        <form class="form-inline box-example">
+    <form class="form-inline box-example">
 
-            <label>Device ID:</label>
-            <select class="form-control" id="deviceID">
-                <option>1</option><option>2</option><option>3</option><option>4</option>
-            </select>
+        <label>Device ID:</label>
+        <select class="form-control" id="deviceID">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+        </select>
 
-            <button type="button" onclick="send(1)" class="btn btn-success">ON</button>
-            <button type="button" onclick="send(0)" class="btn btn-danger">OFF</button>
+        <button type="button" onclick="send(1)" class="btn btn-success">ON</button>
+        <button type="button" onclick="send(0)" class="btn btn-danger">OFF</button>
 
-        </form>
-        <div id="response"></div>
+    </form>
+    <div id="response"></div>
 
-    </div>
+</div>
 </body>
 </html>

@@ -63,7 +63,7 @@ public class Main extends BaseDeviceManager {
 			mode = MODE_LOCAL;
 		}
 		
-		int port = 8181; 
+		int port = 8181;
 		int restPort = 9191;
 		
 		if(webport != null && webport.trim().length() != 0) port= Integer.parseInt(webport);
@@ -140,6 +140,7 @@ public class Main extends BaseDeviceManager {
 	
 
 	public static void main(String[] args) throws Exception {
+
         final Main main = new Main();
         main.init();
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -149,7 +150,7 @@ public class Main extends BaseDeviceManager {
             }
         });
 
-        System.out.print("Enter something:");
+        System.out.print("Type Enter to Shutdown ....");
         Scanner in = new Scanner(System.in);
         String data= in.nextLine();
         in.close();

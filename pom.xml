@@ -9,11 +9,54 @@
     <packaging>pom</packaging>
     <version>0.1.2-SNAPSHOT</version>
     <name>OpenDevice Package</name>
+    <description>Open IoT (Internet Of Things) Platform and Framework.</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <opendevice-version>0.1.2-SNAPSHOT</opendevice-version>
     </properties>
+
+    <scm>
+        <connection>scm:git:git@github.com:CriativaSoft/OpenDevice.git</connection>
+        <developerConnection>scm:git:git@github.com:CriativaSoft/OpenDevice.git</developerConnection>
+        <url>http://github.com/CriativaSoft/OpenDevicee</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <mailingLists>
+        <mailingList>
+            <name>OpenDevice Dev List</name>
+            <archive>https://groups.google.com/group/opendevice-iot</archive>
+        </mailingList>
+    </mailingLists>
+
+    <licenses>
+        <license>
+            <name>Eclipse Public License - v 1.0</name>
+            <url>http://www.eclipse.org/legal/epl-v10.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Ricardo JL Rufino</name>
+            <email>ricardo.jl.rufino@gmail.com</email>
+            <organization>CriativaSoft</organization>
+            <organizationUrl>http://www.criativasoft.com.br</organizationUrl>
+        </developer>
+    </developers>
 
     <modules>
         <module>opendevice-connection</module>
@@ -27,6 +70,7 @@
     </modules>
 
     <build>
+
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -39,6 +83,24 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
     </build>
 
 

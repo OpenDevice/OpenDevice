@@ -40,7 +40,7 @@ import java.util.List;
  * @author Ricardo JL Rufino
  * @date 11/06/2013
  */
-public class AbstractAtmosphereConnection extends AbstractConnection implements AtmosphereInterceptor, ConnectionListener {
+public abstract class AbstractAtmosphereConnection extends AbstractConnection implements AtmosphereInterceptor, ConnectionListener {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractAtmosphereConnection.class);
 
@@ -65,8 +65,8 @@ public class AbstractAtmosphereConnection extends AbstractConnection implements 
 
                 initServerEvents();
 
+                log.debug("Starting server on port: " + port);
                 server.start();
-                log.debug("internal socket server [ok]");
 
                 setStatus(ConnectionStatus.CONNECTED);
 
@@ -109,9 +109,7 @@ public class AbstractAtmosphereConnection extends AbstractConnection implements 
         }
     }
 
-    protected void configure(Config.Builder conf){
-
-    }
+    protected abstract void configure(Config.Builder conf);
 
     @Override
     public void disconnect() throws ConnectionException {
@@ -150,6 +148,9 @@ public class AbstractAtmosphereConnection extends AbstractConnection implements 
     public Action inspect(AtmosphereResource atmosphereResource) {
 
         ConnectionGuiceProvider.setConnection(this);
+
+        BroadcasterFactory factory = atmosphereResource.getAtmosphereConfig().getBroadcasterFactory();
+        System.out.println("atmosphereResource = "+ factory);
 
         // atmosphereResource.getRequest().getParameterMap().put("requestUID", new String[]{atmosphereResource.uuid()});
         // atmosphereResource.getRequest().setAttribute("requestUID", atmosphereResource.uuid());

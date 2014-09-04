@@ -15,7 +15,7 @@
     <properties>
         <jersey-version>1.18.1</jersey-version>
         <jaxb-version>2.1</jaxb-version>
-        <nettosphere-version>2.2.0-RC1</nettosphere-version>
+        <nettosphere-version>2.2.1-SNAPSHOT</nettosphere-version>
         <atmosphere-version>2.3.0-SNAPSHOT</atmosphere-version>
     </properties>
 
@@ -49,7 +49,7 @@
         <dependency>
             <groupId>org.atmosphere</groupId>
             <artifactId>atmosphere-runtime</artifactId>
-            <version>${nettosphere-version}</version>
+            <version>${atmosphere-version}</version>
         </dependency>
 
         <dependency>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>org.atmosphere</groupId>
             <artifactId>atmosphere-guice</artifactId>
-            <version>${nettosphere-version}</version> <!-- TODO: deveser o SNAPSHOT -->
+            <version>${atmosphere-version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>

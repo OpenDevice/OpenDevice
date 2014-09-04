@@ -16,6 +16,7 @@ package br.com.criativasoft.opendevice.samples;
 import br.com.criativasoft.opendevice.connection.*;
 import br.com.criativasoft.opendevice.connection.message.ByteMessage;
 import br.com.criativasoft.opendevice.connection.message.Message;
+import br.com.criativasoft.opendevice.connection.message.SimpleMessage;
 
 import java.io.IOException;
 
@@ -85,7 +86,7 @@ public class SerialCommunicationDemo implements ConnectionListener {
     @Override
     public void connectionStateChanged(DeviceConnection connection,ConnectionStatus status) {System.out.println("conected...");
         try {
-            this.connection.send(Message.HIGH);
+            this.connection.send(SimpleMessage.HIGH);
         } catch (IOException e) {
             e.printStackTrace();
         }

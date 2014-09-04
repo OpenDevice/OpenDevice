@@ -14,7 +14,6 @@
 package br.com.criativasoft.opendevice.samples;
 
 import br.com.criativasoft.opendevice.connection.*;
-import br.com.criativasoft.opendevice.connection.message.GPIO;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.connection.message.SimpleMessage;
 import br.com.criativasoft.opendevice.core.command.CommandStreamReader;
@@ -71,14 +70,14 @@ public class OnOffController  implements ConnectionListener {
 				if (btnName.equalsIgnoreCase("ON")) {
 					System.out.println("SEND: ON");
 					// connection.send(new GPIO(PIN, GPIO.HIGH));
-                    connection.send(DeviceCommand.ON_OFF(1, GPIO.HIGH));
+                    connection.send(DeviceCommand.ON(1));
 
 				}
 				
 				if (btnName.equalsIgnoreCase("OFF")) {
 					System.out.println("SEND: OFF");
                     // connection.send(new GPIO(PIN, GPIO.LOW));
-                    connection.send(DeviceCommand.ON_OFF(1, GPIO.LOW));
+                    connection.send(DeviceCommand.OFF(1));
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();

@@ -27,6 +27,7 @@ class DeviceConnection{
 #define API_VERSION   1 // software version of this library
 #define DATA_BUFFER   64
 #define MAX_LISTENERS 10
+#define DEBUG_CON 	1
 
 
 protected:

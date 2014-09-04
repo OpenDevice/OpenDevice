@@ -162,14 +162,12 @@ void OpenDevice::debugChange(uint8_t id, uint16_t value){
 
 	if(DEBUG_MODE){
 		// TODO: verificar se da pra usar o PRINT'F
-		Serial.print(F("DB:CHANGE:"));
-		Serial.print(id);
-		Serial.print(F("="));
-		Serial.print(value, DEC);
-		Serial.print(F("->"));
-		Serial.print(value, HEX);
-		Serial.println();
-		freeRam();
+		deviceConnection->doStart();
+		deviceConnection->print("DB:CHANGE:");
+		deviceConnection->print(id);
+		deviceConnection->print("=");
+		deviceConnection->print(value);
+		deviceConnection->doEnd();
 	}
 }
 
@@ -186,15 +184,19 @@ void OpenDevice::freeRam() {
 
 void OpenDevice::debug(const __FlashStringHelper* data) {
 	if(DEBUG_MODE){
-		Serial.print("DB:");
-		Serial.println(data);
+		deviceConnection->doStart();
+		deviceConnection->print("DB:");
+		deviceConnection->print(data);
+		deviceConnection->doEnd();
 	}
 }
 
 void OpenDevice::debug(const char str[]){
 	if(DEBUG_MODE){
-		Serial.print("DB:");
-		Serial.println(str);
+		deviceConnection->doStart();
+		deviceConnection->print("DB:");
+		deviceConnection->print(str);
+		deviceConnection->doEnd();
 	}
 }
 

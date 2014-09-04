@@ -67,10 +67,12 @@ void DeviceConnection::removeListener(uint8_t command){
 bool DeviceConnection::checkDataAvalible(){
 	uint8_t lastByte;
 	boolean timeout = false;
+
 	while(!timeout)
 	{
 		while(com->available() > 0)
 		{
+
 			lastByte = com->read();
 			if(lastByte == STOP_BIT){
 				flush();
@@ -98,8 +100,6 @@ bool DeviceConnection::checkDataAvalible(){
 // Private methods
 void DeviceConnection::notifyListeners(Command cmd){
 
-	Serial.println(F("ETAPA:2:notifyListeners"));
-
 	if(defaultListener) (*defaultListener)(cmd);
 	// Notify specific listener
 	for (uint8_t i = 0; i < listenersLength; ++i) {
@@ -108,7 +108,6 @@ void DeviceConnection::notifyListeners(Command cmd){
 			break;
 		}
 	}
-	Serial.println(F("ETAPA:3:notifyListeners"));
 
 }
 

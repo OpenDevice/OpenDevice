@@ -14,3 +14,4 @@ bin/
 /OLD/
 /IntelliHouse-Android/
 /.gradle/
+*.ipr

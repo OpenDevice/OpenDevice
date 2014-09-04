@@ -14,20 +14,19 @@
 package br.com.criativasoft.opendevice.server;
 
 import br.com.criativasoft.opendevice.atemospherews.WSServerConnection;
+import br.com.criativasoft.opendevice.connection.StreamConnectionFactory;
+import br.com.criativasoft.opendevice.connection.UsbConnection;
 import br.com.criativasoft.opendevice.connection.discovery.DiscoveryServer;
-import br.com.criativasoft.opendevice.core.AbstractDeviceController;
+import br.com.criativasoft.opendevice.core.BaseDeviceManager;
+import br.com.criativasoft.opendevice.core.dao.memory.DeviceMemoryDao;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceCategory;
 import br.com.criativasoft.opendevice.core.model.DeviceType;
-import br.com.criativasoft.opendevice.server.repositoty.DeviceRepository;
-import br.com.criativasoft.opendevice.server.repositoty.mem.DeviceRepositoryMemory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.File;
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Scanner;
 
 //
@@ -35,36 +34,33 @@ import java.util.Scanner;
 // URLs REST:
 // - http://localhost:9191/device/1/setvalue/1
 
-public class Main extends AbstractDeviceController {
+public class Main extends BaseDeviceManager {
 	
 	private static final String MODE_REMOTE = "remote";
 	private static final String MODE_LOCAL = "local";
 	
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-	
-	private DeviceRepository repository;
-
 	public void init() throws Exception {
-		Collection<Device> TEMP_LIST = new LinkedList<Device>();
-		TEMP_LIST.add(new Device(1, "Luz DB1", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
-		TEMP_LIST.add(new Device(2, "Luz DB2", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
-		TEMP_LIST.add(new Device(3, "Tomada DB1", DeviceType.DIGITAL, DeviceCategory.POWER_SOURCE, 0));
-		TEMP_LIST.add(new Device(4, "Tomada DB2", DeviceType.DIGITAL, DeviceCategory.POWER_SOURCE, 0));
+
+        setDeviceDao(new DeviceMemoryDao());
+
+		addDevice(new Device(1, "Luz DB1", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
+        addDevice(new Device(2, "Luz DB2", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
+        addDevice(new Device(3, "Tomada DB1", DeviceType.DIGITAL, DeviceCategory.POWER_SOURCE, 0));
+        addDevice(new Device(4, "Tomada DB2", DeviceType.DIGITAL, DeviceCategory.POWER_SOURCE, 0));
 		
-		// Ativar serviço de descoberta desse servidor.
+		// Ativar serviço de descoberta desse servidor via UDP.
 		Thread discoveryThread = new Thread(DiscoveryServer.getInstance());
 		discoveryThread.start();
 
-		repository = new DeviceRepositoryMemory(TEMP_LIST);
-		
 		String webport = System.getProperty("app.port");
 		String webapp = System.getProperty("app.dir");
 		String mode = System.getProperty("app.mode");
 		String remoteServer = "http://openhouse.criativasoft.com.br/";
 		
 		if(mode == null){
-			mode = MODE_REMOTE;
+			mode = MODE_LOCAL;
 		}
 		
 		int port = 8181; 
@@ -79,16 +75,28 @@ public class Main extends AbstractDeviceController {
 
         // Setup WebSocket (Socket.IO) with suport for simple htttpServer
         WSServerConnection wsServerConnection = new WSServerConnection(port);
-        // wsServerConnection.setChannelInitializer(new HttpServerChannel(getWebAppDir()));
+        wsServerConnection.addWebResource("/media/Dados/Codigos/Java/Projetos/OpenDevice/opendevice-web-view/src/main/webapp");
 
-        this.addConnectionIN(wsServerConnection);
+        this.addInput(wsServerConnection);
 		// this.addConnectionIN(new RestServerConnection(restPort)); // Servidor REST
 		
 //		// No modo local ele se conecta com o servidor remoto.
 //		if(MODE_LOCAL.equalsIgnoreCase(mode)){
 //			this.addConnectionIN(new WSClientConnection(remoteServer));
 //		}
-		
+
+        // Procurar dispositivos USB
+        if(MODE_LOCAL.equalsIgnoreCase(mode)){
+            String usbPort = UsbConnection.getFirstAvailable();
+
+            log.debug("Connection to USB port: " + usbPort);
+
+            // setup connection with arduino/hardware
+           if(usbPort != null) {
+               addOutput(StreamConnectionFactory.createUsb(usbPort)); // Connect to first USB port available
+           }
+        }
+
 		// Não é o andoid e possue suporte a ambiente visual (! isHeadless)
 		// TODO: Testar em anbiente onde não tem o bluetooth....
 		if(! (System.getProperty("java.vm.name").equalsIgnoreCase("Dalvik")) &&
@@ -152,13 +160,5 @@ public class Main extends AbstractDeviceController {
         System.out.println("Shutdown [OK]");
     }
 	
-	public Device findDevice(int deviceID){
-		return repository.findByDeviceID(deviceID);
-	}
 
-
-	@Override
-	public Collection<Device> getDevices() {
-		return repository.listAll();
-	}
 }

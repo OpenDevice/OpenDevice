@@ -112,7 +112,7 @@
 
         <dependency>
             <groupId>br.com.criativasoft.opendevice</groupId>
-            <artifactId>opendevice-atmosphere-server</artifactId>
+            <artifactId>opendevice-rest-ws-server</artifactId>
             <version>${opendevice-version}</version>
         </dependency>
 

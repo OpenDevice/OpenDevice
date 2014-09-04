@@ -115,7 +115,7 @@ public class DefaultSteamReader implements Runnable, Cloneable, StreamReader {
 	
 	public void processPacketRead(byte read[]){
         if(log.isTraceEnabled()) {
-            log.trace("processPacketRead: " + new String(read) + ", size: " + read.length);
+            log.trace("processPacketRead: " + new String(read) + " (size: " + read.length + ")");
         }
 		
 		for (int i = 0; i < read.length; i++) {

@@ -13,9 +13,11 @@
 
 package br.com.criativasoft.opendevice.samples;
 
-import br.com.criativasoft.opendevice.connection.DeviceConnection;
-import br.com.criativasoft.opendevice.connection.StreamConnectionFactory;
+import br.com.criativasoft.opendevice.connection.*;
 import br.com.criativasoft.opendevice.connection.message.Message;
+import br.com.criativasoft.opendevice.connection.message.SimpleMessage;
+
+import java.util.Collection;
 
 /**
  * USE: samples/arduino/UsbConnection ou samples/arduino/BluetoothConnection
@@ -24,16 +26,33 @@ import br.com.criativasoft.opendevice.connection.message.Message;
  */
 public class BlinkUsb {
 	public static void main(String[] args) throws Exception {
-		
-		DeviceConnection connection = StreamConnectionFactory.createUsb("/dev/ttyACM0");
+
+        Collection<String> portNames = UsbConnection.listAvaiblePortNames();
+        System.out.println("AvaiblePort: " + portNames);
+
+        StreamConnection connection = StreamConnectionFactory.createUsb("/dev/ttyACM0");
+
+        connection.addListener(listener);
 		connection.connect();
-		
-		while(true){
-			connection.send(Message.ON);
-			Thread.sleep(100);
-			connection.send(Message.OFF);
-			Thread.sleep(100);
+
+        while(true){
+			connection.send(SimpleMessage.ON);
+			Thread.sleep(500);
+			connection.send(SimpleMessage.OFF);
+			Thread.sleep(500);
 		}
 
 	}
+
+    private static ConnectionListener listener = new ConnectionListener() {
+        @Override
+        public void connectionStateChanged(DeviceConnection connection, ConnectionStatus status) {
+            System.out.println("connectionStateChanged -> " + status);
+        }
+
+        @Override
+        public void onMessageReceived(Message message, DeviceConnection connection) {
+            System.out.println("onMessageReceived -> " + message);
+        }
+    };
 }

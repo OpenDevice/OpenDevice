@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
 public class UsbConnection extends AbstractStreamConnection implements SerialPortEventListener  {
 	
@@ -63,14 +63,26 @@ public class UsbConnection extends AbstractStreamConnection implements SerialPor
 	 * @param portName - port to connect (Ex.: "COM3", "/dev/ttyUSB0" )
 	 */
 	public UsbConnection(String portName)  {
+        if(portName == null) throw new IllegalArgumentException("Serial port name is NULL ! (It's busy , not have access or not found)");
 		this.portName = portName;
 	}
 
-	public static Collection<String> listAvaiblePortNames() {
+	public static List<String> listAvaiblePortNames() {
 		String[] portNames = SerialPortList.getPortNames();
 		return Arrays.asList(portNames);
 	}
-	
+
+
+    /**
+     * Returns the first available port
+     * @return If none is available returns NULL
+     */
+    public static String getFirstAvailable() {
+        String[] portNames = SerialPortList.getPortNames();
+        if(portNames != null && portNames.length > 0) return portNames[0];
+        return null;
+    }
+
 
 	/* (non-Javadoc)
 	 * @see br.com.criativasoft.arduinoconnection.ArduinoConnection#connect()
@@ -170,20 +182,20 @@ public class UsbConnection extends AbstractStreamConnection implements SerialPor
 			
 		} else if(event.isCTS()){//If CTS line has changed state
             if(event.getEventValue() == 1){//If line is ON
-                System.out.println("CTS - ON");
+                log.debug("SerialEvent - CTS = ON");
             }
             else {
-                System.out.println("CTS - OFF");
+                log.debug("SerialEvent - CTS = OFF");
             }
         }
         else if(event.isBREAK()){///If DSR line has changed state
-        		System.out.println("isBREAK - ON");
+            log.debug("SerialEvent - isBREAK");
         }
         else if(event.isERR()){///If DSR line has changed state
-        		System.out.println("isERR - ON");
+            log.debug("SerialEvent - isERR");
         }
         else if(event.isRING()){///If DSR line has changed state
-        	System.out.println("isRING - ON");
+            log.debug("SerialEvent - isRING");
         }
 		
 	}

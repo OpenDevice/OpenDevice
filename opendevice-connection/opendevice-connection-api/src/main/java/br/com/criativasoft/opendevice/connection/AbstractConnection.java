@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -41,12 +42,18 @@ public abstract class AbstractConnection implements DeviceConnection {
 	
 	private MessageSerializer<?, ?> serializer;
 
+    private String uid = UUID.randomUUID().toString();
+
 	/**
 	 * Notify All Listeners about received command.
 	 */
 	public void notifyListeners(final Message message) {
 
         if(listeners.isEmpty())  log.warn("No listener was registered ! use: addListener");
+
+        if(message.getConnectionUUID() == null) {
+            message.setConnectionUUID(this.getUID());
+        }
 
 		for (final ConnectionListener listener : listeners) {
             // TODO: Add config to use in SYNC MODE.
@@ -112,4 +119,8 @@ public abstract class AbstractConnection implements DeviceConnection {
 		return listeners;
 	}
 
+    @Override
+    public String getUID() {
+        return uid;
+    }
 }

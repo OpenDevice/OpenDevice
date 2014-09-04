@@ -17,17 +17,9 @@ import java.io.Serializable;
 
 public interface Message extends Serializable{
 
-    /** SimpleMessage to send byte = 1 */
-	public static final  SimpleMessage HIGH =  new SimpleMessage((byte)1);
+    public String getUid();
 
-    /** SimpleMessage to send byte = 0 */
-	public static final  SimpleMessage LOW =  new SimpleMessage((byte)0);
+    public String getConnectionUUID();
 
-    /** SimpleMessage to send byte = 1 */
-	public static final  SimpleMessage ON =  HIGH;
-
-    /** SimpleMessage to send byte = 0 */
-	public static final  SimpleMessage OFF =  LOW;
-	
-
+    public void setConnectionUUID(String connectionUUID);
 }

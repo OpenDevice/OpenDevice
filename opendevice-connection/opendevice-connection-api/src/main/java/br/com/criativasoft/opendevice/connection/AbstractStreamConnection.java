@@ -121,6 +121,7 @@ public abstract class AbstractStreamConnection extends AbstractConnection implem
             log.warn("connection closed !");
             return;
         }
+
 		output.write(value);
 		output.flush();	
 	}

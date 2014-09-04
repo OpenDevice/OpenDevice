@@ -21,11 +21,22 @@ import br.com.criativasoft.opendevice.connection.util.DataUtils;
  * @author Ricardo JL Rufino
  * @date 18/06/2014
  */
-public class SimpleMessage implements Message, ByteMessage {
+public class SimpleMessage extends AbstractMessage implements Message, ByteMessage {
 	
 	private static final long serialVersionUID = 4467004980332125276L;
-	
-	
+
+    /** SimpleMessage to send byte = 1 */
+    public static final  SimpleMessage HIGH =  new SimpleMessage((byte)1);
+
+    /** SimpleMessage to send byte = 0 */
+    public static final  SimpleMessage LOW =  new SimpleMessage((byte)0);
+
+    /** SimpleMessage to send byte = 1 */
+    public static final  SimpleMessage ON =  HIGH;
+
+    /** SimpleMessage to send byte = 0 */
+    public static final  SimpleMessage OFF =  LOW;
+
 	private byte[] bytes;
 	
 	public SimpleMessage(byte value) {

@@ -30,9 +30,12 @@ public class BlinkBluetooth {
 //       20:13:01:24:01:93 - BT-MCU-3(st)
 		
 		StreamConnection connection = StreamConnectionFactory.createBluetooth("20:13:01:24:01:93");
+
 		connection.connect();
 		// connection.setSerialReader(new AmarinoSerialReader());
-		
+
+        System.out.println("Connected !");
+
 		while(true){
 			connection.write((byte)1);
 			Thread.sleep(500);

@@ -47,5 +47,6 @@ public interface DeviceConnection {
 	
 	public MessageSerializer<?, ?> getSerializer();
 
+    public String getUID();
 
 }

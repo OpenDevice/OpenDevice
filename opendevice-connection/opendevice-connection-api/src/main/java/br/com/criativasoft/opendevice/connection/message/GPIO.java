@@ -13,12 +13,16 @@
 
 package br.com.criativasoft.opendevice.connection.message;
 
-public class GPIO implements ByteMessage {
+public class GPIO extends AbstractMessage implements ByteMessage {
 	
 	public static final byte HIGH = 1;
 	public static final byte LOW = 0;
 
+    public static final byte ON = 1;
+    public static final byte OFF = 0;
+
     private byte[] bytes = new byte[2];
+
 
     public GPIO(byte pin,  byte state) {
         bytes[0] = pin;

@@ -17,11 +17,13 @@ import br.com.criativasoft.opendevice.connection.*;
 import br.com.criativasoft.opendevice.connection.message.GPIO;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.connection.message.SimpleMessage;
+import br.com.criativasoft.opendevice.core.command.CommandStreamReader;
+import br.com.criativasoft.opendevice.core.command.CommandStreamSerializer;
+import br.com.criativasoft.opendevice.core.command.DeviceCommand;
 import br.com.criativasoft.opendevice.samples.ui.FormController;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 
 public class OnOffController  implements ConnectionListener {
 
@@ -33,11 +35,16 @@ public class OnOffController  implements ConnectionListener {
 	public OnOffController() {
 		
 		//USE: samples/arduino/UsbConnection
-		// connection = StreamConnectionFactory.createUsb("/dev/ttyACM0"); //
+		connection = StreamConnectionFactory.createUsb("/dev/ttyACM0"); //
 		
 		//USE: samples/arduino/BluetoothConnection
 		// connection = StreamConnectionFactory.createBluetooth("20:13:01:24:01:93");
 
+        if(connection instanceof StreamConnection){
+            StreamConnection streamConnection = (StreamConnection) connection;
+            streamConnection.setSerializer(new CommandStreamSerializer()); // data conversion..
+            streamConnection.setStreamReader(new CommandStreamReader()); // data protocol..
+        }
 
 		connection.addListener(this);
 
@@ -63,12 +70,15 @@ public class OnOffController  implements ConnectionListener {
 			try {
 				if (btnName.equalsIgnoreCase("ON")) {
 					System.out.println("SEND: ON");
-					connection.send(new GPIO(PIN, GPIO.HIGH));
+					// connection.send(new GPIO(PIN, GPIO.HIGH));
+                    connection.send(DeviceCommand.ON_OFF(1, GPIO.HIGH));
+
 				}
 				
 				if (btnName.equalsIgnoreCase("OFF")) {
 					System.out.println("SEND: OFF");
-                    connection.send(new GPIO(PIN, GPIO.LOW));
+                    // connection.send(new GPIO(PIN, GPIO.LOW));
+                    connection.send(DeviceCommand.ON_OFF(1, GPIO.LOW));
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
@@ -84,11 +94,11 @@ public class OnOffController  implements ConnectionListener {
 		try {
 			if(connection.isConnected()){
 				System.out.println("Connected !!!");
-				connection.send(SimpleMessage.LOW);  // Iniciar comunicacao	.
+				// connection.send(SimpleMessage.LOW);  // Iniciar comunicacao	.
 			}else{
 				System.out.println("Disconnected !!!");
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

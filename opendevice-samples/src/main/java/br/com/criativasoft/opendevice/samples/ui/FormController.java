@@ -60,17 +60,20 @@ public class FormController extends JFrame implements ConnectionListener, Action
 		JButton btn = new JButton(name);
 		btn.addActionListener(listener);
 		btn.setActionCommand(name);
-		panelButtons.add(btn);
+		addButton(btn);
 		return btn;
 	}
-	
-	
+
+    public void addButton(JButton button){
+        panelButtons.add(button);
+    }
+
 	public void writeLog(String value){
 		text.append(value);
 		text.append("\n");	
 	}
 
-	private void initComponents() {
+	protected void initComponents() {
 		
 //		JPanel panel = new JPanel();
 //		panel.setBorder(new TitledBorder("Logs"));

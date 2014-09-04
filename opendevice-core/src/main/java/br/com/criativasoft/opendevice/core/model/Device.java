@@ -15,6 +15,8 @@ package br.com.criativasoft.opendevice.core.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Classe que representa um disposivo inteligente que pode ser controlado via REDE/USB/Etc...
@@ -27,6 +29,9 @@ public class Device implements Serializable {
 	
 	public static final int VALUE_HIGH = 1;
 	public static final int VALUE_LOW = 0;
+
+    public static final int ON = 1;
+    public static final int OFF = 0;
 	
 	private long id; // Database ID
 	private int uid; // Logic level user ID.
@@ -37,7 +42,16 @@ public class Device implements Serializable {
 	private Date dateCreated;
 	
 	private long value = VALUE_LOW;
-	
+
+    private volatile Set<DeviceListener> listeners = new HashSet<DeviceListener>();
+
+    public Device(int uid,DeviceType type) {
+        super();
+        this.uid = uid;
+        this.type = type;
+        this.category = DeviceCategory.GENERIC;
+    }
+
 	public Device(int uid, String name, DeviceType type, DeviceCategory category) {
 		super();
 		this.uid = uid;
@@ -89,10 +103,31 @@ public class Device implements Serializable {
 	}
 	
 	public void setValue(long value) {
-		this.value = value;
+
+        if(value != this.value){
+            this.value = value;
+            notifyListeners();
+        }
+
 	}
-	
-	public long getValue() {
+
+    /**
+     * Set value 1(HIGH).
+     * shorthand call to setValue(HIGH)
+     */
+    public void on(){
+       this.setValue(Device.VALUE_HIGH);
+    }
+
+    /**
+     * Set value 0 (LOW).
+     * shorthand call to setValue(LOW)
+     */
+    public void off(){
+        this.setValue(Device.VALUE_LOW);
+    }
+
+    public long getValue() {
 		return value;
 	}
 	
@@ -119,9 +154,28 @@ public class Device implements Serializable {
 	public Date getDateCreated() {
 		return dateCreated;
 	}
-	
-	@Override
+
+    public boolean addListener(DeviceListener e) {
+        return listeners.add(e);
+    }
+
+    /**
+     * Notify All Listeners about received command.
+     */
+    public void notifyListeners() {
+
+        if (listeners.isEmpty()) return;
+
+        for (final DeviceListener listener : listeners) {
+            listener.onDeviceChanged(this);
+        }
+
+    }
+
+    @Override
 	public String toString() {
 		return "Device[UID:"+uid+", Name:"+getName()+", Value:"+getValue()+", Type:" + getType()+"]";
 	}
+
+
 }

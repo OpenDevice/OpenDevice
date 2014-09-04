@@ -13,18 +13,33 @@
 
 package br.com.criativasoft.opendevice.core;
 
+import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.core.command.Command;
+import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.model.Device;
+import br.com.criativasoft.opendevice.core.model.DeviceListener;
 
 import java.io.IOException;
 import java.util.Collection;
 
 public interface DeviceManager {
-	
+
+    public void setDeviceDao(DeviceDao deviceDao);
+
 	public Collection<Device> getDevices() ;
 	
-	public Device findDevice(int deviceID);
+	public Device findDeviceByUID(long deviceID);
+
+    public void addDevice(Device device);
 	
 	public void send(Command command) throws IOException;
+
+    public void connect() throws IOException;
+
+    public void addInput(DeviceConnection connection);
+
+    public void addOutput(DeviceConnection connection);
+
+    public boolean addListener(DeviceListener e);
 
 }

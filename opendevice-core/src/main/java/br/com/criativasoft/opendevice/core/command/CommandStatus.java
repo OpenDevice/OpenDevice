@@ -17,15 +17,24 @@ import br.com.criativasoft.opendevice.core.metamodel.EnumCode;
 
 public enum CommandStatus implements EnumCode {
 	
-	CREATED(1), DELIVERED(2), RECEIVED(3), FAIL(4);
+	CREATED(1),
+    DELIVERED(2),
+    RECEIVED(3),
+    FAIL(4),
+    // Response...
+    SUCCESS(200),
+    NOT_FOUND(404),
+    BAD_REQUEST(400),
+    UNAUTHORIZED(401),
+    PERMISSION_DENIED(550),
+    FORBIDDEN(403),
+    INTERNAL_ERROR(500),
+    NOT_IMPLEMENTED(501);
 
     private int code;
 
-    /**
-     * @param code - Device type code. MAX 127.
-     */
     private CommandStatus(int code) {
-        this.code = (byte) code;
+        this.code = code;
     }
 
     public int getCode() {

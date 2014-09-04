@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.UUID;
 
 public class MultipleConnection implements DeviceConnection, ConnectionListener {
 	
@@ -35,6 +36,17 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 	private Set<ConnectionListener> listeners = new LinkedHashSet<ConnectionListener>();
 	
 	private ConnectionStatus status = ConnectionStatus.DISCONNECTED;
+
+    private boolean broadcast = false;
+
+    private String uid = UUID.randomUUID().toString();
+
+    /**
+     * Broadcast the received commands to other connections
+     */
+    public void enableBroadcast(){
+        broadcast = true;
+    }
 	  
 	public boolean addListener(ConnectionListener e) {
 		boolean value = false;
@@ -114,8 +126,7 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 	}
 	
 	public void send(Message command) throws IOException {
-		boolean send = false;
-		
+
 		for (DeviceConnection connection : connections) {
 			if(connection != null){
 				connection.send(command);
@@ -180,7 +191,12 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 	public int getSize(){
 		return getConnections().size();
 	}
-	
+
+    @Override
+    public String getUID() {
+        return uid;
+    }
+
 	/**
 	 * Repassa o comando que foi recebido, para as outras conexões.
 	 */
@@ -207,7 +223,9 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 
     @Override
     public void onMessageReceived(Message command, DeviceConnection connection) {
-		broadcastCommand(command, connection);
+        if(broadcast){
+            broadcastCommand(command, connection);
+        }
 	}
 
 	@Override

@@ -50,8 +50,9 @@ public class CommandFactory {
 		}else if(type == CommandType.DEVICE_COMMAND_RESPONSE){
 			String id = split[1];
 			int status = Integer.parseInt(split[3]);	// Command.value
-			
-			command = new ResponseCommand(CommandStatus.getByCode(status)); // TODO: pode ser necessário o connection UUID
+
+			command = new ResponseCommand(CommandStatus.getByCode(status));
+            command.setUid(id);
 
         // Received: GET_DEVICES_RESPONSE;ID;[ID, PIN, VALUE, TARGET, SENSOR?, TYPE];[ID, PIN, VALUE, TARGET, SENSOR?, TYPE];....
         }else if(type == CommandType.GET_DEVICES_RESPONSE){ // Returned list of devices.

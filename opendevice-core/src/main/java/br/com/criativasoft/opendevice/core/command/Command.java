@@ -28,7 +28,6 @@ public abstract class Command implements Message{
 	
 	private static final long serialVersionUID = 676280722282919715L;
 
-	private long id; // DataBase ID.
 	private String uid; // Logic level user ID.
 	private String connectionUUID; // id of connection/channel that requested the command
     private String clientID; // id of client (for Multitenancy support)
@@ -54,11 +53,6 @@ public abstract class Command implements Message{
 	}
 
 
-	/** Internal command ID */
-	public long getId() {
-		return id;
-	}
-
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;
 	}
@@ -74,8 +68,13 @@ public abstract class Command implements Message{
 	public String getUid() {
 		return uid;
 	}
-	
-	public void setConnectionUUID(String connectionUUID) {
+
+    /** CAUTION: It should not be called directly by clients*/
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public void setConnectionUUID(String connectionUUID) {
 		this.connectionUUID = connectionUUID;
 	}
 

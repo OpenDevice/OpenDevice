@@ -71,7 +71,7 @@ public class CommandDelivery {
 	
 	/**
 	 * Returns the next id from the sequence <br/>
-	 * // TODO: This generation logic id probably is not scalable to the level of a service in CLOUD
+	 * // FIXME: This generation logic id probably is not scalable to the level of a service in CLOUD
 	 * @param connection
 	 */
 	protected synchronized String getNextUID(DeviceConnection connection){
@@ -147,11 +147,11 @@ public class CommandDelivery {
 		@Override
 		public Boolean call() throws Exception {
 			
-			this.originalID = command.getConnectionUUID();
+			this.originalID = command.getUid();
 			this.newID = getNextUID(connection); 
 			
 			connection.addListener(this);
-			command.setConnectionUUID(newID);
+			command.setUid(newID);
 			
 			log.debug("Send and Wait reponse. Cmd.ID:" + this.newID + " (RefID:"+this.originalID+")");
 			
@@ -173,7 +173,7 @@ public class CommandDelivery {
 				lock.notifyAll();
 			}
 			
-			command.setConnectionUUID(originalID);
+			command.setUid(originalID);
 			connection.removeListener(this);
 		}
 
@@ -189,7 +189,7 @@ public class CommandDelivery {
 
 			if(received instanceof ResponseCommand){
 
-				String requestUID = received.getConnectionUUID();
+				String requestUID = received.getUid();
 
 				if(requestUID != null && requestUID.equals(this.newID)){
 

@@ -13,6 +13,8 @@
 
 package br.com.criativasoft.opendevice.core.command;
 
+import br.com.criativasoft.opendevice.core.model.Device;
+
 public class DeviceCommand extends Command {
 
     public DeviceCommand(){
@@ -47,13 +49,26 @@ public class DeviceCommand extends Command {
         return isCompatible(CommandType.getByCode(type));
     }
 
-
-    public static DeviceCommand GPIO( int deviceID, long value){
-        return new DeviceCommand(CommandType.GPIO_DIGITAL, deviceID, value);
+    public static DeviceCommand GPIO( int pin, long value){
+        return new DeviceCommand(CommandType.GPIO_DIGITAL, pin, value);
     }
 
-    public static DeviceCommand ON_OFF( int deviceID, long value){
-        return new DeviceCommand(CommandType.ON_OFF, deviceID, value);
+    /**
+     * Create {@link br.com.criativasoft.opendevice.core.command.DeviceCommand} of type {@link CommandType#ON_OFF} with value HIGH
+     * @param deviceID
+     * @return
+     */
+    public static DeviceCommand ON(int deviceID){
+        return new DeviceCommand(CommandType.ON_OFF, deviceID, Device.VALUE_HIGH);
+    }
+
+    /**
+     * Create {@link br.com.criativasoft.opendevice.core.command.DeviceCommand} of type {@link CommandType#ON_OFF} with value LOW
+     * @param deviceID
+     * @return
+     */
+    public static DeviceCommand OFF(int deviceID){
+        return new DeviceCommand(CommandType.ON_OFF, deviceID, Device.VALUE_LOW);
     }
 
 }

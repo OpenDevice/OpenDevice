@@ -19,8 +19,12 @@ import br.com.criativasoft.opendevice.connection.serialize.MessageSerializer;
 import br.com.criativasoft.opendevice.connection.util.DataUtils;
 import br.com.criativasoft.opendevice.core.command.amarino.AmarinoIntent;
 import br.com.criativasoft.opendevice.core.command.amarino.MessageBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CommandStreamSerializer implements MessageSerializer<byte[], byte[]> {
+
+    private static Logger log = LoggerFactory.getLogger(CommandStreamSerializer.class);
 
 	@Override
 	public Message parse(byte[] data) {
@@ -43,11 +47,13 @@ public class CommandStreamSerializer implements MessageSerializer<byte[], byte[]
 		int[] cmd = new int[4];
 		cmd[0] = command.getType().getCode();
 		cmd[1] = -1;
-		if(command.getConnectionUUID() != null){
+		if(command.getUid() != null){
 			try{
-				cmd[1] = Integer.parseInt(command.getConnectionUUID());
+				cmd[1] = Integer.parseInt(command.getUid());
 			}catch (Exception e) {
-				throw new CommandException("RequestUID must be int");
+                cmd[1] = 0;
+                log.warn("command UUID must be int");
+//				throw new CommandException("command UUID must be int");
 			}
 		}
 		if(command instanceof DeviceCommand){
@@ -58,7 +64,8 @@ public class CommandStreamSerializer implements MessageSerializer<byte[], byte[]
 			cmd[3] = 0;
 			
 		}
-		
+
+        // FIXME: remover chamada ao MessageBuilder poderia ser para o CommandFactory mesmo...
 		String msg = MessageBuilder.getMessage('A', cmd, AmarinoIntent.INT_ARRAY_EXTRA);
 		
 		return msg.getBytes();

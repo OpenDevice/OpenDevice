@@ -1,6 +1,7 @@
 ---
 tags: [arduino, rasberry, IoT]
 projects: [opendevice]
+state: [alpha]
 ---
 :toc:
 :icons: font
@@ -12,18 +13,36 @@ OpenDevice is a set of tools and APIs to build solutions for the *"Internet of T
 Provide an open and unified framework to interconnect IoT devices, data, and applications over the Web,
 if you need communication between software and hardware, probably your place is here.
 
-The main objective is monitor and control inexpensive hardwares like Arduino, RaspberryPI and link:docs/#supported-devices[similar platforms], local(offline) or over the cloud using high-level programing languages and with abstraction of protocols and low-level details.
+The main objective is monitor and control inexpensive hardwares like *Arduino, RaspberryPI and similar platforms*, local(offline) or over the *cloud* using high-level programing languages and with abstraction of protocols and low-level details.
 
 This allows you to focus on your project and innovation, leave obscure details of communication protocols and specifications with OpenDevice, you will make a major step towards the success of your project.
 
 TIP: Plug your device (Arduino/Raspberypi/Other) to the Cloud and sync in real-time	
 
 [source,java]
+.Simple like this
 ----
-{"id":1,"content":"Hello, World!"}
+        // ... {structure and imports omitted} ...
+        DeviceManager manager = new SimpleDeviceManager();
+        Device led = new Device(1, DeviceType.DIGITAL);
+        
+        // setup connection with arduino/hardware
+        String usbPort = UsbConnection.getFirstAvailable();
+        manager.addOutput(StreamConnectionFactory.createUsb(usbPort)); // Connect to first USB port available
+        manager.addListener(this); // monitor changes on devices
+        manager.connect();
+
+        manager.addDevice(led);
+
+        while(true){
+            led.on();
+            Thread.sleep(500);
+            led.off();
+            Thread.sleep(500);
+        }
 ----
 
-See documentation at:
+See documentation and examples at:
 ----
-http://opendevice.criativasoft.com.br/
+[http://opendevice.criativasoft.com.br/]
 ----

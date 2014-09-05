@@ -110,7 +110,7 @@ public class SimpleChart  extends ApplicationFrame implements ConnectionListener
 
         if(connection instanceof UsbConnection){
 
-            Collection<String> portNames = UsbConnection.listAvaiblePortNames();
+            Collection<String> portNames = UsbConnection.listAvailablePortNames();
             for (String name : portNames){
                 combo.addItem(name);
             }

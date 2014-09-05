@@ -31,7 +31,7 @@ public class TestSerial {
 
     public static void main(String[] args) throws ConnectionException, InterruptedException {
 
-        Collection<String> portNames = UsbConnection.listAvaiblePortNames();
+        Collection<String> portNames = UsbConnection.listAvailablePortNames();
         System.out.println("AvaiblePort: " + portNames);
 
         UsbConnection connection = new UsbConnection(portNames.iterator().next());

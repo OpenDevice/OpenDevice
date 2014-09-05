@@ -1,6 +1,6 @@
 ---
 project: [opendevice-platform]
-tags: [arduino, rasberry, IoT, sensors, embedded, rest/websocket]
+tags: [arduino, rasberry, internet of things, sensors]
 state: [alpha]
 ---
 :toc:

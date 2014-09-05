@@ -34,6 +34,17 @@
         </repository>
     </distributionManagement>
 
+    <repositories>
+        <repository>
+            <id>oss.sonatype.org</id>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>oss.sonatype.org-snapshot</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+
     <mailingLists>
         <mailingList>
             <name>OpenDevice Dev List</name>

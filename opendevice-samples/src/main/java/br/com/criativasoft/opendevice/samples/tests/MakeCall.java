@@ -30,7 +30,7 @@ import java.util.Collection;
 public class MakeCall {
 
     public static void main(String[] args) throws InterruptedException {
-        Collection<String> strings = UsbConnection.listAvaiblePortNames();
+        Collection<String> strings = UsbConnection.listAvailablePortNames();
         System.out.println(strings);
 
         StreamConnection usb = StreamConnectionFactory.createUsb("/dev/ttyACM0");

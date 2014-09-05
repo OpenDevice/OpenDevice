@@ -48,7 +48,7 @@ public class OnOffController  implements ConnectionListener {
 		form.setVisible(true);
 		
 		
-		System.out.println("listAvaibleURIs = "+ UsbConnection.listAvaiblePortNames());
+		System.out.println("listAvaibleURIs = "+ UsbConnection.listAvailablePortNames());
 		
 		// connection.setEndOfMessageToken(ArduinoConnection.TOKEN_ZERO);
 		// ((AbstractSerialConnection) connection).setSerialReader(new FixedSerialReader(3));

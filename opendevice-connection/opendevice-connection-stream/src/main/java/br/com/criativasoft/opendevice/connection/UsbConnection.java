@@ -67,7 +67,7 @@ public class UsbConnection extends AbstractStreamConnection implements SerialPor
 		this.portName = portName;
 	}
 
-	public static List<String> listAvaiblePortNames() {
+	public static List<String> listAvailablePortNames() {
 		String[] portNames = SerialPortList.getPortNames();
 		return Arrays.asList(portNames);
 	}

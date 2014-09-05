@@ -27,7 +27,7 @@ import java.util.Collection;
 public class BlinkUsb {
 	public static void main(String[] args) throws Exception {
 
-        Collection<String> portNames = UsbConnection.listAvaiblePortNames();
+        Collection<String> portNames = UsbConnection.listAvailablePortNames();
         System.out.println("AvaiblePort: " + portNames);
 
         StreamConnection connection = StreamConnectionFactory.createUsb("/dev/ttyACM0");

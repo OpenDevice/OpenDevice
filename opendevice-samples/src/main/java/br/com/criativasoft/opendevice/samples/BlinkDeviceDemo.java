@@ -39,7 +39,7 @@ public class BlinkDeviceDemo implements DeviceListener {
 
     public BlinkDeviceDemo() throws Exception {
 
-        String usbPort = UsbConnection.getFirstAvailable();
+        String usbPort = UsbConnection.listAvailablePortNames();
 
         // setup connection with arduino/hardware
         manager.addOutput(StreamConnectionFactory.createUsb(usbPort)); // Connect to first USB port available

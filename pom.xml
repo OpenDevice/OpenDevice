@@ -37,11 +37,11 @@
     <repositories>
         <repository>
             <id>oss.sonatype.org</id>
-            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+            <url>http://oss.sonatype.org/content/repositories/releases</url>
         </repository>
         <repository>
             <id>oss.sonatype.org-snapshot</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
     </repositories>
 

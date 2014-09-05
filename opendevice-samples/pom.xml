@@ -15,18 +15,6 @@
         <opendevice-version>0.1.2-SNAPSHOT</opendevice-version>
 	</properties>
 
-    <repositories>
-        <repository>
-            <id>oss.sonatype.org</id>
-            <url>https://oss.sonatype.org/content/repositories/releases/</url>
-        </repository>
-        <repository>
-            <id>oss.sonatype.org-snapshot</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </repository>
-    </repositories>
-
-
 	<dependencies>
 		<dependency>
 			<groupId>br.com.criativasoft.opendevice</groupId>

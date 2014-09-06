@@ -19,7 +19,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Classe que representa um disposivo inteligente que pode ser controlado via REDE/USB/Etc...
+ * Device is an abstraction of a physical device, which may be a lamp, socket, sensor, robot, or even a logical device. <br/>
+ * These devices are managed and controlled by a hardware like Arduino, Raspberry and others (see list) or can be built <br/>
+ * in an embedded own equipment, this is the proposal of the internet of things. <br/>
  * @author Ricardo JL Rufino
  * @date 04/09/2011 12:40:01
  */
@@ -45,6 +47,21 @@ public class Device implements Serializable {
 
     private volatile Set<DeviceListener> listeners = new HashSet<DeviceListener>();
 
+    /**
+     * Create new Device with type  {@link DeviceType#DIGITAL}
+     * @param uid Must match with 'id' configured in the physical module
+     */
+    public Device(int uid) {
+        this.uid = uid;
+        this.type = DeviceType.DIGITAL;
+        this.category = DeviceCategory.GENERIC;
+    }
+
+    /**
+     * Create new Device
+     * @param uid Must match with 'id' configured in the physical module
+     * @param type Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}
+     */
     public Device(int uid,DeviceType type) {
         super();
         this.uid = uid;
@@ -52,6 +69,13 @@ public class Device implements Serializable {
         this.category = DeviceCategory.GENERIC;
     }
 
+    /**
+     * Create new Device
+     * @param uid Must match with 'id' configured in the physical module
+     * @param name Logical name of device
+     * @param type Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}
+     * @param category Does not influence the communication logic, only the GUIs
+     */
 	public Device(int uid, String name, DeviceType type, DeviceCategory category) {
 		super();
 		this.uid = uid;
@@ -59,9 +83,16 @@ public class Device implements Serializable {
 		this.type = type;
 		this.category = category;
 	}
-	
-	
-	
+
+
+    /**
+     * Create new Device
+     * @param uid Must match with 'id' configured in the physical module
+     * @param name Logical name of device
+     * @param type Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}
+     * @param category - Does not influence the communication logic, only the GUIs
+     * @param value
+     */
 	public Device(int uid, String name, DeviceType type, DeviceCategory category, long value) {
 		super();
 		this.uid = uid;
@@ -71,11 +102,7 @@ public class Device implements Serializable {
 		this.value = value;
 	}
 
-	public Device(int uid) {
-		this.uid = uid;
-		this.type = DeviceType.DIGITAL;
-		this.category = DeviceCategory.GENERIC;
-	}
+
 
 	public void setId(long id) {
 		this.id = id;

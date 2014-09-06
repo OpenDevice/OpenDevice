@@ -24,7 +24,7 @@ import java.net.Socket;
 /**
  * TCP Socket bases connection
  */
-public class TCPConnection extends AbstractStreamConnection{
+public class TCPConnection extends AbstractStreamConnection implements ITcpConnection{
 	
 	private static final Logger log = LoggerFactory.getLogger(TCPConnection.class);
 	

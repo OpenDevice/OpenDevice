@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class UsbConnection extends AbstractStreamConnection implements SerialPortEventListener  {
+public class UsbConnection extends AbstractStreamConnection implements IUsbConnection, SerialPortEventListener  {
 	
 	protected static final Logger log = LoggerFactory.getLogger(UsbConnection.class);
 	
@@ -55,23 +55,25 @@ public class UsbConnection extends AbstractStreamConnection implements SerialPor
 	
 	private SerialPort serialPort;
 	
-	private String portName; // If NULL will use PORT_NAMES to locate defaultport.
-	
+    /**
+     * Create a usb connection with physical device on first available port (@{link #getFirstAvailable})
+     */
+    public UsbConnection()  {
+       this(null);
+    }
 	
 	/**
-	 * Create connection to Arduino.
+	 * Create a usb connection with physical device
 	 * @param portName - port to connect (Ex.: "COM3", "/dev/ttyUSB0" )
 	 */
 	public UsbConnection(String portName)  {
-        if(portName == null) throw new IllegalArgumentException("Serial port name is NULL ! (It's busy , not have access or not found)");
-		this.portName = portName;
+		this.deviceURI = portName;
 	}
 
 	public static List<String> listAvailablePortNames() {
 		String[] portNames = SerialPortList.getPortNames();
 		return Arrays.asList(portNames);
 	}
-
 
     /**
      * Returns the first available port
@@ -84,19 +86,18 @@ public class UsbConnection extends AbstractStreamConnection implements SerialPor
     }
 
 
-	/* (non-Javadoc)
-	 * @see br.com.criativasoft.arduinoconnection.ArduinoConnection#connect()
-	 */
 	@Override
 	public synchronized void connect() throws ConnectionException {
 		
-		if(portName != null){
-			serialPort = new SerialPort(portName);
-		}else{ // TODO: automatic discovery
-//			portId  = findPort();
-//			if (portId == null) {
-//				throw new PortNotFoundException();
-//			}
+		if(deviceURI != null){
+			serialPort = new SerialPort(deviceURI);
+		}else{
+
+            deviceURI = getFirstAvailable();
+
+            if(deviceURI == null) throw new ConnectionException("Serial port name is NULL ! (It's busy , not have access or not found)");
+
+            serialPort = new SerialPort(deviceURI);
 		}
 
 		try {
@@ -129,13 +130,10 @@ public class UsbConnection extends AbstractStreamConnection implements SerialPor
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see br.com.criativasoft.arduinoconnection.ArduinoConnection#disconnect()
-	 */
 	@Override
 	public synchronized void disconnect() throws ConnectionException {
 		
-		log.debug("Disconnect SerialPort: " + portName);
+		log.debug("Disconnect SerialPort: " + deviceURI);
 			
 		if (serialPort != null) {
 			

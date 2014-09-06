@@ -39,6 +39,8 @@ public abstract class AbstractStreamConnection extends AbstractConnection implem
 	protected OutputStream output;
 	
 	protected StreamReader reader;
+
+    protected String deviceURI;
 	
 	public AbstractStreamConnection() {
 		this.setSerializer(new StreamSerializer());
@@ -50,8 +52,18 @@ public abstract class AbstractStreamConnection extends AbstractConnection implem
 		this.reader = reader;
 		this.reader.setConnection(this);
 	}
-	
-	@Override
+
+    @Override
+    public void setConnectionURI(String uri) {
+        this.deviceURI = uri;
+    }
+
+    @Override
+    public String getConnectionURI() {
+        return deviceURI;
+    }
+
+    @Override
 	public StreamReader getStreamReader() {
 		return this.reader;
 	}

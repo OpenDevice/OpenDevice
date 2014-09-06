@@ -149,9 +149,6 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
         ConnectionGuiceProvider.setConnection(this);
 
-        BroadcasterFactory factory = atmosphereResource.getAtmosphereConfig().getBroadcasterFactory();
-        System.out.println("atmosphereResource = "+ factory);
-
         // atmosphereResource.getRequest().getParameterMap().put("requestUID", new String[]{atmosphereResource.uuid()});
         // atmosphereResource.getRequest().setAttribute("requestUID", atmosphereResource.uuid());
         // AtmosphereResource atmosphereHandler = atmosphereResource.getAtmosphereHandler();

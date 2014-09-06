@@ -26,11 +26,13 @@
 
 package br.com.criativasoft.opendevice.atemospherews;
 
-import br.com.criativasoft.opendevice.atemospherews.AbstractAtmosphereConnection;
 import br.com.criativasoft.opendevice.connection.ConnectionListener;
+import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.restapi.DeviceRest;
 import org.atmosphere.cpr.AtmosphereInterceptor;
 import org.atmosphere.nettosphere.Config;
+
+import java.io.IOException;
 
 
 /**
@@ -49,4 +51,9 @@ public class RestServerConnection extends AbstractAtmosphereConnection implement
         conf.resource(DeviceRest.class);
     }
 
+
+    @Override
+    public void send(Message message) throws IOException {
+        // this is not possible, ignore
+    }
 }

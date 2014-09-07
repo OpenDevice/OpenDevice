@@ -24,21 +24,21 @@ TIP: Plug your device (Arduino/Raspberypi/Other) to the Cloud and sync in real-t
 [source,java]
 .Simple like this
 ----
-        // ... {structure and imports omitted} ...
-        DeviceManager manager = new SimpleDeviceManager();
-        Device led = new Device(1, DeviceType.DIGITAL);
-        
-        manager.addOutput(Connections.out.usb()); // Connect to first USB port available
-        manager.connect();
+    // ... {structure and imports omitted} ...
+    DeviceManager manager = new SimpleDeviceManager();
+    Device led = new Device(1, DeviceType.DIGITAL);
 
-        manager.addDevice(led);
+    manager.addOutput(Connections.out.usb()); // Connect to first USB port available
+    manager.connect();
 
-        while(true){
-            led.on();
-            Thread.sleep(500);
-            led.off();
-            Thread.sleep(500);
-        }
+    manager.addDevice(led);
+
+    while(true){
+        led.on();
+        Thread.sleep(500);
+        led.off();
+        Thread.sleep(500);
+    }
 ----
 
 But not only that...

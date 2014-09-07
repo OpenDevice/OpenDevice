@@ -6,6 +6,7 @@ state: [alpha]
 :toc:
 :icons: font
 :source-highlighter: prettify
+:hide-uri-scheme:
 
 == What is OpenDevice?
 
@@ -19,9 +20,6 @@ This allows you to focus on your project and innovation, leave obscure details o
 
 TIP: Plug your device (Arduino/Raspberypi/Other) to the Cloud and sync in real-time	
 
-// setup connection with arduino/hardware
-
-addOutput(Connections.out.bluetooth("001303141907"));
 
 [source,java]
 .Simple like this
@@ -47,20 +45,18 @@ But not only that...
 
 == Communications & Protocols
 
-=== You can communicate with OpenDevice Middleware (Cloud and Local Services) using a variety of protocols:
-----
+You can communicate with OpenDevice Middleware (Cloud and Local Services) using a variety of protocols::
  * HTTP (REST)
  * Sockets/Websocket
  * MQTT (In progress)
----
 
-=== You can communicate with devices using a variety of protocols via:
-----
+
+You can communicate with devices using a variety of protocols via::
  * USB
  * Ethernet
  * WiFi
  * Bluetooth
-----
+
 
 See documentation and examples at:
 ----

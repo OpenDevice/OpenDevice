@@ -19,6 +19,10 @@ This allows you to focus on your project and innovation, leave obscure details o
 
 TIP: Plug your device (Arduino/Raspberypi/Other) to the Cloud and sync in real-time	
 
+// setup connection with arduino/hardware
+
+addOutput(Connections.out.bluetooth("001303141907"));
+
 [source,java]
 .Simple like this
 ----
@@ -26,10 +30,7 @@ TIP: Plug your device (Arduino/Raspberypi/Other) to the Cloud and sync in real-t
         DeviceManager manager = new SimpleDeviceManager();
         Device led = new Device(1, DeviceType.DIGITAL);
         
-        // setup connection with arduino/hardware
-        String usbPort = UsbConnection.getFirstAvailable();
-        manager.addOutput(StreamConnectionFactory.createUsb(usbPort)); // Connect to first USB port available
-        manager.addListener(this); // monitor changes on devices
+        manager.addOutput(Connections.out.usb()); // Connect to first USB port available
         manager.connect();
 
         manager.addDevice(led);
@@ -42,7 +43,24 @@ TIP: Plug your device (Arduino/Raspberypi/Other) to the Cloud and sync in real-t
         }
 ----
 
+But not only that...
+
+== Communications & Protocols
+You can communicate with OpenDevice Middleware (Cloud and Local Services) using a variety of protocols:
+---
+ * HTTP (REST)
+ * Sockets/Websocket
+ * MQTT (In progress)
+---
+You can communicate with devices using a variety of protocols via:
+---
+ * USB
+ * Ethernet
+ * WiFi
+ * Bluetooth
+---
+
 See documentation and examples at:
 ----
-[http://opendevice.criativasoft.com.br/]
+http://opendevice.criativasoft.com.br
 ----

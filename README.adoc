@@ -1,12 +1,14 @@
 ---
 project: [opendevice-platform]
 tags: [arduino, rasberry, internet of things, sensors]
-state: [alpha, [![Build Status](https://buildhive.cloudbees.com/job/CriativaSoft/job/OpenDevice/badge/icon)](https://buildhive.cloudbees.com/job/CriativaSoft/job/OpenDevice/)]
+state: [alpha]
 ---
 :toc:
 :icons: font
 :source-highlighter: prettify
 :hide-uri-scheme:
+
+[![Build Status](https://buildhive.cloudbees.com/job/CriativaSoft/job/OpenDevice/badge/icon)](https://buildhive.cloudbees.com/job/CriativaSoft/job/OpenDevice/)
 
 == What is OpenDevice?
 

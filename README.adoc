@@ -8,7 +8,7 @@ state: [alpha]
 :source-highlighter: prettify
 :hide-uri-scheme:
 
-!https://buildhive.cloudbees.com/job/CriativaSoft/job/OpenDevice/badge/icon[]
+image:https://buildhive.cloudbees.com/job/CriativaSoft/job/OpenDevice/badge/icon[]
 
 == What is OpenDevice?
 

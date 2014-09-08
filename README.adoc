@@ -41,7 +41,7 @@ TIP: Plug your device (Arduino/Raspberypi/Other) to the Cloud and sync in real-t
     }
 ----
 
-But not only that...
+But not only that... (You can also do in javascript and other languages)
 
 == Communications & Protocols
 

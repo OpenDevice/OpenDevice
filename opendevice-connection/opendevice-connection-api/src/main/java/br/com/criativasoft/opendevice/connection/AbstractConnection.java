@@ -102,12 +102,12 @@ public abstract class AbstractConnection implements DeviceConnection {
 		return status == ConnectionStatus.CONNECTED;
 	}
 
-	public boolean addListener(ConnectionListener e) {
+	public synchronized boolean addListener(ConnectionListener e) {
 		return listeners.add(e);
 	}
 
 	@Override
-	public boolean removeListener(ConnectionListener e) {
+	public synchronized boolean removeListener(ConnectionListener e) {
 		return listeners.remove(e);
 	}
 

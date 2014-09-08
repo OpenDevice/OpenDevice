@@ -28,7 +28,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 
+ * This class monitor sending commands to the device and your answers to see if the communication is correct.<br/>
+ * It is used by the {@link br.com.criativasoft.opendevice.core.BaseDeviceManager DeviceManager}
  * @author Ricardo JL Rufino
  * @date 23/06/2013
  */
@@ -87,6 +88,11 @@ public class CommandDelivery {
 	}
 
 	private void sendWithTimeout(Command command, DeviceConnection connection){
+
+        if(!connection.isConnected()){
+            log.warn(connection.getClass().getSimpleName() + " not Connected!");
+            return;
+        }
 		
 		final SendTask sendTask = new SendTask(command, connection);
 		
@@ -97,9 +103,12 @@ public class CommandDelivery {
 				Future<Boolean> future = executor.submit(sendTask);
 				try {
 					future.get(MAX_TIMEOUT, TimeUnit.SECONDS);
-				} catch (TimeoutException e) {	
-					log.error("Response not received ! Command:"+ sendTask.getCommand().getConnectionUUID() + ", Connection:" + sendTask.getConnection());
-					
+				} catch (TimeoutException e) {
+
+                    log.error("Response not received ! Command:"+ sendTask.getCommand().getConnectionUUID() + ", Connection:" + sendTask.getConnection());
+
+                    sendTask.restoreComand();
+
 					// TODO: Notify not received...
 					
 				} catch (Exception e) {
@@ -153,7 +162,7 @@ public class CommandDelivery {
 			connection.addListener(this);
 			command.setUid(newID);
 			
-			log.debug("Send and Wait reponse. Cmd.ID:" + this.newID + " (RefID:"+this.originalID+")");
+			log.debug("Send and Wait reponse :: Cmd.SEQ:<" + this.newID + ">, UID: "+this.originalID);
 			
 			connection.send(command);
 			
@@ -181,7 +190,6 @@ public class CommandDelivery {
         public void onMessageReceived(Message message, DeviceConnection connection) {
 
             if(!(message instanceof Command)){
-                log.debug("Message received : " + message);
                 return;
             }
 
@@ -193,7 +201,7 @@ public class CommandDelivery {
 
 				if(requestUID != null && requestUID.equals(this.newID)){
 
-					log.debug("Response received :: Cmd.ID=" + this.newID + " (RefID:"+this.originalID+")");
+					log.debug("Response received :: Cmd.SEQ:<" + this.newID + ">, UID: "+this.originalID);
 
 					restoreComand(); // release lock and restore ID
 

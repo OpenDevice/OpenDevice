@@ -30,6 +30,16 @@ public class Sensor extends Device {
     /**
      * Create new Sensor
      * @param uid Must match with 'id' configured in the physical module
+     * @param type Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}
+     * @param category Does not influence the communication logic, only the GUIs
+     */
+    public Sensor(int uid, DeviceType type, DeviceCategory category) {
+        super(uid, null, type, category);
+    }
+
+    /**
+     * Create new Sensor
+     * @param uid Must match with 'id' configured in the physical module
      * @param name Logical name of device
      * @param type Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}
      * @param category Does not influence the communication logic, only the GUIs
@@ -37,5 +47,6 @@ public class Sensor extends Device {
     public Sensor(int uid, String name, DeviceType type, DeviceCategory category) {
         super(uid, name, type, category);
     }
+
 
 }

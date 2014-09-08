@@ -14,7 +14,6 @@
 package br.com.criativasoft.opendevice.core;
 
 import br.com.criativasoft.opendevice.core.dao.memory.DeviceMemoryDao;
-import br.com.criativasoft.opendevice.core.model.DeviceListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * @autor Ricardo JL Rufino
  * @date 24/08/14.
  */
-public class SimpleDeviceManager extends BaseDeviceManager implements DeviceListener {
+public class SimpleDeviceManager extends BaseDeviceManager {
 
     private static final Logger log = LoggerFactory.getLogger(SimpleDeviceManager.class);
 

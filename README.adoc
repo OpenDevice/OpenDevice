@@ -1,7 +1,7 @@
 ---
 project: [opendevice-platform]
 tags: [arduino, rasberry, internet of things, sensors]
-state: [alpha]
+state: [alpha, [![Build Status](https://buildhive.cloudbees.com/job/CriativaSoft/job/OpenDevice/badge/icon)](https://buildhive.cloudbees.com/job/CriativaSoft/job/OpenDevice/)]
 ---
 :toc:
 :icons: font

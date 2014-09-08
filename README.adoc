@@ -8,7 +8,7 @@ state: [alpha]
 :source-highlighter: prettify
 :hide-uri-scheme:
 
-image:https://buildhive.cloudbees.com/job/CriativaSoft/job/OpenDevice/badge/icon[]
+image:https://criativasoft.ci.cloudbees.com/buildStatus/icon?job=OpenDevice[]
 
 == What is OpenDevice?
 
@@ -62,4 +62,3 @@ You can communicate with devices using a variety of protocols via::
 See documentation and examples at:
 
 http://opendevice.criativasoft.com.br
-

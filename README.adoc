@@ -59,7 +59,6 @@ You can communicate with devices using a variety of protocols via::
  * WiFi
  * Bluetooth
 
-
 See documentation and examples at:
 
 http://opendevice.criativasoft.com.br

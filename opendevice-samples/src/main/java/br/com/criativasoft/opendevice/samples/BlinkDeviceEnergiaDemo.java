@@ -26,11 +26,11 @@ import br.com.criativasoft.opendevice.core.model.*;
 public class BlinkDeviceEnergiaDemo extends SimpleDeviceManager implements DeviceListener {
 
     Device led1 = new Device(1, DeviceType.DIGITAL);
-    Device led2 = new Device(1, DeviceType.DIGITAL);
-    Device led3 = new Device(1, DeviceType.DIGITAL);
+    Device led2 = new Device(2, DeviceType.DIGITAL);
+    Device led3 = new Device(3, DeviceType.DIGITAL);
 
-    Sensor btn1 = new Sensor(4, "Btn1", DeviceType.DIGITAL, DeviceCategory.GENERIC_SENSOR);
-    Sensor btn2 = new Sensor(5, "Btn2", DeviceType.DIGITAL, DeviceCategory.GENERIC_SENSOR);
+    Sensor btn1 = new Sensor(4, DeviceType.DIGITAL);
+    Sensor btn2 = new Sensor(5, DeviceType.DIGITAL);
 
     public static void main(String[] args) throws Exception {
         new BlinkDeviceEnergiaDemo();
@@ -46,7 +46,7 @@ public class BlinkDeviceEnergiaDemo extends SimpleDeviceManager implements Devic
         addInput(new RestServerConnection(8181));
 
         addListener(this); // monitor changes on devices
-        connect();
+        connect(); // Connects all configured connections
 
         addDevice(led1);
         addDevice(led2);
@@ -54,28 +54,25 @@ public class BlinkDeviceEnergiaDemo extends SimpleDeviceManager implements Devic
         addDevice(btn1);
         addDevice(btn2);
 
-        addDevice(
-        addDevice(new Sensor(5, "Btn2", DeviceType.DIGITAL, DeviceCategory.GENERIC_SENSOR));
-
         while(true){
-//            led.on();
-//            Thread.sleep(500);
-//            led.off();
+            led1.on();
+            Thread.sleep(500);
+            led1.off();
             Thread.sleep(500);
         }
     }
 
-
-    // If the device has changed this method is called
+    // If the device has changed this method is called.
     public void onDeviceChanged(Device device) {
+
         System.out.println("DeviceChanged = " + device);
 
         if(device == btn1){
-            led.setValue(device.getValue());
+            led1.setValue(device.getValue());
         }
 
         if(device == btn2){
-            fin
+            led2.setValue(device.getValue());
         }
     }
 

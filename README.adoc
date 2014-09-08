@@ -8,6 +8,8 @@ state: [alpha]
 :source-highlighter: prettify
 :hide-uri-scheme:
 
+image:https://buildhive.cloudbees.com/job/CriativaSoft/job/OpenDevice/badge/icon[]
+
 == What is OpenDevice?
 
 OpenDevice is a set of tools and APIs to build solutions for the *"Internet of Things"* like home automations systems, robotics, smart city, energy monitoring, security, sensor monitoring. +

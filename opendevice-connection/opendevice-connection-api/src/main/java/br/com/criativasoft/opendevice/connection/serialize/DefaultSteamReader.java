@@ -71,7 +71,7 @@ public class DefaultSteamReader implements Runnable, Cloneable, StreamReader {
 	 * Required only if the encapsulated connection does not provide any mechanism for callback or listener
 	 */
 	public void startReading(){
-		if(readingThread == null){
+		if(readingThread == null || ! readingThread.isAlive()){
 			readingThread = new Thread(this);
 			readingThread.start();
 		}

@@ -107,15 +107,13 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
 			// set port parameters
 			serialPort.setParams(BAUDRATE, SerialPort.DATABITS_8,SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 			
-			serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |  SerialPort.FLOWCONTROL_RTSCTS_OUT);
-			
-			// open the streams
-//			input = serialPort.getInputStream();
-//			output = serialPort.getOutputStream();
+                        // NOTE: Not working with arduino.nano
+			// serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |  SerialPort.FLOWCONTROL_RTSCTS_OUT);
 			
 			// add event listeners
 			int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS + SerialPort.MASK_DSR + SerialPort.MASK_ERR + SerialPort.MASK_RING + SerialPort.MASK_BREAK;//Prepare mask
-			serialPort.addEventListener(this, mask);
+			serialPort.setEventsMask(mask);
+                        serialPort.addEventListener(this);
 			// serialPort.notifyOnDataAvailable(true);
 			
 			setStatus(ConnectionStatus.CONNECTED);
@@ -130,72 +128,73 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
 		}
 	}
 
-	@Override
-	public synchronized void disconnect() throws ConnectionException {
-		
-		log.debug("Disconnect SerialPort: " + deviceURI);
-			
-		if (serialPort != null) {
-			
-			try {
-				serialPort.closePort();
-				super.disconnect();
-				// FIXME: verificar caso a USB sera removido ou desligada abruptamente
-			} catch (SerialPortException e) {
-				throw new ConnectionException(e);
-			} catch (IOException e) {
-				throw new ConnectionException(e);
-			}
-			setStatus(ConnectionStatus.DISCONNECTED);
-		}
-	}
+    @Override
+    public synchronized void disconnect() throws ConnectionException {
+
+        log.debug("Disconnect SerialPort: " + deviceURI);
+
+        if (serialPort != null) {
+
+            try {
+                serialPort.closePort();
+                // FIXME: verificar caso a USB sera removido ou desligada abruptamente
+            } catch (SerialPortException e) {
+                throw new ConnectionException(e);
+            } finally {
+                super.disconnect();
+            }
+            setStatus(ConnectionStatus.DISCONNECTED);
+        }
+    }
 	
 	
 	@Override
 	public void write(byte[] value) throws IOException {
-		if(!isConnected()) return;
-		
-		try {
-			serialPort.writeBytes(value);
-		} catch (SerialPortException e) {
-			throw new ConnectionException(e);
-		}
+            if(!isConnected()) return;
+
+            try {
+                    serialPort.writeBytes(value);
+            } catch (SerialPortException e) {
+                    throw new ConnectionException(e);
+            }
 	}
 	
-	public synchronized void serialEvent(SerialPortEvent event) {
-		
-		if(log.isTraceEnabled()){
-			log.trace("SerialEvent[" + event.getEventType() + " on " + event.getPortName()+"]");
-		}
-		
-		if (event.isRXCHAR() && hasListeners()) {// If data is available
-			byte[] data;
-			try {
-				data = serialPort.readBytes(event.getEventValue());
-				getStreamReader().processPacketRead(data);
-			} catch (SerialPortException e) {
-				log.error(e.getMessage(), e);
-				throw new RuntimeException(e);
-			}
-			
-		} else if(event.isCTS()){//If CTS line has changed state
-            if(event.getEventValue() == 1){//If line is ON
-                log.debug("SerialEvent - CTS = ON");
+       @Override
+    public synchronized void serialEvent(SerialPortEvent event) {
+
+        if (log.isTraceEnabled()) {
+            log.trace("SerialEvent[" + event.getEventType() + " on " + event.getPortName() + "]");
+        }
+
+        if (event.isRXCHAR() && hasListeners()) {// If data is available
+            byte[] data;
+            try {
+                data = serialPort.readBytes(event.getEventValue());
+                getStreamReader().processPacketRead(data);
+            } catch (SerialPortException e) {
+                log.error(e.getMessage(), e);
+                throw new RuntimeException(e);
             }
-            else {
+
+        } else if (event.isCTS()) {//If CTS line has changed state
+            if (event.getEventValue() == 1) {//If line is ON
+                log.debug("SerialEvent - CTS = ON");
+            } else {
                 log.debug("SerialEvent - CTS = OFF");
             }
-        }
-        else if(event.isBREAK()){///If DSR line has changed state
+        } else if (event.isBREAK()) {///If DSR line has changed state
             log.debug("SerialEvent - isBREAK");
-        }
-        else if(event.isERR()){///If DSR line has changed state
+        } else if (event.isERR()) {///If DSR line has changed state
             log.debug("SerialEvent - isERR");
-        }
-        else if(event.isRING()){///If DSR line has changed state
+            try {
+                disconnect();
+            } catch (ConnectionException ex) {
+                log.error(ex.getMessage(), ex);
+            }
+        } else if (event.isRING()) {///If DSR line has changed state
             log.debug("SerialEvent - isRING");
         }
-		
-	}
+
+    }
 	
 }

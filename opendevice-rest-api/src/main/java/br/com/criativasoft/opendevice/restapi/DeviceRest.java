@@ -14,17 +14,19 @@
 package br.com.criativasoft.opendevice.restapi;
 
 
-import br.com.criativasoft.opendevice.connection.DeviceConnection;
+import br.com.criativasoft.opendevice.connection.ServerConnection;
+import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.core.command.*;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceVO;
-import br.com.criativasoft.opendevice.core.model.DeviceCategory;
-import br.com.criativasoft.opendevice.core.model.DeviceType;
+import br.com.criativasoft.opendevice.core.model.Device;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,17 +45,17 @@ public class DeviceRest implements DeviceService {
     private DeviceService service;
 
     @Inject
-    private DeviceConnection connection;
+    private ServerConnection connection;
 
+    private String clientUUID = "clientname-123456"; // PEGAR DO USUARIO LOGADO !!
 
     @GET
-    @Path("/{id}/value/{value}")
+    @Path("/{uid}/value/{value}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseCommand setValue(@PathParam("id") int id, @PathParam("value") String value){
+    public ResponseCommand setValue(@PathParam("uid") int uid, @PathParam("value") String value){
 
-        String clientUUID = "fake-client-123-123"; // DEVE PEGAR DE ALGUM LUGAR !!
-        DeviceCommand command = new DeviceCommand(CommandType.ON_OFF, id, Long.parseLong(value));
-        command.setClientID(clientUUID);
+        DeviceCommand command = new DeviceCommand(CommandType.ON_OFF, uid, Long.parseLong(value));
+        command.setApplicationID(clientUUID);
         connection.notifyListeners(command);
 
         String connectionUUID = connection.getUID();
@@ -63,10 +65,65 @@ public class DeviceRest implements DeviceService {
     }
 
     @GET
-    @Path("/{id}/value")
+    @Path("/{uid}/value")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getValue(@PathParam("id") int id) {
-        return getService().getValue(id);
+    public String getValue(@PathParam("uid") int uid) {
+
+        GetDevicesRequest request = new GetDevicesRequest(GetDevicesRequest.FILTER_BY_ID, uid);
+        request.setApplicationID(clientUUID);
+        request.setConnectionUUID(connection.getUID());
+
+        request.setApplicationID(clientUUID);
+        request.setConnectionUUID(connection.getUID());
+
+        Message response = connection.notifyAndWait(request);
+
+        if(response instanceof  GetDevicesResponse){
+
+            GetDevicesResponse devicesResponse = (GetDevicesResponse) response;
+
+            Collection<Device> deviceList = devicesResponse.getDevices();
+
+            if(!deviceList.isEmpty()){
+                Device device = deviceList.iterator().next();
+                return ""+device.getValue();
+            }
+
+        }
+
+        return "";
+
+    }
+
+    @GET
+    @Path("/{uid}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public DeviceVO getDevice(@PathParam("uid") int uid) {
+
+        GetDevicesRequest request = new GetDevicesRequest(GetDevicesRequest.FILTER_BY_ID, uid);
+        request.setApplicationID(clientUUID);
+        request.setConnectionUUID(connection.getUID());
+
+        request.setApplicationID(clientUUID);
+        request.setConnectionUUID(connection.getUID());
+
+        Message response = connection.notifyAndWait(request);
+
+        if(response instanceof  GetDevicesResponse){
+
+            GetDevicesResponse devicesResponse = (GetDevicesResponse) response;
+
+            Collection<Device> deviceList = devicesResponse.getDevices();
+
+            if(!deviceList.isEmpty()){
+                Device device = deviceList.iterator().next();
+                return new DeviceVO(device);
+            }
+
+        }
+
+        return null;
+
     }
 
     @DELETE
@@ -79,24 +136,27 @@ public class DeviceRest implements DeviceService {
     @GET
     @Path("/list")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<DeviceVO> list(){
+    public List<DeviceVO> list() throws IOException {
 
-        DeviceVO device1 = new DeviceVO(1,"Device 1", DeviceType.DIGITAL, DeviceCategory.LAMP, 0);
-        DeviceVO device2 = new DeviceVO(2,"Device 2", DeviceType.DIGITAL, DeviceCategory.POWER_SOURCE, 0);
-        DeviceVO device3 = new DeviceVO(3,"Device 3", DeviceType.DIGITAL, DeviceCategory.LAMP, 0);
-        DeviceVO device4 = new DeviceVO(4,"Device 4", DeviceType.DIGITAL, DeviceCategory.POWER_SOURCE, 0);
+        GetDevicesRequest request = new GetDevicesRequest();
+        request.setApplicationID(clientUUID);
+        request.setConnectionUUID(connection.getUID());
+
+        Message response = connection.notifyAndWait(request);
 
         List<DeviceVO> devices = new LinkedList<DeviceVO>();
-        devices.add(device1);
-        devices.add(device2);
-        devices.add(device3);
-        devices.add(device4);
 
-//        try {
-//            Thread.sleep(5000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        if(response instanceof  GetDevicesResponse){
+
+            GetDevicesResponse devicesResponse = (GetDevicesResponse) response;
+
+            Collection<Device> deviceList = devicesResponse.getDevices();
+
+            for (Device device : deviceList) {
+                devices.add(new DeviceVO(device));
+            }
+
+        }
 
         return devices;
     }

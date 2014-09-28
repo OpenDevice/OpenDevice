@@ -44,6 +44,8 @@ public abstract class AbstractConnection implements DeviceConnection {
 
     private String uid = UUID.randomUUID().toString();
 
+    private String applicationID;
+
 	/**
 	 * Notify All Listeners about received command.
 	 */
@@ -55,14 +57,16 @@ public abstract class AbstractConnection implements DeviceConnection {
             message.setConnectionUUID(this.getUID());
         }
 
-		for (final ConnectionListener listener : listeners) {
-            // TODO: Add config to use in SYNC MODE.
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    listener.onMessageReceived(message, AbstractConnection.this);
-                }
-            });
+        synchronized (listeners){
+            for (final ConnectionListener listener : listeners) {
+                // TODO: Add config to use in SYNC MODE.
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        listener.onMessageReceived(message, AbstractConnection.this);
+                    }
+                });
+            }
         }
 	}
 	
@@ -122,5 +126,16 @@ public abstract class AbstractConnection implements DeviceConnection {
     @Override
     public String getUID() {
         return uid;
+    }
+
+    @Override
+    public DeviceConnection setApplicationID(String applicationID) {
+        this.applicationID = applicationID;
+        return this;
+    }
+
+    @Override
+    public String getApplicationID() {
+        return applicationID;
     }
 }

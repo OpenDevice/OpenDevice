@@ -23,9 +23,9 @@ import br.com.criativasoft.opendevice.core.command.ResponseCommand;
  */
 public interface DeviceService {
 
-    ResponseCommand setValue(int id, String value);
+    ResponseCommand setValue(int uid, String value);
 
-    String getValue(int id);
+    String getValue(int uid);
 
-    String delete(int id);
+    String delete(int uid);
 }

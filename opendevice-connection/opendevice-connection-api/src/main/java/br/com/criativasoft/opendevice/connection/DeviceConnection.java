@@ -37,7 +37,7 @@ public interface DeviceConnection {
 	
 	public void send(Message message) throws IOException;
 	
-	public boolean addListener(ConnectionListener listener);
+	public  boolean addListener(ConnectionListener listener);
 	
 	public boolean removeListener(ConnectionListener e);
 	
@@ -48,5 +48,9 @@ public interface DeviceConnection {
 	public MessageSerializer<?, ?> getSerializer();
 
     public String getUID();
+
+    public String getApplicationID();
+
+    public DeviceConnection setApplicationID(String id);
 
 }

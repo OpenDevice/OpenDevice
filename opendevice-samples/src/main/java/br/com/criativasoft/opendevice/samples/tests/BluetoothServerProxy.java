@@ -11,7 +11,7 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.samples;
+package br.com.criativasoft.opendevice.samples.tests;
 
 import br.com.criativasoft.opendevice.connection.*;
 import br.com.criativasoft.opendevice.connection.message.Message;

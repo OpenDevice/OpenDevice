@@ -18,6 +18,8 @@ import br.com.criativasoft.opendevice.connection.ConnectionStatus;
 import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.connection.message.SimpleMessage;
+import br.com.criativasoft.opendevice.core.command.Command;
+import br.com.criativasoft.opendevice.core.command.CommandType;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -25,12 +27,16 @@ import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class FormController extends JFrame implements ConnectionListener, ActionListener {
 	
 	private DeviceConnection connection;
 	private JTextArea text;
 	private JPanel panelButtons;
+
+    private SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
 	
 	public FormController() {
 		 JFrame.setDefaultLookAndFeelDecorated(true);
@@ -64,7 +70,7 @@ public class FormController extends JFrame implements ConnectionListener, Action
 		return btn;
 	}
 
-    public void addButton(JButton button){
+    public void addButton(AbstractButton button){
         panelButtons.add(button);
     }
 
@@ -113,8 +119,19 @@ public class FormController extends JFrame implements ConnectionListener, Action
 
 	@Override
 	public void onMessageReceived(Message message, DeviceConnection connection) {
-		SimpleMessage stream = (SimpleMessage) message;
-		String value = new String(stream.getBytes());
+        String value;
+        if(message instanceof  SimpleMessage) {
+            SimpleMessage stream = (SimpleMessage) message;
+            value = new String(stream.getBytes());
+        }else if(message instanceof Command) {
+            Command command = (Command) message;
+            value = "Command Received (from: " + connection.getClass().getSimpleName() + ") : " + CommandType.getByCode(command.getType().getCode()).toString();
+        }else{
+            value = message.toString();
+        }
+
+
+        text.append("["+sdf.format(new Date()) + "]: ");
 		text.append(value);
 		text.append("\n");
 	}

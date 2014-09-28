@@ -41,6 +41,12 @@
         </dependency>
 
         <dependency>
+            <groupId>br.com.criativasoft.opendevice</groupId>
+            <artifactId>opendevice-js</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.0.13</version>
@@ -82,8 +88,26 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>br.com.criativasoft.opendevice.samples.BlinkDeviceDemo</mainClass>
+                    <mainClass>br.com.criativasoft.opendevice.samples.WebSocketDemo</mainClass>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-remote-resources-plugin</artifactId>
+                <version>1.5</version>
+                <configuration>
+                    <resourceBundles>
+                        <resourceBundle>br.com.criativasoft.opendevice:opendevice-js:${project.version}</resourceBundle>
+                    </resourceBundles>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
 		</plugins>

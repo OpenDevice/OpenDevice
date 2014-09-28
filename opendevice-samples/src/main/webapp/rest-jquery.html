@@ -10,11 +10,20 @@
     <script>
 
         function send(value) {
-
             var deviceID = $("#deviceID").val();
+            var url = "http://localhost:8181/device/" + deviceID + "/value/" + value;
+            call_rest(url);
+        }
 
+        function getValue(){
+            var deviceID = $("#deviceID").val();
+            var url = "http://localhost:8181/device/" + deviceID + "/value";
+            call_rest(url);
+        }
+
+        function call_rest(url){
             $.ajax({
-                url: "http://localhost:8181/device/" + deviceID + "/value/" + value
+                url: url
             }).then(function (data) {
                 $("#response").text(JSON.stringify(data));
             });
@@ -31,14 +40,16 @@
 
         <label>Device ID:</label>
         <select class="form-control" id="deviceID">
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
         </select>
 
         <button type="button" onclick="send(1)" class="btn btn-success">ON</button>
         <button type="button" onclick="send(0)" class="btn btn-danger">OFF</button>
+        <button type="button" onclick="getValue()" class="btn btn-info">GetValue</button>
 
     </form>
     <div id="response"></div>

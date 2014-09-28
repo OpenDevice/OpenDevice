@@ -13,45 +13,42 @@
 
 package br.com.criativasoft.opendevice.samples;
 
-import br.com.criativasoft.opendevice.connection.TCPConnection;
-import br.com.criativasoft.opendevice.core.SimpleDeviceManager;
+import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.core.connection.Connections;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceType;
+import br.com.criativasoft.opendevice.core.model.Sensor;
+import br.com.criativasoft.opendevice.samples.ui.FormDevicesAPIController;
+
+import java.util.Collection;
+import java.util.LinkedList;
 
 /**
- *
  * Tutorial: https://opendevice.atlassian.net/wiki/display/DOC/A.+First+Steps+with+OpenDevice
  * For arduino/energia use: opendevice-hardware-libraries/arduino/OpenDevice/examples/UsbConnection
  * For arduino(with bluetooth): opendevice-hardware-libraries/arduino/OpenDevice/examples/BluetoothConnection
- *
- * @author Ricardo JL Rufino
- * @date 17/02/2014
+ * @autor ricardo
+ * @date 25/06/14.
  */
-public class BlinkDeviceDemo extends SimpleDeviceManager {
+public class PanelButtonsGUI extends FormDevicesAPIController {
 
-    public static void main(String[] args) throws Exception {
-        new BlinkDeviceDemo();
+    public PanelButtonsGUI() throws ConnectionException {
+//        super(Connections.out.bluetooth("001303141907"));
+        super(Connections.out.usb());
+
+        Collection<Device> devices = new LinkedList<Device>();
+        devices.add(new Device(1,"RED", DeviceType.DIGITAL));
+        devices.add(new Device(2,"GREEN", DeviceType.DIGITAL));
+        devices.add(new Device(3,"BLUE", DeviceType.DIGITAL));
+        devices.add(new Sensor(4,"Sensor 1", DeviceType.DIGITAL));
+        devices.add(new Sensor(5,"Sensor 2", DeviceType.DIGITAL));
+
+        addDevices(devices);
+        connect();
     }
 
-    public BlinkDeviceDemo() throws Exception {
-
-        Device led = new Device(1, DeviceType.DIGITAL);
-
-        // setup connection with arduino/hardware
-        addOutput(Connections.out.usb()); // Connect to first USB port available
-        // addOutput(Connections.out.tcp("192.168.0.204:8081"));
-
-        connect();
-
-        addDevice(led);
-
-        while(true){
-            led.on();
-            delay(500);
-            led.off();
-            delay(500);
-        }
+    public static void main(String[] args) throws ConnectionException {
+        new PanelButtonsGUI().setVisible(true);
     }
 
 }

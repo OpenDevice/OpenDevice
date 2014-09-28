@@ -16,32 +16,29 @@ package br.com.criativasoft.opendevice.samples.ui;
 import br.com.criativasoft.opendevice.connection.ConnectionListener;
 import br.com.criativasoft.opendevice.connection.ConnectionStatus;
 import br.com.criativasoft.opendevice.connection.DeviceConnection;
-import br.com.criativasoft.opendevice.connection.StreamConnection;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
-import br.com.criativasoft.opendevice.connection.message.ByteMessage;
 import br.com.criativasoft.opendevice.connection.message.Message;
-import br.com.criativasoft.opendevice.core.command.CommandStreamReader;
-import br.com.criativasoft.opendevice.core.command.CommandStreamSerializer;
+import br.com.criativasoft.opendevice.core.DeviceManager;
+import br.com.criativasoft.opendevice.core.SimpleDeviceManager;
 import br.com.criativasoft.opendevice.core.command.CommandType;
 import br.com.criativasoft.opendevice.core.command.DeviceCommand;
+import br.com.criativasoft.opendevice.core.model.Device;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.Collection;
 
 
 // USE: OpenDevice Middleware in Arduino...
-public class FormDevicesAPIController extends JFrame implements ActionListener, ConnectionListener {
+public class FormDevicesAPIController extends JFrame implements ConnectionListener {
 
     private DeviceConnection connection;
 	private boolean state = false;
 
-    private JButton btn1;
-    private JButton btn2;
-    private JButton btn3;
-    private JButton btn4;
+    DeviceManager manager = new SimpleDeviceManager();
 
 	public FormDevicesAPIController(DeviceConnection connection) throws ConnectionException {
 		this.init();
@@ -49,22 +46,28 @@ public class FormDevicesAPIController extends JFrame implements ActionListener, 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		this.connection = connection;
+        manager.addOutput(connection);
+        connection.addListener(this);
+    }
 
-        // If is a Connection with physical device..
-        if(connection instanceof StreamConnection){
-            StreamConnection streamConnection = (StreamConnection) connection;
-            streamConnection.setSerializer(new CommandStreamSerializer()); // data conversion..
-            streamConnection.setStreamReader(new CommandStreamReader()); // data protocol reader..
+    public void connect(){
+        try {
+            manager.connect();
+        } catch (ConnectionException ex) {
+            ex.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
 
-		try {
-            connection.addListener(this);
-            connection.connect();
-		} catch (ConnectionException ex) {
-			ex.printStackTrace();
-		}
-	}
-	 
+    public void addDevices(Collection<Device> devices){
+        manager.addDevices(devices);
+        for (Device device : devices){
+            PowerButton powerButton = new PowerButton(device);
+            add(powerButton);
+        }
+        pack(); // force resize
+    }
 
     @Override
     public void connectionStateChanged(DeviceConnection connection,ConnectionStatus status) {
@@ -74,30 +77,24 @@ public class FormDevicesAPIController extends JFrame implements ActionListener, 
     @Override
     public void onMessageReceived(Message message, DeviceConnection connection) {
 
-		System.out.println(this.getClass().getSimpleName() + " >>> commandReceived = " + message.getClass().getSimpleName());
-
-        if(message instanceof ByteMessage){
-            System.out.println(">>> commandReceived = " + message.toString());
-        }
-		
 		if(message instanceof DeviceCommand){
 		
 			DeviceCommand deviceCommand = (DeviceCommand) message;
 			
 			int deviceID = deviceCommand.getDeviceID();
 			long value = deviceCommand.getValue();
-
-            JButton targetButton = null;
-            switch (deviceID){
-                case 1: targetButton = btn1; break;
-                case 2: targetButton = btn2; break;
-                case 3: targetButton = btn3; break;
-                case 4: targetButton = btn4; break;
-            }
-
-            if(targetButton != null){
-                changeButton(targetButton, deviceID, value);
-            }
+//
+//            AbstractButton targetButton = null;
+//            switch (deviceID){
+//                case 1: targetButton = btn1; break;
+//                case 2: targetButton = btn2; break;
+//                case 3: targetButton = btn3; break;
+//                case 4: targetButton = btn4; break;
+//            }
+//
+//            if(targetButton != null){
+//                changeButton(targetButton, deviceID, value);
+//            }
 			
 			if(deviceID == 51){
 				
@@ -137,16 +134,10 @@ public class FormDevicesAPIController extends JFrame implements ActionListener, 
         }
 
         this.setTitle("Java Client (using: WebSocket)");
-		btn1 = new JButton("1.OFF");
-		btn2 = new JButton("2.OFF");
-		btn3 = new JButton("3.OFF");
-		btn4 = new JButton("4.OFF");
+
+        final Collection<Device> devices = manager.getDevices();
+
 		final JButton btn5 = new JButton("Disconnect");
-		
-        this.add(btn1);
-        this.add(btn2);
-        this.add(btn3);
-        this.add(btn4);
         super.add (btn5);
         this.setLocation(150, 150);
         
@@ -162,10 +153,10 @@ public class FormDevicesAPIController extends JFrame implements ActionListener, 
 				try{
 					if(text.equals("Disconnect")){
 						connection.disconnect();
-                        changeButton(btn1, 1, 0);
-                        changeButton(btn2, 2, 0);
-                        changeButton(btn3, 3, 0);
-                        changeButton(btn4, 4, 0);
+
+                        for (Device device : devices){
+                            device.setValue(0);
+                        }
 
 						btn5.setText("Connect");
 					}else{
@@ -181,43 +172,6 @@ public class FormDevicesAPIController extends JFrame implements ActionListener, 
         
         
 	}
-
-	protected void add(JButton button){
-
-        button.setMinimumSize(new Dimension(100, 60));
-        button.setPreferredSize(new Dimension(100, 60));
-        button.setFont(new Font(Font.SANS_SERIF, 3, 15));
-        button.setActionCommand(button.getText());
-        button.addActionListener(this);
-        super.add(button);
-	}
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        JButton btn = (JButton) e.getSource();
-
-        String text = btn.getText();
-        if(text.contains(".")){
-            int id = Integer.parseInt(text.split("\\.")[0]);
-            String value = text.split("\\.")[1];
-
-            DeviceCommand command = new DeviceCommand(CommandType.ON_OFF, id, (value.equals("ON") ? 0 : 1));
-
-            changeButton(btn, id, (value.equals("ON") ? 0 : 1));
-
-            try {
-                connection.send(command);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        }
-
-    }
-
-    private void changeButton(JButton btn, int id, long value){
-        btn.setText(id + "." +  (value == 1 ? "ON" : "OFF")); // Alternar texto.
-        btn.setForeground(value == 1 ? Color.green : Color.black); // Alternar texto.
-    }
 
     public DeviceConnection getConnection() {
         return connection;

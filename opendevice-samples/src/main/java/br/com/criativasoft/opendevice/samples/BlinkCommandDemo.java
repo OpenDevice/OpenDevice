@@ -19,9 +19,14 @@ import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.CommandStreamReader;
 import br.com.criativasoft.opendevice.core.command.CommandStreamSerializer;
 import br.com.criativasoft.opendevice.core.command.DeviceCommand;
+import br.com.criativasoft.opendevice.core.connection.Connections;
 
 
 /**
+ *
+ * Tutorial: https://opendevice.atlassian.net/wiki/display/DOC/A.+First+Steps+with+OpenDevice
+ * For arduino/energia use: opendevice-hardware-libraries/arduino/OpenDevice/examples/UsbConnection
+ * For arduino(with bluetooth): opendevice-hardware-libraries/arduino/OpenDevice/examples/BluetoothConnection
  * @author Ricardo JL Rufino
  * @date 17/02/2014
  */
@@ -29,17 +34,10 @@ public class BlinkCommandDemo implements ConnectionListener {
 
     public BlinkCommandDemo() throws Exception {
 
-        StreamConnection conn = StreamConnectionFactory.createUsb(UsbConnection.getFirstAvailable());
-        // StreamConnection connection = StreamConnectionFactory.createBluetooth("20:13:01:24:01:93");
-        // StreamConnection connection = StreamConnectionFactory.createTcp("192.168.0.101:8282");
-
-        // Configure OpenDevices Commands Protocol
-        conn.setSerializer(new CommandStreamSerializer()); // for de/serialization..
-        conn.setStreamReader(new CommandStreamReader());   // for reading streams
-
+        DeviceConnection conn = Connections.out.usb();
+        conn.addListener(this);
         conn.connect();
-
-        long delay= 300;
+        long delay = 500;
 
         while(conn.isConnected()) {
             conn.send(DeviceCommand.ON(1)); // '1' is Device ID not pin !
@@ -47,6 +45,8 @@ public class BlinkCommandDemo implements ConnectionListener {
             conn.send(DeviceCommand.OFF(1));
             Thread.sleep(delay);
         }
+
+        System.out.println("TERMINATED !");
     }
 	
 	public static void main(String[] args) throws Exception {
@@ -54,22 +54,17 @@ public class BlinkCommandDemo implements ConnectionListener {
 	}
 
 
-    // ------------- ConnectionListener Impl --------------------------
     // ------------------------------------------------------------
-
-    @Override
-    public void connectionStateChanged(DeviceConnection connection, ConnectionStatus status) {
-        System.out.println("connectionStateChanged :  " + status);
-    }
+    // ------------- ConnectionListener Impl --------------------------
 
     @Override
     public void onMessageReceived(Message message, DeviceConnection connection) {
         String type = message.getClass().getSimpleName();
+        System.out.println("onMessageReceived("+type+"): "+ message);
+    }
 
-        if(message instanceof Command){
-            System.out.println("onMessageReceived("+type+"): "+((Command) message).getType());
-        }else{
-            System.out.println("onMessageReceived("+type+"): "+message.toString());
-        }
+    @Override
+    public void connectionStateChanged(DeviceConnection connection, ConnectionStatus status) {
+        System.out.println("connectionStateChanged :  " + status);
     }
 }

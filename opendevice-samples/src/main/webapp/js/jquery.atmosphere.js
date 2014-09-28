@@ -77,7 +77,7 @@
     };
 
     jQuery.atmosphere = {
-        version: "2.2.3-jquery",
+        version: "2.2.4-jquery",
         uuid : 0,
         requests: [],
         callbacks: [],
@@ -221,6 +221,7 @@
                     server: null
                 },
                 ackInterval: 0,
+                closeAsync: false,
                 onError: function (response) {
                 },
                 onClose: function (response) {
@@ -1791,7 +1792,7 @@
                             if (jQuery.trim(responseText).length === 0 && rq.transport === 'long-polling') {
                                 // For browser that aren't support onabort
                                 if (!ajaxRequest.hasData) {
-                                    disconnected();
+                                    _reconnect(ajaxRequest, rq, rq.pollingInterval);
                                 } else {
                                     ajaxRequest.hasData = false;
                                 }
@@ -2306,15 +2307,6 @@
                 }
             }
 
-            function _pushOnClose(message) {
-                var rq = _getPushRequest(message);
-                rq.transport = "ajax";
-                rq.method = "GET";
-                rq.async = false;
-                rq.reconnect = false;
-                _executeRequest(rq);
-            }
-
             function _pushLocal(message) {
                 _localStorageService.send(message);
             }
@@ -2662,15 +2654,17 @@
                     if (_request.connectTimeout > 0) {
                         jQuery.ajax({
                             url: url,
-                            async: false,
+                            async: _request.closeAsync,
                             timeout: _request.connectTimeout,
-                            cache: false
+                            cache: false,
+                            crossDomain: _request.enableXDR
                         });
                     } else {
                         jQuery.ajax({
                             url: url,
-                            async: false,
-                            cache: false
+                            async: _request.closeAsync,
+                            cache: false,
+                            crossDomain: _request.enableXDR
                         });
                     }
                 }

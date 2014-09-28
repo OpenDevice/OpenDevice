@@ -44,7 +44,7 @@ public class MakeCall {
             // DTMF
 
 
-            //usb.write("ATD99689512;\r\n");
+            //usb.write("ATD99689513;\r\n");
 
         } catch (ConnectionException e) {
             e.printStackTrace();

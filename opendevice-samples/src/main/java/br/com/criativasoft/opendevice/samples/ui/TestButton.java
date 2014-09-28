@@ -14,6 +14,7 @@
 package br.com.criativasoft.opendevice.samples.ui;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * TODO: PENDING DOC
@@ -28,7 +29,9 @@ public class TestButton extends FormController {
         super.initComponents();
 
         JButton buttonBrowse = new JButton();
-        buttonBrowse.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/switch_off.png")));
+        buttonBrowse.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/power_circle_on.png")));
+        buttonBrowse.setPreferredSize(new Dimension(128,128));
+        buttonBrowse.setMinimumSize(new Dimension(128,128));
         buttonBrowse.setBorderPainted(false);
         buttonBrowse.setFocusPainted(false);
         buttonBrowse.setContentAreaFilled(false);

@@ -13,7 +13,6 @@
 
 package br.com.criativasoft.opendevice.samples;
 
-import br.com.criativasoft.opendevice.atemospherews.RestServerConnection;
 import br.com.criativasoft.opendevice.core.SimpleDeviceManager;
 import br.com.criativasoft.opendevice.core.connection.Connections;
 import br.com.criativasoft.opendevice.core.model.Device;
@@ -21,16 +20,23 @@ import br.com.criativasoft.opendevice.core.model.DeviceListener;
 import br.com.criativasoft.opendevice.core.model.DeviceType;
 
 /**
+ * In this example we add a control interface via REST, allowing integration with any other programming language or other software. <br/>
+ * Access the URL in the browser: http://localhost:8181/device/1/value/1   <br/>
+ * Or open sample: opendevice-samples/src/main/webapp/rest-jquery.html  <br/>
+ *
+ * Tutorial: https://opendevice.atlassian.net/wiki/display/DOC/Step+2+-+Adding+REST
+ * For arduino/energia use: opendevice-hardware-libraries/arduino/OpenDevice/examples/UsbConnection
+ * For arduino(with bluetooth): opendevice-hardware-libraries/arduino/OpenDevice/examples/BluetoothConnection
  * @author Ricardo JL Rufino
  * @date 17/02/2014
  */
-public class BlinkWithRestDeviceDemo extends SimpleDeviceManager implements DeviceListener {
+public class RestControlDemo extends SimpleDeviceManager implements DeviceListener {
 
     public static void main(String[] args) throws Exception {
-        new BlinkWithRestDeviceDemo();
+        new RestControlDemo();
     }
 
-    public BlinkWithRestDeviceDemo() throws Exception {
+    public RestControlDemo() throws Exception {
 
         Device led = new Device(1, DeviceType.DIGITAL);
 
@@ -38,20 +44,13 @@ public class BlinkWithRestDeviceDemo extends SimpleDeviceManager implements Devi
         addOutput(Connections.out.usb()); // Connect to first USB port available
 
         // Configure a Rest interface for receiving commands over HTTP
-        // Access the URL in the browser: http://localhost:8181/device/1/value/1
-        addInput(new RestServerConnection(8181));
+        addInput(Connections.in.rest(8181));
 
         addListener(this); // monitor changes on devices
         connect();
 
         addDevice(led);
 
-        while(true){
-//            led.on();
-//            Thread.sleep(500);
-//            led.off();
-            Thread.sleep(500);
-        }
     }
 
     // ------------- DeviceListener Impl --------------------------

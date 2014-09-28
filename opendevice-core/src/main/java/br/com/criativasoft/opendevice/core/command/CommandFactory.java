@@ -52,7 +52,7 @@ public class CommandFactory {
 			int status = Integer.parseInt(split[3]);	// Command.value
 
 			command = new ResponseCommand(CommandStatus.getByCode(status));
-            command.setUid(id);
+            command.setTrackingID(Integer.parseInt(id));
 
         // Received: GET_DEVICES_RESPONSE;ID;[ID, PIN, VALUE, TARGET, SENSOR?, TYPE];[ID, PIN, VALUE, TARGET, SENSOR?, TYPE];....
         }else if(type == CommandType.GET_DEVICES_RESPONSE){ // Returned list of devices.

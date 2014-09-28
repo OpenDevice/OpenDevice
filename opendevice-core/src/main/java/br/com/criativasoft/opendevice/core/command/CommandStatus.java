@@ -21,13 +21,14 @@ public enum CommandStatus implements EnumCode {
     DELIVERED(2),
     RECEIVED(3),
     FAIL(4),
+    EMPTY_DATABASE(5),
     // Response...
     SUCCESS(200),
     NOT_FOUND(404),
     BAD_REQUEST(400),
     UNAUTHORIZED(401),
-    PERMISSION_DENIED(550),
     FORBIDDEN(403),
+    PERMISSION_DENIED(550),
     INTERNAL_ERROR(500),
     NOT_IMPLEMENTED(501);
 

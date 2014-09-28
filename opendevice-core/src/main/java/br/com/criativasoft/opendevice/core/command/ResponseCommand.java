@@ -38,6 +38,9 @@ public class ResponseCommand extends Command {
 		super(type, UUID.randomUUID().toString(), connectionUUID);
 		this.setStatus(status);
 	}
-	
 
+    @Override
+    public String toString() {
+        return "ResponseCommand[type="+getType()+", status="+getStatus()+"]";
+    }
 }

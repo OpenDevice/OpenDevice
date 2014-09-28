@@ -1,9 +1,9 @@
 package br.com.criativasoft.opendevice.core.connection;
 
-import br.com.criativasoft.opendevice.connection.DeviceConnection;
-import br.com.criativasoft.opendevice.connection.IBluetoothConnection;
-import br.com.criativasoft.opendevice.connection.ITcpConnection;
-import br.com.criativasoft.opendevice.connection.IUsbConnection;
+import br.com.criativasoft.opendevice.connection.*;
+import br.com.criativasoft.opendevice.core.command.CommandStreamReader;
+import br.com.criativasoft.opendevice.core.command.CommandStreamSerializer;
+import br.com.criativasoft.opendevice.core.model.Device;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -16,21 +16,41 @@ import java.util.ServiceLoader;
  */
 public class OutputConnections {
 
+    /**
+     * Create a USB connection with first serial port available
+     * @return
+     */
     public IUsbConnection usb(){
         return usb(null);
     }
 
+    /**
+     * Create a USB connection.
+     * @param port - The serial port like: "COM3", "/dev/ttyUSB0", "/dev/ttyACM0"
+     * @return
+     */
     public IUsbConnection usb(String port){
         IUsbConnection connection = load(IUsbConnection.class);
         if(connection != null) connection.setConnectionURI(port);
         return connection;
     }
 
+    /**
+     * Create a bluetooth connection with first device available. <br/>
+     * Do not forget that you must pair with the PC first.
+     * @return
+     */
     public IBluetoothConnection bluetooth(){
         return bluetooth(null);
     }
 
 
+    /**
+     * Create a bluetooth connection. <br/>
+     * Do not forget that you must pair with the PC first.
+     * @param uri bluetooth address:
+     * @return
+     */
     public IBluetoothConnection bluetooth(String uri){
         IBluetoothConnection connection = load(IBluetoothConnection.class);
         if(connection != null) connection.setConnectionURI(uri);
@@ -43,6 +63,7 @@ public class OutputConnections {
         return connection;
     }
 
+
     private <T> T load(Class<T> klass){
 
         // lonkup....
@@ -52,6 +73,11 @@ public class OutputConnections {
 
         if(iterator.hasNext()){
             T connection = iterator.next();
+            if(connection instanceof StreamConnection){
+                StreamConnection conn = (StreamConnection) connection;
+                conn.setSerializer(new CommandStreamSerializer()); // for de/serialization..
+                conn.setStreamReader(new CommandStreamReader());   // for reading streams
+            }
             return connection;
         }
 

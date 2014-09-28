@@ -26,7 +26,8 @@ public enum CommandType implements EnumCode {
     ANALOG(2),
     ANALOG_REPORT(3),
 	GPIO_DIGITAL(4), // Controle a nivel logico do PINO (diferente do ON_OFF que pode ligar/desligar varios pinos)
-	GPIO_ANALOG(5), // Controle de baixo nivel 
+	GPIO_ANALOG(5), // Controle de baixo nivel
+    PWM(6),
 	
 	/** Response to commands like: ON_OFF, POWER_LEVEL, INFRA RED  */
 	DEVICE_COMMAND_RESPONSE(10), // Responsta para comandos como: ON_OFF, POWER_LEVEL, INFRA_RED

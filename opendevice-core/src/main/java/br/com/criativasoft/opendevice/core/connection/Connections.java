@@ -9,6 +9,8 @@ public class Connections {
 
     public static final OutputConnections out = new OutputConnections();
 
+    public static final InputContections in = new InputContections();
+
     /** Don't let anyone instantiate this class */
     private Connections() {
     }

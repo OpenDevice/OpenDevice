@@ -29,12 +29,20 @@ public class CommandStreamSerializer implements MessageSerializer<byte[], byte[]
 	@Override
 	public Message parse(byte[] data) {
 
-        Command command = CommandFactory.parse(new String(data));
+        String cmd = new String(data);
 
-        if(command != null){
-            return command;
-        }else{ // Undefined command.
-            return new SimpleMessage(data);
+        if(cmd.length() > 0){
+            Command command = CommandFactory.parse(cmd);
+
+            if(command != null){
+                return command;
+            }else{ // Undefined command.
+                return new SimpleMessage(data);
+            }
+
+        }else{
+            log.warn("empty message received !");
+            return null;
         }
 
 	}
@@ -48,13 +56,7 @@ public class CommandStreamSerializer implements MessageSerializer<byte[], byte[]
 		cmd[0] = command.getType().getCode();
 		cmd[1] = -1;
 		if(command.getUid() != null){
-			try{
-				cmd[1] = Integer.parseInt(command.getUid());
-			}catch (Exception e) {
-                cmd[1] = 0;
-                log.warn("command UUID must be int");
-//				throw new CommandException("command UUID must be int");
-			}
+		    cmd[1] = command.getTrackingID();
 		}
 		if(command instanceof DeviceCommand){
 			cmd[2] = ((DeviceCommand) command).getDeviceID();

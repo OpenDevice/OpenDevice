@@ -28,6 +28,16 @@ public class Sensor extends Device {
     }
 
     /**
+     * Create new Device
+     * @param name Logical name of device
+     * @param uid Must match with 'id' configured in the physical module
+     * @param type Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}
+     */
+    public Sensor(int uid, String name, DeviceType type) {
+        this(uid, name, type, DeviceCategory.GENERIC_SENSOR);
+    }
+
+    /**
      * Create new Sensor
      * @param uid Must match with 'id' configured in the physical module
      * @param type Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}

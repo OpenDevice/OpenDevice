@@ -21,5 +21,5 @@ import br.com.criativasoft.opendevice.core.model.Device;
  */
 public interface DeviceDao extends Dao<Device> {
 
-    public Device getByUID(long uid);
+    public Device getByUID(int uid);
 }

@@ -30,7 +30,8 @@ public abstract class Command implements Message{
 
 	private String uid; // Logic level user ID.
 	private String connectionUUID; // id of connection/channel that requested the command
-    private String clientID; // id of client (for Multitenancy support)
+    private String applicationID; // id of client (for Multitenancy support)
+    private volatile int trackingID = 0; // To monitor execution of commands, is usually a sequential number and managed by CommandDelivery
 	
 	private CommandType type;
 	private Date timestamp;
@@ -78,12 +79,12 @@ public abstract class Command implements Message{
 		this.connectionUUID = connectionUUID;
 	}
 
-    public void setClientID(String clientID) {
-        this.clientID = clientID;
+    public void setApplicationID(String applicationID) {
+        this.applicationID = applicationID;
     }
 
-    public String getClientID() {
-        return clientID;
+    public String getApplicationID() {
+        return applicationID;
     }
 
     /**
@@ -101,8 +102,15 @@ public abstract class Command implements Message{
 		return status;
 	}
 
+    public void setTrackingID(int trackingID) {
+        this.trackingID = trackingID;
+    }
 
-	@Override
+    public int getTrackingID() {
+        return trackingID;
+    }
+
+    @Override
 	public String toString() {
 		return this.getClass().getSimpleName() + "["+hashCode()+"]";
 	}

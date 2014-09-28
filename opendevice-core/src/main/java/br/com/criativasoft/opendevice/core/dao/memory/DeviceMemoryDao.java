@@ -40,7 +40,7 @@ public class DeviceMemoryDao implements DeviceDao {
         return null;
     }
 
-    public Device getByUID(long uid) {
+    public Device getByUID(int uid) {
         for (Device device : devices){
             if(device.getUid() == uid){
                 return device;

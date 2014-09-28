@@ -16,6 +16,7 @@ package br.com.criativasoft.opendevice.core.metamodel;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceCategory;
 import br.com.criativasoft.opendevice.core.model.DeviceType;
+import br.com.criativasoft.opendevice.core.model.Sensor;
 
 import java.util.Date;
 
@@ -26,6 +27,7 @@ public class DeviceVO {
 	private int type;
 	private int category;
 	private long value;
+    private boolean sensor=false;
 	
 	private Date lastUpdate;
 	private Date dateCreated;
@@ -37,6 +39,10 @@ public class DeviceVO {
 	public DeviceVO(Device device) {
 		this(device.getUid(), device.getName(), device.getType().getCode(), device.getCategory().getCode(), 
 		     device.getValue(), device.getLastUpdate(), device.getDateCreated());
+
+        if(device instanceof Sensor){
+            setSensor(true);
+        }
 	}
 
     public DeviceVO(int id, String name, DeviceType type, DeviceCategory category, long value) {
@@ -101,6 +107,12 @@ public class DeviceVO {
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
 	}
-	
-	
+
+    public void setSensor(boolean sensor) {
+        this.sensor = sensor;
+    }
+
+    public boolean isSensor() {
+        return sensor;
+    }
 }

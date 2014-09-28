@@ -47,7 +47,9 @@ public class CommandStreamReader extends DefaultSteamReader {
             if (checkEndOfMessage(read[i], inputBuffer)) {
                 byte[] array = inputBuffer.toByteArray();
                 Message event = parse(array);
-                notifyOnDataRead(event);
+                if(event != null){
+                    notifyOnDataRead(event);
+                }
                 inputBuffer.reset();
 
             }else{

@@ -20,7 +20,13 @@ public class DeviceCommand extends Command {
     public DeviceCommand(){
         super();
     }
-	
+
+    /**
+     * It is a command used to control devices or indicating a command has been received. Is bound to a Device.
+     * @param type
+     * @param deviceID - Device UID ({@link br.com.criativasoft.opendevice.core.model.Device#getUid()})
+     * @param value
+     */
 	public DeviceCommand(CommandType type, int deviceID, long value) {
 		super(type);
 		this.deviceID = deviceID;

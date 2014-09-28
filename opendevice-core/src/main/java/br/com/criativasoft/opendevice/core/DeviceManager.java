@@ -28,9 +28,11 @@ public interface DeviceManager {
 
 	public Collection<Device> getDevices() ;
 	
-	public Device findDeviceByUID(long deviceID);
+	public Device findDeviceByUID(int deviceUID);
 
     public void addDevice(Device device);
+
+    public void addDevices(Collection<Device> devices);
 	
 	public void send(Command command) throws IOException;
 

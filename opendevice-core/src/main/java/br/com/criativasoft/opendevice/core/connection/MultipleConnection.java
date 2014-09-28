@@ -19,6 +19,7 @@ import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.connection.serialize.MessageSerializer;
+import br.com.criativasoft.opendevice.core.command.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,7 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
         broadcast = true;
     }
 	  
-	public boolean addListener(ConnectionListener e) {
+	public synchronized boolean addListener(ConnectionListener e) {
 		boolean value = false;
 		listeners.add(e);
 		
@@ -62,7 +63,7 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 	}
 	
 	@Override
-	public boolean removeListener(ConnectionListener e) {
+	public synchronized boolean removeListener(ConnectionListener e) {
 		boolean value = false;
 		listeners.remove(e);
 		
@@ -125,11 +126,20 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 		return true;		
 	}
 	
-	public void send(Message command) throws IOException {
+	public void send(Message message) throws IOException {
 
 		for (DeviceConnection connection : connections) {
 			if(connection != null){
-				connection.send(command);
+
+                // Validate ApplicationID
+                if(message instanceof Command){
+                    Command command = (Command) message;
+                    if(connection.getApplicationID() != null && ! connection.getApplicationID().equals(command.getApplicationID())){
+                        continue; // Ignore
+                    }
+                }
+
+				connection.send(message);
 			}
 		}
 	}
@@ -197,7 +207,18 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
         return uid;
     }
 
-	/**
+
+    @Override
+    public String getApplicationID() {
+        return null;
+    }
+
+    @Override
+    public DeviceConnection setApplicationID(String id) {
+        return this;
+    }
+
+    /**
 	 * Repassa o comando que foi recebido, para as outras conexões.
 	 */
 	private void broadcastCommand(Message message, DeviceConnection fromConnection){

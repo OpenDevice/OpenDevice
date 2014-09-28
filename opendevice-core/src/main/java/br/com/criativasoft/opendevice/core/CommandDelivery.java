@@ -75,7 +75,7 @@ public class CommandDelivery {
 	 * // FIXME: This generation logic id probably is not scalable to the level of a service in CLOUD
 	 * @param connection
 	 */
-	protected synchronized String getNextUID(DeviceConnection connection){
+	protected synchronized int getNextUID(DeviceConnection connection){
 		
 		int id = cmdCount.incrementAndGet();
 		
@@ -84,7 +84,7 @@ public class CommandDelivery {
 			id = 1;
 		}		
 				
-		return Integer.toString(id);
+		return id;
 	}
 
 	private void sendWithTimeout(Command command, DeviceConnection connection){
@@ -134,8 +134,8 @@ public class CommandDelivery {
 		private Command command;
 		private DeviceConnection connection;
 		
-		private String originalID;
-		private String newID;
+		private int originalID;
+		private int newID;
 		
 		private Object lock = new Object();
 		
@@ -156,13 +156,13 @@ public class CommandDelivery {
 		@Override
 		public Boolean call() throws Exception {
 			
-			this.originalID = command.getUid();
+			this.originalID = command.getTrackingID();
 			this.newID = getNextUID(connection); 
 			
 			connection.addListener(this);
-			command.setUid(newID);
+			command.setTrackingID(newID);
 			
-			log.debug("Send and Wait reponse :: Cmd.SEQ:<" + this.newID + ">, UID: "+this.originalID);
+			log.debug("Send and Wait reponse :: Cmd.SEQ:<" + this.newID + ">, UID: "+command.getUid());
 			
 			connection.send(command);
 			
@@ -182,7 +182,7 @@ public class CommandDelivery {
 				lock.notifyAll();
 			}
 			
-			command.setUid(originalID);
+			command.setTrackingID(originalID);
 			connection.removeListener(this);
 		}
 
@@ -197,11 +197,11 @@ public class CommandDelivery {
 
 			if(received instanceof ResponseCommand){
 
-				String requestUID = received.getUid();
+				int requestUID = received.getTrackingID();
 
-				if(requestUID != null && requestUID.equals(this.newID)){
+				if(requestUID == this.newID){
 
-					log.debug("Response received :: Cmd.SEQ:<" + this.newID + ">, UID: "+this.originalID);
+					log.debug("Response received :: Cmd.SEQ:<" + this.newID + ">");
 
 					restoreComand(); // release lock and restore ID
 

@@ -29,9 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This is the base class for device management and input and output connections. <br/>
@@ -59,8 +57,8 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
     private DeviceListener thisListener = new DeviceManagerListener();
 
     @Override
-    public Device findDeviceByUID(long deviceID) {
-        return getValidDeviceDao().getByUID(deviceID);
+    public Device findDeviceByUID(int deviceUID) {
+        return getValidDeviceDao().getByUID(deviceUID);
     }
 
     public void setDeviceDao(DeviceDao deviceDao) {
@@ -85,12 +83,24 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
     }
 
     @Override
+    public void addDevices(Collection<Device> devices) {
+        for (Device device : devices){
+            addDevice(device);
+        }
+    }
+
+    @Override
     public Collection<Device> getDevices() {
         return getValidDeviceDao().listAll();
     }
 
     public boolean addListener(DeviceListener e) {
         return listeners.add(e);
+    }
+
+    public void addConnectionListener(ConnectionListener e) {
+        if(inputConnections != null) inputConnections.addListener(e);
+        if(outputConnections != null) outputConnections.addListener(e);
     }
 
     /**
@@ -159,10 +169,12 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
 
         if(connection instanceof StreamConnection){
             StreamConnection streamConnection = (StreamConnection) connection;
-            streamConnection.setSerializer(new CommandStreamSerializer()); // data conversion..
-            streamConnection.setStreamReader(new CommandStreamReader()); // data protocol..
+            if(! (streamConnection.getSerializer() instanceof CommandStreamSerializer)){
+                streamConnection.setSerializer(new CommandStreamSerializer()); // data conversion..
+                streamConnection.setStreamReader(new CommandStreamReader()); // data protocol..
+            }
         }
-		
+
 		outputConnections.addConnection(connection);
 	}
 
@@ -178,6 +190,10 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
         }
 
         Command command = (Command) message;
+
+        if(command.getApplicationID() == null || command.getApplicationID().length() == 0){
+            command.setApplicationID(connection.getApplicationID());
+        }
 
         log.debug("Command Received (from: " + connection.getClass().getSimpleName() + ") : " + CommandType.getByCode(command.getType().getCode()).toString());
 
@@ -200,9 +216,11 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
             // Se foi recebido pelo modulo físico(Bluetooth/USB/Wifi), não precisa ser gerenciado pelo CommandDelivery
             // basta ser enviado para os clientes..
             if (outputConnections != null && outputConnections.exist(connection)) {
-                log.debug("Sending to input connections...");
                 try {
-                    inputConnections.send(command); // Não precisa de time-out.
+                    if(inputConnections != null){
+                        log.debug("Sending to input connections...");
+                        inputConnections.send(command); // Não precisa de time-out.
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -221,7 +239,21 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
 
         } else if (type == CommandType.GET_DEVICES) {
 
-            GetDevicesResponse response = new GetDevicesResponse(getDevices(), command.getConnectionUUID());
+            GetDevicesRequest request = (GetDevicesRequest) message;
+            List<Device> devices = new LinkedList<Device>();
+
+            if(request.getFilter() <= 0) devices.addAll(getDevices());
+
+            if(request.getFilter() == GetDevicesRequest.FILTER_BY_ID){
+                Object id = request.getFilterValue();
+                if(id instanceof Integer){
+                    Device device = findDeviceByUID((Integer) id);
+                    if(device != null) devices.add(device);
+                }
+            }
+
+            GetDevicesResponse response = new GetDevicesResponse(devices, command.getConnectionUUID());
+            response.setApplicationID(command.getApplicationID());
 
             try {
 
@@ -265,6 +297,20 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
 		}
 		
 	}
+
+    /**
+     * Causes the currently executing thread to sleep (temporarily cease
+     * execution)
+     * @param millis
+     * @see Thread#sleep(long)
+     */
+    protected void delay(int millis){
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
     final class DeviceManagerListener implements DeviceListener {
 

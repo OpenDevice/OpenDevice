@@ -11,6 +11,8 @@
  * *****************************************************************************
  */
 
+
+
 /** @namespace */
 var od = od || {};
 
@@ -38,7 +40,7 @@ od.DeviceConnection = function(config){
     var Status = od.ConnectionStatus;
 
     // Private
-    var socket = atmosphere || $.atmosphere;
+    var socket = window.atmosphere || $.atmosphere;
     var serverConnection;
     var _this = this;
     var listeners = [];
@@ -53,12 +55,14 @@ od.DeviceConnection = function(config){
     init(config);
 
     function init(_config){
-        _config.url += ("/device/connection/" + _config.clientID); // set end point .
+        _config.url += ("/device/connection/" + _config.applicationID); // set end point .
         // _config.dropHeaders = false;
 
         if(_config["contentType"] == undefined)       _config["contentType"] = "application/json";
         if(_config["transport"] == undefined)         _config["transport"]   = "websocket";
         if(_config["fallbackTransport"] == undefined) _config["fallbackTransport"] = "long-polling";
+        if(_config["reconnectInterval"] == undefined) _config["reconnectInterval"] = 5000;
+        if(_config["maxReconnectOnClose"] == undefined) _config["maxReconnectOnClose"] = 5;
 
 
         _config.onError = function (response) {

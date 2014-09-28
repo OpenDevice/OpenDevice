@@ -12,7 +12,7 @@ var app = angular.module('opendevice', [
 // Constants
 // ===================
 app.constant('opendevice_url', 'http://'+window.location.host);
-app.constant('clientID', 'fake-client-123-123');
+app.constant('applicationID', 'clientname-123456');
 
 app.config(['$routeProvider', function($routeProvider) {
     //$routeProvider.when('/view1', {templateUrl: 'partials/partial1.html', controller: 'MyCtrl1'});

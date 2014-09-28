@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /*
+  ~  * ******************************************************************************
+  ~  *  Copyright (c) 2013-2014 CriativaSoft (www.criativasoft.com.br)
+  ~  *  All rights reserved. This program and the accompanying materials
+  ~  *  are made available under the terms of the Eclipse Public License v1.0
+  ~  *  which accompanies this distribution, and is available at
+  ~  *  http://www.eclipse.org/legal/epl-v10.html
+  ~  *
+  ~  *  Contributors:
+  ~  *  Ricardo JL Rufino - Initial API and Implementation
+  ~  * *****************************************************************************
+  ~  */
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>opendevice-clients</artifactId>
+        <groupId>br.com.criativasoft.opendevice</groupId>
+        <version>0.1.2-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>opendevice-js</artifactId>
+    <packaging>jar</packaging>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-remote-resources-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includes>
+                        <include>**/*.js</include>
+                        <include>**/*.css</include>
+                    </includes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

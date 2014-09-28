@@ -11,6 +11,14 @@
 	<artifactId>opendevice-web-view</artifactId>
 	<packaging>jar</packaging>
 
+    <dependencies>
+        <dependency>
+            <groupId>br.com.criativasoft.opendevice</groupId>
+            <artifactId>opendevice-js</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
 	<build>
 		<resources>
 			<resource>
@@ -20,8 +28,44 @@
 		</resources>
 
 		<plugins>
-		    
-		    
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-remote-resources-plugin</artifactId>
+                <version>1.5</version>
+                <configuration>
+                    <resourceBundles>
+                        <resourceBundle>br.com.criativasoft.opendevice:opendevice-js:${project.version}</resourceBundle>
+                    </resourceBundles>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-remote-resources-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includes>
+                        <include>**/webapp/*</include>
+                    </includes>
+                </configuration>
+            </plugin>
+
+
+
 <!-- 			<plugin> -->
 <!-- 				<groupId>com.samaxes.maven</groupId> -->
 <!-- 				<artifactId>minify-maven-plugin</artifactId> -->

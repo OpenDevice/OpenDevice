@@ -11,9 +11,9 @@ var app = angular.module('opendevice.services', []);
  * @param opendevice_url - injected from constants
  * @returns {od.DeviceConnection}
  */
-app.factory('connection', function(opendevice_url, clientID) {
+app.factory('connection', function(opendevice_url, applicationID) {
 
-        var config = { url: opendevice_url, clientID: clientID, logLevel : 'debug', reconnectInterval : 5000, maxReconnectOnClose : 10};
+        var config = { url: opendevice_url, applicationID: applicationID, logLevel : 'debug', reconnectInterval : 5000, maxReconnectOnClose : 10};
 
         var connection = new od.DeviceConnection(config);
 

@@ -28,7 +28,6 @@ app.controller('DashboardController', ['$scope','manager', function ($scope, man
 
         manager.on(DEvent.DEVICE_LIST_UPDATE, function(data){
             $scope.model.devices = data;
-            alert('data updated !!');
         });
 
         manager.on(DEvent.DEVICE_UPDATE, function(data){

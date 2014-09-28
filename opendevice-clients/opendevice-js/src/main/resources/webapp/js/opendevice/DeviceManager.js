@@ -11,6 +11,7 @@
  * *****************************************************************************
  */
 
+
 /** @namespace */
 var od = od || {};
 
@@ -58,9 +59,20 @@ od.DeviceManager = function(connection){
 
         if(device){
             device.value = value;
+            notifyListeners(DEvent.DEVICE_UPDATE, device);
         }
 
         // TODO :Alterar dados locais (localstorage)
+
+    };
+
+    this.toggleValue = function(deviceID){
+
+        var device = this.findDevice(deviceID);
+
+        if(device){
+            device.toggleValue();
+        }
 
     };
 
@@ -72,10 +84,6 @@ od.DeviceManager = function(connection){
     this.getDevices = function(){
 
         if(devices && devices.length > 0) return devices; // return from cache...
-
-        // try local storage
-        devices =  _getDevicesLocalStorege();
-        if(devices && devices.length > 0) return devices;
 
         // load remote.
         devices = sync(false);
@@ -103,6 +111,10 @@ od.DeviceManager = function(connection){
      * @returns {Array}
      */
      function sync(notify){
+
+        // try local storage
+        devices =  _getDevicesLocalStorege();
+        if(devices && devices.length > 0) return devices;
 
         // load remote.
         devices = _getDevicesRemote();
@@ -150,14 +162,20 @@ od.DeviceManager = function(connection){
 
     /**
      *
-     * @returns {*}
+     * @returns Array[]
      * @private
      */
     function _getDevicesRemote(){
 
         var response = rest("list");
 
-        return response;
+        var devices = [];
+
+        for(var i = 0; i < response.length; i++ ){
+            devices.push(new od.Device(response[i]));
+        }
+
+        return devices;
     }
 
     /**
@@ -214,6 +232,10 @@ od.DeviceManager = function(connection){
 
     function _connectionStateChanged(conn, newStatus, oldStatus){
         console.log("DeviceManager._connectionStateChanged :" + newStatus);
+
+        if(od.ConnectionStatus.CONNECTED == newStatus){
+            sync(true);
+        }
     };
 
     init(); //

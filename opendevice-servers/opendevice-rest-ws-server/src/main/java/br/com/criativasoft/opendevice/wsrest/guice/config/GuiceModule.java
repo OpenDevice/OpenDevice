@@ -63,9 +63,10 @@
  * holder.
  */
 
-package br.com.criativasoft.opendevice.atemospherews.guice.config;
+package br.com.criativasoft.opendevice.wsrest.guice.config;
 
-import br.com.criativasoft.opendevice.atemospherews.guice.GuiceResourceProvider;
+import br.com.criativasoft.opendevice.connection.ServerConnection;
+import br.com.criativasoft.opendevice.wsrest.guice.GuiceResourceProvider;
 import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.restapi.DeviceService;
 import br.com.criativasoft.opendevice.restapi.DeviceServiceImpl;
@@ -78,7 +79,7 @@ public class GuiceModule extends GuiceResourceProvider {
 
     @Override
     public void configure(Binder binder) {
-        binder.bind(DeviceConnection.class).toProvider(ConnectionGuiceProvider.class);
+        binder.bind(ServerConnection.class).toProvider(ConnectionGuiceProvider.class);
         binder.bind(DeviceService.class).to(DeviceServiceImpl.class);
     }
 

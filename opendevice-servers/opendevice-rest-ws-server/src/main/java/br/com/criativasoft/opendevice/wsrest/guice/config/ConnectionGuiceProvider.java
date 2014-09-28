@@ -11,28 +11,28 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.atemospherews.guice.config;
+package br.com.criativasoft.opendevice.wsrest.guice.config;
 
-import br.com.criativasoft.opendevice.connection.DeviceConnection;
+import br.com.criativasoft.opendevice.connection.ServerConnection;
 import com.google.inject.Provider;
 
 
 /**
- * Guice provider to Inject DeviceConnection into Rest Resources. </br>
+ * Guice provider to Inject ServerConnection into Rest Resources. </br>
  * TODO: Deve ser configurado em um filtro ou interceptor, usando #setConnection.
  * @autor Ricardo JL Rufino
  * @date 05/07/14.
  */
-public class ConnectionGuiceProvider implements Provider<DeviceConnection> {
+public class ConnectionGuiceProvider implements Provider<ServerConnection> {
 
-    private static ThreadLocal<DeviceConnection> connectionThreadLocal = new ThreadLocal<DeviceConnection>();
+    private static ThreadLocal<ServerConnection> connectionThreadLocal = new ThreadLocal<ServerConnection>();
 
-    public static void setConnection(DeviceConnection connection){
+    public static void setConnection(ServerConnection connection){
         connectionThreadLocal.set(connection);
     }
 
     @Override
-    public DeviceConnection get() {
+    public ServerConnection get() {
         return connectionThreadLocal.get();
     }
 }

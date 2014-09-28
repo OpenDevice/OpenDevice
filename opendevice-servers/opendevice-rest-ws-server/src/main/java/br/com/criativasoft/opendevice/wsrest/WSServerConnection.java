@@ -11,11 +11,10 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.atemospherews;
+package br.com.criativasoft.opendevice.wsrest;
 
-import br.com.criativasoft.opendevice.connection.ConnectionListener;
+import br.com.criativasoft.opendevice.connection.IWSServerConnection;
 import br.com.criativasoft.opendevice.restapi.DeviceRest;
-import org.atmosphere.cpr.AtmosphereInterceptor;
 import org.atmosphere.nettosphere.Config;
 
 
@@ -24,12 +23,16 @@ import org.atmosphere.nettosphere.Config;
  * @author Ricardo JL Rufino
  * @date 11/06/2013
  */
-public class WSServerConnection extends AbstractAtmosphereConnection implements AtmosphereInterceptor, ConnectionListener {
+public class WSServerConnection extends AbstractAtmosphereConnection implements IWSServerConnection {
 	
     private static WSServerConnection INSTANCE;
 
     public static WSServerConnection getInstance() {
         return INSTANCE;
+    }
+
+    public WSServerConnection() {
+        this(-1);
     }
 
 	public WSServerConnection(int port) {

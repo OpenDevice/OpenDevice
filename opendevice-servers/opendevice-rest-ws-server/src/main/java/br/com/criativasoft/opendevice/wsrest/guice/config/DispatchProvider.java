@@ -11,7 +11,7 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.atemospherews.guice.config;
+package br.com.criativasoft.opendevice.wsrest.guice.config;
 
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.server.impl.inject.InjectableValuesProvider;

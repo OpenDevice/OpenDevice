@@ -11,33 +11,35 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.atemospherews.io;
+package br.com.criativasoft.opendevice.wsrest.io;
 
-import br.com.criativasoft.opendevice.core.json.CommandJacksonMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.atmosphere.config.managed.Encoder;
+import org.atmosphere.jersey.Broadcastable;
 
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Provider;
-
+import java.io.IOException;
 
 /**
- * JAX-RS Provider to configure JSON Serialization of Commands.</br>
- * It must be used in conjunction with 'jackson-jaxrs-json-provider' maven dependecy.
+ * Atmosphere JSON Response Encoder..
  *
  * @autor Ricardo JL Rufino
  * @date 09/07/14.
  */
-@Provider
-public class CommandJacksonProvider implements ContextResolver<ObjectMapper> {
+public class ResponseEncoder implements Encoder<Broadcastable, String> {
 
-    private final CommandJacksonMapper mapper;
+    private final ObjectMapper mapper;
 
-    public CommandJacksonProvider() {
-        mapper = new CommandJacksonMapper();
+    public ResponseEncoder() {
+        mapper = new ObjectMapper();
     }
 
     @Override
-    public ObjectMapper getContext(Class<?> type) {
-        return mapper.getMapper();
+    public String encode(Broadcastable s) {
+        try {
+            return mapper.writeValueAsString(s);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

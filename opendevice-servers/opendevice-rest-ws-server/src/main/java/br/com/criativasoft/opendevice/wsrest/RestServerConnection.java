@@ -24,12 +24,11 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.atemospherews;
+package br.com.criativasoft.opendevice.wsrest;
 
-import br.com.criativasoft.opendevice.connection.ConnectionListener;
+import br.com.criativasoft.opendevice.connection.IRestServerConnection;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.restapi.DeviceRest;
-import org.atmosphere.cpr.AtmosphereInterceptor;
 import org.atmosphere.nettosphere.Config;
 
 import java.io.IOException;
@@ -40,7 +39,11 @@ import java.io.IOException;
  * @author Ricardo JL Rufino
  * @date 11/06/2013
  */
-public class RestServerConnection extends AbstractAtmosphereConnection implements AtmosphereInterceptor, ConnectionListener {
+public class RestServerConnection extends AbstractAtmosphereConnection implements IRestServerConnection {
+
+    public RestServerConnection() {
+        super();
+    }
 
 	public RestServerConnection(int port) {
 		super(port);

@@ -12,7 +12,7 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.atemospherews.io;
+package br.com.criativasoft.opendevice.wsrest.io;
 
 import org.atmosphere.cpr.AtmosphereResourceEvent;
 import org.atmosphere.websocket.WebSocketEventListener;

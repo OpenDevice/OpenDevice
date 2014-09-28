@@ -1,4 +1,4 @@
-import br.com.criativasoft.opendevice.atemospherews.WSServerConnection;
+import br.com.criativasoft.opendevice.wsrest.WSServerConnection;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 
 /**

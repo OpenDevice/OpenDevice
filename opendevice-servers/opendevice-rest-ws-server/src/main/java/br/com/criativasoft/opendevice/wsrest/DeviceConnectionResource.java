@@ -11,10 +11,10 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.atemospherews;
+package br.com.criativasoft.opendevice.wsrest;
 
-import br.com.criativasoft.opendevice.atemospherews.io.EventsLogger;
-import br.com.criativasoft.opendevice.connection.DeviceConnection;
+import br.com.criativasoft.opendevice.connection.ServerConnection;
+import br.com.criativasoft.opendevice.wsrest.io.EventsLogger;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.CommandStatus;
 import br.com.criativasoft.opendevice.core.command.ResponseCommand;
@@ -46,7 +46,7 @@ public class DeviceConnectionResource {
     private @Context AtmosphereResource resource;
 
     @Inject
-    private DeviceConnection connection;
+    private ServerConnection connection;
 
     @GET
     @Suspend(contentType = "application/json", listeners = EventsLogger.class)
@@ -69,7 +69,7 @@ public class DeviceConnectionResource {
 
         // Find caller ID.
         if(command.getConnectionUUID() == null)   command.setConnectionUUID(resource.uuid());
-        command.setClientID(topic.getID()); // This is APPLICATION ID TOKEN !
+        command.setApplicationID(topic.getID()); // This is APPLICATION ID TOKEN !
 
         connection.notifyListeners(command); // broadcast to all clients (browser/android/desktop)
 
@@ -77,43 +77,4 @@ public class DeviceConnectionResource {
         return  new ResponseCommand(CommandStatus.DELIVERED,  command.getConnectionUUID());
     }
 
-//    @POST
-//    @Broadcast
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Broadcastable publish(CommandParams params, @Context HttpHeaders headers) {
-//
-//        ResponseCommand response = null;
-//
-//        // Find caller ID.
-//        String requestUID = null;
-//        List<String> header = headers.getRequestHeader("requestUID");
-//        if(header == null || header.isEmpty()){
-//            header = headers.getRequestHeader("X-Atmosphere-tracking-id");
-//        }
-//        if(header!= null && !header.isEmpty()) requestUID = header.iterator().next();
-//
-//        // not found in header
-//        if(requestUID == null || requestUID.length() == 0 || requestUID.equals("0")){
-//            requestUID = params.getRequestUID();
-//        }
-//
-//        System.out.println(" >> requestUID =" + requestUID);
-//
-//        CommandType type = CommandType.getByCode(params.getType());
-//
-//        if(CommandType.isDeviceCommand(type)){
-//            long value = Long.parseLong(params.getValue());
-//            DeviceCommand command = new DeviceCommand(type, params.getDeviceID(), value);
-//            command.setRequestUID(requestUID);
-//            connection.notifyListeners(command);
-//
-//            // response = new ResponseCommand(type, requestUID, ResponseCommandStatus.SUCCESS);
-//        }
-//
-//        System.out.println("CommandParams = " + params);
-//
-//        // response=  new ResponseCommand(type, requestUID, ResponseCommandStatus.NOT_IMPLEMENTED);
-//
-//        return new Broadcastable(params, "", topic);
-//    }
 }

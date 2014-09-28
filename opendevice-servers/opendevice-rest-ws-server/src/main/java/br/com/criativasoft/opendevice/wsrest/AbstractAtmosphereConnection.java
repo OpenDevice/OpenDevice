@@ -11,15 +11,14 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.atemospherews;
+package br.com.criativasoft.opendevice.wsrest;
 
-import br.com.criativasoft.opendevice.atemospherews.guice.config.ConnectionGuiceProvider;
-import br.com.criativasoft.opendevice.atemospherews.guice.config.GuiceModule;
-import br.com.criativasoft.opendevice.atemospherews.io.CommandJacksonProvider;
-import br.com.criativasoft.opendevice.connection.AbstractConnection;
-import br.com.criativasoft.opendevice.connection.ConnectionListener;
-import br.com.criativasoft.opendevice.connection.ConnectionStatus;
-import br.com.criativasoft.opendevice.connection.DeviceConnection;
+import br.com.criativasoft.opendevice.connection.*;
+import br.com.criativasoft.opendevice.connection.message.Request;
+import br.com.criativasoft.opendevice.restapi.WaitResponseListener;
+import br.com.criativasoft.opendevice.wsrest.guice.config.ConnectionGuiceProvider;
+import br.com.criativasoft.opendevice.wsrest.guice.config.GuiceModule;
+import br.com.criativasoft.opendevice.wsrest.io.CommandJacksonProvider;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.core.command.Command;
@@ -30,9 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -40,7 +37,7 @@ import java.util.List;
  * @author Ricardo JL Rufino
  * @date 11/06/2013
  */
-public abstract class AbstractAtmosphereConnection extends AbstractConnection implements AtmosphereInterceptor, ConnectionListener {
+public abstract class AbstractAtmosphereConnection extends AbstractConnection implements AtmosphereInterceptor, ConnectionListener, ServerConnection {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractAtmosphereConnection.class);
 
@@ -50,8 +47,18 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
     private List<String> resources = new ArrayList<String>();
 
+    private List<WaitResponseListener> waitListeners = new LinkedList<WaitResponseListener>();
+
+    public AbstractAtmosphereConnection() {
+        super();
+    }
+
     public AbstractAtmosphereConnection(int port) {
         super();
+        this.port = port;
+    }
+
+    public void setPort(int port) {
         this.port = port;
     }
 
@@ -88,9 +95,8 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             conf.resource(GuiceModule.class);
             conf.resource(CommandJacksonProvider.class);
 
-            conf.resource("./webapp");  // For *-distrubution
-            conf.resource("./src/main/webapp"); // For mvn exec:java
-            conf.resource("./opendevice-samples/src/main/resources"); // For running inside an IDE
+            //conf.resource("./webapp");  // For *-distrubution
+            //conf.resource("./src/main/webapp"); // For mvn exec:java
 
             for(String resource : resources){
                 conf.resource(resource);
@@ -125,8 +131,7 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
     @Override
     public void send(Message message) throws IOException {
-        Command command = (Command) message;
-        log.info("Send not implemented !");
+        onResponseReceived(message);
     }
 
     private void initServerEvents() {
@@ -166,6 +171,21 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
     }
 
+
+    @Override
+    public Message notifyAndWait(Request request) {
+
+        WaitResponseListener waitResponse =  new WaitResponseListener(request, this);
+        waitListeners.add(waitResponse);
+
+        try {
+            return waitResponse.getResponse(1000);
+        } catch (InterruptedException e) {
+            return null;
+        }
+
+    }
+
     /**
      * Used to broadcast events/commands.</br>
      * Is fired by DeviceRest AND DeviceConnectionResource
@@ -179,6 +199,27 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
     }
 
 
+    /**
+     *
+     * @param message
+     */
+    public void onResponseReceived(Message message){
+
+        log.debug("waitListeners = " + waitListeners.size());
+        log.debug("threads = " + Thread.activeCount());
+
+        // Notify REST clients that are waiting for a response
+        Iterator<WaitResponseListener> iterator = waitListeners.iterator();
+        while(iterator.hasNext()){
+            WaitResponseListener waitListener = iterator.next();
+            boolean accept = waitListener.accept(message);
+            if(accept) iterator.remove();
+        }
+
+        broadcast(message);
+
+    }
+
     private void broadcast(Message message){
 
         AtmosphereConfig atmosphereConfig = server.framework().getAtmosphereConfig();
@@ -188,26 +229,28 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             Command cmd = (Command) message;
 
             // Get broadcast group for client.
-            Broadcaster broadcaster = atmosphereConfig.getBroadcasterFactory().lookup(cmd.getClientID());
+            Broadcaster broadcaster = atmosphereConfig.getBroadcasterFactory().lookup(cmd.getApplicationID());
+
+            Collection<Broadcaster> broadcasters = atmosphereConfig.getBroadcasterFactory().lookupAll();
+            System.out.println("WSServer.broadcasters = "+ broadcasters.size());
+            for (Broadcaster item : broadcasters) {
+                System.out.println(" - " + item.getID());
+            }
 
             if(broadcaster != null){
                 Collection<AtmosphereResource> atmosphereResources = broadcaster.getAtmosphereResources();
-                System.out.println("WSServer.clients = "+ atmosphereResources.size());
+//                System.out.println("WSServer.clients = "+ atmosphereResources.size());
+
                 for (AtmosphereResource atmosphereResource : atmosphereResources) {
 
                     // Don't broadcast to yourself
                     if(!atmosphereResource.uuid().equals(cmd.getConnectionUUID())){
-                        System.out.println("BroadCast to -> " + atmosphereResource.uuid());
+                        System.out.println("Broadcast ["+message+"] to -> " + atmosphereResource.uuid());
                         broadcaster.broadcast(message, atmosphereResource);
                     }
 
                 }
 
-                Collection<Broadcaster> broadcasters = atmosphereConfig.getBroadcasterFactory().lookupAll();
-                System.out.println("WSServer.broadcasters = "+ broadcasters.size());
-                for (Broadcaster item : broadcasters) {
-                    System.out.println(" - " + item.getID());
-                }
             }
 
 
@@ -219,8 +262,8 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
 
             // Each client has your channel.
-//            if(cmd.getClientID() != null && cmd.getClientID().trim().length() > 0){
-//                atmosphereConfig.metaBroadcaster().broadcastTo(cmd.getClientID(), message);
+//            if(cmd.getApplicationID() != null && cmd.getApplicationID().trim().length() > 0){
+//                atmosphereConfig.metaBroadcaster().broadcastTo(cmd.getApplicationID(), message);
 //            }
 
         }

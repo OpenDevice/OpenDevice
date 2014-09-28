@@ -11,7 +11,7 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.atemospherews.guice;
+package br.com.criativasoft.opendevice.wsrest.guice;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;

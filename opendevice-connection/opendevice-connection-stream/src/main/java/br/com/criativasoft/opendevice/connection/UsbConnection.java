@@ -81,7 +81,14 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
      */
     public static String getFirstAvailable() {
         String[] portNames = SerialPortList.getPortNames();
-        if(portNames != null && portNames.length > 0) return portNames[0];
+        if(portNames != null && portNames.length > 0){
+            for (String port : portNames){
+                if(!port.contains("rfcomm0")){
+                    return port;
+                }
+            }
+            return null;
+        }
         return null;
     }
 

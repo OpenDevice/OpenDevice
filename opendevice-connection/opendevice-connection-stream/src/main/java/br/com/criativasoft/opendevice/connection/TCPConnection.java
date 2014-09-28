@@ -28,16 +28,18 @@ public class TCPConnection extends AbstractStreamConnection implements ITcpConne
 	
 	private static final Logger log = LoggerFactory.getLogger(TCPConnection.class);
 	
-	private String deviceURI;
-
     private Socket connection;
+
+    public TCPConnection() {
+        super();
+    }
 
     /**
      * @param deviceURI - (Ex.: 192.168.0.101:1234)
      */
 	public TCPConnection(String deviceURI) {
 		super();
-        this.deviceURI = deviceURI;
+        setConnectionURI(deviceURI);
 	}
 
 	@Override
@@ -75,7 +77,7 @@ public class TCPConnection extends AbstractStreamConnection implements ITcpConne
             String port = (index > 0 ?  deviceURI.substring(index + 1, deviceURI.length()) : "80");
             String host = deviceURI.substring(0, index);
 
-            log.debug("Connecting to: " + deviceURI);
+            log.debug("Connecting to: " + deviceURI + ", port:" + port);
 
             connection = new Socket(host, Integer.parseInt(port));
 

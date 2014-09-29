@@ -4,15 +4,15 @@
 #include <DeviceManager.h>
 #include <OpenDevice.h>
 
-#include <UIPEthernet.h>
-#include <ConnectionENC28J60.h>
+//#include <UIPEthernet.h>
+//#include <ConnectionENC28J60.h>
 
 
 // ========================================================================
 // Variables
 // ========================================================================
 
-DeviceConnection deviceConnection (Serial);
+DeviceConnection deviceConnection (Serial1);
 
 DeviceManager deviceManager;
 
@@ -24,15 +24,17 @@ bool DEBUG_USB = true;
 void setup(){
   
        Serial.begin(9600);
-       while (!Serial){delay(1);} // wait to open
+       Serial1.begin(9600);
        
-       if(DEBUG_USB) OpenDevice::debug(F("Starting..."));
+       // while (!Serial){delay(1);} // wait to open (no work on lauchpah)
+       
+       if(DEBUG_USB) OpenDevice::debug("Starting...");
 
-       deviceManager.addDevice(13, Device::DIGITAL); // ID:1
+       deviceManager.addDevice(RED_LED, Device::DIGITAL); // ID:1
 	
     // TODO: falta configurar o IP..			
     OpenDevice::begin(&deviceManager, &deviceConnection);			
-    OpenDevice::debug(F("Started!"));
+    OpenDevice::debug("Started!");
         
 }
 

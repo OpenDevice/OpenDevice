@@ -51,6 +51,7 @@
             <artifactId>logback-classic</artifactId>
             <version>1.0.13</version>
         </dependency>
+
         <dependency>
             <groupId>org.jfree</groupId>
             <artifactId>jfreechart</artifactId>

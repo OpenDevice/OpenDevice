@@ -1,0 +1,101 @@
+
+
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>OpenDevice WebSocket Sample</title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/demo.css">
+
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery.atmosphere.js"></script>
+
+    <script type="text/javascript" src="js/opendevice/Device.js"></script>
+    <script type="text/javascript" src="js/opendevice/Constants.js"></script>
+    <script type="text/javascript" src="js/opendevice/DeviceConnection.js"></script>
+    <script type="text/javascript" src="js/opendevice/DeviceManager.js"></script>
+
+
+    <script>
+
+    var connection = null;
+    var manager = null;
+
+    $(function(){
+
+        connection = new od.DeviceConnection({ url: "http://localhost:8181", applicationID: "clientname-123456", logLevel : 'debug'});
+
+        manager = new od.DeviceManager(connection);
+
+        manager.on(od.DeviceEvent.DEVICE_LIST_UPDATE, function(devices){
+            console.log(devices);
+            createButtons(devices);
+        });
+
+        manager.on(od.DeviceEvent.DEVICE_CHANGED, function(data){
+            updateView(data);
+
+            // User Logic.
+            if(data.sensor){
+                var device = manager.findDevice(data.id - 2);
+                if(device) device.setValue(data.value);
+            }
+        });
+
+        connection.connect();
+
+    });
+
+    function toggleValue(deviceID){
+        manager.toggleValue(deviceID);
+        updateView(manager.findDevice(deviceID));
+    }
+
+    /** Create HTML */
+    function createButtons(devices){
+
+        var form = $("form");
+        form.empty();
+
+        for(var i = 0; i < devices.length; i++){
+            var id = devices[i].id;
+            var klass = (devices[i].value == 0 ? "danger" : "success");
+            var text = "Device " + id;
+            var disabled = (devices[i].sensor ? 'disabled="disabled"' : '');
+
+            var btn = $('<button type="button" '+disabled+' onclick="toggleValue('+id+')" data-deviceid="'+id+'" class="btn btn-'+klass+'">'+text+'</button>');
+
+            form.append(btn);
+        }
+
+    }
+
+    /** update HTML */
+    function updateView(device){
+
+        var view = $("button").filter("[data-deviceid='" + device.id + "']");
+
+        if(device.value == 0){
+            view.attr('class', 'btn btn-danger');
+        }else{
+            view.attr('class', 'btn btn-success');
+        }
+
+    }
+
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <h1>OpenDevice WebSocket Sample</h1>
+
+    <form class="form-inline box-example"></form>
+
+    <div id="response"></div>
+</div>
+
+</body>
+</html>

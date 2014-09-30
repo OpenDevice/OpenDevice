@@ -28,23 +28,59 @@
     <packaging>jar</packaging>
 
     <build>
+
+        <resources>
+            <resource>
+                <directory>${basedir}/dist</directory>
+                <!--<targetPath>META-INF</targetPath>-->
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <artifactId>maven-remote-resources-plugin</artifactId>
                 <version>1.5</version>
                 <executions>
                     <execution>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>bundle</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
+                    <resourcesDirectory>${basedir}/dist</resourcesDirectory>
                     <includes>
                         <include>**/*.js</include>
                         <include>**/*.css</include>
                     </includes>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.samaxes.maven</groupId>
+                <artifactId>minify-maven-plugin</artifactId>
+                <version>1.7.4</version>
+                <executions>
+                    <execution>
+                        <id>default-minify</id>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <charset>UTF-8</charset>
+                            <cssSourceDir>css</cssSourceDir>
+                            <jsSourceIncludes>
+                                <jsSourceInclude>**/*.js</jsSourceInclude>
+                            </jsSourceIncludes>
+                            <jsFinalFile>opendevice.js</jsFinalFile>
+                            <webappTargetDir>${basedir}/dist</webappTargetDir>
+                            <jsEngine>CLOSURE</jsEngine>
+                        </configuration>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                    </execution>
+
+                </executions>
             </plugin>
         </plugins>
     </build>

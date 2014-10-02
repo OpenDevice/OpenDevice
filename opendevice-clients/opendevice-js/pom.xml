@@ -25,35 +25,23 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>opendevice-js</artifactId>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <build>
 
-        <resources>
-            <resource>
-                <directory>${basedir}/dist</directory>
-                <!--<targetPath>META-INF</targetPath>-->
-            </resource>
-        </resources>
-
         <plugins>
+
             <plugin>
-                <artifactId>maven-remote-resources-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.4</version>
                 <configuration>
-                    <resourcesDirectory>${basedir}/dist</resourcesDirectory>
-                    <includes>
-                        <include>**/*.js</include>
-                        <include>**/*.css</include>
-                    </includes>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <webResources>
+                        <resource>
+                            <directory>dist</directory>
+                        </resource>
+                    </webResources>
                 </configuration>
             </plugin>
 
@@ -72,6 +60,7 @@
                                 <jsSourceInclude>**/*.js</jsSourceInclude>
                             </jsSourceIncludes>
                             <jsFinalFile>opendevice.js</jsFinalFile>
+                            <webappSourceDir>${basedir}/src</webappSourceDir>
                             <webappTargetDir>${basedir}/dist</webappTargetDir>
                             <jsEngine>CLOSURE</jsEngine>
                         </configuration>

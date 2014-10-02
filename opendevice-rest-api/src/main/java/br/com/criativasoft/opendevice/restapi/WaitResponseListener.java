@@ -15,8 +15,6 @@
 
 package br.com.criativasoft.opendevice.restapi;
 
-import br.com.criativasoft.opendevice.connection.ConnectionListener;
-import br.com.criativasoft.opendevice.connection.ConnectionStatus;
 import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.connection.message.Request;
@@ -24,7 +22,8 @@ import br.com.criativasoft.opendevice.core.command.Command;
 
 
 /**
- * Created by ricardo on 21/09/14.
+ * Listener used to await the connection response. Usen in {@link br.com.criativasoft.opendevice.connection.ServerConnection#notifyAndWait(br.com.criativasoft.opendevice.connection.message.Request)}
+ * @author Ricardo JL Rufino
  */
 public class WaitResponseListener {
 
@@ -43,6 +42,7 @@ public class WaitResponseListener {
     public boolean accept(Message message) {
 
         if(waitCommand.getResponseType().isAssignableFrom(message.getClass())){
+
             // TODO: verificar o UID da requisição.
             this.lastCommand = (Command) message;
 

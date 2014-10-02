@@ -31,18 +31,19 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * TODO: PENDING DOC
+ * Device Rest Interface for controling devices. <br/>
+ * See https://opendevice.atlassian.net/wiki/display/DOC/Rest+API
  *
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 04/07/14.
  */
 @Path("device")
-public class DeviceRest implements DeviceService {
+public class DeviceRest {
 
     private static final Logger log = LoggerFactory.getLogger(DeviceRest.class);
 
-    @Inject
-    private DeviceService service;
+//    @Inject
+//    private DeviceService service;
 
     @Inject
     private ServerConnection connection;
@@ -130,7 +131,7 @@ public class DeviceRest implements DeviceService {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public String delete(@PathParam("id") int id){
-        return getService().delete(id);
+        return "";
     }
 
     @GET
@@ -161,13 +162,13 @@ public class DeviceRest implements DeviceService {
         return devices;
     }
 
-    private DeviceService getService(){
-
-        if(service == null){
-            service = new DeviceServiceImpl();
-            log.warn("@Injection not working !!");
-        }
-
-        return service;
-    }
+//    private DeviceService getService(){
+//
+//        if(service == null){
+//            service = new DeviceServiceImpl();
+//            log.warn("@Injection not working !!");
+//        }
+//
+//        return service;
+//    }
 }

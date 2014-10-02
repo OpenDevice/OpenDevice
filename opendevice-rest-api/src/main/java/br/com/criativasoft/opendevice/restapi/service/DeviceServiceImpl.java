@@ -11,21 +11,32 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.restapi;
+package br.com.criativasoft.opendevice.restapi.service;
+
 
 import br.com.criativasoft.opendevice.core.command.ResponseCommand;
 
 /**
  * TODO: PENDING DOC
  *
- * @autor Ricardo JL Rufino
- * @date 04/07/14.
+ * @author ricardo
+ * @date 03/07/14.
  */
-public interface DeviceService {
+public class DeviceServiceImpl implements DeviceService {
 
-    ResponseCommand setValue(int uid, String value);
+    @Override
+    public ResponseCommand setValue(int id,String value) {
+        return null;
+    }
 
-    String getValue(int uid);
+    @Override
+    public String getValue(int id) {
+        return "{getValue:X, id="+id+"}";
+    }
 
-    String delete(int uid);
+    @Override
+    public String delete( int id) {
+        return "{delete: id="+id+"}";
+    }
+
 }

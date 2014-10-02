@@ -77,7 +77,6 @@
         <module>opendevice-servers</module>
         <module>opendevice-web-view</module>
         <module>opendevice-middleware</module>
-        <module>opendevice-samples</module>
     </modules>
 
     <build>

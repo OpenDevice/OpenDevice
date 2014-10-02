@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * TODO: PENDING DOC
  *
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 27/08/14.
  */
 public class DeviceMemoryDao implements DeviceDao {

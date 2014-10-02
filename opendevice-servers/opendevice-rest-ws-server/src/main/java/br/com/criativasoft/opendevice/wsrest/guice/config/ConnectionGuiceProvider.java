@@ -20,7 +20,7 @@ import com.google.inject.Provider;
 /**
  * Guice provider to Inject ServerConnection into Rest Resources. </br>
  * TODO: Deve ser configurado em um filtro ou interceptor, usando #setConnection.
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 05/07/14.
  */
 public class ConnectionGuiceProvider implements Provider<ServerConnection> {

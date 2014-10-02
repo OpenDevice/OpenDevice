@@ -17,7 +17,7 @@ import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 
 /**
  * Interface that indicates that the connection supports reconnection
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 11/07/14.
  */
 public interface ReconnectionSupport {

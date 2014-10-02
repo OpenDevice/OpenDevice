@@ -38,7 +38,7 @@ import java.util.Collection;
 /**
  * TODO: PENDING DOC
  *
- * @autor ricardo
+ * @author ricardo
  * @date 30/06/14.
  */
 public class SimpleChart  extends ApplicationFrame implements ConnectionListener {

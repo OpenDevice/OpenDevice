@@ -24,7 +24,7 @@ import java.io.IOException;
 /**
  * Jackson Converter to serialize enum as integer
  *
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 08/07/14.
  */
 public class EnumCodeSerializer extends JsonSerializer<EnumCode> {

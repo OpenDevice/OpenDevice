@@ -16,7 +16,7 @@ package br.com.criativasoft.opendevice.core.dao;
 import br.com.criativasoft.opendevice.core.model.Device;
 
 /**
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 27/08/14.
  */
 public interface DeviceDao extends Dao<Device> {

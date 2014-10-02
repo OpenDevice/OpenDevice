@@ -2,7 +2,7 @@ import br.com.criativasoft.opendevice.wsrest.WSServerConnection;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 
 /**
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 05/07/14.
  */
 public class TestServer {

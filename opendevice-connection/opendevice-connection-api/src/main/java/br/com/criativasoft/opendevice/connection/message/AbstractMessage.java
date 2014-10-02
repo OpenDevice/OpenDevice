@@ -17,7 +17,7 @@ import java.util.UUID;
 
 /**
  * Base class for Message
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 02/09/14.
  */
 public class AbstractMessage implements Message {

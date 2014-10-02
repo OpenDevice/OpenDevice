@@ -19,7 +19,7 @@ import br.com.criativasoft.opendevice.connection.message.Request;
 /**
  * TODO: PENDING DOC
  *
- * @autor ricardo
+ * @author ricardo
  * @date 28/06/14.
  */
 public class GetDevicesRequest extends Command implements Request {

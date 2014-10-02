@@ -19,7 +19,7 @@ import java.awt.*;
 /**
  * TODO: PENDING DOC
  *
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 29/08/14.
  */
 public class TestButton extends FormController {

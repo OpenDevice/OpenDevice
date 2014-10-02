@@ -16,7 +16,7 @@ package br.com.criativasoft.opendevice.core.command;
 /**
  * TODO: PENDING DOC
  *
- * @autor ricardo
+ * @author ricardo
  * @date 19/06/14.
  */
 public class GPIO extends DeviceCommand {

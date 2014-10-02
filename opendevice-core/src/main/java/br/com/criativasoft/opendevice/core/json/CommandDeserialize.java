@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * TODO: PENDING DOC
  *
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 27/07/14.
  */
 public class CommandDeserialize extends StdDeserializer<Command> {

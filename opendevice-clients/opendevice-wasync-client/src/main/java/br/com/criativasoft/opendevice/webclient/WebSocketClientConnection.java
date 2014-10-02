@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 /**
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 10/07/14.
  */
 public class WebSocketClientConnection extends AbstractConnection implements ReconnectionSupport {

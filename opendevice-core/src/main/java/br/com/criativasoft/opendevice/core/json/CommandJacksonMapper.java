@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 /**
  * Jackson Configuration for Commands
  *
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 11/07/14.
  */
 public class CommandJacksonMapper  {

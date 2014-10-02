@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 /**
  * TODO: PENDING DOC
  *
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 24/08/14.
  */
 public class SimpleDeviceManager extends BaseDeviceManager {

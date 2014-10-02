@@ -20,7 +20,7 @@ import com.sun.jersey.server.impl.model.method.dispatch.AbstractResourceMethodDi
 /**
  * TODO: PENDING DOC
  *
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 05/07/14.
  */
 // @Provider (disabled for now)

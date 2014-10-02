@@ -17,7 +17,7 @@ package br.com.criativasoft.opendevice.core.model;
  * The listener interface for receiving Device change events. <br/>
  * When the event occurs, the @{link #onDeviceChanged } method is invoked.
  *
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 24/08/14.
  */
 public interface DeviceListener {

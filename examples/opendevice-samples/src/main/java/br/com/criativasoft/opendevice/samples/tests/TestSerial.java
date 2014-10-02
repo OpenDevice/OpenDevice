@@ -26,7 +26,7 @@ import java.util.Date;
 
 /**
  * Test Raw Reading..
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 27/08/14.
  */
 public class TestSerial {

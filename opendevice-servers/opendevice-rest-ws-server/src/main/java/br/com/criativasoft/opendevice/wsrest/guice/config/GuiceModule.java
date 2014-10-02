@@ -67,9 +67,8 @@ package br.com.criativasoft.opendevice.wsrest.guice.config;
 
 import br.com.criativasoft.opendevice.connection.ServerConnection;
 import br.com.criativasoft.opendevice.wsrest.guice.GuiceResourceProvider;
-import br.com.criativasoft.opendevice.connection.DeviceConnection;
-import br.com.criativasoft.opendevice.restapi.DeviceService;
-import br.com.criativasoft.opendevice.restapi.DeviceServiceImpl;
+import br.com.criativasoft.opendevice.restapi.service.DeviceService;
+import br.com.criativasoft.opendevice.restapi.service.DeviceServiceImpl;
 import com.google.inject.Binder;
 
 import javax.ws.rs.ext.Provider;

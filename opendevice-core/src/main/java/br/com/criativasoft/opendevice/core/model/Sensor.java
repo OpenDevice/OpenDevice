@@ -2,7 +2,7 @@ package br.com.criativasoft.opendevice.core.model;
 
 /**
  * Sensors are basically the same as devices.
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 06/09/14.
  * @see br.com.criativasoft.opendevice.core.model.Device
  */

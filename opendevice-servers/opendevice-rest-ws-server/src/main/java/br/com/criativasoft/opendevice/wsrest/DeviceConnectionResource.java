@@ -33,7 +33,7 @@ import javax.ws.rs.core.MediaType;
 /**
  * TODO: PENDING DOC
  *
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 08/07/14.
  */
 @Path("/device/connection/{topic}")

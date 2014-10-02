@@ -22,7 +22,7 @@ import java.io.IOException;
 /**
  * Atmosphere JSON Response Encoder..
  *
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 09/07/14.
  */
 public class ResponseEncoder implements Encoder<Broadcastable, String> {

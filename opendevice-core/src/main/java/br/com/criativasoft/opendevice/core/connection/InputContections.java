@@ -9,7 +9,7 @@ import java.util.ServiceLoader;
 /**
  * Factory for Input Connections
  *
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 06/09/14.
  */
 public class InputContections {

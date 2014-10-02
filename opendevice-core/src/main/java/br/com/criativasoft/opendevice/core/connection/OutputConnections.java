@@ -11,14 +11,13 @@ import java.util.ServiceLoader;
 /**
  * Factory for Output Connections
  *
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 06/09/14.
  */
 public class OutputConnections {
 
     /**
      * Create a USB connection with first serial port available
-     * @return
      */
     public IUsbConnection usb(){
         return usb(null);
@@ -27,7 +26,6 @@ public class OutputConnections {
     /**
      * Create a USB connection.
      * @param port - The serial port like: "COM3", "/dev/ttyUSB0", "/dev/ttyACM0"
-     * @return
      */
     public IUsbConnection usb(String port){
         IUsbConnection connection = load(IUsbConnection.class);
@@ -38,7 +36,6 @@ public class OutputConnections {
     /**
      * Create a bluetooth connection with first device available. <br/>
      * Do not forget that you must pair with the PC first.
-     * @return
      */
     public IBluetoothConnection bluetooth(){
         return bluetooth(null);
@@ -49,7 +46,6 @@ public class OutputConnections {
      * Create a bluetooth connection. <br/>
      * Do not forget that you must pair with the PC first.
      * @param uri bluetooth address:
-     * @return
      */
     public IBluetoothConnection bluetooth(String uri){
         IBluetoothConnection connection = load(IBluetoothConnection.class);

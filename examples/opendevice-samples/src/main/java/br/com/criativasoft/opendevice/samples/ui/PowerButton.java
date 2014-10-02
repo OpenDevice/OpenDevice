@@ -12,7 +12,7 @@ import java.awt.event.ItemListener;
 /**
  * TODO: PENDING DOC
  *
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 14/09/14.
  */
 public class PowerButton extends JToggleButton implements ItemListener, DeviceListener{

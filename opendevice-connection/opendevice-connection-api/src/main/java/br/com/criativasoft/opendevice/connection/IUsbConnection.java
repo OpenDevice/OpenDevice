@@ -2,7 +2,7 @@ package br.com.criativasoft.opendevice.connection;
 
 /**
  * SPI Interface Marker for Usb.
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 06/09/14.
  */
 public interface IUsbConnection extends StreamConnection {

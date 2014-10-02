@@ -16,7 +16,7 @@ package br.com.criativasoft.opendevice.core.metamodel;
 /**
  * TODO: PENDING DOC
  *
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 08/07/14.
  */
 public interface EnumCode {

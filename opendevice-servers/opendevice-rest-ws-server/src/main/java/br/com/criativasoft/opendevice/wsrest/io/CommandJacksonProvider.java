@@ -24,7 +24,7 @@ import javax.ws.rs.ext.Provider;
  * JAX-RS Provider to configure JSON Serialization of Commands.</br>
  * It must be used in conjunction with 'jackson-jaxrs-json-provider' maven dependecy.
  *
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 09/07/14.
  */
 @Provider

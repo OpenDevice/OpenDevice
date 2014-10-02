@@ -25,7 +25,7 @@ import java.io.IOException;
 /**
  * TODO: PENDING DOC
  *
- * @autor Ricardo JL Rufino
+ * @author Ricardo JL Rufino
  * @date 11/07/14.
  */
 public class CommandEncoderDecoder implements Encoder<Command, String>, Decoder<String, Command> {

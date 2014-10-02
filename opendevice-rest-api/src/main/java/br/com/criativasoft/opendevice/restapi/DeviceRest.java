@@ -73,9 +73,6 @@ public class DeviceRest implements DeviceService {
         request.setApplicationID(clientUUID);
         request.setConnectionUUID(connection.getUID());
 
-        request.setApplicationID(clientUUID);
-        request.setConnectionUUID(connection.getUID());
-
         Message response = connection.notifyAndWait(request);
 
         if(response instanceof  GetDevicesResponse){
@@ -91,7 +88,10 @@ public class DeviceRest implements DeviceService {
 
         }
 
-        return "";
+        log.debug("response = " + response);
+
+
+        return "ERROR: Not Found !";
 
     }
 

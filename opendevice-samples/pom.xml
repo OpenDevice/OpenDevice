@@ -30,12 +30,6 @@
 
         <dependency>
             <groupId>br.com.criativasoft.opendevice</groupId>
-            <artifactId>opendevice-wasync-client</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>br.com.criativasoft.opendevice</groupId>
             <artifactId>opendevice-rest-ws-server</artifactId>
             <version>${project.version}</version>
         </dependency>

@@ -131,7 +131,19 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
     @Override
     public void send(Message message) throws IOException {
-        onResponseReceived(message);
+
+        log.debug("waitListeners = " + waitListeners.size());
+        log.debug("threads = " + Thread.activeCount());
+
+        // Notify REST clients that are waiting for a response
+        Iterator<WaitResponseListener> iterator = waitListeners.iterator();
+        while(iterator.hasNext()){
+            WaitResponseListener waitListener = iterator.next();
+            boolean accept = waitListener.accept(message);
+            if(accept) iterator.remove();
+        }
+
+        broadcast(message);
     }
 
     private void initServerEvents() {
@@ -181,6 +193,7 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
         try {
             return waitResponse.getResponse(1000);
         } catch (InterruptedException e) {
+            log.error(e.getMessage());
             return null;
         }
 
@@ -199,26 +212,6 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
     }
 
 
-    /**
-     *
-     * @param message
-     */
-    public void onResponseReceived(Message message){
-
-        log.debug("waitListeners = " + waitListeners.size());
-        log.debug("threads = " + Thread.activeCount());
-
-        // Notify REST clients that are waiting for a response
-        Iterator<WaitResponseListener> iterator = waitListeners.iterator();
-        while(iterator.hasNext()){
-            WaitResponseListener waitListener = iterator.next();
-            boolean accept = waitListener.accept(message);
-            if(accept) iterator.remove();
-        }
-
-        broadcast(message);
-
-    }
 
     private void broadcast(Message message){
 

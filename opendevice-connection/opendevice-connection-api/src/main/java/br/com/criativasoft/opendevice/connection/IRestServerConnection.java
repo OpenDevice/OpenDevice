@@ -7,4 +7,6 @@ package br.com.criativasoft.opendevice.connection;
  * @date 13/09/14.
  */
 public interface IRestServerConnection extends ServerConnection {
+
+    void addWebResource(String path);
 }

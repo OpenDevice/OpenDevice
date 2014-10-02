@@ -54,9 +54,4 @@ public class RestServerConnection extends AbstractAtmosphereConnection implement
         conf.resource(DeviceRest.class);
     }
 
-
-    @Override
-    public void send(Message message) throws IOException {
-        // this is not possible, ignore
-    }
 }

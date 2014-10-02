@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Hello Rest OpenDevice</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/demo.css">
+    <script src="js/jquery-1.11.1.min.js"></script>
+
+    <script>
+
+        function send(value) {
+            var deviceID = $("#deviceID").val();
+            var url = "http://localhost:8181/device/" + deviceID + "/value/" + value;
+            call_rest(url);
+        }
+
+        function getValue(){
+            var deviceID = $("#deviceID").val();
+            var url = "http://localhost:8181/device/" + deviceID + "/value";
+            call_rest(url);
+        }
+
+        function call_rest(url){
+            $.ajax({
+                url: url
+            }).then(function (data) {
+                $("#response").text(JSON.stringify(data));
+            });
+        }
+
+    </script>
+</head>
+
+<body>
+<div class="container">
+    <h1>OpenDevice Rest Sample</h1>
+
+    <form class="form-inline box-example">
+
+        <label>Device ID:</label>
+        <select class="form-control" id="deviceID">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+
+        <button type="button" onclick="send(1)" class="btn btn-success">ON</button>
+        <button type="button" onclick="send(0)" class="btn btn-danger">OFF</button>
+        <button type="button" onclick="getValue()" class="btn btn-info">GetValue</button>
+
+    </form>
+    <div id="response"></div>
+
+</div>
+</body>
+</html>

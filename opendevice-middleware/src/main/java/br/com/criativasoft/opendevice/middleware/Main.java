@@ -11,13 +11,9 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.server;
+package br.com.criativasoft.opendevice.middleware;
 
-import br.com.criativasoft.opendevice.connection.TCPConnection;
-import br.com.criativasoft.opendevice.core.connection.Connections;
 import br.com.criativasoft.opendevice.wsrest.WSServerConnection;
-import br.com.criativasoft.opendevice.connection.StreamConnectionFactory;
-import br.com.criativasoft.opendevice.connection.UsbConnection;
 import br.com.criativasoft.opendevice.connection.discovery.DiscoveryServer;
 import br.com.criativasoft.opendevice.core.BaseDeviceManager;
 import br.com.criativasoft.opendevice.core.dao.memory.DeviceMemoryDao;
@@ -32,6 +28,7 @@ import java.io.File;
 import java.util.Scanner;
 
 //
+// Run using Maven using: mvn compile exec:java -Dexec.mainClass=br.com.criativasoft.opendevice.middleware.Main
 // Run on firebug: app.deviceList.create({name:'Tomada DB2', value:0, category: app.DeviceCategory.POWER_SOURCE});
 // URLs REST:
 // - http://localhost:8181/device/1/setvalue/1
@@ -75,17 +72,13 @@ public class Main extends BaseDeviceManager {
 		}
 
         // Setup WebSocket (Socket.IO) with suport for simple htttpServer
-        WSServerConnection wsServerConnection = new WSServerConnection(port);
-        // Static WebResources
+        WSServerConnection webscoket = new WSServerConnection(port);
         String current = System.getProperty("user.dir");
-//        wsServerConnection.addWebResource( current + "/webapp");
-//        wsServerConnection.addWebResource( current + "/src/main/webapp"); // running exec:java
-//        wsServerConnection.addWebResource( current + "/target/classes/webapp"); // opendevice-js dependecy.
-        wsServerConnection.addWebResource("/media/Dados/Codigos/Java/Projetos/OpenDevice/opendevice-web-view/src/main/webapp");
-        wsServerConnection.addWebResource("/media/Dados/Codigos/Java/Projetos/OpenDevice/opendevice-clients/opendevice-js/src/main/resources/webapp");
+        // Static WebResources
+        webscoket.addWebResource( current + "/webapp");
+        webscoket.addWebResource( current + "/target/classes/webapp"); //  running exec:java
 
-
-        this.addInput(wsServerConnection);
+        this.addInput(webscoket);
 		// this.addConnectionIN(new RestServerConnection(restPort)); // Servidor REST
 		
 //		// No modo local ele se conecta com o servidor remoto.
@@ -96,7 +89,7 @@ public class Main extends BaseDeviceManager {
         // Procurar dispositivos USB
         if(MODE_LOCAL.equalsIgnoreCase(mode)){
                // addOutput(Connections.out.usb()); // Connect to first USB port available
-               addOutput(Connections.out.tcp("192.168.0.204:8081"));
+               //addOutput(Connections.out.tcp("192.168.0.204:8081"));
         }
 
 		// Não é o andoid e possue suporte a ambiente visual (! isHeadless)

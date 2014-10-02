@@ -11,7 +11,7 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.server.test;
+package br.com.criativasoft.opendevice.middleware.test;
 
 import javax.swing.*;
 

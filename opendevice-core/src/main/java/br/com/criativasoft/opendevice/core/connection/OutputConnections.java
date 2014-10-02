@@ -81,6 +81,6 @@ public class OutputConnections {
             return connection;
         }
 
-        return null;
+        throw new RuntimeException("Provider for connection class: " + klass.getSimpleName() + ", not found ! (TIP: Add dependency)");
     }
 }

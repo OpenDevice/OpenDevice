@@ -246,7 +246,7 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
 
             if(request.getFilter() == GetDevicesRequest.FILTER_BY_ID){
                 Object id = request.getFilterValue();
-                if(id instanceof Integer){
+                if(id instanceof Integer || id instanceof Long){
                     Device device = findDeviceByUID((Integer) id);
                     if(device != null) devices.add(device);
                 }

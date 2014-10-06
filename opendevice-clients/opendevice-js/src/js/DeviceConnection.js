@@ -50,12 +50,12 @@ od.DeviceConnection = function(config){
     // public
     this.status = Status.DISCONNECTED;
     this.config = config;
-    this.url = config.url;
+    this.url = od.serverURL + "/device/connection/" + od.appID;
 
     init(config);
 
     function init(_config){
-        _config.url += ("/device/connection/" + _config.applicationID); // set end point .
+        _config.url =  _this.url;
         // _config.dropHeaders = false;
 
         if(_config["contentType"] == undefined)       _config["contentType"] = "application/json";
@@ -181,7 +181,6 @@ od.DeviceConnection = function(config){
         catch(err) {
             console.error(" Can't parse response -> " + response.responseBody);
         }
-
-
     }
+
 }

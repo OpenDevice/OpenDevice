@@ -65,9 +65,6 @@ od.CommandType = {
     }
 };
 
-od.CommandType
-
-
 
 od.DeviceEvent = {
     DEVICE_LIST_UPDATE : "DEVICE_LIST_UPDATE",

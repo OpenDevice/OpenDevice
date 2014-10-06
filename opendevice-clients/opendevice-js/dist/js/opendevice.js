@@ -65,9 +65,6 @@ od.CommandType = {
     }
 };
 
-od.CommandType
-
-
 
 od.DeviceEvent = {
     DEVICE_LIST_UPDATE : "DEVICE_LIST_UPDATE",
@@ -174,12 +171,12 @@ od.DeviceConnection = function(config){
     // public
     this.status = Status.DISCONNECTED;
     this.config = config;
-    this.url = config.url;
+    this.url = od.serverURL + "/device/connection/" + od.appID;
 
     init(config);
 
     function init(_config){
-        _config.url += ("/device/connection/" + _config.applicationID); // set end point .
+        _config.url =  _this.url;
         // _config.dropHeaders = false;
 
         if(_config["contentType"] == undefined)       _config["contentType"] = "application/json";
@@ -305,9 +302,8 @@ od.DeviceConnection = function(config){
         catch(err) {
             console.error(" Can't parse response -> " + response.responseBody);
         }
-
-
     }
+
 }/*
  * ******************************************************************************
  *  Copyright (c) 2013-2014 CriativaSoft (www.criativasoft.com.br)
@@ -327,8 +323,6 @@ var od = od || {};
 
 /** global instance. @type {{od.DeviceManager}} */
 od.deviceManager = {};
-
-
 
 
 /**
@@ -380,14 +374,14 @@ od.DeviceManager = function(connection){
 
         var device = this.findDevice(deviceID);
 
-        if(device){
+        if(device && ! device.sensor){
             device.toggleValue();
         }
 
     };
 
     this.addDevice = function(){
-        // Isso teria no final que salvar na EPROM do arduino.
+        // Isso teria no final que salvar na EPROM/Servidor do arduino.
     }
 
 
@@ -477,7 +471,7 @@ od.DeviceManager = function(connection){
      */
     function _getDevicesRemote(){
 
-        var response = rest("list");
+        var response = OpenDevice.devices.list(); // rest !
 
         var devices = [];
 
@@ -489,32 +483,13 @@ od.DeviceManager = function(connection){
     }
 
     /**
-     * Call DeviceRest Resource.
-     *
-     * @private
-     * @param path
-     * @returns {*}
-     */
-    function rest(path){
-        var response = $.ajax({
-            type: "GET",
-            url: connection.url + "/device/" + path,
-            async: false
-        }).responseText;
-
-        // TODO: fazer tratamento dos possíveis erros (como exceptions e servidor offline)
-
-        return JSON.parse(response);
-    }
-
-    /**
      *
      * @param message
      * @private
      */
     function _onMessageReceived(conn, message){
 
-        // HACK: Bug in broadcast, is sending back same command.
+        // HACK: Bug in broadcast(atmosphere), is sending back same command.
         if(CType.isDeviceCommand(message.type) && conn.getConnectionUUID() == message.connectionUUID ){
             return;
         }
@@ -549,4 +524,135 @@ od.DeviceManager = function(connection){
     };
 
     init(); //
-}
+}/*
+ * ******************************************************************************
+ *  Copyright (c) 2013-2014 CriativaSoft (www.criativasoft.com.br)
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Ricardo JL Rufino - Initial API and Implementation
+ * *****************************************************************************
+ */
+
+var od = od || {};
+
+od.version = "1.0";
+od.APP_ID_NAME = "AppID";
+
+od.appID;
+od.serverURL = 'http://'+window.location.host;
+
+
+var OpenDevice = (function () {
+
+// Exported Methods
+return {
+
+    appID : od.appID,
+    serverURL : od.serverURL,
+
+    on : od.deviceManager.on,
+    
+    setAppID : function(appID){
+        od.appID = appID;
+    },
+
+    setServer : function(serverURL){
+        od.serverURL = serverURL;
+    },
+
+    rest : function(path){
+        var response = $.ajax({
+                type: "GET",
+                url: od.serverURL + path,
+                headers : {
+                    'X-AppID' : od.appID
+                },
+                async: false
+        }).responseText;
+
+        // TODO: fazer tratamento dos possíveis erros (como exceptions e servidor offline)
+
+        return JSON.parse(response);
+    },
+
+    /** Try to find APPID URL->Cookie->LocalStore */
+    findAppID : function(){
+
+        /** Get URL query param */
+        function getQueryParam(name){
+            var qs = (function(a) {
+                if (a == "") return {};
+                var b = {};
+                for (var i = 0; i < a.length; ++i)
+                {
+                    var p=a[i].split('=', 2);
+                    if (p.length == 1)
+                        b[p[0]] = "";
+                    else
+                        b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+                }
+                return b;
+            })(window.location.search.substr(1).split('&'));
+
+            return qs[name];
+        }
+
+        /** Get URL query param */
+        function getCookie(name) {
+          var value = "; " + document.cookie;
+          var parts = value.split("; " + name + "=");
+          if (parts.length == 2) return parts.pop().split(";").shift();
+        }
+
+
+        od.appID = getQueryParam(od.APP_ID_NAME);
+
+        if(od.appID != null) return od.appID;
+
+        od.appID = getCookie(od.APP_ID_NAME);
+
+        if(od.appID != null) return od.appID;
+
+        if( window.localStorage ){
+            od.appID = window.localStorage.getItem(od.APP_ID_NAME)
+        }
+
+        return od.appID;
+    }
+
+
+};
+
+})();
+
+
+/**
+ * REST Interface: Devices
+ */
+
+OpenDevice.devices = {
+
+    path : "/device",
+
+    get : function(deviceID){
+        return OpenDevice.rest(OpenDevice.devices.path + "/" + deviceID);
+    },
+
+    value : function(deviceID, value){
+
+        if(value != null){
+            return OpenDevice.rest(OpenDevice.devices.path + "/" + deviceID + "/value/" + value);
+        }else{
+            return OpenDevice.rest(OpenDevice.devices.path + "/" + deviceID + "/value");
+        }
+    },
+
+    list : function(deviceID){
+        return OpenDevice.rest(OpenDevice.devices.path + "/list");
+    }
+
+};

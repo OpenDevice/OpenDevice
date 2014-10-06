@@ -19,8 +19,6 @@ var od = od || {};
 od.deviceManager = {};
 
 
-
-
 /**
  * DeviceManager
  * @param {DeviceConnection} connection (Optional)
@@ -70,14 +68,14 @@ od.DeviceManager = function(connection){
 
         var device = this.findDevice(deviceID);
 
-        if(device){
+        if(device && ! device.sensor){
             device.toggleValue();
         }
 
     };
 
     this.addDevice = function(){
-        // Isso teria no final que salvar na EPROM do arduino.
+        // Isso teria no final que salvar na EPROM/Servidor do arduino.
     }
 
 
@@ -167,7 +165,7 @@ od.DeviceManager = function(connection){
      */
     function _getDevicesRemote(){
 
-        var response = rest("list");
+        var response = OpenDevice.devices.list(); // rest !
 
         var devices = [];
 
@@ -179,32 +177,13 @@ od.DeviceManager = function(connection){
     }
 
     /**
-     * Call DeviceRest Resource.
-     *
-     * @private
-     * @param path
-     * @returns {*}
-     */
-    function rest(path){
-        var response = $.ajax({
-            type: "GET",
-            url: connection.url + "/device/" + path,
-            async: false
-        }).responseText;
-
-        // TODO: fazer tratamento dos possíveis erros (como exceptions e servidor offline)
-
-        return JSON.parse(response);
-    }
-
-    /**
      *
      * @param message
      * @private
      */
     function _onMessageReceived(conn, message){
 
-        // HACK: Bug in broadcast, is sending back same command.
+        // HACK: Bug in broadcast(atmosphere), is sending back same command.
         if(CType.isDeviceCommand(message.type) && conn.getConnectionUUID() == message.connectionUUID ){
             return;
         }

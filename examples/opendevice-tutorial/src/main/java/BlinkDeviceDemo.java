@@ -26,7 +26,6 @@ public class BlinkDeviceDemo extends SimpleDeviceManager {
 
         // setup connection with arduino/hardware
         addOutput(Connections.out.usb()); // Connect to first USB port available
-        // addOutput(Connections.out.tcp("192.168.0.204:8081"));
 
         connect();
 

@@ -11,22 +11,21 @@
 
         function send(value) {
             var deviceID = $("#deviceID").val();
-            var url = "http://localhost:8181/device/" + deviceID + "/value/" + value;
+            var url = "/device/" + deviceID + "/value/" + value;
             call_rest(url);
         }
 
         function getValue(){
             var deviceID = $("#deviceID").val();
-            var url = "http://localhost:8181/device/" + deviceID + "/value";
+            var url = "/device/" + deviceID + "/value";
             call_rest(url);
         }
 
         function call_rest(url){
-            $.ajax({
-                url: url
-            }).then(function (data) {
+            $.get('http://'+window.location.host + url,{},function (data) {
                 $("#response").text(JSON.stringify(data));
             });
+
         }
 
     </script>

@@ -15,7 +15,6 @@ package br.com.criativasoft.opendevice.core.command;
 
 import br.com.criativasoft.opendevice.connection.message.Message;
 
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 import java.util.UUID;
 
@@ -23,7 +22,7 @@ import java.util.UUID;
  * @author Ricardo JL Rufino
  * @date 04/09/2011 13:48:57
  */
-@XmlRootElement
+// @XmlRootElement
 public abstract class Command implements Message{
 	
 	private static final long serialVersionUID = 676280722282919715L;
@@ -38,7 +37,7 @@ public abstract class Command implements Message{
 	private CommandStatus status = CommandStatus.CREATED;
 
     public Command() {
-        this(CommandType.ON_OFF, UUID.randomUUID().toString(), null);
+        this(CommandType.DIGITAL, UUID.randomUUID().toString(), null);
     }
 
 	public Command(CommandType type) {

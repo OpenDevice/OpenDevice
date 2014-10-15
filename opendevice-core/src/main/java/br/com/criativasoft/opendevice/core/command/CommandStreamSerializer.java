@@ -41,7 +41,7 @@ public class CommandStreamSerializer implements MessageSerializer<byte[], byte[]
             }
 
         }else{
-            log.warn("empty message received !");
+            log.trace("empty message received !");
             return null;
         }
 

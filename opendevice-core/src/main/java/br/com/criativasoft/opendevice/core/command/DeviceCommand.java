@@ -47,6 +47,11 @@ public class DeviceCommand extends Command {
 	}
 
     /**@see br.com.criativasoft.opendevice.core.command.CommandType#isDeviceCommand(CommandType) */
+    public static final boolean isCompatible(Command command){
+        return CommandType.isDeviceCommand(command.getType());
+    }
+
+    /**@see br.com.criativasoft.opendevice.core.command.CommandType#isDeviceCommand(CommandType) */
 	public static final boolean isCompatible(CommandType type){
 		return CommandType.isDeviceCommand(type);
 	}
@@ -60,21 +65,21 @@ public class DeviceCommand extends Command {
     }
 
     /**
-     * Create {@link br.com.criativasoft.opendevice.core.command.DeviceCommand} of type {@link CommandType#ON_OFF} with value HIGH
+     * Create {@link br.com.criativasoft.opendevice.core.command.DeviceCommand} of type {@link CommandType#DIGITAL} with value HIGH
      * @param deviceID
      * @return
      */
     public static DeviceCommand ON(int deviceID){
-        return new DeviceCommand(CommandType.ON_OFF, deviceID, Device.VALUE_HIGH);
+        return new DeviceCommand(CommandType.DIGITAL, deviceID, Device.VALUE_HIGH);
     }
 
     /**
-     * Create {@link br.com.criativasoft.opendevice.core.command.DeviceCommand} of type {@link CommandType#ON_OFF} with value LOW
+     * Create {@link br.com.criativasoft.opendevice.core.command.DeviceCommand} of type {@link CommandType#DIGITAL} with value LOW
      * @param deviceID
      * @return
      */
     public static DeviceCommand OFF(int deviceID){
-        return new DeviceCommand(CommandType.ON_OFF, deviceID, Device.VALUE_LOW);
+        return new DeviceCommand(CommandType.DIGITAL, deviceID, Device.VALUE_LOW);
     }
 
 }

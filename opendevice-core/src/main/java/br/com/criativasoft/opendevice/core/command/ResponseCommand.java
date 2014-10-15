@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.UUID;
 
 
-@XmlRootElement
+// @XmlRootElement
 public class ResponseCommand extends Command {
 	
 	private static final long serialVersionUID = 1891204618345540528L;

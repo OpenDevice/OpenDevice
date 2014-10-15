@@ -22,15 +22,15 @@ import br.com.criativasoft.opendevice.core.metamodel.EnumCode;
  * @date 04/09/2011 12:44:44
  */
 public enum CommandType implements EnumCode {
-	ON_OFF(1),
+	DIGITAL(1),
     ANALOG(2),
     ANALOG_REPORT(3),
-	GPIO_DIGITAL(4), // Controle a nivel logico do PINO (diferente do ON_OFF que pode ligar/desligar varios pinos)
+	GPIO_DIGITAL(4), // Controle a nivel logico do PINO (diferente do DIGITAL que pode ligar/desligar varios pinos)
 	GPIO_ANALOG(5), // Controle de baixo nivel
     PWM(6),
 	
-	/** Response to commands like: ON_OFF, POWER_LEVEL, INFRA RED  */
-	DEVICE_COMMAND_RESPONSE(10), // Responsta para comandos como: ON_OFF, POWER_LEVEL, INFRA_RED
+	/** Response to commands like: DIGITAL, POWER_LEVEL, INFRA RED  */
+	DEVICE_COMMAND_RESPONSE(10), // Responsta para comandos como: DIGITAL, POWER_LEVEL, INFRA_RED
 	
 	
 	PING_REQUEST(20), // Verificar se esta ativo
@@ -72,7 +72,7 @@ public enum CommandType implements EnumCode {
         if(type == null) return false;
 
         switch (type) {
-            case ON_OFF:
+            case DIGITAL:
                 return true;
             case ANALOG:
                 return true;

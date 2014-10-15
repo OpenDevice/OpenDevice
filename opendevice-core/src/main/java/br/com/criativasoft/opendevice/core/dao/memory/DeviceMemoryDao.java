@@ -13,11 +13,14 @@
 
 package br.com.criativasoft.opendevice.core.dao.memory;
 
+import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.model.Device;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * TODO: PENDING DOC
@@ -27,10 +30,24 @@ import java.util.List;
  */
 public class DeviceMemoryDao implements DeviceDao {
 
-    private List<Device> devices = new LinkedList<Device>();
+    private Map<String, List<Device>> deviceMap = new HashMap<String, List<Device>>();
+
+
+    private List<Device> getCurrentDevices(){
+
+        List<Device> devices = deviceMap.get(TenantProvider.getCurrentID());
+
+        return devices;
+
+    }
 
     @Override
     public Device getById(long id) {
+
+        List<Device> devices = getCurrentDevices();
+
+        if(devices == null) return null;
+
         for (Device device : devices){
             if(device.getId() == id){
                 return device;
@@ -41,6 +58,11 @@ public class DeviceMemoryDao implements DeviceDao {
     }
 
     public Device getByUID(int uid) {
+
+        List<Device> devices = getCurrentDevices();
+
+        if(devices == null) return null;
+
         for (Device device : devices){
             if(device.getUid() == uid){
                 return device;
@@ -55,6 +77,9 @@ public class DeviceMemoryDao implements DeviceDao {
             Device find = getById(device.getId());
             return find != null;
         }else{
+            List<Device> devices = getCurrentDevices();
+            if(devices == null) return false;
+
             for (Device find : devices){
                 if(device == find || device.equals(find)){ // check if same instance.
                     return true;
@@ -67,8 +92,15 @@ public class DeviceMemoryDao implements DeviceDao {
 
     @Override
     public void persist(Device entity) {
+        List<Device> devices = getCurrentDevices();
 
         if(!exist(entity)){
+
+            if(devices == null){
+                devices = new LinkedList<Device>();
+                deviceMap.put(TenantProvider.getCurrentID(), devices);
+            }
+
             devices.add(entity);
         }
 
@@ -81,6 +113,10 @@ public class DeviceMemoryDao implements DeviceDao {
 
     @Override
     public void delete(Device entity) {
+
+        List<Device> devices = getCurrentDevices();
+
+        if(devices == null || devices.isEmpty()) return;
 
         boolean removed = devices.remove(entity); // remove by instance
 
@@ -101,6 +137,7 @@ public class DeviceMemoryDao implements DeviceDao {
 
     @Override
     public List<Device> listAll() {
+        List<Device> devices = getCurrentDevices();
         return devices;
     }
 }

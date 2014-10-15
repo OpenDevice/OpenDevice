@@ -32,15 +32,17 @@ public class Device implements Serializable {
 	public static final int VALUE_HIGH = 1;
 	public static final int VALUE_LOW = 0;
 
+    public static final DeviceType ANALOG = DeviceType.ANALOG;
+    public static final DeviceType DIGITAL = DeviceType.DIGITAL;
+
     public static final int ON = 1;
     public static final int OFF = 0;
 	
-	private long id; // Database ID
 	private int uid; // Logic level user ID.
 	private String name;
 	private DeviceType type;
 	private DeviceCategory category;
-	private Date lastUpdate;
+	private long lastUpdate;
 	private Date dateCreated;
 	
 	private long value = VALUE_LOW;
@@ -113,13 +115,12 @@ public class Device implements Serializable {
 	}
 
 
-
-	public void setId(long id) {
-		this.id = id;
+	public void setId(int id) {
+		this.uid = id;
 	}
 	
-	public long getId() {
-		return id;
+	public int getId() {
+		return uid;
 	}
 	
 	public int getUid() {
@@ -142,11 +143,20 @@ public class Device implements Serializable {
 	public void setValue(long value) {
 
         if(value != this.value){
+            setLastUpdate(System.currentTimeMillis());
             this.value = value;
             notifyListeners();
         }
 
 	}
+
+    /**
+     * Check if the value is high
+     * @return true if value > 0
+     */
+    public boolean isON(){
+        return getValue() > 0;
+    }
 
     /**
      * Set value 1(HIGH).
@@ -176,11 +186,11 @@ public class Device implements Serializable {
 		return category;
 	}
 	
-	public void setLastUpdate(Date lastUpdate) {
+	public void setLastUpdate(long lastUpdate) {
 		this.lastUpdate = lastUpdate;
 	}
 	
-	public Date getLastUpdate() {
+	public long getLastUpdate() {
 		return lastUpdate;
 	}
 	

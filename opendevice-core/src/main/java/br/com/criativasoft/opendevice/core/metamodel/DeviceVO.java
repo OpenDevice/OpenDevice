@@ -29,7 +29,7 @@ public class DeviceVO {
 	private long value;
     private boolean sensor=false;
 	
-	private Date lastUpdate;
+	private long lastUpdate;
 	private Date dateCreated;
 	
 	public DeviceVO() {
@@ -50,10 +50,10 @@ public class DeviceVO {
     }
 
     public DeviceVO(int id, String name, int type, int category, long value) {
-        this(id, name, type, category, value, null, null);
+        this(id, name, type, category, value, 0, null);
     }
 
-	public DeviceVO(int id, String name, int type, int category, long value,Date lastUpdate, Date dateCreated) {
+	public DeviceVO(int id, String name, int type, int category, long value,long lastUpdate, Date dateCreated) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -95,10 +95,10 @@ public class DeviceVO {
 	public void setValue(long value) {
 		this.value = value;
 	}
-	public Date getLastUpdate() {
+	public long getLastUpdate() {
 		return lastUpdate;
 	}
-	public void setLastUpdate(Date lastUpdate) {
+	public void setLastUpdate(long lastUpdate) {
 		this.lastUpdate = lastUpdate;
 	}
 	public Date getDateCreated() {

@@ -98,8 +98,6 @@
 .mws-ic.ic-battery-half{background-image:url(32/battery_half.png);}
 .mws-ic.ic-battery-low{background-image:url(32/battery_low.png);}
 
-.mws-ic.ic-battery-on{background-image:url(32/battery_full.png);}
-.mws-ic.ic-battery-off{background-image:url(32/battery_low.png);}
 
 .mws-ic.ic-bell{background-image:url(32/bell.png);}
 .mws-ic.ic-bell-add{background-image:url(32/bell_add.png);}
@@ -715,8 +713,6 @@
 .mws-ic.ic-lightbulb{background-image:url(32/lightbulb.png);}
 .mws-ic.ic-lightbulb-add{background-image:url(32/lightbulb_add.png);}
 .mws-ic.ic-lightbulb-delete{background-image:url(32/lightbulb_delete.png);}
-.mws-ic.ic-lightbulb-on{background-image:url(32/lightbulb.png);}
-.mws-ic.ic-lightbulb-off{background-image:url(32/lightbulb_off.png);}
 .mws-ic.ic-lightning{background-image:url(32/lightning.png);}
 .mws-ic.ic-lightning-add{background-image:url(32/lightning_add.png);}
 .mws-ic.ic-lightning-delete{background-image:url(32/lightning_delete.png);}

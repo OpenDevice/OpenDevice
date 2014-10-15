@@ -26,7 +26,7 @@
 
 /* Use as necessary for nested content. Also use percents here for fluidity. */
 .content-pad-right { margin-right: 4%; }
-.content-pad-left: { margin-left: 4%; }
+.content-pad-left { margin-left: 4%; }
 
 audio,
 img,
@@ -39,7 +39,7 @@ video {
 /* @iPhone < 480px - One column fluid.
 -------------------------------------------------------------- */
 @media screen and (max-width:480px) {
-	
+
 }
 
 /* @1-Col < 768px - One column fluid.
@@ -49,16 +49,16 @@ video {
 		-webkit-text-size-adjust:none;
 		-ms-text-size-adjust:none
 	}
-	
+
 	body{
 		font-size: 82.5%;
 	}
-	
+
 	.container{
 		width:92%;
 		margin:0 auto
 	}
-	
+
 	.grid_1,.grid_2,.grid_3,.grid_4,.grid_5,.grid_6,.grid_7,.grid_8,.grid_full{
 		float: none;
 		width:100%;

@@ -278,7 +278,7 @@ div#mws-user-tools .mws-dropdown-menu .mws-dropdown-box .mws-dropdown-content ul
 
 div#mws-user-tools .mws-dropdown-menu .mws-dropdown-box .mws-dropdown-content ul.mws-messages li.read a
 {
-	background:url(../icons/16/email_open.png) no-repeat 8px center;
+	background:url(.mws-panel../icons/16/email_open.png) no-repeat 8px center;
 }
 
 div#mws-user-tools .mws-dropdown-menu .mws-dropdown-box .mws-dropdown-content ul.mws-messages li.unread a
@@ -533,9 +533,10 @@ div#mws-container
 
 div#mws-container .container
 {
-	float:left;
-	margin:0 4%;
-	padding-top:100px;
+    float: left;
+    margin: 0 5px;
+    padding-top: 85px;
+    width: 99%;
 }
 
 
@@ -546,7 +547,7 @@ div#mws-footer
 	width:92%;
 	margin:0 4%;
 	text-align:center;
-	padding:16px 0;
+	padding:12px 0;
 	border-top:1px solid #dadada;
 	float:left;
 }

@@ -8,21 +8,14 @@
 <!-- Required Stylesheets -->
 <link rel="stylesheet" type="text/css" href="css/reset.css" media="screen" />
 <link rel="stylesheet" type="text/css" href="css/text.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="css/fonts/ptsans/stylesheet.css" media="screen" />
 <link rel="stylesheet" type="text/css" href="css/fluid.css" media="screen" />
 
-<!-- <link rel="stylesheet" type="text/css" href="css/mws.style.css" media="screen" /> -->
-<link rel="stylesheet" type="text/css" href="css/core/mws.styles-all-min.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="css/app.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="css/core/mws.styles-all.min.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="css/app.css" media="screen" />
 <link rel="stylesheet" type="text/css" href="css/icons/icons.css" media="screen" />
 
-<!-- Demo and Plugin Stylesheets -->
-<!-- <link rel="stylesheet" type="text/css" href="css/demo.css" media="screen" /> -->
-
-<!-- <link rel="stylesheet" type="text/css" href="plugins/colorpicker/colorpicker.css" media="screen" /> -->
 <link rel="stylesheet" type="text/css" href="plugins/jgrowl/jquery.jgrowl.css" media="screen" />
-<!-- <link rel="stylesheet" type="text/css" href="css/jui/jquery.ui.css" media="screen" /> -->
-<link rel="stylesheet" type="text/css" href="css/jui/styles/jquery.ui-all-min.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="css/jui/jquery.ui-all-min.css" media="screen" />
 
 <!-- Theme Stylesheet -->
 <link rel="stylesheet" type="text/css" href="css/mws.theme.css" media="screen" />
@@ -31,23 +24,21 @@
 
 <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
 
+<script type="text/javascript" src="plugins/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="plugins/jgrowl/jquery.jgrowl-min.js"></script>
 <!--[if lt IE 9]>
 <script type="text/javascript" src="plugins/flot/excanvas.min.js"></script>
 <![endif]-->
-<!-- <script type="text/javascript" src="plugins/colorpicker/colorpicker-min.js"></script> -->
 <script type="text/javascript" src="plugins/validate/jquery.validate-min.js"></script>
 <script type="text/javascript" src="js/jquery-ui.js"></script>
 
 <script type="text/javascript" src="js/mws.js"></script>
 
-
-<title>OpenHouse - Dashboard</title>
+<title>OpenDevice - Dashboard</title>
 
 </head>
 
 <body>
-	
 
 	<!-- Header Wrapper -->
 	<div id="mws-header" class="clearfix">
@@ -60,7 +51,8 @@
         </div>
         
         <!-- User Area Wrapper -->
-        <div id="mws-user-tools" class="clearfix">
+        <!-- DISABLED -->
+        <div id="mws-user-tools" class="clearfix" style="display: none">
         
         	<!-- User Notifications -->
         	<div id="mws-user-notif" class="mws-dropdown-menu">
@@ -149,7 +141,7 @@
                 </div>
                 <div id="mws-user-functions">
                     <div id="mws-username">
-                        Ricardo JL Rufino
+                        Usuário
                     </div>
                     <ul>
                     	<li><a href="#">Perfil</a></li>
@@ -163,7 +155,7 @@
     </div>
     
     <!-- Main Wrapper -->
-    <div id="mws-wrapper">
+    <div id="mws-wrapper" ng-controller="DashboardController">
     	<!-- Necessary markup, do not remove -->
 		<div id="mws-sidebar-stitch"></div>
 		<div id="mws-sidebar-bg"></div>
@@ -182,16 +174,16 @@
             <!-- Main Navigation -->
             <div id="mws-navigation">
             	<ul>
-                	<li class="active"><a href="dashboard.html" class="mws-i-24 i-home">Dashboard</a></li>
-                	<li><a href="files.html" class="mws-i-24 i-file-cabinet">Dispositivos <span class="mws-nav-tooltip">4+</span></a></li>
-                	<li><a href="table.html" class="mws-i-24 i-list">Conexões</a></li>
-                	<li><a href="calendar.html" class="mws-i-24 i-day-calendar">Agendamento</a></li>
-                	<li><a href="charts.html" class="mws-i-24 i-chart">Logs</a></li>
+                	<li class="active"><a href="index.html" class="mws-i-24 i-home">Dashboard</a></li>
+                	<li><a href="#" onclick="alert('Not Implemented !')" class="mws-i-24 i-file-cabinet">Dispositivos <span class="mws-nav-tooltip">${model.devices.length}+</span></a></li>
+                	<li><a href="#" onclick="alert('Not Implemented !')" class="mws-i-24 i-list">Conexões</a></li>
+                	<li><a href="#" onclick="alert('Not Implemented !')" class="mws-i-24 i-day-calendar">Agendamento</a></li>
+                	<li><a href="#" onclick="alert('Not Implemented !')" class="mws-i-24 i-chart">Logs</a></li>
                 	<li>
                     	<a href="#" class="mws-i-24 i-cog">Configuração</a>
                         <ul>
-                        	<li><a href="form_layouts.html">Interface</a></li>
-                        	<li><a href="form_elements.html">Aplicação</a></li>
+                        	<li><a href="#" onclick="alert('Not Implemented !')">Interface</a></li>
+                        	<li><a href="#" onclick="alert('Not Implemented !')">Aplicação</a></li>
                         </ul>
                     </li>
 
@@ -206,8 +198,9 @@
         <div id="mws-container" class="clearfix">
         
         	<!-- Main Container -->
-            <div class="container ng-cloak" ng-controller="DashboardController">
-            
+            <div class="container ng-cloak">
+
+
             	<div class="mws-panel grid_8">
                 	<div class="mws-panel-header">
                     	<span class="mws-i-24 i-sign-post">Dispositivos: Escritório (${model.devices.length}) </span>
@@ -227,20 +220,27 @@
 
 		                </div>
 
-                        Status: <span>${model.status}</span><br/>
-                        <button ng-click="send();">Send</button>
-
-
 						<div class="mws-panel-toolbar bottom right clearfix" data-devicegroup="1">
                         	<ul>
                         	    <li><a href="#" class="mws-ic-16 ic-add" id="btn-device-add" >&nbsp;</a></li>
                             	<li><a href="#" class="mws-ic-16 ic-arrow-refresh">&nbsp;</a></li>
                             	<li><a href="#" class="mws-ic-16 ic-cross" onclick="new app.VoiceCommand().init()" >&nbsp;</a></li>
-                            	<li><a href="#" class="mws-ic-16 ic-lightbulb-off" >Desligar Todos</a></li>
-                            	<li><a href="#" class="mws-ic-16 ic-lightbulb" >Ligar Todos</a></li>
+                            	<li><a href="#" class="mws-ic-16 ic-lightbulb-off" ng-click="sendToAll(0);">Desligar Todos</a></li>
+                            	<li><a href="#" class="mws-ic-16 ic-lightbulb" ng-click="sendToAll(1);">Ligar Todos</a></li>
                             </ul>
                         </div>
                     	
+                    </div>
+                </div>
+
+                <div class="mws-panel grid_8">
+                    <div class="mws-panel-header">
+                        <span class="mws-i-24 i-sign-post"> Dispositivos Analógicos </span>
+                    </div>
+                    <div class="mws-panel-body">
+
+                        <div id="device-chart" style="height:220px"></div>
+
                     </div>
                 </div>
                 
@@ -264,6 +264,8 @@
   <p>TODO: Formulario Pendente !</p>
 </div>
 
+
+
 <!-- ----------------------------------------------------- -->
 <!-- AngularJS Code -->
 <!-- ----------------------------------------------------- -->
@@ -276,31 +278,28 @@
 <!-- ----------------------------------------------------- -->
 
     <script type="text/javascript" src="js/atmosphere.js"></script>
-    <!--<script type="text/javascript" src="js/jquery.atmosphere.js"></script> <!--Deve ser usado esse, testar compatibilidade !-->-->
+    <!--<script type="text/javascript" src="js/jquery.atmosphere.js"></script> <!--Deve ser usado esse, testar compatibilidade !-->
 
     <script type="text/javascript" src="js/opendevice.js"></script> <!-- mvn:dependency -->
 
-<!-- ----------------------------------------------------- -->
-<!-- Application Code -->
-<!-- ----------------------------------------------------- -->
+    <script type="text/javascript" src="js/DeviceChart.js"></script>
+
+    <!-- ----------------------------------------------------- -->
+    <!-- Application Code -->
+    <!-- ----------------------------------------------------- -->
 
     <script type="text/javascript" src="js_app/main.js"></script>
-    <script type="text/javascript" src="js_app/ConnectionFactory.js"></script>
     <script type="text/javascript" src="js_app/DashboardController.js"></script>
-   
-	<!--<script type="text/javascript" src="app/Constants.js"></script>-->
-	<!---->
-	<!--<!-- MODELS -->-->
-	<!--<script type="text/javascript" src="app/models/Command.js"></script>-->
-	<!--<script type="text/javascript" src="app/models/Device.js"></script>-->
-	<!--<!-- CONTROLLERs / logic -->-->
-	<!--<script type="text/javascript" src="app/controllers/CommandController.js"></script>-->
-	<!--<script type="text/javascript" src="app/controllers/VoiceCommandController.js"></script>-->
-	<!--<!-- VIEW -->-->
-	<!--<script type="text/javascript" src="app/view/DeviceView.js"></script>-->
-	<!---->
-	<!--<script type="text/javascript" src="app/App.js"></script>-->
-	   <!---->
+
+    <script>
+
+        $(function() {
+            new DeviceChart('#device-chart', [6, 7]);
+        });
+
+
+    </script>
+
     
 </body>
 </html>

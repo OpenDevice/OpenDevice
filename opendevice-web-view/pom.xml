@@ -30,6 +30,39 @@
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
+
+            <!--<plugin>-->
+                <!--<groupId>com.samaxes.maven</groupId>-->
+                <!--<artifactId>minify-maven-plugin</artifactId>-->
+                <!--<version>1.7.4</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>default-minify</id>-->
+                        <!--<phase>generate-resources</phase>-->
+                        <!--<configuration>-->
+                            <!--<charset>UTF-8</charset>-->
+                            <!--<cssSourceFiles>-->
+                                <!--<cssSourceFile>core.css</cssSourceFile>-->
+                                <!--<cssSourceFile>table.css</cssSourceFile>-->
+                                <!--<cssSourceFile>gallery.css</cssSourceFile>-->
+                                <!--<cssSourceFile>panels.css</cssSourceFile>-->
+                                <!--<cssSourceFile>misc.css</cssSourceFile>-->
+                                <!--<cssSourceFile>form.css</cssSourceFile>-->
+                                <!--<cssSourceFile>report.css</cssSourceFile>-->
+                                <!--<cssSourceFile>button.css</cssSourceFile>-->
+                                <!--<cssSourceFile>error.css</cssSourceFile>-->
+                            <!--</cssSourceFiles>-->
+                            <!--<cssSourceDir>css/core</cssSourceDir>-->
+                            <!--<cssFinalFile>mws.styles-all.css</cssFinalFile>-->
+                            <!--&lt;!&ndash;<webappTargetDir>${basedir}/src/main/webapp</webappTargetDir>&ndash;&gt;-->
+                        <!--</configuration>-->
+                        <!--<goals>-->
+                            <!--<goal>minify</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+
+                <!--</executions>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 </project>

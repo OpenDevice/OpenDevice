@@ -3,9 +3,22 @@
 }
 
 
+@font-face {
+    font-family: 'PTSansRegular';
+    src: url('fonts/ptsans/PTS55F-webfont.eot');
+    src: url('fonts/ptsans/PTS55F-webfont.eot?#iefix') format('embedded-opentype'),
+    url('fonts/ptsans/PTS55F-webfont.woff') format('woff'),
+    url('fonts/ptsans/PTS55F-webfont.ttf') format('truetype'),
+    url('fonts/ptsans/PTS55F-webfont.svg#PTSansRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
 .device-view-container {
     width: 100%;
-    margin-bottom: 24px
+    /*margin-bottom: 24px*/
 }
 
 .device-view {

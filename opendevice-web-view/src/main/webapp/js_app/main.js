@@ -1,18 +1,20 @@
 'use strict';
 
+var urlParams;
+
 // Declare app level module which depends on filters, and services
 var app = angular.module('opendevice', [
     'ngRoute',
     //'myApp.filters',
     //'myApp.directives',
-    'opendevice.services',
+    //'opendevice.services',
     'opendevice.controllers'
 ]);
 
 // Constants
 // ===================
-app.constant('opendevice_url', 'http://'+window.location.host);
-app.constant('applicationID', 'clientname-123456');
+// app.constant('opendevice_url', 'http://'+window.location.host);
+OpenDevice.setAppID = OpenDevice.findAppID() || 'clientname-123456x';
 
 app.config(['$routeProvider', function($routeProvider) {
     //$routeProvider.when('/view1', {templateUrl: 'partials/partial1.html', controller: 'MyCtrl1'});
@@ -20,7 +22,10 @@ app.config(['$routeProvider', function($routeProvider) {
     //$routeProvider.otherwise({redirectTo: '/view1'});
 }]);
 
+// Configuration to Work like JSP templates
 app.config(['$interpolateProvider', function($interpolateProvider) {
     $interpolateProvider.startSymbol('${');
     $interpolateProvider.endSymbol('}');
 }]);
+
+

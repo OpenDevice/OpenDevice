@@ -19,6 +19,7 @@ import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceType;
 import br.com.criativasoft.opendevice.core.model.Sensor;
 import br.com.criativasoft.opendevice.samples.ui.FormDevicesAPIController;
+import br.com.criativasoft.opendevice.webclient.WebSocketClientConnection;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -34,7 +35,10 @@ public class PanelButtonsGUI extends FormDevicesAPIController {
 
     public PanelButtonsGUI() throws ConnectionException {
 //        super(Connections.out.bluetooth("001303141907"));
-        super(Connections.out.usb());
+//        super(Connections.out.usb());
+
+        // TODO: usar Connections
+        super(new WebSocketClientConnection("http://localhost:8181/device/connection/app-demo-1"));
 
         Collection<Device> devices = new LinkedList<Device>();
         devices.add(new Device(1,"RED", DeviceType.DIGITAL));

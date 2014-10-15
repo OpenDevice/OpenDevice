@@ -15,15 +15,15 @@ import java.awt.event.ItemListener;
  * @author Ricardo JL Rufino
  * @date 14/09/14.
  */
-public class PowerButton extends JToggleButton implements ItemListener, DeviceListener{
+public class SwitchButton extends JToggleButton implements ItemListener, DeviceListener{
 
-    private static ImageIcon iconON = new javax.swing.ImageIcon(PowerButton.class.getResource("/icons/power_circle_on.png"));
-    private static ImageIcon iconOFF = new javax.swing.ImageIcon(PowerButton.class.getResource("/icons/power_circle_off.png"));
-    private static ImageIcon iconOFF_Hover = new javax.swing.ImageIcon(PowerButton.class.getResource("/icons/power_circle_off-hover.png"));
+    private static ImageIcon iconON = new javax.swing.ImageIcon(SwitchButton.class.getResource("/icons/power_circle_on.png"));
+    private static ImageIcon iconOFF = new javax.swing.ImageIcon(SwitchButton.class.getResource("/icons/power_circle_off.png"));
+    private static ImageIcon iconOFF_Hover = new javax.swing.ImageIcon(SwitchButton.class.getResource("/icons/power_circle_off-hover.png"));
 
     private Device device;
 
-    public PowerButton (Device device) {
+    public SwitchButton(Device device) {
         super(device.getName(), iconOFF, false);
         this.device = device;
         device.addListener(this);

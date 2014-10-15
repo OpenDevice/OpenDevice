@@ -63,8 +63,8 @@ public class FormDevicesAPIController extends JFrame implements ConnectionListen
     public void addDevices(Collection<Device> devices){
         manager.addDevices(devices);
         for (Device device : devices){
-            PowerButton powerButton = new PowerButton(device);
-            add(powerButton);
+            SwitchButton switchButton = new SwitchButton(device);
+            add(switchButton);
         }
         pack(); // force resize
     }
@@ -77,51 +77,23 @@ public class FormDevicesAPIController extends JFrame implements ConnectionListen
     @Override
     public void onMessageReceived(Message message, DeviceConnection connection) {
 
+        System.out.println("FormDevicesAPIController.onMessageReceived >>" + message.getClass());
+
 		if(message instanceof DeviceCommand){
-		
+
 			DeviceCommand deviceCommand = (DeviceCommand) message;
-			
-			int deviceID = deviceCommand.getDeviceID();
-			long value = deviceCommand.getValue();
-//
-//            AbstractButton targetButton = null;
-//            switch (deviceID){
-//                case 1: targetButton = btn1; break;
-//                case 2: targetButton = btn2; break;
-//                case 3: targetButton = btn3; break;
-//                case 4: targetButton = btn4; break;
-//            }
-//
-//            if(targetButton != null){
-//                changeButton(targetButton, deviceID, value);
-//            }
-			
-			if(deviceID == 51){
-				
-				System.out.println("INFRA-RED: " + Long.toHexString(value));
-			
-				if(value == 0x800f8422){
-					
-					System.out.println("INFRA-RED: - > BTN: OK");
-					
-					DeviceCommand onoff = new DeviceCommand(CommandType.ON_OFF, 1, (state ? 1 : 0));
-					
-					if(state == true) state = false;
-					if(state == false) state = true;
 
-                    try {
-                        connection.send(onoff);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
 
-                }
-			}
-		
-		}
-		
-		
-		
+            Device device = manager.findDeviceByUID(deviceCommand.getDeviceID());
+            if(device != null){
+
+            }
+
+
+        }
+
+
+
 		
 	}
 	

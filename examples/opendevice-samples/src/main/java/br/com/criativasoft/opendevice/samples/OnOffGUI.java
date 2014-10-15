@@ -18,6 +18,7 @@ import br.com.criativasoft.opendevice.core.SimpleDeviceManager;
 import br.com.criativasoft.opendevice.core.command.DeviceCommand;
 import br.com.criativasoft.opendevice.core.connection.Connections;
 import br.com.criativasoft.opendevice.samples.ui.FormController;
+import br.com.criativasoft.opendevice.webclient.WebSocketClientConnection;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

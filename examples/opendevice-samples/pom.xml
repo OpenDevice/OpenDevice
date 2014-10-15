@@ -36,8 +36,15 @@
 
         <dependency>
             <groupId>br.com.criativasoft.opendevice</groupId>
+            <artifactId>opendevice-wasync-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>br.com.criativasoft.opendevice</groupId>
             <artifactId>opendevice-js</artifactId>
             <version>${project.version}</version>
+            <type>war</type>
         </dependency>
 
         <dependency>
@@ -83,26 +90,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>br.com.criativasoft.opendevice.samples.WebSocketDemo</mainClass>
+                    <mainClass>br.com.criativasoft.opendevice.samples.PanelButtonsGUI</mainClass>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-remote-resources-plugin</artifactId>
-                <version>1.5</version>
-                <configuration>
-                    <resourceBundles>
-                        <resourceBundle>br.com.criativasoft.opendevice:opendevice-js:${project.version}</resourceBundle>
-                    </resourceBundles>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
 		</plugins>
@@ -131,7 +120,7 @@
                             <shadedClassifierName>shaded</shadedClassifierName>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>br.com.criativasoft.opendevice.samples.ui.SimpleChart</mainClass>
+                                    <mainClass>br.com.criativasoft.opendevice.samples.PanelButtonsGUI</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -153,7 +142,7 @@
                                     <outfile>${project.build.directory}/${project.name}.exe</outfile>
                                     <downloadUrl>http://java.com/download</downloadUrl>
                                     <classPath>
-                                        <mainClass>br.com.criativasoft.opendevice.samples.ui.SimpleChart</mainClass>
+                                        <mainClass>br.com.criativasoft.opendevice.samples.PanelButtonsGUI</mainClass>
                                         <preCp>anything</preCp>
                                     </classPath>
                                     <!--<icon>application.ico</icon>-->

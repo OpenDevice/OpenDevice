@@ -14,9 +14,13 @@
 package br.com.criativasoft.opendevice.core;
 
 import br.com.criativasoft.opendevice.connection.DeviceConnection;
+import br.com.criativasoft.opendevice.core.command.Command;
+import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.dao.memory.DeviceMemoryDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * TODO: PENDING DOC
@@ -31,6 +35,7 @@ public class SimpleDeviceManager extends BaseDeviceManager {
     private String applicationID;
 
     public void setApplicationID(String applicationID) {
+        TenantProvider.setCurrentID(applicationID);
         this.applicationID = applicationID;
     }
 
@@ -54,5 +59,24 @@ public class SimpleDeviceManager extends BaseDeviceManager {
         if(connection.getApplicationID() == null)
             connection.setApplicationID(this.applicationID);
         super.addOutput(connection);
+    }
+
+    @Override
+    public void send(Command command) throws IOException {
+
+        if(command.getApplicationID() == null){
+            command.setApplicationID(getApplicationID());
+        }
+        super.send(command);
+    }
+
+    @Override
+    public DeviceDao getValidDeviceDao() {
+
+        if(TenantProvider.getCurrentID() == null){
+            TenantProvider.setCurrentID(applicationID);
+        }
+
+        return super.getValidDeviceDao();
     }
 }

@@ -22,6 +22,7 @@ import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.core.command.*;
 import br.com.criativasoft.opendevice.core.connection.MultipleConnection;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
+import br.com.criativasoft.opendevice.core.filter.CommandFilter;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceListener;
 import br.com.criativasoft.opendevice.core.model.DeviceType;
@@ -43,10 +44,12 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
 	private static final Logger log = LoggerFactory.getLogger(BaseDeviceManager.class);
 	
 	/**Client connections: Websockets, http, rest, etc ...*/
-	private MultipleConnection inputConnections;
+	private MultipleConnection inputConnections = new MultipleConnection();
 	
 	/** Connection with the physical modules (middleware) or a proxy  */
-	private MultipleConnection outputConnections;
+	private MultipleConnection outputConnections = new MultipleConnection();
+
+    private Set<CommandFilter> filters = new LinkedHashSet<CommandFilter>();
 	
 	private CommandDelivery delivery = new CommandDelivery(this);
 
@@ -61,10 +64,12 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
         return getValidDeviceDao().getByUID(deviceUID);
     }
 
+    @Override
     public void setDeviceDao(DeviceDao deviceDao) {
         this.deviceDao = deviceDao;
     }
 
+    @Override
     public DeviceDao getDeviceDao() {
         return deviceDao;
     }
@@ -98,6 +103,11 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
         return listeners.add(e);
     }
 
+    @Override
+    public void addFilter(CommandFilter filter) {
+        filters.add(filter);
+    }
+
     public void addConnectionListener(ConnectionListener e) {
         if(inputConnections != null) inputConnections.addListener(e);
         if(outputConnections != null) outputConnections.addListener(e);
@@ -116,12 +126,10 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
     }
 
     protected void initInputConnections(){
-		inputConnections = new MultipleConnection();
 		inputConnections.addListener(this);
 	}
 	
 	protected void initOutputConnections(){
-		outputConnections = new MultipleConnection();
 		outputConnections.addListener(this);
 	}
 
@@ -137,35 +145,33 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
 
     protected void disconnectAll(){
 
-        if(inputConnections != null) {
-            try {
-                inputConnections.disconnect();
-            } catch (ConnectionException e) {
-                e.printStackTrace();
-            }
+        try {
+            inputConnections.disconnect();
+        } catch (ConnectionException e) {
+            e.printStackTrace();
         }
 
-        if(outputConnections != null){
-            try {
-                outputConnections.disconnect();
-            } catch (ConnectionException e) {
-                e.printStackTrace();
-            }
+        try {
+            outputConnections.disconnect();
+        } catch (ConnectionException e) {
+            e.printStackTrace();
         }
 
     }
 	
 	public void addInput(DeviceConnection connection){
 		
-		if(inputConnections == null) initInputConnections();
-		
+		if(inputConnections.getSize() == 0) initInputConnections();
+
+        connection.setConnectionManager(this);
+        connection.setApplicationID(TenantProvider.getCurrentID());
 		inputConnections.addConnection(connection);
 		
 	}
 
 	public void addOutput(DeviceConnection connection){
 		
-		if(outputConnections == null) initOutputConnections();
+		if(outputConnections.getSize() == 0) initOutputConnections();
 
         if(connection instanceof StreamConnection){
             StreamConnection streamConnection = (StreamConnection) connection;
@@ -175,6 +181,8 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
             }
         }
 
+        connection.setApplicationID(TenantProvider.getCurrentID());
+        connection.setConnectionManager(this);
 		outputConnections.addConnection(connection);
 	}
 
@@ -183,6 +191,7 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
     public void onMessageReceived(Message message, DeviceConnection connection) {
 
         this.lastMessage = message;
+
 
         if (!(message instanceof Command)) {
             log.debug("Message received : " + message);
@@ -195,11 +204,25 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
             command.setApplicationID(connection.getApplicationID());
         }
 
-        log.debug("Command Received (from: " + connection.getClass().getSimpleName() + ") : " + CommandType.getByCode(command.getType().getCode()).toString());
+
+        if(!filters.isEmpty()){
+
+            for (CommandFilter filter : filters) {
+
+                if(!filter.filter(command, connection)){
+                    if(log.isTraceEnabled()) log.debug("Message blocked by filter: " + filter.getClass().getSimpleName());
+                    return;
+                }
+
+            }
+
+        }
+
+        if(log.isDebugEnabled()) log.debug("Command Received - Type: {} (from: " + connection.getClass().getSimpleName() + ")", CommandType.getByCode(command.getType().getCode()).toString());
 
         CommandType type = command.getType();
 
-        // Comandos de ON_OFF e similares..
+        // Comandos de DIGITAL e similares..
         if (DeviceCommand.isCompatible(type)) {
 
             DeviceCommand deviceCommand = (DeviceCommand) command;
@@ -229,11 +252,13 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
             // Comando recebido pelos clientes (WebSockets / Rest / etc...)
             // Ele deve ser enviado para o modulo físico, e monitorar a resposta.
             if (inputConnections != null && inputConnections.exist(connection)) {
-                log.debug("Sending to output connections...");
-                try {
-                    sendTo(deviceCommand, outputConnections);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    if(outputConnections.hasConnections()){
+                        log.debug("Sending to output connections...");
+                        try {
+                            sendTo(deviceCommand, outputConnections);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                    }
                 }
             }
 
@@ -287,13 +312,23 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
 
 	@Override
 	public void send(Command command) throws IOException {
-		
-		if(outputConnections != null){
-			delivery.sendTo(command, outputConnections);
+
+        if(outputConnections.hasConnections()){
+
+            Set<DeviceConnection> connections = outputConnections.getConnections();
+            for (DeviceConnection connection : connections) {
+                delivery.sendTo(command, connection);
+            }
+
 		}
 		
-		if(inputConnections != null){
-			delivery.sendTo(command, inputConnections);
+		if(inputConnections.hasConnections()){
+
+            Set<DeviceConnection> connections = inputConnections.getConnections();
+            for (DeviceConnection connection : connections) {
+                delivery.sendTo(command, connection);
+            }
+
 		}
 		
 	}
@@ -330,7 +365,7 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
                 }
 
                 if (device.getType() == DeviceType.DIGITAL) {
-                    DeviceCommand cmd = new DeviceCommand(CommandType.ON_OFF, device.getUid(), device.getValue());
+                    DeviceCommand cmd = new DeviceCommand(CommandType.DIGITAL, device.getUid(), device.getValue());
                     send(cmd);
                 }
 
@@ -345,5 +380,40 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
         }
     }
 
+    /**
+     * Checks whether a connection has been added
+     */
+    @Override
+    public boolean hasConnections(){
+        int size = inputConnections.getSize();
+        size += outputConnections.getSize();
+        return size > 0;
+    }
 
+    /**
+     * Checks if a connection is active. Considers the input and output
+     */
+    @Override
+    public boolean isConnected(){
+
+        if(hasConnections()){
+
+            if(inputConnections.isConnected()) return true;
+            if(outputConnections.isConnected()) return true;
+
+        }
+
+        return false;
+    }
+
+    @Override
+    public Collection<DeviceConnection> getConnections() {
+
+        Set<DeviceConnection> newList = new LinkedHashSet<DeviceConnection>();
+
+        newList.addAll(inputConnections.getConnections());
+        newList.addAll(outputConnections.getConnections());
+
+        return newList;
+    }
 }

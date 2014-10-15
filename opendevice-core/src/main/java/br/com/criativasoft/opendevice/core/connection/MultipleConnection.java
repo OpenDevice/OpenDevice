@@ -14,6 +14,7 @@
 package br.com.criativasoft.opendevice.core.connection;
 
 import br.com.criativasoft.opendevice.connection.ConnectionListener;
+import br.com.criativasoft.opendevice.connection.ConnectionManager;
 import br.com.criativasoft.opendevice.connection.ConnectionStatus;
 import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
@@ -24,19 +25,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class MultipleConnection implements DeviceConnection, ConnectionListener {
 	
 	private static final Logger log = LoggerFactory.getLogger(MultipleConnection.class);
 	
 	private Set<DeviceConnection> connections = new LinkedHashSet<DeviceConnection>();
-	private Set<ConnectionListener> listeners = new LinkedHashSet<ConnectionListener>();
+	private Set<ConnectionListener> listeners = Collections.synchronizedSet(new HashSet<ConnectionListener>());
 	
 	private ConnectionStatus status = ConnectionStatus.DISCONNECTED;
+
+    private ConnectionManager manager;
 
     private boolean broadcast = false;
 
@@ -129,16 +129,7 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 	public void send(Message message) throws IOException {
 
 		for (DeviceConnection connection : connections) {
-			if(connection != null){
-
-                // Validate ApplicationID
-                if(message instanceof Command){
-                    Command command = (Command) message;
-                    if(connection.getApplicationID() != null && ! connection.getApplicationID().equals(command.getApplicationID())){
-                        continue; // Ignore
-                    }
-                }
-
+			if(connection != null && connection.isConnected()){
 				connection.send(message);
 			}
 		}
@@ -150,7 +141,7 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 		for (ConnectionListener listener : listeners) {
 			connection.addListener(listener);
 		}
-		connection.addListener(this);
+		connection.addListener(this); // only to broadcast.
 		connections.add(connection);
 		return connection;
 	}
@@ -201,6 +192,10 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 	public int getSize(){
 		return getConnections().size();
 	}
+
+    public boolean hasConnections(){
+        return getSize() > 0;
+    }
 
     @Override
     public String getUID() {
@@ -284,5 +279,14 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
         return null; // IGNORE
     }
 
+    @Override
+    public void setConnectionManager(ConnectionManager manager) {
+        this.manager = manager;
+    }
+
+    @Override
+    public ConnectionManager getConnectionManager() {
+        return this.manager;
+    }
 }
 

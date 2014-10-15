@@ -16,6 +16,7 @@ package br.com.criativasoft.opendevice.core;
 import br.com.criativasoft.opendevice.connection.ConnectionListener;
 import br.com.criativasoft.opendevice.connection.ConnectionStatus;
 import br.com.criativasoft.opendevice.connection.DeviceConnection;
+import br.com.criativasoft.opendevice.connection.ServerConnection;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.CommandStatus;
@@ -24,6 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -33,7 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Ricardo JL Rufino
  * @date 23/06/2013
  */
-public class CommandDelivery {
+public class CommandDelivery implements ConnectionListener {
 	
 	private static final Logger log = LoggerFactory.getLogger(CommandDelivery.class);
 	
@@ -42,35 +46,56 @@ public class CommandDelivery {
 	private DeviceManager manager;
 	
 	private AtomicInteger cmdCount = new AtomicInteger(0);
+
+    private final Set<SendTask> waitingTask =Collections.synchronizedSet(new HashSet<SendTask>());
 	
 	public static int MAX_CMD_COUNT = 9999;
 	
-	/** Timeout in seconds */
-	public static int MAX_TIMEOUT = 5;
+	/** Timeout in miliseconds */
+	public static int MAX_TIMEOUT = 3000;
 	
 	public CommandDelivery(DeviceManager manager) {
 		super();
 		this.manager = manager;
 	}
 
+
+
 	public void sendTo(Command command, DeviceConnection connection) throws IOException {
 		
 		command.setStatus(CommandStatus.DELIVERED);
+
+        connection.addListener(this);
 		
-		if(command instanceof ResponseCommand){
-			
-			connection.send(command);
+		if(command instanceof ResponseCommand || connection instanceof ServerConnection){
+
+            connection.send(command);
 			
 		}else{
 			
 			sendWithTimeout(command, connection);
 			
 		}
-		
-		
+
 	}
-	
-	/**
+
+    @Override
+    public void onMessageReceived(Message message, DeviceConnection connection) {
+
+        synchronized (waitingTask){
+            for (SendTask sendTask : waitingTask) {
+               sendTask.onMessageReceived(message, connection);
+            }
+        }
+
+    }
+
+    @Override
+    public void connectionStateChanged(DeviceConnection connection, ConnectionStatus status) {
+
+    }
+
+    /**
 	 * Returns the next id from the sequence <br/>
 	 * // FIXME: This generation logic id probably is not scalable to the level of a service in CLOUD
 	 * @param connection
@@ -93,57 +118,44 @@ public class CommandDelivery {
             log.warn(connection.getClass().getSimpleName() + " not Connected!");
             return;
         }
-		
-		final SendTask sendTask = new SendTask(command, connection);
-		
-		executor.execute(new Runnable() {
-			 
-			@Override
-			public void run() {
-				Future<Boolean> future = executor.submit(sendTask);
-				try {
-					future.get(MAX_TIMEOUT, TimeUnit.SECONDS);
-				} catch (TimeoutException e) {
 
-                    log.error("Response not received ! Command:"+ sendTask.getCommand().getConnectionUUID() + ", Connection:" + sendTask.getConnection());
-
-                    sendTask.restoreComand();
-
-					// TODO: Notify not received...
-					
-				} catch (Exception e) {
-					log.error(e.getMessage(), e);
-                    future.cancel(true);
-				} finally{
-					 sendTask.restoreComand();
-				}
-			}
- 
-		});		
+        if(log.isTraceEnabled()) log.trace("Sends taks: {}, threads: {}", waitingTask.size(), Thread.activeCount());
 		
+		final SendTask sendTask = new SendTask(command, connection, this);
+        waitingTask.add(sendTask);
+        executor.execute(sendTask);
+
 
 //      TODO: executor.shutdownNow();		
 	}
-	
+
+
+    protected void removeTask(SendTask task){
+        waitingTask.remove(task);
+    }
+
 	public void stop(){
 		executor.shutdown();
 	}
 	
-	private class SendTask implements Callable<Boolean>, ConnectionListener{
+	private class SendTask implements Runnable, ConnectionListener{
 		
 		private Command command;
 		private DeviceConnection connection;
-		
-		private int originalID;
+        private CommandDelivery commandDelivery;
+
+        private int originalID;
 		private int newID;
 		
-		private Object lock = new Object();
-		
-		public SendTask(Command command, DeviceConnection connection) {
+		private final Object lock = new Object();
+        private long start;
+
+        public SendTask(Command command, DeviceConnection connection, CommandDelivery commandDelivery) {
 			super();
 			this.command = command;
 			this.connection = connection;
-		}
+            this.commandDelivery = commandDelivery;
+        }
 		
 		public Command getCommand() {
 			return command;
@@ -153,26 +165,41 @@ public class CommandDelivery {
 			return connection;
 		}
 
-		@Override
-		public Boolean call() throws Exception {
-			
-			this.originalID = command.getTrackingID();
-			this.newID = getNextUID(connection); 
-			
-			connection.addListener(this);
-			command.setTrackingID(newID);
-			
-			log.debug("Send and Wait reponse :: Cmd.SEQ:<" + this.newID + ">, UID: "+command.getUid());
-			
-			connection.send(command);
-			
-			synchronized(lock){
-				lock.wait();
-			}
-			
-			return true;
-		}
-		
+        @Override
+        public void run() {
+
+            this.originalID = command.getTrackingID();
+            this.newID = getNextUID(connection);
+
+            command.setTrackingID(newID);
+
+            log.debug("Send and Wait :: SEQ <" + this.newID + ">, UID: "+command.getUid());
+
+            try {
+
+                start = System.currentTimeMillis();
+                connection.send(command);
+                synchronized(lock){
+                    lock.wait(MAX_TIMEOUT);
+                }
+
+                // If not received response...
+                if(command.getStatus() == CommandStatus.DELIVERED){
+                    command.setStatus(CommandStatus.FAIL);
+                }
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                commandDelivery.removeTask(this);
+            }
+
+        }
+
+
 		/**
 		 * release lock and restore ID
 		 */
@@ -181,9 +208,9 @@ public class CommandDelivery {
 			synchronized(lock){
 				lock.notifyAll();
 			}
-			
+
+            command.setStatus(CommandStatus.SUCCESS);
 			command.setTrackingID(originalID);
-			connection.removeListener(this);
 		}
 
 		@Override
@@ -201,7 +228,8 @@ public class CommandDelivery {
 
 				if(requestUID == this.newID){
 
-					log.debug("Response received :: Cmd.SEQ:<" + this.newID + ">");
+                    long time = System.currentTimeMillis() - start;
+					log.debug("Response received :: SEQ:<" + this.newID + "> , time: " + time + "ms");
 
 					restoreComand(); // release lock and restore ID
 

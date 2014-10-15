@@ -13,8 +13,10 @@
 
 package br.com.criativasoft.opendevice.core;
 
+import br.com.criativasoft.opendevice.connection.ConnectionManager;
 import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.core.command.Command;
+import br.com.criativasoft.opendevice.core.filter.CommandFilter;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceListener;
@@ -22,9 +24,11 @@ import br.com.criativasoft.opendevice.core.model.DeviceListener;
 import java.io.IOException;
 import java.util.Collection;
 
-public interface DeviceManager {
+public interface DeviceManager extends ConnectionManager{
 
     public void setDeviceDao(DeviceDao deviceDao);
+
+    public DeviceDao getDeviceDao();
 
 	public Collection<Device> getDevices() ;
 	
@@ -43,5 +47,11 @@ public interface DeviceManager {
     public void addOutput(DeviceConnection connection);
 
     public boolean addListener(DeviceListener e);
+
+    public void addFilter(CommandFilter filter);
+
+    public boolean isConnected();
+
+    public boolean hasConnections();
 
 }

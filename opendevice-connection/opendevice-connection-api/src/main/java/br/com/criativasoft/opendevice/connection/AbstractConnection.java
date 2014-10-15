@@ -18,10 +18,8 @@ import br.com.criativasoft.opendevice.connection.serialize.MessageSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -34,9 +32,11 @@ public abstract class AbstractConnection implements DeviceConnection {
 
     protected static final Logger log = LoggerFactory.getLogger(AbstractConnection.class);
 
-    private static ExecutorService executor = Executors.newCachedThreadPool();
+    private static ExecutorService executor;
 
-	private Set<ConnectionListener> listeners = new HashSet<ConnectionListener>();
+    private boolean useThreadPool =  false;
+
+	private final Set<ConnectionListener> listeners = Collections.synchronizedSet(new HashSet<ConnectionListener>());
 
 	private ConnectionStatus status = ConnectionStatus.DISCONNECTED;
 	
@@ -46,7 +46,18 @@ public abstract class AbstractConnection implements DeviceConnection {
 
     private String applicationID;
 
-	/**
+    private ConnectionManager manager;
+
+    /**
+     * Enables notification of listeners in separate threads if the implementations of listeners slow to run (eg sending an email)
+     * @param useThreadPool - Default false
+     */
+    public void setUseThreadPool(boolean useThreadPool) {
+        this.useThreadPool = useThreadPool;
+        if(useThreadPool) executor = Executors.newCachedThreadPool();
+    }
+
+    /**
 	 * Notify All Listeners about received command.
 	 */
 	public void notifyListeners(final Message message) {
@@ -58,15 +69,25 @@ public abstract class AbstractConnection implements DeviceConnection {
         }
 
         synchronized (listeners){
-            for (final ConnectionListener listener : listeners) {
-                // TODO: Add config to use in SYNC MODE.
-                executor.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        listener.onMessageReceived(message, AbstractConnection.this);
-                    }
-                });
+
+            Iterator<ConnectionListener> iterator = listeners.iterator();
+
+            while(iterator.hasNext()){
+                final ConnectionListener listener = iterator.next();
+
+                if(useThreadPool){
+                    executor.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.onMessageReceived(message, AbstractConnection.this);
+                        }
+                    });
+                }else{
+                    listener.onMessageReceived(message, AbstractConnection.this);
+                }
             }
+
+
         }
 	}
 	
@@ -111,8 +132,10 @@ public abstract class AbstractConnection implements DeviceConnection {
 	}
 
 	@Override
-	public synchronized boolean removeListener(ConnectionListener e) {
-		return listeners.remove(e);
+	public  boolean removeListener(ConnectionListener e) {
+        synchronized (listeners){
+            return listeners.remove(e);
+        }
 	}
 
 	public boolean addAll(Collection<? extends ConnectionListener> c) {
@@ -137,5 +160,15 @@ public abstract class AbstractConnection implements DeviceConnection {
     @Override
     public String getApplicationID() {
         return applicationID;
+    }
+
+    @Override
+    public void setConnectionManager(ConnectionManager manager) {
+        this.manager = manager;
+    }
+
+    @Override
+    public ConnectionManager getConnectionManager() {
+        return this.manager;
     }
 }

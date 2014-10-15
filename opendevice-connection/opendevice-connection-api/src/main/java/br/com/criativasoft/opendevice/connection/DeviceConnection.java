@@ -37,7 +37,7 @@ public interface DeviceConnection {
 	
 	public void send(Message message) throws IOException;
 	
-	public  boolean addListener(ConnectionListener listener);
+	public boolean addListener(ConnectionListener listener);
 	
 	public boolean removeListener(ConnectionListener e);
 	
@@ -52,5 +52,9 @@ public interface DeviceConnection {
     public String getApplicationID();
 
     public DeviceConnection setApplicationID(String id);
+
+    public void setConnectionManager(ConnectionManager manager);
+
+    public ConnectionManager getConnectionManager();
 
 }

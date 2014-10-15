@@ -16,85 +16,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-	<profiles>
 
-		<profile>
-			<id>build-android-compined</id>
-
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-shade-plugin</artifactId>
-						<version>2.1</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<goals>
-									<goal>shade</goal>
-								</goals>
-								<configuration>
-									<shadedArtifactAttached>true</shadedArtifactAttached>
-<!-- 									<minimizeJar>true</minimizeJar> -->
-									<shadedClassifierName>combined</shadedClassifierName>
-									<artifactSet>
-										<excludes>
-											<exclude>log4j:log4j:jar:</exclude>
-											<exclude>org.slf4j:slf4j-api</exclude>
-											<exclude>org.slf4j:slf4j-log4j12</exclude>
-											<exclude>net.sf.bluecove:*</exclude>
-											<exclude>com.strategicgains:*</exclude>
-<!-- 											<exclude>com.fasterxml.jackson.core:jackson-databind:jar:</exclude> -->
-<!-- 											<exclude>com.fasterxml.jackson.core:jackson-annotations:jar:</exclude> -->
-<!-- 											<exclude>com.fasterxml.jackson.core:*</exclude> -->
-											<exclude>com.thoughtworks.xstream:*</exclude>
-<!-- 											<exclude>br.com.criativasoft:arduino-connection</exclude> -->
-											<!-- <exclude>br.com.criativasoft:opendevice-api</exclude> -->
-										</excludes>
-									</artifactSet>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-
-			</build>
-		</profile>
-
-		<profile>
-			<id>build-standalone</id>
-			<build>
-				<finalName>opendevice-server</finalName>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-shade-plugin</artifactId>
-						<version>2.3</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<goals>
-									<goal>shade</goal>
-								</goals>
-								<configuration>
-									<shadedArtifactAttached>true</shadedArtifactAttached>
-									<!-- <shadedClassifierName>combined</shadedClassifierName> -->
-									<!-- <promoteTransitiveDependencies>true</promoteTransitiveDependencies> -->
-									<finalName>${project.artifactId}-standalone</finalName>
-									<transformers>
-										<transformer
-											implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-											<mainClass>br.com.criativasoft.opendevice.middleware.Main</mainClass>
-										</transformer>
-									</transformers>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
 	<dependencies>
 
@@ -117,10 +39,10 @@
         </dependency>
 
         <dependency>
-			<groupId>br.com.criativasoft.opendevice</groupId>
-			<artifactId>opendevice-connection-stream</artifactId>
+            <groupId>br.com.criativasoft.opendevice</groupId>
+            <artifactId>opendevice-connection-stream</artifactId>
             <version>${opendevice-version}</version>
-		</dependency>
+        </dependency>
 
         <dependency>
             <groupId>br.com.criativasoft.opendevice</groupId>
@@ -129,51 +51,31 @@
             <type>war</type>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>br.com.criativasoft.opendevice</groupId>-->
-            <!--<artifactId>opendevice-connection-rest</artifactId>-->
-            <!--<version>${opendevice-version}</version>-->
-            <!--&lt;!&ndash; Evict conflicts with Socket.IO &ndash;&gt;-->
-            <!--<exclusions>-->
-                <!--<exclusion>-->
-                    <!--<artifactId>jackson-core</artifactId>-->
-                    <!--<groupId>com.fasterxml.jackson.core</groupId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<artifactId>jackson-databind</artifactId>-->
-                    <!--<groupId>com.fasterxml.jackson.core</groupId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<artifactId>jackson-annotations</artifactId>-->
-                    <!--<groupId>com.fasterxml.jackson.core</groupId>-->
-                <!--</exclusion>-->
-            <!--</exclusions>-->
-        <!--</dependency>-->
-
+        <dependency>
+            <groupId>br.com.criativasoft.opendevice</groupId>
+            <artifactId>opendevice-raspberry-gpio</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
 
         <!-- arduino-connection DEPENDENCES: TODO: remover foi colocado pq o shade, não colocava dentro do JAR final -->
-		<dependency>
-			<groupId>net.sf.bluecove</groupId>
-			<artifactId>bluecove</artifactId>
-			<version>2.1.0</version>
-		</dependency>
 
-		<dependency>
-			<groupId>net.sf.bluecove</groupId>
-			<artifactId>bluecove-gpl</artifactId>
-			<version>2.1.0</version>
-		</dependency>	
+
+		<!--<dependency>-->
+			<!--<groupId>net.sf.bluecove</groupId>-->
+			<!--<artifactId>bluecove-gpl</artifactId>-->
+			<!--<version>2.1.0</version>-->
+		<!--</dependency>	-->
 		<!-- //END:arduino-connection DEPENDENCE  -->	
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>test</scope>
-		</dependency>
+
 	</dependencies>
+
+
 	<build>
 		<finalName>opendevice-middleware</finalName>
+        <defaultGoal>package</defaultGoal>
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -186,45 +88,6 @@
 				</configuration>
 			</plugin>
 
-			<!--<plugin>-->
-				<!--<groupId>org.apache.maven.plugins</groupId>-->
-				<!--<artifactId>maven-war-plugin</artifactId>-->
-				<!--<version>2.3</version>-->
-				<!--<configuration>-->
-					<!--<webResources>-->
-						<!--<resource>-->
-							<!--&lt;!&ndash; this is relative to the pom.xml directory &ndash;&gt;-->
-							<!--<directory>../opensourse-web-view</directory>-->
-						<!--</resource>-->
-					<!--</webResources>-->
-				<!--</configuration>-->
-			<!--</plugin>-->
-
-			<!-- <plugin> -->
-			<!-- <artifactId>maven-assembly-plugin</artifactId> -->
-			<!-- <configuration> -->
-			<!-- <archive> -->
-			<!-- <manifest> -->
-			<!-- <mainClass>br.com.criativasoft.opendevice.middleware.Main</mainClass> -->
-			<!-- </manifest> -->
-			<!-- </archive> -->
-			<!-- <descriptors> -->
-			<!-- <descriptor>src/main/resources/view-assembly.xml</descriptor> -->
-			<!-- </descriptors> -->
-			<!-- <descriptorRefs> -->
-			<!-- <descriptorRef>jar-with-dependencies</descriptorRef> -->
-			<!-- </descriptorRefs> -->
-			<!-- </configuration> -->
-			<!-- <executions> -->
-			<!-- <execution> -->
-			<!-- <id>make-assembly</id> this is used for inheritance merges -->
-			<!-- <phase>package</phase> bind to the packaging phase -->
-			<!-- <goals> -->
-			<!-- <goal>single</goal> -->
-			<!-- </goals> -->
-			<!-- </execution> -->
-			<!-- </executions> -->
-			<!-- </plugin> -->
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -274,6 +137,8 @@
                 </executions>
             </plugin>
 		</plugins>
+
+
 		<extensions>
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
@@ -282,4 +147,127 @@
 			</extension>
 		</extensions>
 	</build>
+
+    <profiles>
+
+        <profile>
+            <id>build-android-compined</id>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>2.1</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                                <configuration>
+                                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                                    <!-- 									<minimizeJar>true</minimizeJar> -->
+                                    <shadedClassifierName>combined</shadedClassifierName>
+                                    <artifactSet>
+                                        <excludes>
+                                            <exclude>log4j:log4j:jar:</exclude>
+                                            <exclude>org.slf4j:slf4j-api</exclude>
+                                            <exclude>org.slf4j:slf4j-log4j12</exclude>
+                                            <exclude>net.sf.bluecove:*</exclude>
+                                            <exclude>com.strategicgains:*</exclude>
+                                            <!-- 											<exclude>com.fasterxml.jackson.core:jackson-databind:jar:</exclude> -->
+                                            <!-- 											<exclude>com.fasterxml.jackson.core:jackson-annotations:jar:</exclude> -->
+                                            <!-- 											<exclude>com.fasterxml.jackson.core:*</exclude> -->
+                                            <exclude>com.thoughtworks.xstream:*</exclude>
+                                            <!-- 											<exclude>br.com.criativasoft:arduino-connection</exclude> -->
+                                            <!-- <exclude>br.com.criativasoft:opendevice-api</exclude> -->
+                                        </excludes>
+                                    </artifactSet>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+
+            </build>
+        </profile>
+
+        <profile>
+            <id>standalone</id>
+
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>2.3</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                                <configuration>
+                                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                                    <!-- <shadedClassifierName>combined</shadedClassifierName> -->
+                                    <!-- <promoteTransitiveDependencies>true</promoteTransitiveDependencies> -->
+                                    <finalName>${project.artifactId}-standalone</finalName>
+                                    <transformers>
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                            <mainClass>br.com.criativasoft.opendevice.middleware.Main</mainClass>
+                                        </transformer>
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                                    </transformers>
+                                    <filters>
+                                        <!--  filter to address "Invalid signature file" issue - see http://stackoverflow.com/a/6743609/589215-->
+                                        <filter>
+                                            <artifact>*:*</artifact>
+                                            <excludes>
+                                                <exclude>META-INF/*.SF</exclude>
+                                                <exclude>META-INF/*.DSA</exclude>
+                                                <exclude>META-INF/*.RSA</exclude>
+                                            </excludes>
+                                        </filter>
+                                    </filters>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>raspberry</id>
+            <dependencies>
+                <dependency>
+                    <groupId>br.com.criativasoft.opendevice.ext</groupId>
+                    <artifactId>bluecove-gpl-arm</artifactId>
+                    <version>2.1.1-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>br.com.criativasoft.opendevice</groupId>
+                    <artifactId>opendevice-raspberry-gpio</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>linux</id>
+            <dependencies>
+                <dependency>
+                    <groupId>br.com.criativasoft.opendevice.ext</groupId>
+                    <artifactId>bluecove-gpl</artifactId>
+                    <version>2.1.1-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+    </profiles>
 </project>

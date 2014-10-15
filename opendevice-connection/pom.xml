@@ -14,6 +14,7 @@
 	<modules>
 		<module>opendevice-connection-api</module>
 		<module>opendevice-connection-stream</module>
+		<module>opendevice-raspberry-gpio</module>
 		<module>opendevice-connection-samples</module>
     </modules>
 

@@ -22,12 +22,15 @@ public class ConnectionException extends IOException {
 
 	private static final long serialVersionUID = 4806827126960117788L;
 
+    private Throwable cause; // make android 2.2 compatible
+
 	public ConnectionException() {
 		super();
 	}
 
 	public ConnectionException(String message, Throwable cause) {
 		super(message, cause);
+        this.cause = cause;
 	}
 
 	public ConnectionException(String message) {
@@ -35,7 +38,11 @@ public class ConnectionException extends IOException {
 	}
 
 	public ConnectionException(Throwable cause) {
-		super(cause);
+        this.cause = cause;
 	}
 
+    @Override
+    public synchronized Throwable getCause() {
+        return cause;
+    }
 }

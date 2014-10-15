@@ -13,19 +13,25 @@
 
 package br.com.criativasoft.opendevice.middleware;
 
-import br.com.criativasoft.opendevice.wsrest.WSServerConnection;
-import br.com.criativasoft.opendevice.connection.discovery.DiscoveryServer;
-import br.com.criativasoft.opendevice.core.BaseDeviceManager;
+import br.com.criativasoft.opendevice.connection.IWSServerConnection;
+import br.com.criativasoft.opendevice.connection.discovery.DiscoveryService;
+import br.com.criativasoft.opendevice.core.SimpleDeviceManager;
+import br.com.criativasoft.opendevice.core.connection.Connections;
+import br.com.criativasoft.opendevice.core.filter.FixedReadIntervalFilter;
+import br.com.criativasoft.opendevice.core.model.Sensor;
 import br.com.criativasoft.opendevice.core.dao.memory.DeviceMemoryDao;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceCategory;
 import br.com.criativasoft.opendevice.core.model.DeviceType;
+import br.com.criativasoft.opendevice.middleware.test.FakeSensorSimulator;
+import br.com.criativasoft.opendevice.raspberry.RaspberryConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.io.File;
-import java.util.Scanner;
+import java.io.*;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 //
 // Run using Maven using: mvn compile exec:java -Dexec.mainClass=br.com.criativasoft.opendevice.middleware.Main
@@ -33,78 +39,68 @@ import java.util.Scanner;
 // URLs REST:
 // - http://localhost:8181/device/1/setvalue/1
 
-public class Main extends BaseDeviceManager {
-	
-	private static final String MODE_REMOTE = "remote";
-	private static final String MODE_LOCAL = "local";
+public class Main extends SimpleDeviceManager {
 	
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
+
+    protected int port = 8181;
 
 	public void init() throws Exception {
 
         setDeviceDao(new DeviceMemoryDao());
 
-		addDevice(new Device(1, "Luz DB1", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
+        setApplicationID("app-demo-1");
+        addDevice(new Device(1, "Luz 1", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
+        addDevice(new Device(2, "Luz 2", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
+        addDevice(new Device(3, "Tomada 1", DeviceType.DIGITAL, DeviceCategory.POWER_SOURCE, 0));
+        addDevice(new Sensor(4, "Sensor D1", DeviceType.DIGITAL));
+        addDevice(new Sensor(5, "Sensor D2", DeviceType.DIGITAL));
+        addDevice(new Sensor(6, "Sensor A1", DeviceType.ANALOG));
+        addDevice(new Sensor(7, "Sensor A2", DeviceType.ANALOG));
+
+
+        setApplicationID("app-demo-2");
+        addDevice(new Device(1, "Luz DB1", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
         addDevice(new Device(2, "Luz DB2", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
-        addDevice(new Device(3, "Tomada DB1", DeviceType.DIGITAL, DeviceCategory.POWER_SOURCE, 0));
-        addDevice(new Device(4, "Tomada DB2", DeviceType.DIGITAL, DeviceCategory.POWER_SOURCE, 0));
-		
+
+        setApplicationID("app-demo-1");
+
+        //new FakeSensorSimulator(50, this, 6, 7).start(); // generate fake data
+        // addFilter(new FixedReadIntervalFilter(1000, this));
+
+
 		// Ativar serviço de descoberta desse servidor via UDP.
-		Thread discoveryThread = new Thread(DiscoveryServer.getInstance());
-		discoveryThread.start();
-
-		String webport = System.getProperty("app.port");
-		String webapp = System.getProperty("app.dir");
-		String mode = System.getProperty("app.mode");
-		String remoteServer = "http://openhouse.criativasoft.com.br/";
-		
-		if(mode == null){
-			mode = MODE_LOCAL;
-		}
-		
-		int port = 8181;
-
-		if(webport != null && webport.trim().length() != 0) port= Integer.parseInt(webport);
-
-		if(! (System.getProperty("java.vm.name").equalsIgnoreCase("Dalvik"))){
-			String current = getWebAppDir();
-			// StaticResourceHandler.setDefaultTempDir(new File(current)); FIXME: implementar algo similar, para funcionar no android !!
-		}
+        DiscoveryService.listen(port);
 
         // Setup WebSocket (Socket.IO) with suport for simple htttpServer
-        WSServerConnection webscoket = new WSServerConnection(port);
+        IWSServerConnection webscoket = Connections.in.websocket(port);
         String current = System.getProperty("user.dir");
+
         // Static WebResources
-        webscoket.addWebResource( current + "/webapp");
+        String rootWebApp = getWebAppDir();
+        webscoket.addWebResource(rootWebApp);
+        log.debug("Current webresource: " + rootWebApp);
         webscoket.addWebResource( current + "/target/classes/webapp"); //  running exec:java
 
+        webscoket.addWebResource("/media/Dados/Codigos/Java/Projetos/OpenDevice/opendevice-web-view/src/main/webapp");
+        webscoket.addWebResource("/media/Dados/Codigos/Java/Projetos/OpenDevice/opendevice-clients/opendevice-js/dist");
+        webscoket.addWebResource("/media/Dados/Codigos/Java/Projetos/OpenDevice/examples/opendevice-tutorial/src/main/resources");
+
+
         this.addInput(webscoket);
-		// this.addConnectionIN(new RestServerConnection(restPort)); // Servidor REST
-		
+
+
 //		// No modo local ele se conecta com o servidor remoto.
 //		if(MODE_LOCAL.equalsIgnoreCase(mode)){
 //			this.addConnectionIN(new WSClientConnection(remoteServer));
 //		}
 
-        // Procurar dispositivos USB
-        if(MODE_LOCAL.equalsIgnoreCase(mode)){
-               // addOutput(Connections.out.usb()); // Connect to first USB port available
-               //addOutput(Connections.out.tcp("192.168.0.204:8081"));
-        }
-
-		// Não é o andoid e possue suporte a ambiente visual (! isHeadless)
-		// TODO: Testar em anbiente onde não tem o bluetooth....
-		if(! (System.getProperty("java.vm.name").equalsIgnoreCase("Dalvik")) &&
-		   ! GraphicsEnvironment.isHeadless()){  
-//			this.addConnectionOut(new BluetoothDesktopConnection("00:13:03:14:19:07")); // stellaris 
-//			this.addConnectionOut(new BluetoothDesktopConnection("00:11:06:14:04:57")); // stellaris old
-
-//            StreamConnection bluetoothConnection = StreamConnectionFactory.createBluetooth("20:13:01:24:01:93");
-//            bluetoothConnection.setSerializer(new CommandStreamSerializer()); // data conversion..
-//            bluetoothConnection.setStreamReader(new CommandStreamReader()); // data protocol..
-//			this.addConnectionOut(bluetoothConnection);
-		}
-
+        // OutputConnections
+        // ===============================
+//        addOutput(Connections.out.bluetooth("00:13:03:14:19:07"));
+        // addOutput(new RaspberryConnection());
+        // addOutput(Connections.out.usb()); // Connect to first USB port available
+        //addOutput(Connections.out.tcp("192.168.0.204:8081"));
 
 		this.connectAll();
 
@@ -112,32 +108,90 @@ public class Main extends BaseDeviceManager {
 	
 	
 	private String getWebAppDir(){
+
+        extractResources();
+
 		String current = System.getProperty("user.dir");
-		
-		File webapp = new File(current + "/static-webapp" );
-		
+
+		File webapp = new File(current + File.separator + "webapp" );
 		// Default app..
 		if(webapp.exists()){
 			return webapp.getPath();
 		}
-		
+
+        webapp = new File(current + File.separator + "target"+ File.separator + "webapp" );
+        // Default app..
+        if(webapp.exists()){
+            return webapp.getPath();
+        }
+
 		// Find project in same directory...
 		File currentDir = new File(current);
 		String parent = currentDir.getParent();
-		
-		webapp = new File(parent + "/opendevice-web-view/src/main/webapp" );
+
+		webapp = new File(parent + "/target/webapp" );
 		if(webapp.exists()){
 			return webapp.getPath();
 		}
 		
 		return null;
 	}
+
+    public static boolean extractResources() {
+        try {
+
+            String destPath = System.getProperty("user.dir") +  File.separator + "target" + File.separator;
+
+            if(new File(destPath + "webapp").exists()){
+                return false;
+            }
+
+            String jarSource = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+            log.debug("Extracting contents to: " + destPath);
+            log.debug("Source: " + jarSource);
+
+            if(!jarSource.endsWith(".jar") && !jarSource.endsWith(".war")) return false;
+
+            JarFile jarFile = new JarFile(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+            Enumeration<JarEntry> enums = jarFile.entries();
+            while (enums.hasMoreElements()) {
+                JarEntry entry = enums.nextElement();
+                if (entry.getName().startsWith("webapp")) {
+                    File toWrite = new File(destPath + entry.getName());
+                    if (entry.isDirectory()) {
+                        toWrite.mkdirs();
+                        continue;
+                    }
+                    InputStream in = new BufferedInputStream(jarFile.getInputStream(entry));
+                    OutputStream out = new BufferedOutputStream(new FileOutputStream(toWrite));
+                    byte[] buffer = new byte[2048];
+                    for (;;) {
+                        int nBytes = in.read(buffer);
+                        if (nBytes <= 0) {
+                            break;
+                        }
+                        out.write(buffer, 0, nBytes);
+                    }
+                    out.flush();
+                    out.close();
+                    in.close();
+                    log.debug("Extracting: {}", entry.getName());
+                }
+            }
+        } catch (IOException ex) {
+            log.error(ex.getMessage(), ex);
+            return false;
+        }
+        return true;
+    }
 	
 
 	public static void main(String[] args) throws Exception {
 
         final Main main = new Main();
         main.init();
+
+        // Automatic shutdown
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
@@ -145,15 +199,19 @@ public class Main extends BaseDeviceManager {
             }
         });
 
-        System.out.print("Type Enter to Shutdown ....");
-        Scanner in = new Scanner(System.in);
-        String data= in.nextLine();
-        in.close();
+        // Manual shutdown
+        log.info("OpenDevice Middleware - Server started on port {}", main.port);
+        log.info("Type quit to stop the server");
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String a = "";
+        while (!("quit".equals(a))) {
+            a = br.readLine();
+        }
 
-        System.out.println("Shutdown...");
+        System.out.println("Disconnecting all...");
         main.disconnectAll();
-        Thread.sleep(2000);
-        System.out.println("Shutdown [OK]");
+        Thread.sleep(800);
+        System.exit(-1);
     }
 	
 

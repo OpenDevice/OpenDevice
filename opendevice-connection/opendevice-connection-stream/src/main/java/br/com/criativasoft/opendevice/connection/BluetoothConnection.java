@@ -83,7 +83,6 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
 			String uri = getDeviceURLConnection();
 			log.debug("Connecting to: " + uri);
 			connection = (StreamConnection) Connector.open(uri);
-			log.debug("Connectend ! internal connection: " + connection.getClass());
 		}
 	}
 	

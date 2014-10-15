@@ -15,8 +15,12 @@ package br.com.criativasoft.opendevice.restapi;
 
 
 import br.com.criativasoft.opendevice.connection.ServerConnection;
-import br.com.criativasoft.opendevice.connection.message.Message;
-import br.com.criativasoft.opendevice.core.command.*;
+import br.com.criativasoft.opendevice.core.DeviceManager;
+import br.com.criativasoft.opendevice.core.TenantProvider;
+import br.com.criativasoft.opendevice.core.command.CommandStatus;
+import br.com.criativasoft.opendevice.core.command.CommandType;
+import br.com.criativasoft.opendevice.core.command.DeviceCommand;
+import br.com.criativasoft.opendevice.core.command.ResponseCommand;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceVO;
 import br.com.criativasoft.opendevice.core.model.Device;
 import org.slf4j.Logger;
@@ -46,21 +50,33 @@ public class DeviceRest {
 //    private DeviceService service;
 
     @Inject
+    private DeviceManager manager;
+
+    @Inject
     private ServerConnection connection;
 
-    private String clientUUID = "clientname-123456"; // PEGAR DO USUARIO LOGADO !!
+    @HeaderParam("X-AppID")
+    private String applicationID;
 
     @GET
     @Path("/{uid}/value/{value}")
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseCommand setValue(@PathParam("uid") int uid, @PathParam("value") String value){
 
-        DeviceCommand command = new DeviceCommand(CommandType.ON_OFF, uid, Long.parseLong(value));
-        command.setApplicationID(clientUUID);
-        connection.notifyListeners(command);
-
         String connectionUUID = connection.getUID();
-        ResponseCommand response = new ResponseCommand(CommandStatus.DELIVERED, connectionUUID);
+        ResponseCommand response;
+        Device device = manager.findDeviceByUID(uid);
+
+        if(device != null){
+            DeviceCommand command = new DeviceCommand(CommandType.DIGITAL, uid, Long.parseLong(value));
+            command.setApplicationID(getApplicationID());
+            connection.notifyListeners(command);
+
+            response = new ResponseCommand(CommandStatus.DELIVERED, connectionUUID);
+        }else{
+            response = new ResponseCommand(CommandStatus.NOT_FOUND, connectionUUID);
+        }
+        response.setApplicationID(getApplicationID());
 
         return response;
     }
@@ -70,29 +86,13 @@ public class DeviceRest {
     @Produces(MediaType.APPLICATION_JSON)
     public String getValue(@PathParam("uid") int uid) {
 
-        GetDevicesRequest request = new GetDevicesRequest(GetDevicesRequest.FILTER_BY_ID, uid);
-        request.setApplicationID(clientUUID);
-        request.setConnectionUUID(connection.getUID());
+        Device device = manager.findDeviceByUID(uid);
 
-        Message response = connection.notifyAndWait(request);
-
-        if(response instanceof  GetDevicesResponse){
-
-            GetDevicesResponse devicesResponse = (GetDevicesResponse) response;
-
-            Collection<Device> deviceList = devicesResponse.getDevices();
-
-            if(!deviceList.isEmpty()){
-                Device device = deviceList.iterator().next();
-                return ""+device.getValue();
-            }
-
+        if(device != null){
+            return Long.toString(device.getValue());
         }
 
-        log.debug("response = " + response);
-
-
-        return "ERROR: Not Found !";
+        return "";// TODO: return error ?
 
     }
 
@@ -101,26 +101,10 @@ public class DeviceRest {
     @Produces(MediaType.APPLICATION_JSON)
     public DeviceVO getDevice(@PathParam("uid") int uid) {
 
-        GetDevicesRequest request = new GetDevicesRequest(GetDevicesRequest.FILTER_BY_ID, uid);
-        request.setApplicationID(clientUUID);
-        request.setConnectionUUID(connection.getUID());
+        Device device = manager.findDeviceByUID(uid);
 
-        request.setApplicationID(clientUUID);
-        request.setConnectionUUID(connection.getUID());
-
-        Message response = connection.notifyAndWait(request);
-
-        if(response instanceof  GetDevicesResponse){
-
-            GetDevicesResponse devicesResponse = (GetDevicesResponse) response;
-
-            Collection<Device> deviceList = devicesResponse.getDevices();
-
-            if(!deviceList.isEmpty()){
-                Device device = deviceList.iterator().next();
-                return new DeviceVO(device);
-            }
-
+        if(device != null){
+            return new DeviceVO(device);
         }
 
         return null;
@@ -128,10 +112,18 @@ public class DeviceRest {
     }
 
     @DELETE
-    @Path("/{id}")
+    @Path("/{uid}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String delete(@PathParam("id") int id){
-        return "";
+    public String delete(@PathParam("uid") int uid){
+
+        Device device = manager.findDeviceByUID(uid);
+
+        if(device != null){
+            manager.getDeviceDao().delete(device);
+            return "SUCCESS"; // TODO: return SUCCESS ?
+        }
+
+        return ""; // TODO: return error ?
     }
 
     @GET
@@ -139,27 +131,32 @@ public class DeviceRest {
     @Produces(MediaType.APPLICATION_JSON)
     public List<DeviceVO> list() throws IOException {
 
-        GetDevicesRequest request = new GetDevicesRequest();
-        request.setApplicationID(clientUUID);
-        request.setConnectionUUID(connection.getUID());
-
-        Message response = connection.notifyAndWait(request);
 
         List<DeviceVO> devices = new LinkedList<DeviceVO>();
 
-        if(response instanceof  GetDevicesResponse){
+        Collection<Device> deviceList = manager.getDevices();
 
-            GetDevicesResponse devicesResponse = (GetDevicesResponse) response;
-
-            Collection<Device> deviceList = devicesResponse.getDevices();
-
+        if(deviceList != null){
             for (Device device : deviceList) {
                 devices.add(new DeviceVO(device));
             }
-
         }
 
         return devices;
+    }
+
+    private String getApplicationID(){
+
+        if(applicationID != null && applicationID.length() != 0) return applicationID;
+
+        applicationID = connection.getApplicationID();
+
+        if(applicationID != null  && applicationID.length() != 0) return applicationID;
+
+        applicationID = TenantProvider.getCurrentID();
+
+        return applicationID;
+
     }
 
 //    private DeviceService getService(){

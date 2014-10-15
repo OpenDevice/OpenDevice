@@ -13,29 +13,42 @@
 
 var od = od || {};
 
-od.version = "1.0";
 od.APP_ID_NAME = "AppID";
 
+od.version = "1.0";
 od.appID;
 od.serverURL = 'http://'+window.location.host;
 
-
 var OpenDevice = (function () {
 
-// Exported Methods
+    var connection = new od.DeviceConnection({logLevel : 'debug'});
+    var manager = new od.DeviceManager(connection);
+
+// Exported Methods / Vars
 return {
 
     appID : od.appID,
     serverURL : od.serverURL,
+    manager : manager,
 
-    on : od.deviceManager.on,
-    
+    // Manager delegate
+    on : manager.on,
+    findDevice : manager.findDevice,
+    getDevices : manager.getDevices,
+    setValue : manager.setValue,
+    toggleValue : manager.toggleValue,
+    contains : manager.contains,
+
     setAppID : function(appID){
         od.appID = appID;
     },
 
     setServer : function(serverURL){
         od.serverURL = serverURL;
+    },
+
+    connect : function(){
+        connection.connect();
     },
 
     rest : function(path){

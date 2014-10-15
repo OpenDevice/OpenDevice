@@ -15,8 +15,6 @@
     <name>OpenDevice Clients Package</name>
 
     <modules>
-        <!-- <module>opendevice-rest-client</module> -->
-        <!-- <module>opendevice-websocket-client</module> -->
         <module>opendevice-wasync-client</module>
         <module>opendevice-js</module>
     </modules>

@@ -37,7 +37,7 @@ od.Device = function(data){
         if(this.manager){
             this.manager.setValue(this.id, this.value);
         }
-    }
+    };
 
     this.toggleValue = function(){
         var value = 0;

@@ -25,12 +25,11 @@ od.deviceManager = {};
  * @constructor
  */
 od.DeviceManager = function(connection){
-
+    var _this = this;
     od.deviceManager = this; // set global reference
 
     // Alias
-    var _this = this;
-    var DEvent = od.DeviceEvent;
+    var DEvent = od.Event;
     var CType = od.CommandType;
 
     // Private
@@ -51,13 +50,13 @@ od.DeviceManager = function(connection){
     this.setValue = function(deviceID, value){
 
         var cmd = { 'type' : CType.ON_OFF , 'deviceID' :  deviceID, 'value' : value};
-        this.connection.send(cmd);
+        _this.connection.send(cmd);
 
-        var device = this.findDevice(deviceID);
+        var device = _this.findDevice(deviceID);
 
         if(device){
             device.value = value;
-            notifyListeners(DEvent.DEVICE_UPDATE, device);
+            notifyListeners(DEvent.DEVICE_CHANGED, device);
         }
 
         // TODO :Alterar dados locais (localstorage)
@@ -66,7 +65,7 @@ od.DeviceManager = function(connection){
 
     this.toggleValue = function(deviceID){
 
-        var device = this.findDevice(deviceID);
+        var device = _this.findDevice(deviceID);
 
         if(device && ! device.sensor){
             device.toggleValue();
@@ -76,7 +75,7 @@ od.DeviceManager = function(connection){
 
     this.addDevice = function(){
         // Isso teria no final que salvar na EPROM/Servidor do arduino.
-    }
+    };
 
 
     this.getDevices = function(){
@@ -87,7 +86,7 @@ od.DeviceManager = function(connection){
         devices = sync(false);
 
         return devices;
-    }
+    };
 
     this.findDevice = function(deviceID){
         if(devices){
@@ -122,20 +121,45 @@ od.DeviceManager = function(connection){
         // TODO: salvar no localstore..
 
         return devices;
-    };
+    }
 
     /**
      * Shortcut to {@link addListener}
      */
-    this.on = function(){
-        this.addListener.apply(this, arguments);
-    }
+    this.on = function(event, listener){
+        _this.addListener(event, listener);
+    };
 
     this.addListener = function(event, listener){
 
         if(listenersMap[event] === undefined) listenersMap[event] = [];
         listenersMap[event].push(listener);
 
+    };
+
+    /**
+     * Check if device is in the list passed by parameter or in internal list
+     * @param device
+     * @param list (Optional)
+     * @returns {boolean}
+     */
+    this.contains = function(device, list){
+        if(list == null) list = _this.getDevices();
+
+        for(var i = 0; i<list.length; i++){
+
+            if(typeof list[i] == "object"){
+                if(device.id == list[i].id){
+                    return true;
+                }
+            }else{
+                if(device.id == list[i]){
+                    return true;
+                }
+            }
+        }
+
+        return false;
     };
 
 
@@ -147,7 +171,12 @@ od.DeviceManager = function(connection){
 
             for(var i = 0; i<listeners.length; i++){
                 if (typeof listeners[i] === "function") {
-                    listeners[i](data);
+                    try{
+                        listeners[i](data);
+                    }catch (error){
+                        console.log(error);
+                    }
+
                 }
             }
 
@@ -177,8 +206,6 @@ od.DeviceManager = function(connection){
     }
 
     /**
-     *
-     * @param message
      * @private
      */
     function _onMessageReceived(conn, message){
@@ -194,12 +221,12 @@ od.DeviceManager = function(connection){
 
             var device = updateDevice(message);
             if(device){
-                notifyListeners(DEvent.DEVICE_UPDATE, device);
+                notifyListeners(DEvent.DEVICE_CHANGED, device);
             }
             // TODO: store changes localstore..
         }
 
-    };
+    }
 
     function updateDevice(message){
         var device = _this.findDevice(message.deviceID);
@@ -211,11 +238,19 @@ od.DeviceManager = function(connection){
 
     function _connectionStateChanged(conn, newStatus, oldStatus){
         console.log("DeviceManager._connectionStateChanged :" + newStatus);
+        notifyListeners(DEvent.CONNECTION_CHANGE, newStatus);
 
         if(od.ConnectionStatus.CONNECTED == newStatus){
             sync(true);
+            notifyListeners(DEvent.CONNECTED);
         }
-    };
+
+        if(od.ConnectionStatus.CONNECTED == newStatus){
+            notifyListeners(DEvent.DISCONNECTED);
+        }
+
+
+    }
 
     init(); //
-}
+};

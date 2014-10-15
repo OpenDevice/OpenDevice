@@ -19,6 +19,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.wasync.Decoder;
 import org.atmosphere.wasync.Encoder;
 import org.atmosphere.wasync.Event;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -30,8 +32,9 @@ import java.io.IOException;
  */
 public class CommandEncoderDecoder implements Encoder<Command, String>, Decoder<String, Command> {
 
-    private CommandJacksonMapper mapper;
+    private static Logger log = LoggerFactory.getLogger(CommandEncoderDecoder.class);
 
+    private CommandJacksonMapper mapper;
 
     public ObjectMapper getMapper() {
         if(mapper == null){
@@ -45,7 +48,7 @@ public class CommandEncoderDecoder implements Encoder<Command, String>, Decoder<
     @Override
     public Command decode(Event e, String s) {
 
-        System.out.println("e = " + e + " -> " + s);
+        if(log.isDebugEnabled()) log.debug( e + " -> " + s);
 
         if(e == Event.MESSAGE){
             try {

@@ -18,8 +18,7 @@ var od = od || {};
 // Like OpenDevice JAVA-API
 od.DeviceType = {
     ANALOG:1,
-    DIGITAL:2,
-    SENSOR:3 // TODO: ver se é necessário
+    DIGITAL:2
 };
 
 // Like OpenDevice JAVA-API
@@ -66,11 +65,12 @@ od.CommandType = {
 };
 
 
-od.DeviceEvent = {
+od.Event = {
     DEVICE_LIST_UPDATE : "DEVICE_LIST_UPDATE",
-    DEVICE_UPDATE : "DEVICE_UPDATE",
-    DEVICE_CHANGED : "DEVICE_UPDATE", // ALIAS !
-    CONNECTION_CHANGE : "CONNECTION_CHANGE"
+    DEVICE_CHANGED : "DEVICE_CHANGED",
+    CONNECTION_CHANGE : "CONNECTION_CHANGE",
+    CONNECTED : "CONNECTION_CHANGE_CONNECTED",
+    DISCONNECTED : "CONNECTION_CHANGE_DISCONNECTED"
 };/*
  *
  *  * ******************************************************************************
@@ -110,7 +110,7 @@ od.Device = function(data){
         if(this.manager){
             this.manager.setValue(this.id, this.value);
         }
-    }
+    };
 
     this.toggleValue = function(){
         var value = 0;
@@ -156,14 +156,13 @@ od.ConnectionStatus = {
  * @constructor
  */
 od.DeviceConnection = function(config){
+    var _this = this;
 
     // Alias
     var Status = od.ConnectionStatus;
-
     // Private
     var socket = window.atmosphere || $.atmosphere;
     var serverConnection;
-    var _this = this;
     var listeners = [];
 
     od.connection = this; // set global instance
@@ -171,12 +170,10 @@ od.DeviceConnection = function(config){
     // public
     this.status = Status.DISCONNECTED;
     this.config = config;
-    this.url = od.serverURL + "/device/connection/" + od.appID;
 
     init(config);
 
     function init(_config){
-        _config.url =  _this.url;
         // _config.dropHeaders = false;
 
         if(_config["contentType"] == undefined)       _config["contentType"] = "application/json";
@@ -237,14 +234,19 @@ od.DeviceConnection = function(config){
         };
 
 
-    };
+    }
 
     this.connect = function(){
-        console.log("Connection to: " + config.url);
-        serverConnection = socket.subscribe(config);
+        _this.config.url = _this.getUrl();
+        console.log("Connection to: " + _this.config.url);
+        serverConnection = socket.subscribe(_this.config);
         setConnectionStatus(Status.CONNECTING);
         return _this;
     };
+
+    this.getUrl = function(){
+        return od.serverURL + "/device/connection/" + od.appID;
+    }
 
     this.send = function(data){
         // FIX: bug no atmophere que não enviar os headers da primeira conexao // TODO: registrar ticket
@@ -267,7 +269,7 @@ od.DeviceConnection = function(config){
 
     this.getConnectionUUID = function(){
         return serverConnection.getUUID();
-    }
+    };
 
     function notifyListeners(data){
         for(var i = 0; i<listeners.length; i++){
@@ -279,32 +281,34 @@ od.DeviceConnection = function(config){
     }
 
     function setConnectionStatus(status){
-        
+
         for(var i = 0; i<listeners.length; i++){
             var listener = listeners[i]["connectionStateChanged"];
             if (typeof listener === "function") {
-                listener(_this, status, this.status);
+                listener(_this, status, _this.status);
             }
         }
 
-        this.status = status;
+        _this.status = status;
     }
 
     function _onMessageReceived(response){
 
+        var data = null;
         try {
-            var data = JSON.parse(response.responseBody);
+            data = JSON.parse(response.responseBody);
+        }catch(err) {
+                console.error("Can't parse response. Error: " + err);
+        }
 
+        if(data) {
             console.log("Connection.onMessageReceived(from:" + response.request.uuid + ") -> " + response.responseBody);
-
             notifyListeners(data);
         }
-        catch(err) {
-            console.error(" Can't parse response -> " + response.responseBody);
-        }
+
     }
 
-}/*
+};/*
  * ******************************************************************************
  *  Copyright (c) 2013-2014 CriativaSoft (www.criativasoft.com.br)
  *  All rights reserved. This program and the accompanying materials
@@ -331,12 +335,11 @@ od.deviceManager = {};
  * @constructor
  */
 od.DeviceManager = function(connection){
-
+    var _this = this;
     od.deviceManager = this; // set global reference
 
     // Alias
-    var _this = this;
-    var DEvent = od.DeviceEvent;
+    var DEvent = od.Event;
     var CType = od.CommandType;
 
     // Private
@@ -357,13 +360,13 @@ od.DeviceManager = function(connection){
     this.setValue = function(deviceID, value){
 
         var cmd = { 'type' : CType.ON_OFF , 'deviceID' :  deviceID, 'value' : value};
-        this.connection.send(cmd);
+        _this.connection.send(cmd);
 
-        var device = this.findDevice(deviceID);
+        var device = _this.findDevice(deviceID);
 
         if(device){
             device.value = value;
-            notifyListeners(DEvent.DEVICE_UPDATE, device);
+            notifyListeners(DEvent.DEVICE_CHANGED, device);
         }
 
         // TODO :Alterar dados locais (localstorage)
@@ -372,7 +375,7 @@ od.DeviceManager = function(connection){
 
     this.toggleValue = function(deviceID){
 
-        var device = this.findDevice(deviceID);
+        var device = _this.findDevice(deviceID);
 
         if(device && ! device.sensor){
             device.toggleValue();
@@ -382,7 +385,7 @@ od.DeviceManager = function(connection){
 
     this.addDevice = function(){
         // Isso teria no final que salvar na EPROM/Servidor do arduino.
-    }
+    };
 
 
     this.getDevices = function(){
@@ -393,7 +396,7 @@ od.DeviceManager = function(connection){
         devices = sync(false);
 
         return devices;
-    }
+    };
 
     this.findDevice = function(deviceID){
         if(devices){
@@ -428,20 +431,45 @@ od.DeviceManager = function(connection){
         // TODO: salvar no localstore..
 
         return devices;
-    };
+    }
 
     /**
      * Shortcut to {@link addListener}
      */
-    this.on = function(){
-        this.addListener.apply(this, arguments);
-    }
+    this.on = function(event, listener){
+        _this.addListener(event, listener);
+    };
 
     this.addListener = function(event, listener){
 
         if(listenersMap[event] === undefined) listenersMap[event] = [];
         listenersMap[event].push(listener);
 
+    };
+
+    /**
+     * Check if device is in the list passed by parameter or in internal list
+     * @param device
+     * @param list (Optional)
+     * @returns {boolean}
+     */
+    this.contains = function(device, list){
+        if(list == null) list = _this.getDevices();
+
+        for(var i = 0; i<list.length; i++){
+
+            if(typeof list[i] == "object"){
+                if(device.id == list[i].id){
+                    return true;
+                }
+            }else{
+                if(device.id == list[i]){
+                    return true;
+                }
+            }
+        }
+
+        return false;
     };
 
 
@@ -453,7 +481,12 @@ od.DeviceManager = function(connection){
 
             for(var i = 0; i<listeners.length; i++){
                 if (typeof listeners[i] === "function") {
-                    listeners[i](data);
+                    try{
+                        listeners[i](data);
+                    }catch (error){
+                        console.log(error);
+                    }
+
                 }
             }
 
@@ -483,8 +516,6 @@ od.DeviceManager = function(connection){
     }
 
     /**
-     *
-     * @param message
      * @private
      */
     function _onMessageReceived(conn, message){
@@ -500,12 +531,12 @@ od.DeviceManager = function(connection){
 
             var device = updateDevice(message);
             if(device){
-                notifyListeners(DEvent.DEVICE_UPDATE, device);
+                notifyListeners(DEvent.DEVICE_CHANGED, device);
             }
             // TODO: store changes localstore..
         }
 
-    };
+    }
 
     function updateDevice(message){
         var device = _this.findDevice(message.deviceID);
@@ -517,14 +548,22 @@ od.DeviceManager = function(connection){
 
     function _connectionStateChanged(conn, newStatus, oldStatus){
         console.log("DeviceManager._connectionStateChanged :" + newStatus);
+        notifyListeners(DEvent.CONNECTION_CHANGE, newStatus);
 
         if(od.ConnectionStatus.CONNECTED == newStatus){
             sync(true);
+            notifyListeners(DEvent.CONNECTED);
         }
-    };
+
+        if(od.ConnectionStatus.CONNECTED == newStatus){
+            notifyListeners(DEvent.DISCONNECTED);
+        }
+
+
+    }
 
     init(); //
-}/*
+};/*
  * ******************************************************************************
  *  Copyright (c) 2013-2014 CriativaSoft (www.criativasoft.com.br)
  *  All rights reserved. This program and the accompanying materials
@@ -539,29 +578,42 @@ od.DeviceManager = function(connection){
 
 var od = od || {};
 
-od.version = "1.0";
 od.APP_ID_NAME = "AppID";
 
+od.version = "1.0";
 od.appID;
 od.serverURL = 'http://'+window.location.host;
 
-
 var OpenDevice = (function () {
 
-// Exported Methods
+    var connection = new od.DeviceConnection({logLevel : 'debug'});
+    var manager = new od.DeviceManager(connection);
+
+// Exported Methods / Vars
 return {
 
     appID : od.appID,
     serverURL : od.serverURL,
+    manager : manager,
 
-    on : od.deviceManager.on,
-    
+    // Manager delegate
+    on : manager.on,
+    findDevice : manager.findDevice,
+    getDevices : manager.getDevices,
+    setValue : manager.setValue,
+    toggleValue : manager.toggleValue,
+    contains : manager.contains,
+
     setAppID : function(appID){
         od.appID = appID;
     },
 
     setServer : function(serverURL){
         od.serverURL = serverURL;
+    },
+
+    connect : function(){
+        connection.connect();
     },
 
     rest : function(path){

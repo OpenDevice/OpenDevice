@@ -18,8 +18,7 @@ var od = od || {};
 // Like OpenDevice JAVA-API
 od.DeviceType = {
     ANALOG:1,
-    DIGITAL:2,
-    SENSOR:3 // TODO: ver se é necessário
+    DIGITAL:2
 };
 
 // Like OpenDevice JAVA-API
@@ -66,9 +65,10 @@ od.CommandType = {
 };
 
 
-od.DeviceEvent = {
+od.Event = {
     DEVICE_LIST_UPDATE : "DEVICE_LIST_UPDATE",
-    DEVICE_UPDATE : "DEVICE_UPDATE",
-    DEVICE_CHANGED : "DEVICE_UPDATE", // ALIAS !
-    CONNECTION_CHANGE : "CONNECTION_CHANGE"
+    DEVICE_CHANGED : "DEVICE_CHANGED",
+    CONNECTION_CHANGE : "CONNECTION_CHANGE",
+    CONNECTED : "CONNECTION_CHANGE_CONNECTED",
+    DISCONNECTED : "CONNECTION_CHANGE_DISCONNECTED"
 };

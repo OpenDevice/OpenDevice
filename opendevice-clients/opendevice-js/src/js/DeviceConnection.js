@@ -35,14 +35,13 @@ od.ConnectionStatus = {
  * @constructor
  */
 od.DeviceConnection = function(config){
+    var _this = this;
 
     // Alias
     var Status = od.ConnectionStatus;
-
     // Private
     var socket = window.atmosphere || $.atmosphere;
     var serverConnection;
-    var _this = this;
     var listeners = [];
 
     od.connection = this; // set global instance
@@ -50,12 +49,10 @@ od.DeviceConnection = function(config){
     // public
     this.status = Status.DISCONNECTED;
     this.config = config;
-    this.url = od.serverURL + "/device/connection/" + od.appID;
 
     init(config);
 
     function init(_config){
-        _config.url =  _this.url;
         // _config.dropHeaders = false;
 
         if(_config["contentType"] == undefined)       _config["contentType"] = "application/json";
@@ -116,14 +113,19 @@ od.DeviceConnection = function(config){
         };
 
 
-    };
+    }
 
     this.connect = function(){
-        console.log("Connection to: " + config.url);
-        serverConnection = socket.subscribe(config);
+        _this.config.url = _this.getUrl();
+        console.log("Connection to: " + _this.config.url);
+        serverConnection = socket.subscribe(_this.config);
         setConnectionStatus(Status.CONNECTING);
         return _this;
     };
+
+    this.getUrl = function(){
+        return od.serverURL + "/device/connection/" + od.appID;
+    }
 
     this.send = function(data){
         // FIX: bug no atmophere que não enviar os headers da primeira conexao // TODO: registrar ticket
@@ -146,7 +148,7 @@ od.DeviceConnection = function(config){
 
     this.getConnectionUUID = function(){
         return serverConnection.getUUID();
-    }
+    };
 
     function notifyListeners(data){
         for(var i = 0; i<listeners.length; i++){
@@ -158,29 +160,31 @@ od.DeviceConnection = function(config){
     }
 
     function setConnectionStatus(status){
-        
+
         for(var i = 0; i<listeners.length; i++){
             var listener = listeners[i]["connectionStateChanged"];
             if (typeof listener === "function") {
-                listener(_this, status, this.status);
+                listener(_this, status, _this.status);
             }
         }
 
-        this.status = status;
+        _this.status = status;
     }
 
     function _onMessageReceived(response){
 
+        var data = null;
         try {
-            var data = JSON.parse(response.responseBody);
+            data = JSON.parse(response.responseBody);
+        }catch(err) {
+                console.error("Can't parse response. Error: " + err);
+        }
 
+        if(data) {
             console.log("Connection.onMessageReceived(from:" + response.request.uuid + ") -> " + response.responseBody);
-
             notifyListeners(data);
         }
-        catch(err) {
-            console.error(" Can't parse response -> " + response.responseBody);
-        }
+
     }
 
-}
+};

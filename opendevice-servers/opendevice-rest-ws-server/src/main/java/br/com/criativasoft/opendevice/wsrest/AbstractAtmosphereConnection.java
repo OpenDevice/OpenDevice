@@ -15,20 +15,26 @@ package br.com.criativasoft.opendevice.wsrest;
 
 import br.com.criativasoft.opendevice.connection.*;
 import br.com.criativasoft.opendevice.connection.message.Request;
+import br.com.criativasoft.opendevice.core.DeviceManager;
+import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.restapi.WaitResponseListener;
 import br.com.criativasoft.opendevice.wsrest.guice.config.ConnectionGuiceProvider;
+import br.com.criativasoft.opendevice.wsrest.guice.config.DeviceManagerGuiceProvider;
 import br.com.criativasoft.opendevice.wsrest.guice.config.GuiceModule;
 import br.com.criativasoft.opendevice.wsrest.io.CommandJacksonProvider;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.core.command.Command;
+import br.com.criativasoft.opendevice.wsrest.io.CrossOriginInterceptor;
 import org.atmosphere.cpr.*;
+import org.atmosphere.interceptor.CorsInterceptor;
 import org.atmosphere.nettosphere.Config;
 import org.atmosphere.nettosphere.Nettosphere;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.*;
 
 
@@ -89,7 +95,8 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
         if(server == null){
             Config.Builder conf = new Config.Builder();
             conf.port(port);
-            conf.host("127.0.0.1");
+            //conf.host("::0"); // bind all local IPs
+            conf.host("0.0.0.0"); // bind all local IPs
             configure(conf);
 
             conf.resource(GuiceModule.class);
@@ -104,9 +111,12 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
             conf.initParam("com.sun.jersey.api.json.POJOMappingFeature", "true");
             conf.initParam(ApplicationConfig.SCAN_CLASSPATH, "false");
+            conf.initParam(ApplicationConfig.ANALYTICS, "false");
+            // conf.initParam(ApplicationConfig.DROP_ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "false");
 
             // conf.initParam("com.sun.jersey.spi.container.ResourceMethodDispatchProvider", "true");
             //.initParam(ApplicationConfig.OBJECT_FACTORY, GuiceConfigFactory.class.getName())
+            conf.interceptor(new CrossOriginInterceptor());
             conf.interceptor(this);
             conf.build();
 
@@ -132,10 +142,7 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
     @Override
     public void send(Message message) throws IOException {
 
-        log.debug("waitListeners = " + waitListeners.size());
-        log.debug("threads = " + Thread.activeCount());
-
-        // Notify REST clients that are waiting for a response
+        // Notify clients that are waiting for a response
         Iterator<WaitResponseListener> iterator = waitListeners.iterator();
         while(iterator.hasNext()){
             WaitResponseListener waitListener = iterator.next();
@@ -152,7 +159,9 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
 
     public void addWebResource(String path){
-        resources.add(path);
+        if(path != null){
+            resources.add(path);
+        }
     }
 
     @Override
@@ -164,7 +173,12 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
     @Override
     public Action inspect(AtmosphereResource atmosphereResource) {
 
+        String appID = atmosphereResource.getRequest().getHeader(TenantProvider.HTTP_HEADER_KEY);
+        if(appID != null) TenantProvider.setCurrentID(appID);
+
+        DeviceManager manager = (DeviceManager) this.getConnectionManager();
         ConnectionGuiceProvider.setConnection(this);
+        DeviceManagerGuiceProvider.setInstance(manager);
 
         // atmosphereResource.getRequest().getParameterMap().put("requestUID", new String[]{atmosphereResource.uuid()});
         // atmosphereResource.getRequest().setAttribute("requestUID", atmosphereResource.uuid());
@@ -176,13 +190,13 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
     @Override
     public void postInspect(AtmosphereResource atmosphereResource) {
         ConnectionGuiceProvider.setConnection(null);
+        DeviceManagerGuiceProvider.setInstance(null);
     }
 
     @Override
     public void connectionStateChanged(DeviceConnection connection, ConnectionStatus status) {
 
     }
-
 
     @Override
     public Message notifyAndWait(Request request) {
@@ -224,13 +238,12 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             // Get broadcast group for client.
             Broadcaster broadcaster = atmosphereConfig.getBroadcasterFactory().lookup(cmd.getApplicationID());
 
-            Collection<Broadcaster> broadcasters = atmosphereConfig.getBroadcasterFactory().lookupAll();
-            System.out.println("WSServer.broadcasters = "+ broadcasters.size());
-            for (Broadcaster item : broadcasters) {
-                System.out.println(" - " + item.getID());
-            }
 
             if(broadcaster != null){
+
+                log.debug("To: " +cmd.getApplicationID()+ " ( clients: "+broadcaster.getAtmosphereResources().size()+" ) ");
+
+
                 Collection<AtmosphereResource> atmosphereResources = broadcaster.getAtmosphereResources();
 //                System.out.println("WSServer.clients = "+ atmosphereResources.size());
 
@@ -244,20 +257,10 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
                 }
 
+            }else{
+                log.warn("To: " +cmd.getApplicationID()+ "( broadcast channel not found )");
             }
 
-
-
-
-
-            // atmosphereConfig.getBroadcasterFactory().
-
-
-
-            // Each client has your channel.
-//            if(cmd.getApplicationID() != null && cmd.getApplicationID().trim().length() > 0){
-//                atmosphereConfig.metaBroadcaster().broadcastTo(cmd.getApplicationID(), message);
-//            }
 
         }
     }

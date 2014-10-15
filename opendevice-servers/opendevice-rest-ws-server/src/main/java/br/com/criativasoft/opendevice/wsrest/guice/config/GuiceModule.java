@@ -66,6 +66,7 @@
 package br.com.criativasoft.opendevice.wsrest.guice.config;
 
 import br.com.criativasoft.opendevice.connection.ServerConnection;
+import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.wsrest.guice.GuiceResourceProvider;
 import br.com.criativasoft.opendevice.restapi.service.DeviceService;
 import br.com.criativasoft.opendevice.restapi.service.DeviceServiceImpl;
@@ -79,6 +80,7 @@ public class GuiceModule extends GuiceResourceProvider {
     @Override
     public void configure(Binder binder) {
         binder.bind(ServerConnection.class).toProvider(ConnectionGuiceProvider.class);
+        binder.bind(DeviceManager.class).toProvider(DeviceManagerGuiceProvider.class);
         binder.bind(DeviceService.class).to(DeviceServiceImpl.class);
     }
 

@@ -51,7 +51,7 @@ public class DeviceConnectionResource {
     @GET
     @Suspend(contentType = "application/json", listeners = EventsLogger.class)
     public String suspend() {
-        return "";
+        return null;
     }
 
 

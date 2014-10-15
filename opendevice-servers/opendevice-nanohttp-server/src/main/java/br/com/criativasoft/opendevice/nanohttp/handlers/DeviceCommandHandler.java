@@ -35,7 +35,7 @@ public class DeviceCommandHandler implements RequestHandler {
 		int value = -1;
 		
 		if(cmdStr==null || cmdStr.trim().length() == 0){
-			type = CommandType.ON_OFF;
+			type = CommandType.DIGITAL;
 		}else{
 			type = CommandType.getByCode(Integer.parseInt(cmdStr));
 		}

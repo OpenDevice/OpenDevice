@@ -31,18 +31,18 @@ public class EventsLogger implements WebSocketEventListener {
     }
 
     public void onSuspend(final AtmosphereResourceEvent event) {
-        logger.info("onSuspend(): {}:{}", event.getResource().getRequest().getRemoteAddr(),
-                event.getResource().getRequest().getRemotePort());
+        logger.info("Connected: {} - {}", event.getResource().getRequest().getRemoteAddr()
+               + ":" +  event.getResource().getRequest().getRemotePort(), event.getResource().uuid());
     }
 
     public void onResume(AtmosphereResourceEvent event) {
-        logger.info("onResume(): {}:{}", event.getResource().getRequest().getRemoteAddr(),
-                event.getResource().getRequest().getRemotePort());
+        logger.info("{} - {}", event.getResource().getRequest().getRemoteAddr()
+                + ":" +  event.getResource().getRequest().getRemotePort(), event.getResource().uuid());
     }
 
     public void onDisconnect(AtmosphereResourceEvent event) {
-        logger.info("onDisconnect(): {}:{}", event.getResource().getRequest().getRemoteAddr(),
-                event.getResource().getRequest().getRemotePort());
+        logger.info("{} - {}", event.getResource().getRequest().getRemoteAddr()
+                + ":" +  event.getResource().getRequest().getRemotePort(), event.getResource().uuid());
     }
 
     public void onBroadcast(AtmosphereResourceEvent event) {
@@ -68,7 +68,7 @@ public class EventsLogger implements WebSocketEventListener {
     }
 
     public void onMessage(WebSocketEvent event) {
-        logger.info("onMessage(): {}", event);
+        logger.debug("onMessage(): {}", event.message());
     }
 
     public void onClose(WebSocketEvent event) {
@@ -80,10 +80,10 @@ public class EventsLogger implements WebSocketEventListener {
     }
 
     public void onDisconnect(WebSocketEvent event) {
-        logger.info("onDisconnect(): {}", event);
+//        logger.info("onDisconnect(): {}", event);
     }
 
     public void onConnect(WebSocketEvent event) {
-        logger.info("onConnect(): {}", event);
+        // logger.info("onConnect(): {}", event);
     }
 }

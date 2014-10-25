@@ -62,6 +62,13 @@ public class OutputConnections {
 
     private <T> T load(Class<T> klass){
 
+
+        try{
+            Class.forName("java.util.ServiceLoader");
+        }catch(ClassNotFoundException ex){
+            throw new RuntimeException("This java version don't support dynamic loading (ServiceLoader), you need use direct class ex: new BluetoothConnection(addr)");
+        }
+
         // lonkup....
         ServiceLoader<T> service = ServiceLoader.load(klass);
 

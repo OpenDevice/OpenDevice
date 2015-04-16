@@ -33,6 +33,7 @@ import java.io.IOException;
 public abstract class ArduinoManager extends SimpleDeviceManager{
 
     public ArduinoManager(){
+        super();
 
         DeviceConnection connection = this.setup();
         if(connection == null) throw new NullPointerException("Connection is NULL !");

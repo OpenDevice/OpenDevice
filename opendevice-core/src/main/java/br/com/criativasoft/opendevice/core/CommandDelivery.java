@@ -13,10 +13,7 @@
 
 package br.com.criativasoft.opendevice.core;
 
-import br.com.criativasoft.opendevice.connection.ConnectionListener;
-import br.com.criativasoft.opendevice.connection.ConnectionStatus;
-import br.com.criativasoft.opendevice.connection.DeviceConnection;
-import br.com.criativasoft.opendevice.connection.ServerConnection;
+import br.com.criativasoft.opendevice.connection.*;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.CommandStatus;
@@ -66,16 +63,12 @@ public class CommandDelivery implements ConnectionListener {
 		command.setStatus(CommandStatus.DELIVERED);
 
         connection.addListener(this);
-		
-		if(command instanceof ResponseCommand || connection instanceof ServerConnection){
 
+        if(connection instanceof StreamConnection && !(command instanceof ResponseCommand)){
+            sendWithTimeout(command, connection);
+        }else{
             connection.send(command);
-			
-		}else{
-			
-			sendWithTimeout(command, connection);
-			
-		}
+        }
 
 	}
 
@@ -173,7 +166,7 @@ public class CommandDelivery implements ConnectionListener {
 
             command.setTrackingID(newID);
 
-            log.debug("Send and Wait :: SEQ <" + this.newID + ">, UID: "+command.getUid());
+            log.debug("Send and Wait :: SEQ <" + this.newID + ">:"+command.getType()+", UID: "+command.getUid());
 
             try {
 

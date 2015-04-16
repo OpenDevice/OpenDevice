@@ -13,19 +13,19 @@
 
 package br.com.criativasoft.opendevice.core;
 
-import br.com.criativasoft.opendevice.connection.ConnectionListener;
-import br.com.criativasoft.opendevice.connection.ConnectionStatus;
-import br.com.criativasoft.opendevice.connection.DeviceConnection;
-import br.com.criativasoft.opendevice.connection.StreamConnection;
+import br.com.criativasoft.opendevice.connection.*;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.core.command.*;
+import br.com.criativasoft.opendevice.core.connection.EmbeddedGPIO;
 import br.com.criativasoft.opendevice.core.connection.MultipleConnection;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.filter.CommandFilter;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceListener;
 import br.com.criativasoft.opendevice.core.model.DeviceType;
+
+import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +40,8 @@ import java.util.*;
  * @date 23/06/2013
  */
 public abstract class BaseDeviceManager implements ConnectionListener, DeviceManager {
+
+    public static DeviceManager instance;
 	
 	private static final Logger log = LoggerFactory.getLogger(BaseDeviceManager.class);
 	
@@ -58,6 +60,18 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
     private Message lastMessage;
 
     private DeviceListener thisListener = new DeviceManagerListener();
+
+    public BaseDeviceManager(){
+        instance = this;
+    }
+
+    /**
+     * Get shared global instance of DevinceManager.
+     * @return
+     */
+    public static DeviceManager getInstance() {
+        return instance;
+    }
 
     @Override
     public Device findDeviceByUID(int deviceUID) {
@@ -135,13 +149,54 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
 
     @Override
     public void connect() throws IOException {
+
+        if(getDevices().isEmpty()) log.warn("No devices registed ! (TIP: Create "+this.getClass().getSimpleName()+" instance before devices or call addDevice !");
+
+        connectAll();
+    }
+
+    @Override
+    public void disconnect() throws IOException {
+        if(outputConnections != null) outputConnections.disconnect();
+        if(inputConnections != null) inputConnections.disconnect();
+    }
+
+    @Override
+    public void connect(DeviceConnection connection) throws IOException {
+        addOutput(connection);
         connectAll();
     }
 
     protected void connectAll() throws ConnectionException{
+
         if(outputConnections != null) outputConnections.connect();
         if(inputConnections != null) inputConnections.connect();
+
 	}
+
+    /**
+     * Synchronize devices with connections that require additional information such as GPIO.
+     * (An example is the raspberry that already has support built GPIO)
+     * @param connection
+     */
+    protected void syncDevices(DeviceConnection connection){
+
+        if(connection instanceof EmbeddedGPIO){
+            EmbeddedGPIO gpioConn = (EmbeddedGPIO) connection;
+            Collection<Device> devices = getDevices();
+            if(devices != null){
+                for (Device device : devices) gpioConn.attach(device);
+            }else{
+                log.warn("None device registered !");
+            }
+        }
+        if(connection instanceof StreamConnection){
+            try {
+                sendTo(new GetDevicesRequest(), connection);
+            } catch (IOException e) {}
+        }
+
+    }
 
     protected void disconnectAll(){
 
@@ -223,7 +278,7 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
         CommandType type = command.getType();
 
         // Comandos de DIGITAL e similares..
-        if (DeviceCommand.isCompatible(type)) {
+        if (DeviceCommand.isCompatible(type) || type == CommandType.INFRA_RED) {
 
             DeviceCommand deviceCommand = (DeviceCommand) command;
 
@@ -232,8 +287,13 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
 
             Device device = findDeviceByUID(deviceID);
 
-            if (device != null) {
+            if(device != null && device.getValue() == value) return; // exist but not changed !
+
+            if (device != null && device.getValue() != value) {
+
                 device.setValue(value);
+                notifyListeners(device);
+
             }
 
             // Se foi recebido pelo modulo físico(Bluetooth/USB/Wifi), não precisa ser gerenciado pelo CommandDelivery
@@ -291,8 +351,27 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
             }
 
         } else if (type == CommandType.DEVICE_COMMAND_RESPONSE) {
+
             ResponseCommand responseCommand = (ResponseCommand) command;
             log.debug("ResponseStatus: " + responseCommand.getStatus());
+
+        } else if (type == CommandType.GET_DEVICES_RESPONSE) {
+
+            GetDevicesResponse response = (GetDevicesResponse) command;
+            Collection<Device> loadDevices = response.getDevices();
+
+            log.debug("Loaded Devices: " + loadDevices.size());
+            DeviceDao dao = getValidDeviceDao();
+
+            for (Device device : loadDevices) {
+                Device found = dao.getByUID(device.getUid());
+                if(found == null){
+                    addDevice(found);
+                }else{
+                    found.setValue(device.getValue());
+                }
+
+            }
         }
     }
 
@@ -307,9 +386,19 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
 	@Override
 	public void connectionStateChanged(DeviceConnection connection, ConnectionStatus status) {
 		log.debug("connectionStateChanged :: "+ connection.getClass().getSimpleName() + ", status = " + status);
+
+        if(status == ConnectionStatus.CONNECTED && connection instanceof StreamConnection){
+
+            syncDevices(connection);
+
+        }
 	}
 	
 
+	/*
+	 * (non-Javadoc)
+	 * @see br.com.criativasoft.opendevice.core.DeviceManager#send(br.com.criativasoft.opendevice.core.command.Command)
+	 */
 	@Override
 	public void send(Command command) throws IOException {
 
@@ -332,6 +421,15 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
 		}
 		
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see br.com.criativasoft.opendevice.core.DeviceManager#sendCommand(java.lang.String, java.lang.Object[])
+	 */
+	@Override
+    public void sendCommand( String commandName , Object ... params ) throws IOException {
+        send(new UserCommand(commandName, params));
+    }
 
     /**
      * Causes the currently executing thread to sleep (temporarily cease
@@ -415,5 +513,9 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
         newList.addAll(outputConnections.getConnections());
 
         return newList;
+    }
+
+    protected OpenDeviceConfig getConfig(){
+        return OpenDeviceConfig.get();
     }
 }

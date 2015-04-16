@@ -39,8 +39,27 @@ public interface DeviceManager extends ConnectionManager{
     public void addDevices(Collection<Device> devices);
 	
 	public void send(Command command) throws IOException;
+	
+	/**
+	 * This will call a user-defined command, allowing you to perform custom method calls directly on device. <br/>
+	 * This is an easy way to extend OpenDevice protocol, but note that in some situations it is best to implement 
+	 * a new device class and work with objects instead of separate functions.
+	 * @param commandName - name command informed the device side
+	 * @param params (Optional) - Parameters to be sent to the function
+	 */
+	public void sendCommand( String commandName , Object ... params ) throws IOException;
 
     public void connect() throws IOException;
+
+    public void disconnect() throws IOException;
+
+    /**
+     * Connect to a single output connection. <br/>
+     * That way you do not need to call addOutput
+     * @param connection
+     * @throws IOException
+     */
+    void connect(DeviceConnection connection) throws IOException;
 
     public void addInput(DeviceConnection connection);
 

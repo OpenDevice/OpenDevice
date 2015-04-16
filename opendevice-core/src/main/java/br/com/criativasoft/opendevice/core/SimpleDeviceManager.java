@@ -17,6 +17,7 @@ import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.dao.memory.DeviceMemoryDao;
+import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +33,7 @@ public class SimpleDeviceManager extends BaseDeviceManager {
 
     private static final Logger log = LoggerFactory.getLogger(SimpleDeviceManager.class);
 
-    private String applicationID;
+    private String applicationID = OpenDeviceConfig.LOCAL_APP_ID;
 
     public void setApplicationID(String applicationID) {
         TenantProvider.setCurrentID(applicationID);
@@ -44,6 +45,7 @@ public class SimpleDeviceManager extends BaseDeviceManager {
     }
 
     public SimpleDeviceManager(){
+        super();
         setDeviceDao(new DeviceMemoryDao());
     }
 
@@ -74,7 +76,12 @@ public class SimpleDeviceManager extends BaseDeviceManager {
     public DeviceDao getValidDeviceDao() {
 
         if(TenantProvider.getCurrentID() == null){
-            TenantProvider.setCurrentID(applicationID);
+            TenantProvider.setCurrentID(getApplicationID());
+        }
+
+        // Check if tenant is valid.
+        if(TenantProvider.getCurrentID() != null && getConfig().isSupportTenants() && OpenDeviceConfig.LOCAL_APP_ID.equals(TenantProvider.getCurrentID())){
+            throw new IllegalStateException("In Multi-Tenant support don't allow '*' in applicationID !");
         }
 
         return super.getValidDeviceDao();

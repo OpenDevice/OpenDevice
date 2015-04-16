@@ -65,7 +65,8 @@ public class TCPConnection extends AbstractStreamConnection implements ITcpConne
 			}
 			
 		} catch (IOException e) {
-			throw new ConnectionException(e);
+            setStatus(ConnectionStatus.FAIL);
+			throw new ConnectionException(e.getMessage(), e);
 		}
 		
 	}

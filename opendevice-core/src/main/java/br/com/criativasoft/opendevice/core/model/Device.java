@@ -13,6 +13,15 @@
 
 package br.com.criativasoft.opendevice.core.model;
 
+import br.com.criativasoft.opendevice.core.BaseDeviceManager;
+import br.com.criativasoft.opendevice.core.DeviceManager;
+import br.com.criativasoft.opendevice.core.command.Command;
+import br.com.criativasoft.opendevice.core.command.CommandType;
+import br.com.criativasoft.opendevice.core.command.DeviceCommand;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
@@ -27,17 +36,21 @@ import java.util.Set;
  */
 public class Device implements Serializable {
 
+    private static final Logger log = LoggerFactory.getLogger(Device.class);
+
 	private static final long serialVersionUID = 1L;
 	
 	public static final int VALUE_HIGH = 1;
 	public static final int VALUE_LOW = 0;
 
-    public static final DeviceType ANALOG = DeviceType.ANALOG;
-    public static final DeviceType DIGITAL = DeviceType.DIGITAL;
-
     public static final int ON = 1;
     public static final int OFF = 0;
-	
+
+    public static final DeviceType ANALOG = DeviceType.ANALOG;
+    public static final DeviceType DIGITAL = DeviceType.DIGITAL;
+    public static final DeviceType SERIAL = DeviceType.SERIAL;
+    public static final DeviceType CHARACTER = DeviceType.CHARACTER;
+
 	private int uid; // Logic level user ID.
 	private String name;
 	private DeviceType type;
@@ -49,14 +62,14 @@ public class Device implements Serializable {
 
     private volatile Set<DeviceListener> listeners = new HashSet<DeviceListener>();
 
+    protected volatile GpioInfo gpio;
+
     /**
      * Create new Device with type  {@link DeviceType#DIGITAL}
      * @param uid Must match with 'id' configured in the physical module
      */
     public Device(int uid) {
-        this.uid = uid;
-        this.type = DeviceType.DIGITAL;
-        this.category = DeviceCategory.GENERIC;
+        this(uid, null, DeviceType.DIGITAL, DeviceCategory.GENERIC);
     }
 
     /**
@@ -65,10 +78,7 @@ public class Device implements Serializable {
      * @param type Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}
      */
     public Device(int uid,DeviceType type) {
-        super();
-        this.uid = uid;
-        this.type = type;
-        this.category = DeviceCategory.GENERIC;
+        this(uid, null, type, DeviceCategory.GENERIC);
     }
 
     /**
@@ -89,11 +99,7 @@ public class Device implements Serializable {
      * @param category Does not influence the communication logic, only the GUIs
      */
 	public Device(int uid, String name, DeviceType type, DeviceCategory category) {
-		super();
-		this.uid = uid;
-		this.name = name;
-		this.type = type;
-		this.category = category;
+        this(uid, name, type, category, (type == Device.DIGITAL ? VALUE_LOW : -1));
 	}
 
 
@@ -108,11 +114,14 @@ public class Device implements Serializable {
 	public Device(int uid, String name, DeviceType type, DeviceCategory category, long value) {
 		super();
 		this.uid = uid;
-		this.name = name;
-		this.type = type;
-		this.category = category;
-		this.value = value;
-	}
+        this.name = name;
+        this.type = type;
+        this.category = category;
+        this.value = value;
+
+        DeviceManager manager = BaseDeviceManager.getInstance();
+        if(manager != null) manager.addDevice(this);
+    }
 
 
 	public void setId(int id) {
@@ -173,6 +182,13 @@ public class Device implements Serializable {
     public void off(){
         this.setValue(Device.VALUE_LOW);
     }
+    
+    public void toggle(){
+        if(getType() == DeviceType.DIGITAL){
+            if(isON()) off();
+            else on();
+        }
+    }
 
     public long getValue() {
 		return value;
@@ -211,7 +227,10 @@ public class Device implements Serializable {
      */
     public void notifyListeners() {
 
-        if (listeners.isEmpty()) return;
+        if (listeners.isEmpty()){
+            if(log.isDebugEnabled()) log.debug("None listener registered for this device: " + this.toString());
+            return;
+        }
 
         for (final DeviceListener listener : listeners) {
             listener.onDeviceChanged(this);
@@ -224,5 +243,37 @@ public class Device implements Serializable {
 		return "Device[UID:"+uid+", Name:"+getName()+", Value:"+getValue()+", Type:" + getType()+"]";
 	}
 
+    /**
+     * Configure GPIO for this device. <br/>
+     * This type of configuration is ideal for devices like the Raspberry.<br/>
+     * Or when it is used to save the settings in the EPROM of low processing power devices
+     * @param pin
+     * @return
+     */
+    public Device gpio(int pin){
+        this.gpio = new GpioInfo(pin);
+        return this;
+    }
 
+    public GpioInfo getGpio() {
+        return gpio;
+    }
+
+    /**
+     * Create {@link br.com.criativasoft.opendevice.core.command.DeviceCommand} of type {@link CommandType#DIGITAL} with value HIGH
+     * @param deviceID
+     * @return
+     */
+    public static DeviceCommand ON(int deviceID){
+        return new DeviceCommand(CommandType.DIGITAL, deviceID, Device.VALUE_HIGH);
+    }
+
+    /**
+     * Create {@link br.com.criativasoft.opendevice.core.command.DeviceCommand} of type {@link CommandType#DIGITAL} with value LOW
+     * @param deviceID
+     * @return
+     */
+    public static DeviceCommand OFF(int deviceID){
+        return new DeviceCommand(CommandType.DIGITAL, deviceID, Device.VALUE_LOW);
+    }
 }

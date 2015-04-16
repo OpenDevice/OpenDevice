@@ -17,14 +17,16 @@ package br.com.criativasoft.opendevice.core.model;
 import br.com.criativasoft.opendevice.core.metamodel.EnumCode;
 
 /**
- * Represento um tipo de dispositivo (IDe) .
+ * Represento um tipo de dispositivo  .
  * @author Ricardo JL Rufino
  * @date 04/09/2011 12:44:44
  */
 public enum DeviceType implements EnumCode {
-	
-	ANALOG(1, "Analógico"), 
-	DIGITAL(2, "Digital");
+
+    DIGITAL(1, "Digital"),
+    ANALOG(2, "Analog"),
+    SERIAL(3, "Serial"),
+    CHARACTER(4, "Character") ;
 
 	private int code;
 	private String description;

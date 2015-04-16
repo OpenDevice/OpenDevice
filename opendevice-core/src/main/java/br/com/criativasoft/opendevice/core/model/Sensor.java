@@ -1,5 +1,7 @@
 package br.com.criativasoft.opendevice.core.model;
 
+import br.com.criativasoft.opendevice.core.command.GPIO;
+
 /**
  * Sensors are basically the same as devices.
  * @author Ricardo JL Rufino
@@ -58,5 +60,16 @@ public class Sensor extends Device {
         super(uid, name, type, category);
     }
 
+    /**
+     * Configure GPIO for this device. <br/>
+     * This type of configuration is ideal for devices like the Raspberry.<br/>
+     * Or when it is used to save the settings in the EPROM of low processing power devices
+     * @param pin
+     * @return
+     */
+    public Device gpio(int pin, GPIO.InputMode inputMode){
+        this.gpio = new GpioInfo(pin, inputMode);
+        return this;
+    }
 
 }

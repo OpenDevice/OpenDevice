@@ -16,7 +16,7 @@ var od = od || {};
 od.APP_ID_NAME = "AppID";
 
 od.version = "1.0";
-od.appID;
+od.appID = "*";
 od.serverURL = 'http://'+window.location.host;
 
 var OpenDevice = (function () {

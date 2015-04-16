@@ -17,8 +17,8 @@ var od = od || {};
 
 // Like OpenDevice JAVA-API
 od.DeviceType = {
-    ANALOG:1,
-    DIGITAL:2
+    DIGITAL:1,
+    ANALOG:2
 };
 
 // Like OpenDevice JAVA-API
@@ -32,26 +32,29 @@ od.DeviceCategory = {
 };
 
 od.CommandType = {
-    ON_OFF:1,
+    DIGITAL:1,
     ANALOG:2,
     ANALOG_REPORT:3,
-    GPIO_DIGITAL:4, // Controle a nivel logico do PINO (diferente do ON_OFF que pode ligar/desligar varios pinos)
-    GPIO_ANALOG:5, // Controle de baixo nivel
+    GPIO_DIGITAL:4,
+    GPIO_ANALOG:5,
+    PWM:6,
+    INFRA_RED:7,
 
-    /** Response to commands like: ON_OFF, POWER_LEVEL, INFRA RED  */
-    DEVICE_COMMAND_RESPONSE : 10, // Responsta para comandos como: ON_OFF, POWER_LEVEL, INFRA_RED
+    /** Response to commands like: DIGITAL, POWER_LEVEL, INFRA RED  */
+    DEVICE_COMMAND_RESPONSE : 10, // Responsta para comandos como: DIGITAL, POWER_LEVEL, INFRA_RED
 
-    PING_REQUEST : 20, // Verificar se esta ativo
-    PING_RESPONSE : 21, // Resposta para o Ping
-    MEMORY_REPORT : 22, // Relatorio de quantidade de memória (repora o atual e o máximo).
+    PING : 20,
+    PING_RESPONSE : 21,
+    MEMORY_REPORT : 22, // Report the amount of memory (displays the current and maximum).
     CPU_TEMPERATURE_REPORT : 23,
     CPU_USAGE_REPORT:24,
     GET_DEVICES : 30,
     GET_DEVICES_RESPONSE : 31,
+    USER_COMMAND : 99,
 
     isDeviceCommand : function(type){
         switch (type) {
-            case this.ON_OFF:
+            case this.DIGITAL:
                 return true;
             case this.ANALOG:
                 return true;
@@ -359,7 +362,7 @@ od.DeviceManager = function(connection){
 
     this.setValue = function(deviceID, value){
 
-        var cmd = { 'type' : CType.ON_OFF , 'deviceID' :  deviceID, 'value' : value};
+        var cmd = { 'type' : CType.DIGITAL , 'deviceID' :  deviceID, 'value' : value};
         _this.connection.send(cmd);
 
         var device = _this.findDevice(deviceID);
@@ -581,7 +584,7 @@ var od = od || {};
 od.APP_ID_NAME = "AppID";
 
 od.version = "1.0";
-od.appID;
+od.appID = "*";
 od.serverURL = 'http://'+window.location.host;
 
 var OpenDevice = (function () {

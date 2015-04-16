@@ -49,7 +49,7 @@ od.DeviceManager = function(connection){
 
     this.setValue = function(deviceID, value){
 
-        var cmd = { 'type' : CType.ON_OFF , 'deviceID' :  deviceID, 'value' : value};
+        var cmd = { 'type' : CType.DIGITAL , 'deviceID' :  deviceID, 'value' : value};
         _this.connection.send(cmd);
 
         var device = _this.findDevice(deviceID);

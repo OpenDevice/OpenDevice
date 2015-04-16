@@ -102,9 +102,11 @@ public abstract class AbstractConnection implements DeviceConnection {
 	protected void setStatus(ConnectionStatus status) {
 		this.status = status;
         if(listeners.isEmpty())  log.warn("No listener was registered ! use: addListener");
-		for (ConnectionListener listener : listeners) {
-			listener.connectionStateChanged(this, status);
-		}
+        synchronized (listeners){
+            for (ConnectionListener listener : listeners) {
+                listener.connectionStateChanged(this, status);
+            }
+        }
 	}
 	
 	@Override
@@ -128,7 +130,12 @@ public abstract class AbstractConnection implements DeviceConnection {
 	}
 
 	public synchronized boolean addListener(ConnectionListener e) {
-		return listeners.add(e);
+        if(!listeners.contains(e)){
+            listeners.add(e);
+            return true;
+        }
+
+		return false;
 	}
 
 	@Override
@@ -171,4 +178,5 @@ public abstract class AbstractConnection implements DeviceConnection {
     public ConnectionManager getConnectionManager() {
         return this.manager;
     }
+
 }

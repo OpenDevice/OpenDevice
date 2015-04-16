@@ -76,11 +76,11 @@ public abstract class AbstractStreamConnection extends AbstractConnection implem
 		return output;
 	}
 	
-	void setInput(InputStream input) {
+	public void setInput(InputStream input) {
 		this.input = input;
 	}
 	
-	void setOutput(OutputStream output) {
+	public void setOutput(OutputStream output) {
 		this.output = output;
 	}
 	

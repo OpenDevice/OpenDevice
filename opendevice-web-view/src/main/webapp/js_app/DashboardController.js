@@ -155,8 +155,15 @@ app.controller('DashboardController', ['$scope','$timeout', function ($scope, $t
             audioPlay.connect(audioContext.destination);
 
             var now = audioContext.currentTime;
-            audioPlay.noteOn( now );
-            audioPlay.noteOff( now + 0.05 ); // "beep" (in seconds)
+
+            if(audioPlay && audioPlay.noteOn){
+                audioPlay.noteOn( now );
+                audioPlay.noteOff( now + 0.05 ); // "beep" (in seconds)
+            }else{
+                console.error("audioPlay not working !");
+            }
+
+
         }
     }
 

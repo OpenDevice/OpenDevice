@@ -5,8 +5,8 @@ var urlParams;
 // Declare app level module which depends on filters, and services
 var app = angular.module('opendevice', [
     'ngRoute',
-    //'myApp.filters',
-    //'myApp.directives',
+    //'opendevice.filters',
+    //'opendevice.directives',
     //'opendevice.services',
     'opendevice.controllers'
 ]);
@@ -14,7 +14,8 @@ var app = angular.module('opendevice', [
 // Constants
 // ===================
 // app.constant('opendevice_url', 'http://'+window.location.host);
-OpenDevice.setAppID = OpenDevice.findAppID() || 'clientname-123456x';
+// OpenDevice.setAppID = OpenDevice.findAppID() || 'clientname-123456x';
+OpenDevice.setAppID = "*";
 
 app.config(['$routeProvider', function($routeProvider) {
     //$routeProvider.when('/view1', {templateUrl: 'partials/partial1.html', controller: 'MyCtrl1'});

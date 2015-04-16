@@ -17,10 +17,7 @@ import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.model.Device;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * TODO: PENDING DOC
@@ -35,9 +32,7 @@ public class DeviceMemoryDao implements DeviceDao {
 
     private List<Device> getCurrentDevices(){
 
-        List<Device> devices = deviceMap.get(TenantProvider.getCurrentID());
-
-        return devices;
+        return deviceMap.get(TenantProvider.getCurrentID());
 
     }
 
@@ -138,6 +133,7 @@ public class DeviceMemoryDao implements DeviceDao {
     @Override
     public List<Device> listAll() {
         List<Device> devices = getCurrentDevices();
+        if(devices == null) return new ArrayList<Device>();
         return devices;
     }
 }

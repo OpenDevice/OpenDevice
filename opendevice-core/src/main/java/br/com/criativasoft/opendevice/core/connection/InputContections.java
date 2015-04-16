@@ -40,11 +40,10 @@ public class InputContections {
         Iterator<T> iterator = service.iterator();
 
         if(iterator.hasNext()){
-            T connection = iterator.next();
-            return connection;
+            return iterator.next();
         }
 
-        throw new RuntimeException("Provider for connection class: " + klass.getSimpleName() + ", not found ! (TIP: Add dependency)");
+        throw new RuntimeException("Provider for connection class: " + klass.getSimpleName() + ", not found ! (TIP: Add pom/jar dependency)");
     }
 
 

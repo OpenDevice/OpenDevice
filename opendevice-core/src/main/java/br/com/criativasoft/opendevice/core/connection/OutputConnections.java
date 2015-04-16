@@ -59,6 +59,12 @@ public class OutputConnections {
         return connection;
     }
 
+    public DeviceConnection websocket(String address){
+        IWSConnection connection = load(IWSConnection.class);
+        if(connection != null) connection.setConnectionURI(address);
+        return connection;
+    }
+
 
     private <T> T load(Class<T> klass){
 

@@ -51,8 +51,11 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 	  
 	public synchronized boolean addListener(ConnectionListener e) {
 		boolean value = false;
-		listeners.add(e);
-		
+
+        if(!listeners.contains(e)){
+            listeners.add(e);
+        }
+
 		for (DeviceConnection connection : connections) {
 			if(connection.addListener(e)){
 				value = true;

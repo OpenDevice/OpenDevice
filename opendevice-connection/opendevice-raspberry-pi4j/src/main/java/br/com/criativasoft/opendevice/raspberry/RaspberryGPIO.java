@@ -17,31 +17,39 @@ package br.com.criativasoft.opendevice.raspberry;
 
 import br.com.criativasoft.opendevice.connection.AbstractConnection;
 import br.com.criativasoft.opendevice.connection.ConnectionStatus;
+import br.com.criativasoft.opendevice.core.command.CommandStatus;
+import br.com.criativasoft.opendevice.core.connection.EmbeddedGPIO;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.core.command.CommandType;
 import br.com.criativasoft.opendevice.core.command.DeviceCommand;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceType;
+import br.com.criativasoft.opendevice.core.model.GpioInfo;
 import br.com.criativasoft.opendevice.core.model.Sensor;
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.gpio.event.GpioPinAnalogValueChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerAnalog;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
+import com.pi4j.io.gpio.impl.PinImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Wrapper to Raspberry GPIO
+ * Wrapper to Raspberry GPIO (pi4j)
  * @author Ricardo JL Rufino
  * @date 06/10/14.
  */
-public class RaspberryConnection extends AbstractConnection {
+public class RaspberryGPIO extends AbstractConnection implements EmbeddedGPIO {
 
+    private final static Logger log = LoggerFactory.getLogger(RaspberryGPIO.class);
 
     private GpioController gpio;
 
@@ -79,13 +87,18 @@ public class RaspberryConnection extends AbstractConnection {
 
             GpioPin pin = findPinForDevice(deviceID);
 
+            if(log.isTraceEnabled()) log.trace("Send GPIO - device = {}, pin = {}", deviceID, pin);
+
             if(pin != null){
+
+                command.setStatus(CommandStatus.SUCCESS);
 
                 if(command.getType() == CommandType.DIGITAL){
 
                     GpioPinDigitalOutput digital = (GpioPinDigitalOutput) pin;
 
-                    digital.setState(command.getValue() == Device.ON);
+                    if(command.getValue() == Device.VALUE_HIGH) digital.high();
+                    if(command.getValue() == Device.VALUE_LOW) digital.low();
 
                 }
 
@@ -104,27 +117,44 @@ public class RaspberryConnection extends AbstractConnection {
     }
 
 
-    public void bind(Device device, Pin pin){
+    @Override
+    public void attach(Device device){
+
+        if(findPinForDevice(device.getId()) != null) return; // exist !
+
+        if(device.getGpio() ==  null) throw new IllegalStateException("Device doesn't have gpio config");
+
+        GpioInfo info = device.getGpio();
+
+        Pin pin = new PinImpl(RaspiGpioProvider.NAME, info.getPin(), "GPIO " + info.getPin(),
+                EnumSet.of(PinMode.DIGITAL_INPUT, PinMode.DIGITAL_OUTPUT),
+                PinPullResistance.all());
+
+        attach(device, pin);
+
+    }
+
+    public void attach(Device device, Pin pin){
 
         if(device instanceof Sensor){
 
             if(device.getType() == DeviceType.DIGITAL){
-                bind(1, gpio.provisionDigitalInputPin(pin));
+                attach(device.getUid(), gpio.provisionDigitalInputPin(pin));
             }else if(device.getType() == DeviceType.ANALOG){
-                bind(1, gpio.provisionAnalogInputPin(pin));
+                attach(device.getUid(), gpio.provisionAnalogInputPin(pin));
             }
 
         }else{
             if(device.getType() == DeviceType.DIGITAL){
-                bind(1, gpio.provisionDigitalOutputPin(pin));
+                attach(device.getUid(), gpio.provisionDigitalOutputPin(pin));
             }else if(device.getType() == DeviceType.ANALOG){
-                bind(1, gpio.provisionAnalogOutputPin(pin));
+                attach(device.getUid(), gpio.provisionAnalogOutputPin(pin));
             }
         }
 
     }
 
-    public void bind(int deviceID, GpioPin pin){
+    public void attach(int deviceID, GpioPin pin){
 
         bindings.put(pin, deviceID);
 
@@ -135,12 +165,12 @@ public class RaspberryConnection extends AbstractConnection {
 
     }
 
-    public void setup(GpioController gpio){
+    /**
+     *
+     * @param gpio
+     */
+    protected void setup(GpioController gpio){
 
-        bind(new Device(1, Device.DIGITAL), RaspiPin.GPIO_01);
-        bind(5, this.gpio.provisionDigitalInputPin(RaspiPin.GPIO_02));
-
-        //GpioPinDigitalInput gpioPinDigitalInput = gpio.provisionDigitalInputPin(RaspiPin.GPIO_02);
     }
 
     public GpioController getGPIO(){
@@ -168,6 +198,7 @@ public class RaspberryConnection extends AbstractConnection {
         @Override
         public void handleGpioPinAnalogValueChangeEvent(GpioPinAnalogValueChangeEvent event) {
 
+            System.out.println("Listener fired !");
             Integer deviceID = bindings.get(event.getPin());
 
             if(deviceID != null){
@@ -181,6 +212,8 @@ public class RaspberryConnection extends AbstractConnection {
         @Override
         public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
             Integer deviceID = bindings.get(event.getPin());
+
+            System.out.println("Listener fired !");
 
             if(deviceID != null){
                 DeviceCommand command = new DeviceCommand(CommandType.DIGITAL, deviceID, event.getState().getValue());

@@ -50,4 +50,8 @@ public class WSServerConnection extends AbstractAtmosphereConnection implements 
 
     }
 
+    @Override
+    public void destroy() {
+        super.destroy();
+    }
 }

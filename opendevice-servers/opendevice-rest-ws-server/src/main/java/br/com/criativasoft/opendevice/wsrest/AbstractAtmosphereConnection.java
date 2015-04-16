@@ -17,6 +17,7 @@ import br.com.criativasoft.opendevice.connection.*;
 import br.com.criativasoft.opendevice.connection.message.Request;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.TenantProvider;
+import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.restapi.WaitResponseListener;
 import br.com.criativasoft.opendevice.wsrest.guice.config.ConnectionGuiceProvider;
 import br.com.criativasoft.opendevice.wsrest.guice.config.DeviceManagerGuiceProvider;
@@ -125,6 +126,10 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
         }
     }
 
+    protected OpenDeviceConfig getConfig(){
+        return OpenDeviceConfig.get();
+    }
+
     protected abstract void configure(Config.Builder conf);
 
     @Override
@@ -229,6 +234,8 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
     private void broadcast(Message message){
 
+        if(server == null) return;
+
         AtmosphereConfig atmosphereConfig = server.framework().getAtmosphereConfig();
 
         if(message instanceof  Command){
@@ -236,8 +243,12 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             Command cmd = (Command) message;
 
             // Get broadcast group for client.
-            Broadcaster broadcaster = atmosphereConfig.getBroadcasterFactory().lookup(cmd.getApplicationID());
-
+            Broadcaster broadcaster;
+            if(getConfig().isSupportTenants()){
+                broadcaster = atmosphereConfig.getBroadcasterFactory().lookup(cmd.getApplicationID());
+            }else{
+                broadcaster = atmosphereConfig.getBroadcasterFactory().lookup(OpenDeviceConfig.LOCAL_APP_ID);
+            }
 
             if(broadcaster != null){
 
@@ -263,6 +274,10 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
 
         }
+    }
+
+    public void destroy() {
+
     }
 
 }

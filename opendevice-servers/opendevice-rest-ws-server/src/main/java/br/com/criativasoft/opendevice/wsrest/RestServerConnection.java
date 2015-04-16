@@ -54,4 +54,8 @@ public class RestServerConnection extends AbstractAtmosphereConnection implement
         conf.resource(DeviceRest.class);
     }
 
+    @Override
+    public void destroy() {
+        super.destroy();
+    }
 }

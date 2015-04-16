@@ -15,11 +15,14 @@ package br.com.criativasoft.opendevice.webclient;
 
 import br.com.criativasoft.opendevice.connection.AbstractConnection;
 import br.com.criativasoft.opendevice.connection.ConnectionStatus;
+import br.com.criativasoft.opendevice.connection.IWSConnection;
 import br.com.criativasoft.opendevice.connection.ReconnectionSupport;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
+import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.webclient.io.CommandEncoderDecoder;
+import com.ning.http.client.AsyncHttpClient;
 import org.atmosphere.wasync.*;
 import org.atmosphere.wasync.impl.DefaultOptions;
 import org.atmosphere.wasync.impl.DefaultOptionsBuilder;
@@ -32,7 +35,7 @@ import java.io.IOException;
  * @author Ricardo JL Rufino
  * @date 10/07/14.
  */
-public class WebSocketClientConnection extends AbstractConnection implements ReconnectionSupport {
+public class WebSocketClientConnection extends AbstractConnection implements ReconnectionSupport, IWSConnection{
 
     private String url;
     private Socket connection;
@@ -40,8 +43,40 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
 
     private static final Logger log = LoggerFactory.getLogger(WebSocketClientConnection.class);
 
+    public WebSocketClientConnection(){
+
+    }
+
     public WebSocketClientConnection(String url) {
-        this.url = url;
+        setConnectionURI(url);
+    }
+
+    @Override
+    public void setConnectionURI(String uri) {
+        this.url = buildUrl(uri);
+    }
+
+    private String buildUrl(String uri){
+        String id = TenantProvider.getCurrentID();
+
+        if(uri.startsWith("http")){
+            uri = uri.replace("http", "ws");
+        }
+
+        if(!uri.startsWith("ws")){
+            uri = "ws://" + uri;
+        }
+
+        if(!uri.contains("/device/connection/")){
+            uri = uri + "/device/connection/" + id;
+        }
+
+        return uri;
+    }
+
+    @Override
+    public String getConnectionURI() {
+        return  this.url;
     }
 
     @Override
@@ -108,6 +143,9 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
             // AtmosphereClient client = ClientFactory.getDefault().newClient(AtmosphereClient.class);
             Client client = ClientFactory.getDefault().newClient();
 
+            // FIXME: Workaround for BUG: https://github.com/Atmosphere/wasync/issues/120
+            System.setProperty("com.ning.http.client.AsyncHttpClientConfig.acceptAnyCertificate", "true");
+
             request = client.newRequestBuilder()
                     .method(Request.METHOD.GET)
                     .uri(url)
@@ -118,11 +156,13 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
             CommandEncoderDecoder jacksonSerializer = new CommandEncoderDecoder();
             request.encoder(jacksonSerializer);
             request.decoder(jacksonSerializer);
-
-            OptionsBuilder<DefaultOptions, DefaultOptionsBuilder> clientOptions = client.newOptionsBuilder()
+            OptionsBuilder clientOptions = client.newOptionsBuilder()
                     .reconnect(true)
                     .reconnectAttempts(10)
                     .pauseBeforeReconnectInSeconds(5);
+
+
+            // clientOptions.runtime().getConfig().isAcceptAnyCertificate()
 
             connection = client.create(clientOptions.build());
             initEvents(connection);

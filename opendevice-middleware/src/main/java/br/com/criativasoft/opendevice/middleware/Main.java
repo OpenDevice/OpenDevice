@@ -17,14 +17,8 @@ import br.com.criativasoft.opendevice.connection.IWSServerConnection;
 import br.com.criativasoft.opendevice.connection.discovery.DiscoveryService;
 import br.com.criativasoft.opendevice.core.SimpleDeviceManager;
 import br.com.criativasoft.opendevice.core.connection.Connections;
-import br.com.criativasoft.opendevice.core.filter.FixedReadIntervalFilter;
-import br.com.criativasoft.opendevice.core.model.Sensor;
+import br.com.criativasoft.opendevice.core.model.*;
 import br.com.criativasoft.opendevice.core.dao.memory.DeviceMemoryDao;
-import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.DeviceCategory;
-import br.com.criativasoft.opendevice.core.model.DeviceType;
-import br.com.criativasoft.opendevice.middleware.test.FakeSensorSimulator;
-import br.com.criativasoft.opendevice.raspberry.RaspberryConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,27 +41,14 @@ public class Main extends SimpleDeviceManager {
 
 	public void init() throws Exception {
 
-        setDeviceDao(new DeviceMemoryDao());
+        setApplicationID(OpenDeviceConfig.LOCAL_APP_ID);
 
-        setApplicationID("app-demo-1");
         addDevice(new Device(1, "Luz 1", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
         addDevice(new Device(2, "Luz 2", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
-        addDevice(new Device(3, "Tomada 1", DeviceType.DIGITAL, DeviceCategory.POWER_SOURCE, 0));
-        addDevice(new Sensor(4, "Sensor D1", DeviceType.DIGITAL));
-        addDevice(new Sensor(5, "Sensor D2", DeviceType.DIGITAL));
-        addDevice(new Sensor(6, "Sensor A1", DeviceType.ANALOG));
-        addDevice(new Sensor(7, "Sensor A2", DeviceType.ANALOG));
+        addDevice(new Device(3, "Luz 2", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
 
-
-        setApplicationID("app-demo-2");
-        addDevice(new Device(1, "Luz DB1", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
-        addDevice(new Device(2, "Luz DB2", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
-
-        setApplicationID("app-demo-1");
-
-        //new FakeSensorSimulator(50, this, 6, 7).start(); // generate fake data
+        // new FakeSensorSimulator(50, this, 6, 7).start(); // generate fake data
         // addFilter(new FixedReadIntervalFilter(1000, this));
-
 
 		// Ativar serviço de descoberta desse servidor via UDP.
         DiscoveryService.listen(port);
@@ -97,12 +78,22 @@ public class Main extends SimpleDeviceManager {
 
         // OutputConnections
         // ===============================
+        addOutput(Connections.out.usb()); // Connect to first USB port available
 //        addOutput(Connections.out.bluetooth("00:13:03:14:19:07"));
-        // addOutput(new RaspberryConnection());
-        // addOutput(Connections.out.usb()); // Connect to first USB port available
-        //addOutput(Connections.out.tcp("192.168.0.204:8081"));
 
-		this.connectAll();
+        //addOutput(Connections.out.tcp("192.168.0.204:8081"));
+//        DeviceConnection conn = new RaspberryConnection() {
+//            @Override
+//            public void setup(GpioController gpio) {
+//                attach(findDeviceByUID(1), RaspiPin.GPIO_01);
+//                attach(findDeviceByUID(2), RaspiPin.GPIO_02);
+//                attach(findDeviceByUID(3), RaspiPin.GPIO_03);
+//                // attach(4, gpio.provisionDigitalInputPin(RaspiPin.GPIO_04));
+//            }
+//        };
+//        addOutput(conn);
+
+        this.connectAll();
 
 	}
 	

@@ -13,17 +13,18 @@
 
 package br.com.criativasoft.opendevice.core.command;
 
+import br.com.criativasoft.opendevice.core.command.ext.IrCommand;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceCategory;
 import br.com.criativasoft.opendevice.core.model.DeviceType;
+import br.com.criativasoft.opendevice.core.model.Sensor;
+import br.com.criativasoft.opendevice.core.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class CommandFactory {
 	
-	public static final String DELIMITER = ";";
+	public static final String DELIMITER = Command.DELIMITER;
 	
 	private CommandFactory(){}
 	
@@ -44,9 +45,22 @@ public class CommandFactory {
 		if(DeviceCommand.isCompatible(type)){
 
 			int deviceID = Integer.parseInt(split[2]);
-			int value = Integer.parseInt(split[3]);
+			long value = Long.parseLong(split[3]);   
 			command = new DeviceCommand(type, deviceID, value);
-
+			
+		}else if(SimpleCommand.isCompatible(type)){
+            
+            long value = Long.parseLong(split[3]);
+            command = new SimpleCommand(type, value);
+                    
+		// Format: INFRA_RED;ID;VALUE;IR_PROTOCOL;LENGTH?;BYTE1...BYTEX?
+		// If IR_PROTOCOL is RAW, 'LENGTH' and BYTE ARRAY EXIST. 
+		}else if(type == CommandType.INFRA_RED){
+		    
+            int deviceID = Integer.parseInt(split[2]);
+            long value = Long.parseLong(split[3]);
+            command = new IrCommand(deviceID, value);	
+            
 		}else if(type == CommandType.DEVICE_COMMAND_RESPONSE){
 			String id = split[1];
 			int status = Integer.parseInt(split[3]);	// Command.value
@@ -54,24 +68,40 @@ public class CommandFactory {
 			command = new ResponseCommand(CommandStatus.getByCode(status));
             command.setTrackingID(Integer.parseInt(id));
 
-        // Received: GET_DEVICES_RESPONSE;ID;[ID, PIN, VALUE, TARGET, SENSOR?, TYPE];[ID, PIN, VALUE, TARGET, SENSOR?, TYPE];....
+        // Format: GET_DEVICES_RESPONSE;ID;[ID, PIN, VALUE, TARGET, SENSOR?, TYPE];[ID, PIN, VALUE, TARGET, SENSOR?, TYPE];....
         }else if(type == CommandType.GET_DEVICES_RESPONSE){ // Returned list of devices.
 
             String reqID = split[1];
-            List<Device> devices = new ArrayList<Device>();
+            List<Device> devices = new LinkedList<Device>();
             command = new GetDevicesResponse(devices, reqID);
 
             for (int i = 2; i < split.length; i++) {
                 String deviceStr = split[i].substring(1, split[i].length()-1);
                 String[] deviceSplit = deviceStr.split(",");
-                DeviceType deviceType =  DeviceType.getByCode(Integer.parseInt(deviceSplit[5]));
                 int uid = Integer.parseInt(deviceSplit[0]);
                 long value = Long.parseLong(deviceSplit[2]);
-                devices.add(new Device(uid, "Device "+uid, deviceType, DeviceCategory.GENERIC, value));
-            }
+                boolean isSensor = Integer.parseInt(deviceSplit[4]) > 0;
 
+                DeviceType deviceType =  DeviceType.getByCode(Integer.parseInt(deviceSplit[5]));
+
+                if(isSensor){
+                    Sensor sensor = new Sensor(uid, "Sensor " + uid, deviceType, DeviceCategory.GENERIC);
+                    sensor.setValue(value);
+                    devices.add(sensor);
+                }else{
+                    devices.add(new Device(uid, "Device "+uid, deviceType, DeviceCategory.GENERIC, value));
+                }
+            }
         }else{
 			throw new CommandException("Can't parse command type : " + type + ", data: " + data);
+		}
+		
+		if(command instanceof ExtendedCommand){
+		    ExtendedCommand extendedCommand = (ExtendedCommand) command;
+		    String[] extradata = Arrays.copyOfRange(split, 4, split.length);
+		    if(extradata.length > 0){
+		        extendedCommand.deserializeExtraData(StringUtils.join(extradata, DELIMITER));
+		    }
 		}
 		
 		command.setTimestamp(new Date());

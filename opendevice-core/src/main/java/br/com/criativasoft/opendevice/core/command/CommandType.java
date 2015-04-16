@@ -13,7 +13,6 @@
 
 package br.com.criativasoft.opendevice.core.command;
 
-
 import br.com.criativasoft.opendevice.core.metamodel.EnumCode;
 
 /**
@@ -22,64 +21,83 @@ import br.com.criativasoft.opendevice.core.metamodel.EnumCode;
  * @date 04/09/2011 12:44:44
  */
 public enum CommandType implements EnumCode {
-	DIGITAL(1),
+    /** Indicates that the values are 0 or 1 (HIGH or LOW) */
+    DIGITAL(1),
     ANALOG(2),
     ANALOG_REPORT(3),
-	GPIO_DIGITAL(4), // Controle a nivel logico do PINO (diferente do DIGITAL que pode ligar/desligar varios pinos)
-	GPIO_ANALOG(5), // Controle de baixo nivel
+    /** Commands sent directly to the pins (digitalWrite) */
+    GPIO_DIGITAL(4),
+    /** Commands sent directly to the pins (analogWrite) */
+    GPIO_ANALOG(5),
     PWM(6),
-	
-	/** Response to commands like: DIGITAL, POWER_LEVEL, INFRA RED  */
-	DEVICE_COMMAND_RESPONSE(10), // Responsta para comandos como: DIGITAL, POWER_LEVEL, INFRA_RED
-	
-	
-	PING_REQUEST(20), // Verificar se esta ativo
-	PING_RESPONSE(21), // Resposta para o Ping
-	MEMORY_REPORT(22), // Relatorio de quantidade de memória (repora o atual e o máximo).
-	CPU_TEMPERATURE_REPORT(23),
-	CPU_USAGE_REPORT(24),
-	
-	GET_DEVICES(30),
-	GET_DEVICES_RESPONSE(31),
-	;
-	
-	private int code;
-		
-	/**
-	 * @param code - Device type code. MAX 127.
-	 */
-	private CommandType(int code) {
-		this.code = (byte) code;
-	}
+    INFRA_RED(7),
+    
+    /** Response to commands like: DIGITAL, POWER_LEVEL, INFRA RED */
+    DEVICE_COMMAND_RESPONSE(10),
 
-	public int getCode() {
-		return code;
-	}
+    PING(20),
+    PING_RESPONSE(21),
+    MEMORY_REPORT(22), // Report the amount of memory (displays the current and maximum).
+    CPU_TEMPERATURE_REPORT(23),
+    CPU_USAGE_REPORT(24),
 
-	public static CommandType getByCode(int code){
-		CommandType[] values = CommandType.values();
-		for (CommandType commandType : values) {
-			if(commandType.getCode() == code){
-				return commandType;
-			}
-		}
-		
-		return null;
-	}
+    GET_DEVICES(30),
+    GET_DEVICES_RESPONSE(31),
+    USER_COMMAND(99),
+    ;
 
-    public static final boolean isDeviceCommand(CommandType type){
+    private int code;
 
-        if(type == null) return false;
+    /**
+     * @param code - Device type code. MAX 127.
+     */
+    private CommandType(int code) {
+        this.code = (byte) code;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public static CommandType getByCode( int code ) {
+        CommandType[] values = CommandType.values();
+        for (CommandType commandType : values) {
+            if (commandType.getCode() == code) {
+                return commandType;
+            }
+        }
+
+        return null;
+    }
+
+    public static final boolean isDeviceCommand( CommandType type ) {
+
+        if (type == null) return false;
 
         switch (type) {
-            case DIGITAL:
-                return true;
-            case ANALOG:
-                return true;
-            case ANALOG_REPORT:
-                return true;
-            default:
-                break;
+        case DIGITAL:
+            return true;
+        case ANALOG:
+            return true;
+        case ANALOG_REPORT:
+            return true;
+        default:
+            break;
+        }
+
+        return false;
+    }
+
+    public static boolean isSimpleCommand( CommandType type ) {
+        if (type == null) return false;
+
+        switch (type) {
+        case PING:
+            return true;
+        case PING_RESPONSE:
+            return true;
+        default:
+            break;
         }
 
         return false;

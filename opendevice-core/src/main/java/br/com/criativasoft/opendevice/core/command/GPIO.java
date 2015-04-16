@@ -21,6 +21,10 @@ package br.com.criativasoft.opendevice.core.command;
  */
 public class GPIO extends DeviceCommand {
 
+    public static enum InputMode{
+        NORMAL, PULL_UP, PULL_DOWN
+    }
+
     public GPIO(int deviceID, long value) {
         super(CommandType.GPIO_DIGITAL, deviceID, value);
     }

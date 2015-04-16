@@ -14,6 +14,7 @@
 package br.com.criativasoft.opendevice.core.command;
 
 import br.com.criativasoft.opendevice.connection.message.Message;
+import br.com.criativasoft.opendevice.core.json.CommandDeserialize;
 
 import java.util.Date;
 import java.util.UUID;
@@ -25,11 +26,16 @@ import java.util.UUID;
 // @XmlRootElement
 public abstract class Command implements Message{
 	
+    public static final char START_FLAG = '/';
+    public static final char ACK_FLAG = '\r';
+    public static final char DELIMITER_FLAG = '/'; // used to separate data strings
+    public static final String DELIMITER = "/"; // used to separate data strings
+    
 	private static final long serialVersionUID = 676280722282919715L;
 
-	private String uid; // Logic level user ID.
+	private String uid;            // Logic level user ID.
 	private String connectionUUID; // id of connection/channel that requested the command
-    private String applicationID; // id of client (for Multitenancy support)
+    private String applicationID;  // id of client (for Multitenancy support)
     private volatile int trackingID = 0; // To monitor execution of commands, is usually a sequential number and managed by CommandDelivery
 	
 	private CommandType type;

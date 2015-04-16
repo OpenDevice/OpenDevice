@@ -13,14 +13,12 @@
 
 package br.com.criativasoft.opendevice.core.command;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.connection.message.SimpleMessage;
 import br.com.criativasoft.opendevice.connection.serialize.MessageSerializer;
-import br.com.criativasoft.opendevice.connection.util.DataUtils;
-import br.com.criativasoft.opendevice.core.command.amarino.AmarinoIntent;
-import br.com.criativasoft.opendevice.core.command.amarino.MessageBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CommandStreamSerializer implements MessageSerializer<byte[], byte[]> {
 
@@ -51,26 +49,35 @@ public class CommandStreamSerializer implements MessageSerializer<byte[], byte[]
 	public byte[] serialize(Message message) {
 		
 		Command command = (Command) message;
-
-		int[] cmd = new int[4];
-		cmd[0] = command.getType().getCode();
-		cmd[1] = -1;
-		if(command.getUid() != null){
-		    cmd[1] = command.getTrackingID();
-		}
-		if(command instanceof DeviceCommand){
-			cmd[2] = ((DeviceCommand) command).getDeviceID();
-			cmd[3] = DataUtils.longToInt( ((DeviceCommand) command).getValue() );
-		}else{
-			cmd[2] = 0;
-			cmd[3] = 0;
-			
-		}
-
-        // FIXME: remover chamada ao MessageBuilder poderia ser para o CommandFactory mesmo...
-		String msg = MessageBuilder.getMessage('A', cmd, AmarinoIntent.INT_ARRAY_EXTRA);
+		StringBuilder sb = new StringBuilder();
+		sb.append(Command.START_FLAG);
+		sb.append(command.getType().getCode());
+		sb.append(Command.DELIMITER_FLAG);
+		sb.append((command.getUid() != null ? command.getTrackingID() : 0));
 		
-		return msg.getBytes();
+		if(CommandType.isDeviceCommand(command.getType())){
+		    sb.append(Command.DELIMITER_FLAG);
+		    sb.append(((DeviceCommand) command).getDeviceID());
+		    sb.append(Command.DELIMITER_FLAG);
+		    sb.append(((DeviceCommand) command).getValue());
+		}else if(command instanceof ExtendedCommand){
+		    ExtendedCommand extra = (ExtendedCommand) command;
+		    String extraData = extra.serializeExtraData();
+		    if(extraData != null){
+		        sb.append(Command.DELIMITER_FLAG);
+		        sb.append(extraData);
+		    }
+		}else{
+            sb.append(0);
+            sb.append(Command.DELIMITER_FLAG);
+            sb.append(0);       
+        }
+		
+		sb.append(Command.ACK_FLAG);
+		
+		if(log.isTraceEnabled()) log.trace("serializing: " + sb);
+		
+		return sb.toString().getBytes();
 	}
 
 

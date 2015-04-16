@@ -13,13 +13,13 @@
 
 package br.com.criativasoft.opendevice.core.command;
 
-import br.com.criativasoft.opendevice.connection.message.Message;
-import br.com.criativasoft.opendevice.connection.serialize.DefaultSteamReader;
-import br.com.criativasoft.opendevice.core.command.amarino.MessageBuilder;
+import java.io.ByteArrayOutputStream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
+import br.com.criativasoft.opendevice.connection.message.Message;
+import br.com.criativasoft.opendevice.connection.serialize.DefaultSteamReader;
 
 /**
  * Parser to convert byte[] into {@link Command}
@@ -29,10 +29,11 @@ import java.io.ByteArrayOutputStream;
 public class CommandStreamReader extends DefaultSteamReader {
 
     private Logger log = LoggerFactory.getLogger(CommandStreamReader.class);
+    boolean processing =  false;
 
     @Override
     protected boolean checkEndOfMessage(byte lastByte,ByteArrayOutputStream readBuffer) {
-        return lastByte == MessageBuilder.ACK_FLAG;
+        return lastByte == Command.ACK_FLAG;
     }
 
     public void processPacketRead(byte read[]){
@@ -43,18 +44,24 @@ public class CommandStreamReader extends DefaultSteamReader {
 
         for (int i = 0; i < read.length; i++) {
 
-            // Reads up to find an EOL.
-            if (checkEndOfMessage(read[i], inputBuffer)) {
+            // NOTE: Start bit is equals to the SEPARATOR
+            if(read[i] == Command.START_FLAG && !processing){
+                processing = true;
+                continue;
+            } else if (checkEndOfMessage(read[i], inputBuffer)) {
                 byte[] array = inputBuffer.toByteArray();
+                
+                if(log.isTraceEnabled())log.trace("Command Data: " + new String(array));
+                
                 Message event = parse(array);
                 if(event != null){
                     notifyOnDataRead(event);
                 }
                 inputBuffer.reset();
+                processing = false;
 
-            }else{
-                if(read[i] != MessageBuilder.ACK_FLAG && read[i] != MessageBuilder.START_FLAG)
-                    inputBuffer.write(read[i]);
+            }else if(processing){
+                inputBuffer.write(read[i]);
             }
 
         }

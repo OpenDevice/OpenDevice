@@ -1,9 +1,8 @@
-
-import br.com.criativasoft.opendevice.connection.TCPConnection;
 import br.com.criativasoft.opendevice.core.SimpleDeviceManager;
 import br.com.criativasoft.opendevice.core.connection.Connections;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceType;
+import br.com.criativasoft.opendevice.webclient.WebSocketClientConnection;
 
 /**
  *
@@ -22,14 +21,9 @@ public class BlinkDeviceDemo extends SimpleDeviceManager {
 
     public BlinkDeviceDemo() throws Exception {
 
-        Device led = new Device(1, DeviceType.DIGITAL);
+        Device led = new Device(1, Device.DIGITAL);
 
-        // setup connection with arduino/hardware
-        addOutput(Connections.out.usb()); // Connect to first USB port available
-
-        connect();
-
-        addDevice(led);
+        connect(Connections.out.bluetooth("00:11:06:14:04:57"));
 
         while(true){
             led.on();
@@ -40,3 +34,5 @@ public class BlinkDeviceDemo extends SimpleDeviceManager {
     }
 
 }
+
+

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>OpenDevice Chart Example</title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/demo.css">
+
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery.atmosphere.js"></script>
+    <script type="text/javascript" src="/js/opendevice.js"></script> <!-- mvn:dependency -->
+
+    <!-- charts -->
+    <script type="text/javascript" src="/js/jquery.flot.min.js"></script>
+
+
+    <script>
+        if(typeof od == "undefined") alert("opendevice.js not loaded !");
+
+        // OpenDevice.setAppID("app-demo-1");
+        OpenDevice.setServer('http://'+window.location.host); // this is default !!
+
+        OpenDevice.on(od.Event.CONNECTED, function(){
+            console.log('CONNECTED: ');
+        });
+
+        OpenDevice.on(od.Event.DEVICE_CHANGED, function(data){
+            if(data.id == 6){
+                updateChart(data.value);
+            }
+        });
+
+        $(function(){ // on load.
+            OpenDevice.connect();
+        });
+
+    </script>
+
+    <!-- chart logic -->
+    <script type="text/javascript">
+
+        var plot;
+        var chardata = [];
+        var totalPoints = 100;
+
+        $(function() {
+
+            chardata.push({label : "Sensor 1", data : []});
+
+            // Init Chat
+            plot = $.plot("#chart", chardata, {
+                series: {
+                    shadowSize: 0	// Drawing is faster without shadows
+                },
+                yaxis: {
+                    min: 0,
+                    max: 1000
+                },
+                xaxis: {
+                    min: 0,
+                    max: totalPoints,
+                    show: false
+                }
+            });
+        });
+
+        /** called automatically (by DEVICE_CHANGED event) when the sensor value change */
+        function updateChart(val) {
+
+            var serie = chardata[0].data;
+
+            if(serie.length >= totalPoints){
+                serie.length = 0;
+            }
+
+            serie.push([serie.length+1, val]);
+
+            plot.setData(chardata);
+
+            plot.draw();
+
+        }
+
+    </script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>OpenDevice Real-Time Chart</h1>
+        <div id="chart"  style="width: 100%; height: 400px"></div>
+    </div>
+
+
+</body>
+</html>

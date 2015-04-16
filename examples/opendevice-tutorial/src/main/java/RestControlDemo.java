@@ -6,6 +6,8 @@ import br.com.criativasoft.opendevice.core.model.DeviceType;
 
 
 /**
+ * Run using Maven: mvn compile exec:java -Dexec.mainClass=RestControlDemo
+ *
  * In this example we add a control interface via REST, allowing integration with any other programming language or other software. <br/>
  * Access the URL in the browser: http://localhost:8181/device/1/value/1   <br/>
  * Or open sample: opendevice-samples/src/main/webapp/rest-jquery.html  <br/>
@@ -24,7 +26,7 @@ public class RestControlDemo extends SimpleDeviceManager implements DeviceListen
 
     public RestControlDemo() throws Exception {
 
-        Device led = new Device(1, DeviceType.DIGITAL);
+        Device led = new Device(1, Device.DIGITAL);
 
         // setup connection with arduino/hardware
         addOutput(Connections.out.usb()); // Connect to first USB port available

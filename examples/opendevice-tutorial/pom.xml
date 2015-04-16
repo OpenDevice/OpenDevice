@@ -39,7 +39,12 @@
 			<artifactId>opendevice-rest-ws-server</artifactId>
 			<version>${opendevice-version}</version>
 		</dependency>
-		 
+
+        <dependency>
+            <groupId>br.com.criativasoft.opendevice</groupId>
+            <artifactId>opendevice-wasync-client</artifactId>
+            <version>${opendevice-version}</version>
+        </dependency>
 
 		<dependency>
 			<groupId>ch.qos.logback</groupId>

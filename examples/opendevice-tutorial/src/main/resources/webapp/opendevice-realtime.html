@@ -1,10 +1,9 @@
-
-
+<!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="utf-8">
-    <title>OpenDevice WebSocket Sample</title>
+    <title>OpenDevice WebSocket Example</title>
 
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/demo.css">
@@ -13,13 +12,12 @@
     <script type="text/javascript" src="js/jquery.atmosphere.js"></script>
     <script type="text/javascript" src="/js/opendevice.js"></script> <!-- mvn:dependency -->
 
-
     <script>
         if(typeof od == "undefined") alert("opendevice.js not loaded !");
 
         var devices = [];
 
-        OpenDevice.setAppID("app-demo-1");
+        // OpenDevice.setAppID("app-demo-1");
         OpenDevice.setServer('http://'+window.location.host); // this is default !!
 
         OpenDevice.on(od.Event.CONNECTED, function(){
@@ -30,20 +28,25 @@
 
         OpenDevice.on(od.Event.DEVICE_CHANGED, function(data){
             updateView(data);
-
-            // User Logic on Sensor change..
-            if(data.sensor && $("#autocontrol").is(":checked")){
-                userLogic(data);
-            }
+            userLogic(data);
         });
 
         $(function(){ // on load.
             OpenDevice.connect();
         });
 
-        function userLogic(data){
-            var device = OpenDevice.findDevice(data.id - 2);
-            if(device) device.setValue(data.value); // Send command and fire DEVICE_CHANGED
+        function userLogic(device){
+
+            if(device && device.sensor){
+                var led = OpenDevice.findDevice(device.id - 3);
+                // led.setValue(device.value); // Send command and fire DEVICE_CHANGED
+
+                if(device.id == 5){
+                    OpenDevice.findDevice(10).setValue(device.value);
+                    // OpenDevice.setValue(10, );
+                }
+            }
+
         }
 
         function toggleValue(deviceID){
@@ -93,11 +96,15 @@
 
     </form>
 
-    <div id="response">
-        <label><input type="checkbox" id="autocontrol"> Auto-Control (control ligths on sensor change)</label>
+    <div id="response"></div>
 
-    </div>
+    <div id="chart"  style="width: 100%; height: 400px"></div>
+
 </div>
+
+
+
+
 
 </body>
 </html>

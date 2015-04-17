@@ -20,7 +20,10 @@ import br.com.criativasoft.opendevice.core.model.DeviceType;
 import br.com.criativasoft.opendevice.core.model.Sensor;
 import br.com.criativasoft.opendevice.core.util.StringUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 public class CommandFactory {
 	

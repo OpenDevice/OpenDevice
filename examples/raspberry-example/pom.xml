@@ -1,0 +1,120 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>br.com.criativasoft.opendevice</groupId>
+    <artifactId>raspberry-example</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <opendevice-version>0.1.2-SNAPSHOT</opendevice-version>
+    </properties>
+
+    <!--<distributionManagement>-->
+        <!--<repository>-->
+            <!--<id>ssh-raspberrypi</id>-->
+            <!--<name>Repository for Maven artifacts</name>-->
+            <!--<url>scp://raspberrypi</url> &lt;!&ndash; configure in hosts file &ndash;&gt;-->
+        <!--</repository>-->
+    <!--</distributionManagement>-->
+
+    <repositories>
+        <repository>
+            <id>oss.sonatype.org</id>
+            <url>https://oss.sonatype.org/content/repositories/releases</url>
+        </repository>
+        <repository>
+            <id>oss.sonatype.org-snapshot</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>br.com.criativasoft.opendevice</groupId>
+            <artifactId>opendevice-core</artifactId>
+            <version>${opendevice-version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>br.com.criativasoft.opendevice</groupId>
+            <artifactId>opendevice-raspberry-pi4j</artifactId>
+            <version>${opendevice-version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.0.13</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <defaultGoal>install</defaultGoal>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>package</phase> <!-- attach to the packaging phase -->
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <archive>
+                        <manifest>
+                            <mainClass>example.GPIOFxGuiDemo</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>wagon-maven-plugin</artifactId>
+                <version>1.0-beta-5</version>
+                <configuration>
+                    <serverId>ssh-raspberrypi</serverId>
+                    <fromFile>${project.build.directory}/${project.build.finalName}.jar</fromFile>
+                    <url>scp://raspberrypi/home/pi</url>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>upload-jar-to-server</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>upload-single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.7</version>
+            </extension>
+        </extensions>
+    </build>
+
+
+</project>

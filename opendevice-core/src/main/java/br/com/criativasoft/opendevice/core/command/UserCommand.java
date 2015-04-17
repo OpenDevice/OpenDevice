@@ -1,0 +1,68 @@
+package br.com.criativasoft.opendevice.core.command;
+
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+/**
+ * User-defined command, this is an easy way to extend OpenDevice protocol. <br/>
+ * Allows you to perform custom method calls directly on device.
+ * @author Ricardo JL Rufino (ricardo@criativasoft.com.br) 
+ * @date 17/02/2015
+ */
+public class UserCommand extends Command implements ExtendedCommand{
+    
+    private static final long serialVersionUID = -2155798878419286601L;
+
+    private String name;
+    
+    private Set<Object> params = new LinkedHashSet<Object>();
+    
+    public UserCommand(String commandName, Object ... params) {
+        super(CommandType.USER_COMMAND);
+        this.name = commandName;
+        
+        if(params != null){
+            for (Object object : params) {
+                 this.params.add(object);
+            }
+        }
+    }
+
+    public Set<Object> getParams() {
+        return params;
+    }
+    
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void deserializeExtraData( String extradata ) {
+        String[] strparams = extradata.split(Command.DELIMITER);
+        params.addAll(Arrays.asList(strparams));
+    }
+
+    @Override
+    public String serializeExtraData() {
+        
+        if(params.isEmpty()) return null;
+        
+        StringBuilder sb = new StringBuilder();
+       
+        Iterator<Object> it = params.iterator();
+        
+        sb.append(name);
+        if(it.hasNext()) sb.append(DELIMITER);
+        
+        while (it.hasNext()) {
+            Object object =  it.next();
+            sb.append(object.toString());
+            if(it.hasNext()) sb.append(DELIMITER);
+            
+        }
+        return sb.toString();
+    }
+
+}

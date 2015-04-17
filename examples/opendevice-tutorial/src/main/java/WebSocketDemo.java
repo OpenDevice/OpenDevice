@@ -37,7 +37,7 @@ public class WebSocketDemo extends SimpleDeviceManager {
 
         // setup connection with arduino/hardware
         addOutput(Connections.out.usb()); // Connect to first USB port available
-        addOutput(Connections.out.bluetooth("00:13:03:14:19:07"));
+        //addOutput(Connections.out.bluetooth("00:13:03:14:19:07"));
 
         // Configure a Websocket interface for receiving commands over HTTP
         IWSServerConnection server = Connections.in.websocket(8181);

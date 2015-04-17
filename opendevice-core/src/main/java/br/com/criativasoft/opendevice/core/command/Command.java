@@ -22,7 +22,6 @@ import java.util.UUID;
  * @author Ricardo JL Rufino
  * @date 04/09/2011 13:48:57
  */
-// @XmlRootElement
 public abstract class Command implements Message{
 	
     public static final char START_FLAG = '/';

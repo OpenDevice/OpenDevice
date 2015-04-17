@@ -14,7 +14,6 @@
 package br.com.criativasoft.opendevice.core.command;
 
 import br.com.criativasoft.opendevice.connection.message.Message;
-import br.com.criativasoft.opendevice.core.json.CommandDeserialize;
 
 import java.util.Date;
 import java.util.UUID;

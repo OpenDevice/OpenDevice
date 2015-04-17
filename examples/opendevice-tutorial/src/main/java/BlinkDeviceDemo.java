@@ -23,7 +23,8 @@ public class BlinkDeviceDemo extends SimpleDeviceManager {
 
         Device led = new Device(1, Device.DIGITAL);
 
-        connect(Connections.out.bluetooth("00:11:06:14:04:57"));
+        connect(Connections.out.usb());
+        // connect(Connections.out.bluetooth("00:11:06:14:04:57"));
 
         while(true){
             led.on();

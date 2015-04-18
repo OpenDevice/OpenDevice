@@ -13,6 +13,12 @@
     <script type="text/javascript" src="/js/opendevice.js"></script> <!-- mvn:dependency -->
 
     <script>
+        // if (mvn dependency) not found
+        if(typeof od == "undefined")
+            document.write('<script src="https://rawgit.com/OpenDevice/OpenDevice/master/opendevice-clients/opendevice-js/dist/js/opendevice.js">\x3C/script>');
+    </script>
+
+    <script>
         if(typeof od == "undefined") alert("opendevice.js not loaded !");
 
         var devices = [];

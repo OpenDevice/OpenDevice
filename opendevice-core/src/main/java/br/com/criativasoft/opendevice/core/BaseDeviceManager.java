@@ -150,9 +150,8 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
     @Override
     public void connect() throws IOException {
 
-        if(getDevices().isEmpty()) log.warn("No devices registed ! (TIP: Create "+this.getClass().getSimpleName()+" instance before devices or call addDevice !");
-
         connectAll();
+
     }
 
     @Override
@@ -235,6 +234,8 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
                 streamConnection.setStreamReader(new CommandStreamReader()); // data protocol..
             }
         }
+
+        delivery.addConnection(connection);
 
         connection.setApplicationID(TenantProvider.getCurrentID());
         connection.setConnectionManager(this);

@@ -57,12 +57,13 @@ public class CommandDelivery implements ConnectionListener {
 	}
 
 
+    public void addConnection(DeviceConnection connection)  {
+        connection.addListener(this);
+    }
 
 	public void sendTo(Command command, DeviceConnection connection) throws IOException {
 		
 		command.setStatus(CommandStatus.DELIVERED);
-
-        connection.addListener(this);
 
         if(connection instanceof StreamConnection && !(command instanceof ResponseCommand)){
             sendWithTimeout(command, connection);

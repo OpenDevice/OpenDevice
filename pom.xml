@@ -93,7 +93,22 @@
                         <target>1.6</target>
                     </configuration>
                 </plugin>
+
+                <!-- MAVEN WRAPPER Generator - 'mvn wrapper:wrapper'  -->
+                <!--<plugin>-->
+                    <!--<groupId>com.rimerosolutions.maven.plugins</groupId>-->
+                    <!--<artifactId>wrapper-maven-plugin</artifactId>-->
+                    <!--<version>0.0.3</version>-->
+                    <!--<configuration>-->
+                        <!--&lt;!&ndash; optional base distribution url &ndash;&gt;-->
+                        <!--<baseDistributionUrl>https://repository.apache.org/content/repositories/releases/org/apache/maven/apache-maven</baseDistributionUrl>-->
+                        <!--&lt;!&ndash; optional wrapper jar output folder &ndash;&gt;-->
+                        <!--<wrapperDirectory>${basedir}/maven</wrapperDirectory>-->
+                    <!--</configuration>-->
+                <!--</plugin>-->
             </plugins>
+
+
         </pluginManagement>
 
         <!--<plugins>-->

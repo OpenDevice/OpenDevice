@@ -1,4 +1,4 @@
-/*
+package br.com.criativasoft.opendevice.wsrest.guice.config;/*
  *
  *  * ******************************************************************************
  *  *  Copyright (c) 2013-2014 CriativaSoft (www.criativasoft.com.br)
@@ -26,7 +26,7 @@ import br.com.criativasoft.opendevice.core.model.Device;
  * @author Ricardo JL Rufino
  * @date 17/02/2014
  */
-public class BlinkArduinoDemo extends ArduinoManager {
+public class DeviceListenerDemo extends ArduinoManager {
 
     Device led;
 

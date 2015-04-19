@@ -30,7 +30,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * TODO: PENDING DOC
+ * (for JSON, change NAME ??!!!)
+ * TODO: PENDING DOC 
  *
  * @author Ricardo JL Rufino
  * @date 27/07/14.

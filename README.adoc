@@ -61,6 +61,5 @@ You can communicate with devices using a variety of protocols via::
 
 See documentation and examples at:
 
-http://opendevice.criativasoft.com.br
+http://opendevice.io
 
-https://opendevice.atlassian.net/wiki

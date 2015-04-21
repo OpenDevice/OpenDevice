@@ -15,6 +15,7 @@ package br.com.criativasoft.opendevice.connection;
 
 
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
+import br.com.criativasoft.opendevice.connection.serialize.DefaultSteamReader;
 import jssc.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,13 +123,20 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
 			serialPort.setEventsMask(mask);
                         serialPort.addEventListener(this);
 			// serialPort.notifyOnDataAvailable(true);
-			
-			setStatus(ConnectionStatus.CONNECTED);
-			
-			log.info("Connected ! " + serialPort.getPortName());
-			
-			// Aguardar um tempo para o boot do arduino.
+
+
+			// Wait a while to boot the Arduino.
+            // NOTE: Perhaps this is only required for Arduino
 			Thread.sleep(ARDUINO_BOOT_TIME);
+
+            log.info("Connected ! " + serialPort.getPortName());
+
+            setStatus(ConnectionStatus.CONNECTED);
+
+//          NOTE: No need, because the implementation of reading is already done in serialEvent
+//            if(reader instanceof DefaultSteamReader){
+//                ((DefaultSteamReader)reader).startReading();
+//            }
 			
 		} catch (Exception e) {
 			new ConnectionException(e);
@@ -170,7 +178,7 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
     public synchronized void serialEvent(SerialPortEvent event) {
 
         if (log.isTraceEnabled()) {
-            log.trace("SerialEvent[" + event.getEventType() + " on " + event.getPortName() + "]");
+            log.trace("SerialEvent '" + event.getEventType() + "' on [" + event.getPortName() + "]");
         }
 
         if (event.isRXCHAR() && hasListeners()) {// If data is available

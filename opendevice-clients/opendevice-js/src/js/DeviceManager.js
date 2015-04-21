@@ -130,6 +130,10 @@ od.DeviceManager = function(connection){
         _this.addListener(event, listener);
     };
 
+    this.onDeviceChange = function (listener){
+        _this.addListener(od.Event.DEVICE_CHANGED, listener);
+    };
+
     this.addListener = function(event, listener){
 
         if(listenersMap[event] === undefined) listenersMap[event] = [];

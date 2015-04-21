@@ -33,6 +33,7 @@ return {
 
     // Manager delegate
     on : manager.on,
+    onDeviceChange : manager.onDeviceChange,
     findDevice : manager.findDevice,
     getDevices : manager.getDevices,
     setValue : manager.setValue,
@@ -47,7 +48,13 @@ return {
         od.serverURL = serverURL;
     },
 
-    connect : function(){
+    connect : function(callback){
+
+        OpenDevice.on(od.Event.CONNECTED, function(){
+            var devices = OpenDevice.getDevices();
+            if(callback) callback(devices);
+        });
+
         connection.connect();
     },
 

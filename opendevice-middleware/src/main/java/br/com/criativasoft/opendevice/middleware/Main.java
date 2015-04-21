@@ -41,7 +41,7 @@ public class Main extends SimpleDeviceManager {
 
 	public void init() throws Exception {
 
-        setApplicationID(OpenDeviceConfig.LOCAL_APP_ID);
+//        setApplicationID(OpenDeviceConfig.LOCAL_APP_ID);
 
         addDevice(new Device(1, "Luz 1", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
         addDevice(new Device(2, "Luz 2", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
@@ -50,7 +50,7 @@ public class Main extends SimpleDeviceManager {
         // new FakeSensorSimulator(50, this, 6, 7).start(); // generate fake data
         // addFilter(new FixedReadIntervalFilter(1000, this));
 
-		// Ativar serviço de descoberta desse servidor via UDP.
+		// Enable UDP discovery service.
         DiscoveryService.listen(port);
 
         // Setup WebSocket (Socket.IO) with suport for simple htttpServer
@@ -65,7 +65,7 @@ public class Main extends SimpleDeviceManager {
 
         webscoket.addWebResource("/media/Dados/Codigos/Java/Projetos/OpenDevice/opendevice-web-view/src/main/webapp");
         webscoket.addWebResource("/media/Dados/Codigos/Java/Projetos/OpenDevice/opendevice-clients/opendevice-js/dist");
-        webscoket.addWebResource("/media/Dados/Codigos/Java/Projetos/OpenDevice/examples/opendevice-tutorial/src/main/resources");
+        // webscoket.addWebResource("/media/Dados/Codigos/Java/Projetos/OpenDevice/examples/opendevice-tutorial/src/main/resources");
 
 
         this.addInput(webscoket);

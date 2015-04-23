@@ -46,7 +46,7 @@ You can communicate with OpenDevice Middleware (Cloud and Local Services) using 
  * MQTT (In progress)
 
 
-You can communicate with devices using a variety of protocols via::
+You can communicate with devices using a variety of protocols::
  * USB
  * Ethernet
  * WiFi

@@ -12,8 +12,6 @@ This allows you to focus on your project and innovation, leave obscure details o
 
 TIP: Plug your device (Arduino/Raspberypi/Other) to the Cloud and sync in real-time	
 
-image:http://opendevice.criativasoft.com.br/images/site-technology.png[]
-
 [source,java]
 .Simple like this
 ----
@@ -35,6 +33,10 @@ image:http://opendevice.criativasoft.com.br/images/site-technology.png[]
 ----
 
 But not only that... (You can also do in javascript and other languages.)
+
+== Technology
+
+image:http://opendevice.criativasoft.com.br/images/site-technology.png[]
 
 == Communications & Protocols
 

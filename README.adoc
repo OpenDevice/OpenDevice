@@ -40,7 +40,7 @@ image:http://opendevice.criativasoft.com.br/images/site-technology.png[]
 
 == Communications & Protocols
 
-You can communicate with OpenDevice Middleware (Cloud and Local Services) using a variety of protocols::
+You can communicate with OpenDevice (Cloud and Local Services) using a variety of protocols::
  * HTTP (REST)
  * Sockets/Websocket
  * MQTT (In progress)

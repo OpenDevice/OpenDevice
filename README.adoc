@@ -59,7 +59,24 @@ You can communicate with devices using a variety of protocols via::
  * WiFi
  * Bluetooth
 
+
+== Documentation
+
 See documentation and examples at:
 
 http://opendevice.io
+
+https://github.com/OpenDevice/opendevice-examples
+
+== Install
+
+https://opendevice.atlassian.net/wiki/display/DOC/A.+First+Steps+with+OpenDevice
+
+== Contributing
+
+Contributions are 10,000% welcome 
+If you discover a bug or would like to propose a new feature, please open a new issue.
+
+To contribute, fork this repository and create a new topic branch for the bug, feature or other existing issue you are addressing. Submit the pull request against the master branch.
+
 

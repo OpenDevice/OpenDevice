@@ -28,14 +28,12 @@ import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.wsrest.io.CrossOriginInterceptor;
 import org.atmosphere.cpr.*;
-import org.atmosphere.interceptor.CorsInterceptor;
 import org.atmosphere.nettosphere.Config;
 import org.atmosphere.nettosphere.Nettosphere;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.*;
 
 
@@ -52,7 +50,8 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
     private Nettosphere server;
 
-    private List<String> resources = new ArrayList<String>();
+    private List<String> webresources = new ArrayList<String>();
+    private List<Class<?>> resources = new ArrayList<Class<?>>();
 
     private List<WaitResponseListener> waitListeners = new LinkedList<WaitResponseListener>();
 
@@ -106,7 +105,11 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             //conf.resource("./webapp");  // For *-distrubution
             //conf.resource("./src/main/webapp"); // For mvn exec:java
 
-            for(String resource : resources){
+            for(String resource : webresources){
+                conf.resource(resource);
+            }
+
+            for(Class<?> resource : resources){
                 conf.resource(resource);
             }
 
@@ -165,9 +168,15 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
     public void addWebResource(String path){
         if(path != null){
-            resources.add(path);
+            webresources.add(path);
         }
     }
+    public void addResource(Class<?> resource){
+        if(resource != null){
+            resources.add(resource);
+        }
+    }
+
 
     @Override
     public void configure(AtmosphereConfig atmosphereConfig) {

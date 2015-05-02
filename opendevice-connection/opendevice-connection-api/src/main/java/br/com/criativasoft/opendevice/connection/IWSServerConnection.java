@@ -9,4 +9,6 @@ package br.com.criativasoft.opendevice.connection;
 public interface IWSServerConnection extends ServerConnection {
 
     void addWebResource(String path);
+
+    void addResource(Class<?> resource);
 }

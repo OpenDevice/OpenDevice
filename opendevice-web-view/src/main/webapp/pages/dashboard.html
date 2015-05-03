@@ -1,0 +1,79 @@
+
+<div class="mws-panel grid_8" data-ng-init="init()">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-sign-post">Dispositivos: Escritório (${model.devices.length}) </span>
+    </div>
+    <div class="mws-panel-body">
+
+
+        <div id="main-device-list" class="device-view-container clearfix">
+
+            <a class="device-view"  data-deviceid="${device.id}" ng-click="toggleValue(device.id);" ng-repeat="device in model.devices">
+                <span class="device-view-icon mws-ic ${getIcon(device.id)}">&nbsp;</span>
+ 		                        <span class="device-view-content">
+ 		                        	<span class="device-view-title">${device.name}</span>
+ 		                            <span class="device-view-value" ng-class="device.value == 1 ? 'on' : 'off'">${device.value == 1 ? "ON" : "OFF"}</span>
+ 		                        </span>
+            </a>
+
+        </div>
+
+        <div class="mws-panel-toolbar bottom right clearfix" data-devicegroup="1">
+            <ul>
+                <li><a href="#" class="mws-ic-16 ic-add" id="btn-device-add" >&nbsp;</a></li>
+                <li><a href="#" class="mws-ic-16 ic-arrow-refresh">&nbsp;</a></li>
+                <li><a href="#" class="mws-ic-16 ic-cross" onclick="new app.VoiceCommand().init()" >&nbsp;</a></li>
+                <li><a href="#" class="mws-ic-16 ic-lightbulb-off" ng-click="sendToAll(0);">Desligar Todos</a></li>
+                <li><a href="#" class="mws-ic-16 ic-lightbulb" ng-click="sendToAll(1);">Ligar Todos</a></li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<div class="mws-panel grid_8">
+    <div class="mws-panel-header">
+        <span class="mws-i-24 i-sign-post"> Dispositivos Analógicos </span>
+    </div>
+    <div class="mws-panel-body">
+
+        <div id="device-chart"></div>
+
+        <div class="mws-panel-toolbar bottom right clearfix" data-devicegroup="1">
+            <ul>
+                <li><a href="javascript:void(0);" class="mws-ic-16 ic-add" ng-click="addNewDash()" >&nbsp;</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="dashboards gridster grid_8">
+    <ul>
+        <li data-itemid="${item.id}" data-row="${item.layout[0]}" data-col="${item.layout[1]}" data-sizex="${item.layout[2]}" data-sizey="${item.layout[3]}"
+            ng-repeat="item in model.dashboardItems"
+            ng-init="$last && renderCompleteDashItem('.dashboards')" >
+            <!--ng-init="initDashItem( $index , item)" -->
+
+            <div ng-if="item.type == 'LINE_CHART' && !item.configMode" class="dash-wrapper">
+                <div class="dash-header dash-move">
+                    <h3>${item.title}</h3>
+                    <div class="dash-actions">
+                        <button ng-click="item.test()"><span class="ui-icon ui-icon-wrench"></span></button>
+                        <button ng-click="removeItem($index)"><span class="ui-icon ui-icon-closethick"></span></button>
+                    </div>
+                </div>
+                <canvas class="dash-body"></canvas>
+                <div class="dash-footer">LINE_CHART Footer</div>
+            </div>
+
+            <div ng-if="item.type == 'text' && !item.configMode">
+                ${item.title}
+            </div>
+
+            <div ng-if="item.configMode">
+                <button ng-click="saveDash($index)">config </button>
+            </div>
+
+        </li>
+    </ul>
+</div>

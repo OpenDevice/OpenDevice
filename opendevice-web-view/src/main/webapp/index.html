@@ -34,7 +34,14 @@
 
 <script type="text/javascript" src="js/mws.js"></script>
 
+
+<script type="text/javascript" src="js/Chart.min.js"></script>
+
+<script type="text/javascript" src="js/jquery.gridster.js"></script>
+<link rel="stylesheet" type="text/css" href="js/jquery.gridster.min.css" media="screen" />
+
 <title>OpenDevice - Dashboard</title>
+
 
 </head>
 
@@ -155,7 +162,7 @@
     </div>
     
     <!-- Main Wrapper -->
-    <div id="mws-wrapper" ng-controller="DashboardController">
+    <div id="mws-wrapper" >
     	<!-- Necessary markup, do not remove -->
 		<div id="mws-sidebar-stitch"></div>
 		<div id="mws-sidebar-bg"></div>
@@ -198,58 +205,14 @@
         <div id="mws-container" class="clearfix">
         
         	<!-- Main Container -->
-            <div class="container ng-cloak">
+            <div class="container ng-cloak" ng-view>
 
-
-            	<div class="mws-panel grid_8">
-                	<div class="mws-panel-header">
-                    	<span class="mws-i-24 i-sign-post">Dispositivos: Escritório (${model.devices.length}) </span>
-                    </div>
-                    <div class="mws-panel-body">
-
-
-		 				<div id="main-device-list" class="device-view-container clearfix">
-
-                            <a class="device-view"  data-deviceid="${device.id}" ng-click="toggleValue(device.id);" ng-repeat="device in model.devices">
- 		                    	<span class="device-view-icon mws-ic ${getIcon(device.id)}">&nbsp;</span>
- 		                        <span class="device-view-content">
- 		                        	<span class="device-view-title">${device.name}</span>
- 		                            <span class="device-view-value" ng-class="device.value == 1 ? 'on' : 'off'">${device.value == 1 ? "ON" : "OFF"}</span>
- 		                        </span>
- 		                    </a>
-
-		                </div>
-
-						<div class="mws-panel-toolbar bottom right clearfix" data-devicegroup="1">
-                        	<ul>
-                        	    <li><a href="#" class="mws-ic-16 ic-add" id="btn-device-add" >&nbsp;</a></li>
-                            	<li><a href="#" class="mws-ic-16 ic-arrow-refresh">&nbsp;</a></li>
-                            	<li><a href="#" class="mws-ic-16 ic-cross" onclick="new app.VoiceCommand().init()" >&nbsp;</a></li>
-                            	<li><a href="#" class="mws-ic-16 ic-lightbulb-off" ng-click="sendToAll(0);">Desligar Todos</a></li>
-                            	<li><a href="#" class="mws-ic-16 ic-lightbulb" ng-click="sendToAll(1);">Ligar Todos</a></li>
-                            </ul>
-                        </div>
-                    	
-                    </div>
-                </div>
-
-                <div class="mws-panel grid_8">
-                    <div class="mws-panel-header">
-                        <span class="mws-i-24 i-sign-post"> Dispositivos Analógicos </span>
-                    </div>
-                    <div class="mws-panel-body">
-
-                        <div id="device-chart" style="height:220px"></div>
-
-                    </div>
-                </div>
-                
             </div>
             <!-- End Main Container -->
             
             <!-- Footer -->
             <div id="mws-footer">
-            	Copyright CriativaSoft 2013. All Rights Reserved.
+            	Copyright CriativaSoft. All Rights Reserved.
             </div>
             <!-- End Footer -->
             
@@ -270,8 +233,9 @@
 <!-- AngularJS Code -->
 <!-- ----------------------------------------------------- -->
 
-	<script type="text/javascript" src="js/angular-1.2.x.js"></script>
-	<script type="text/javascript" src="js/angular-route-1.2.x.js"></script>
+	<script type="text/javascript" src="js/angular.min-1.4.0-rc.1.js"></script>
+	<script type="text/javascript" src="js/angular-route.min.js"></script>
+	<script type="text/javascript" src="js/angular-resource.min.js"></script>
 
 <!-- ----------------------------------------------------- -->
 <!-- OpenDevice -->
@@ -281,24 +245,15 @@
     <!--<script type="text/javascript" src="js/jquery.atmosphere.js"></script> <!--Deve ser usado esse, testar compatibilidade !-->
 
     <script type="text/javascript" src="js/opendevice.js"></script> <!-- mvn:dependency -->
-
-    <script type="text/javascript" src="js/DeviceChart.js"></script>
+    <script type="text/javascript" src="js/opendevice/DashItemView.js"></script>
 
     <!-- ----------------------------------------------------- -->
     <!-- Application Code -->
     <!-- ----------------------------------------------------- -->
 
-    <script type="text/javascript" src="js_app/main.js"></script>
-    <script type="text/javascript" src="js_app/DashboardController.js"></script>
-
-    <script>
-
-        $(function() {
-            new DeviceChart('#device-chart', [6, 7]);
-        });
-
-
-    </script>
+    <script type="text/javascript" src="js/app/app.js"></script>
+    <script type="text/javascript" src="js/app/services.js"></script>
+    <script type="text/javascript" src="js/app/DashboardController.js"></script>
 
     
 </body>

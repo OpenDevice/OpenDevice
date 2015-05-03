@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * ******************************************************************************
  *  Copyright (c) 2013-2014 CriativaSoft (www.criativasoft.com.br)
@@ -10,6 +12,7 @@
  *  Ricardo JL Rufino - Initial API and Implementation
  * *****************************************************************************
  */
+
 
 
 /**

@@ -7,7 +7,7 @@ var app = angular.module('opendevice', [
     'ngRoute',
     //'opendevice.filters',
     //'opendevice.directives',
-    //'opendevice.services',
+    'opendevice.services',
     'opendevice.controllers'
 ]);
 
@@ -18,9 +18,9 @@ var app = angular.module('opendevice', [
 OpenDevice.setAppID = "*";
 
 app.config(['$routeProvider', function($routeProvider) {
-    //$routeProvider.when('/view1', {templateUrl: 'partials/partial1.html', controller: 'MyCtrl1'});
+    $routeProvider.when('/dashboard', {templateUrl: 'pages/dashboard.html', controller: 'DashboardController'});
     //$routeProvider.when('/view2', {templateUrl: 'partials/partial2.html', controller: 'MyCtrl2'});
-    //$routeProvider.otherwise({redirectTo: '/view1'});
+    $routeProvider.otherwise({redirectTo: '/dashboard'});
 }]);
 
 // Configuration to Work like JSP templates

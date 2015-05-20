@@ -1,25 +1,64 @@
-/*
- *
- *  * ******************************************************************************
- *  *  Copyright (c) 2013-2014 CriativaSoft (www.criativasoft.com.br)
- *  *  All rights reserved. This program and the accompanying materials
- *  *  are made available under the terms of the Eclipse Public License v1.0
- *  *  which accompanies this distribution, and is available at
- *  *  http://www.eclipse.org/legal/epl-v10.html
- *  *
- *  *  Contributors:
- *  *  Ricardo JL Rufino - Initial API and Implementation
- *  * *****************************************************************************
- *
- */
-
 var app = angular.module('opendevice.services', ['ngResource']);
 
-app.factory('Dashboard', ['$resource', function($resource){
+app.factory('DashboardRest', ['$resource', function($resource){
 
     return $resource('dashboards/:id', { id: '@id', dashID : '@dashID' }, {
+        list: {method:'GET', url : "dashboards", isArray:true,
+            transformResponse: function(list){
+
+                list = angular.fromJson(list);
+
+                for (var i = 0; i < list.length; i++) {
+
+                    var items = list[i].items;
+
+                    for (var j = 0; j < items.length; j++) {
+                        var item = items[j];
+
+                        try {
+                            if(typeof item.layout == "string") {
+                                item.layout = JSON.parse(item.layout); // convert from String to Array
+                            }
+                        }catch (e){ item.layout = null;}
+
+                        try {
+                            if(typeof item.viewOptions == "string") {
+                                item.viewOptions = JSON.parse(item.viewOptions); // convert from String to Array
+                            }
+                        }catch (e){ console.error('Error on viewOptions', e.stack); }
+
+                        if(!item.layout) item.layout = "[1,1,1,1]";
+
+                    }
+
+                }
+
+                return list;
+        }},
+        activate: {method:'GET', url : "dashboards/:id/activate"},
         items: {method:'GET', url : "dashboards/:id/items", isArray:true},
-        updateLayout: {method:'PUT', url : "dashboards/:dashID/updateLayout"}
+        updateLayout: {method:'PUT', url : "dashboards/:dashID/updateLayout"},
+        saveItem: {method:'POST', url : "dashboards/:dashID/item",
+            transformRequest: function(data) {
+                data.layout =  JSON.stringify(data.layout); // on server is a String
+                data.viewOptions = JSON.stringify(data.viewOptions); // on server is a String
+                return JSON.stringify(data);
+            },transformResponse: function(item, headersGetter){
+
+                item = angular.fromJson(item);
+
+                if(typeof item.viewOptions == "string") {
+                    item.viewOptions = JSON.parse(item.viewOptions); // convert from String to Array
+                }
+
+                if(typeof item.layout == "string") {
+                    item.layout = JSON.parse(item.layout); // convert from String to Array
+                }
+
+                return item;
+            }
+        },
+        removeItem: {method:'DELETE', url : "dashboards/:dashID/item"}
     });
 
 }]);

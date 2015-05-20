@@ -3,45 +3,34 @@
 <html xmlns:ng="http://angularjs.org" ng-app="opendevice">
 <head>
 
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-<!-- Required Stylesheets -->
-<link rel="stylesheet" type="text/css" href="css/reset.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="css/text.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="css/fluid.css" media="screen" />
+    <link rel="icon" type="image/png" href="images/favicon.png" />
 
-<link rel="stylesheet" type="text/css" href="css/core/mws.styles-all.min.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="css/app.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="css/icons/icons.css" media="screen" />
+    <!-- Required Stylesheets -->
+    <link rel="stylesheet" type="text/css" href="css/reset.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="css/text.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="css/fluid.css" media="screen" />
 
-<link rel="stylesheet" type="text/css" href="plugins/jgrowl/jquery.jgrowl.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="css/jui/jquery.ui-all-min.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="css/core/mws.styles-all.min.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="css/app.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="css/icons/icons.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="css/jui/jquery.ui-all-min.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="css/mws.theme.css" media="screen" />
 
-<!-- Theme Stylesheet -->
-<link rel="stylesheet" type="text/css" href="css/mws.theme.css" media="screen" />
+    <!-- angular ui-select-->
+    <link rel="stylesheet" type="text/css" href="js/angular-ui-select.min.css" media="screen" />
+    <link rel="stylesheet" href="css/plugins/select2.css"/>
 
-<!-- JavaScript Plugins -->
+    <link rel="stylesheet" type="text/css" href="js/jquery.gridster.min.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="plugins/jgrowl/jquery.jgrowl.css" media="screen" />
 
-<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
-
-<script type="text/javascript" src="plugins/flot/jquery.flot.min.js"></script>
-<script type="text/javascript" src="plugins/jgrowl/jquery.jgrowl-min.js"></script>
-<!--[if lt IE 9]>
-<script type="text/javascript" src="plugins/flot/excanvas.min.js"></script>
-<![endif]-->
-<script type="text/javascript" src="plugins/validate/jquery.validate-min.js"></script>
-<script type="text/javascript" src="js/jquery-ui.js"></script>
-
-<script type="text/javascript" src="js/mws.js"></script>
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery-ui.js"></script>
+    <script type="text/javascript" src="js/mws.js"></script>
 
 
-<script type="text/javascript" src="js/Chart.min.js"></script>
-
-<script type="text/javascript" src="js/jquery.gridster.js"></script>
-<link rel="stylesheet" type="text/css" href="js/jquery.gridster.min.css" media="screen" />
-
-<title>OpenDevice - Dashboard</title>
-
+    <title>OpenDevice - Dashboard</title>
 
 </head>
 
@@ -162,7 +151,7 @@
     </div>
     
     <!-- Main Wrapper -->
-    <div id="mws-wrapper" >
+    <div id="mws-wrapper" class="mws-sidebar-hidden" >
     	<!-- Necessary markup, do not remove -->
 		<div id="mws-sidebar-stitch"></div>
 		<div id="mws-sidebar-bg"></div>
@@ -222,21 +211,16 @@
     </div>
     <!-- End Main Wrapper -->
     
-     
-<div id="new-dialog" title="Novo Dispositivo" style="display: none;">
-  <p>TODO: Formulario Pendente !</p>
-</div>
-
-
 
 <!-- ----------------------------------------------------- -->
 <!-- AngularJS Code -->
 <!-- ----------------------------------------------------- -->
 
-	<script type="text/javascript" src="js/angular.min-1.4.0-rc.1.js"></script>
+	<script type="text/javascript" src="js/angular-1.4.0-rc.1.js"></script>
 	<script type="text/javascript" src="js/angular-route.min.js"></script>
 	<script type="text/javascript" src="js/angular-resource.min.js"></script>
-
+	<script type="text/javascript" src="js/angular-sanitize.min.js"></script>
+    <script type="text/javascript" src="js/angular-ui-select.min.js"></script>
 <!-- ----------------------------------------------------- -->
 <!-- OpenDevice -->
 <!-- ----------------------------------------------------- -->
@@ -247,9 +231,29 @@
     <script type="text/javascript" src="js/opendevice.js"></script> <!-- mvn:dependency -->
     <script type="text/javascript" src="js/opendevice/DashItemView.js"></script>
 
-    <!-- ----------------------------------------------------- -->
-    <!-- Application Code -->
-    <!-- ----------------------------------------------------- -->
+<!-- ----------------------------------------------------- -->
+<!-- Jquery -->
+<!-- ----------------------------------------------------- -->
+    <script type="text/javascript" src="plugins/jgrowl/jquery.jgrowl-min.js"></script>
+    <script type="text/javascript" src="plugins/validate/jquery.validate-min.js"></script>
+
+    <script type="text/javascript" src="js/jquery.gridster.js"></script>
+    <script type="text/javascript" src="js/jquery.textfill.min.js"></script>
+
+
+    <!--<script type="text/javascript" src="js/Chart.min.js"></script>-->
+    <!--<script src="http://code.highcharts.com/highcharts.src.js"></script>-->
+    <script src="js/highcharts.js"></script>
+    <script src="js/highcharts-more.js"></script>
+    <script src="js/highcharts-solid-gauge.js"></script>
+
+    <link rel="stylesheet" href="js/ladda-themeless.min.css">
+    <script src="js/spin.min.js"></script>
+    <script src="js/ladda.js"></script> <!-- buttons loading -->
+
+<!-- ----------------------------------------------------- -->
+<!-- Application Code -->
+<!-- ----------------------------------------------------- -->
 
     <script type="text/javascript" src="js/app/app.js"></script>
     <script type="text/javascript" src="js/app/services.js"></script>

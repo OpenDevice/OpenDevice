@@ -54,7 +54,7 @@ public class Device implements Serializable {
 	private int uid; // Logic level user ID.
 	private String name;
 	private DeviceType type;
-	private DeviceCategory category;
+	private DeviceCategory category = DeviceCategory.GENERIC;
 	private long lastUpdate;
 	private Date dateCreated;
 	
@@ -63,6 +63,10 @@ public class Device implements Serializable {
     private volatile Set<DeviceListener> listeners = new HashSet<DeviceListener>();
 
     protected volatile GpioInfo gpio;
+
+    public Device(){
+
+    }
 
     /**
      * Create new Device with type  {@link DeviceType#DIGITAL}
@@ -257,6 +261,26 @@ public class Device implements Serializable {
 
     public GpioInfo getGpio() {
         return gpio;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Device device = (Device) o;
+
+        if (uid != device.uid) return false;
+        return !(name != null ? !name.equals(device.name) : device.name != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = uid;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
     }
 
     /**

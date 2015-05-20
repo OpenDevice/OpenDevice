@@ -21,11 +21,9 @@ import br.com.criativasoft.opendevice.core.connection.EmbeddedGPIO;
 import br.com.criativasoft.opendevice.core.connection.MultipleConnection;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.filter.CommandFilter;
-import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.DeviceListener;
-import br.com.criativasoft.opendevice.core.model.DeviceType;
+import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
+import br.com.criativasoft.opendevice.core.model.*;
 
-import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +43,7 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
 	
 	private static final Logger log = LoggerFactory.getLogger(BaseDeviceManager.class);
 	
-	/**Client connections: Websockets, http, rest, etc ...*/
+	/** Client connections: Websockets, http, rest, etc ...*/
 	private MultipleConnection inputConnections = new MultipleConnection();
 	
 	/** Connection with the physical modules (middleware) or a proxy  */
@@ -79,6 +77,11 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
     }
 
     @Override
+    public List<DeviceHistory> getDeviceHistory(DeviceHistoryQuery query) {
+        return getValidDeviceDao().getDeviceHistory(query);
+    }
+
+    @Override
     public void setDeviceDao(DeviceDao deviceDao) {
         this.deviceDao = deviceDao;
     }
@@ -97,8 +100,10 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
 
     @Override
     public void addDevice(Device device) {
-        getValidDeviceDao().persist(device);
-        device.addListener(thisListener);
+        if(findDeviceByUID(device.getId()) == null) {
+            getValidDeviceDao().persist(device);
+            device.addListener(thisListener);
+        }
     }
 
     @Override
@@ -123,6 +128,7 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
     }
 
     public void addConnectionListener(ConnectionListener e) {
+        if(inputConnections.getSize() == 0 && outputConnections.getSize() == 0) throw new IllegalStateException("No connection to add listeners");
         if(inputConnections != null) inputConnections.addListener(e);
         if(outputConnections != null) outputConnections.addListener(e);
     }
@@ -193,6 +199,12 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
             try {
                 sendTo(new GetDevicesRequest(), connection);
             } catch (IOException e) {}
+        }
+        if(connection instanceof MultipleConnection){
+            Set<DeviceConnection> connections = outputConnections.getConnections();
+            for (DeviceConnection current : connections) {
+                syncDevices(current);
+            }
         }
 
     }
@@ -326,29 +338,40 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
         } else if (type == CommandType.GET_DEVICES) {
 
             GetDevicesRequest request = (GetDevicesRequest) message;
-            List<Device> devices = new LinkedList<Device>();
 
-            if(request.getFilter() <= 0) devices.addAll(getDevices());
+            // Received GET_DEVICES with ForceSync
+            if(request.isForceSync() && inputConnections.exist(connection)){
 
-            if(request.getFilter() == GetDevicesRequest.FILTER_BY_ID){
-                Object id = request.getFilterValue();
-                if(id instanceof Integer || id instanceof Long){
-                    Device device = findDeviceByUID((Integer) id);
-                    if(device != null) devices.add(device);
+                if(outputConnections.hasConnections()){
+                    log.debug("Sending to output connections...");
+                    syncDevices(outputConnections);
                 }
-            }
 
-            GetDevicesResponse response = new GetDevicesResponse(devices, command.getConnectionUUID());
-            response.setApplicationID(command.getApplicationID());
+            }else{
+                List<Device> devices = new LinkedList<Device>();
 
-            try {
+                if(request.getFilter() <= 0) devices.addAll(getDevices());
 
-                connection.send(response);
+                if(request.getFilter() == GetDevicesRequest.FILTER_BY_ID){
+                    Object id = request.getFilterValue();
+                    if(id instanceof Integer || id instanceof Long){
+                        Device device = findDeviceByUID((Integer) id);
+                        if(device != null) devices.add(device);
+                    }
+                }
 
-            } catch (CommandException e) {
-                log.error(e.getMessage(), e);
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
+                GetDevicesResponse response = new GetDevicesResponse(devices, command.getConnectionUUID());
+                response.setApplicationID(command.getApplicationID());
+
+                try {
+
+                    connection.send(response);
+
+                } catch (CommandException e) {
+                    log.error(e.getMessage(), e);
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                }
             }
 
         } else if (type == CommandType.DEVICE_COMMAND_RESPONSE) {
@@ -361,10 +384,11 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
             GetDevicesResponse response = (GetDevicesResponse) command;
             Collection<Device> loadDevices = response.getDevices();
 
-            log.debug("Loaded Devices: " + loadDevices.size());
+            log.info("Loaded Devices: " + loadDevices.size() + " , from: " + connection.getClass().getSimpleName());
             DeviceDao dao = getValidDeviceDao();
 
             for (Device device : loadDevices) {
+                log.debug(" - " + device.toString());
                 Device found = dao.getByUID(device.getUid());
                 if(found == null){
                     addDevice(found);

@@ -35,8 +35,13 @@ public class DeviceCategory implements Serializable {
 	public static DeviceCategory GENERIC_SENSOR = new DeviceCategory(50, "Sensor Genérico");
 	public static DeviceCategory IR_SENSOR = new DeviceCategory(51, "Sensor Infra-Vermelho");
 
+
+    public DeviceCategory(){
+
+    }
+
 	/**
-	 *  	
+	 * Create new DeviceCategory (or use static constants like #GENERIC)
 	 * @param code - Device type code. MAX 127.
 	 * @param description
 	 */

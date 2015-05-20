@@ -13,10 +13,7 @@
 
 package br.com.criativasoft.opendevice.core.json;
 
-import br.com.criativasoft.opendevice.core.command.Command;
-import br.com.criativasoft.opendevice.core.command.CommandType;
-import br.com.criativasoft.opendevice.core.command.DeviceCommand;
-import br.com.criativasoft.opendevice.core.command.ResponseCommand;
+import br.com.criativasoft.opendevice.core.command.*;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -45,6 +42,7 @@ public class CommandDeserialize extends StdDeserializer<Command> {
 
         // Default Types.
         registry.put(CommandType.DEVICE_COMMAND_RESPONSE, ResponseCommand.class);
+        registry.put(CommandType.GET_DEVICES, GetDevicesRequest.class);
     }
 
     @Override

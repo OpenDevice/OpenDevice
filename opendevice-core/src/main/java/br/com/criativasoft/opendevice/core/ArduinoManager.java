@@ -26,11 +26,11 @@ import java.io.IOException;
 /**
  * Class that follows the structure for implementing the Arduino,
  * it is not advisable for real projects, just enough for simple things.
- * Give preference to extend {@link SimpleDeviceManager}
+ * Give preference to extend {@link LocalDeviceManager}
  *
  * @author Ricardo JL Rufino on 14/10/14.
  */
-public abstract class ArduinoManager extends SimpleDeviceManager{
+public abstract class ArduinoManager extends LocalDeviceManager {
 
     public ArduinoManager(){
         super();
@@ -45,11 +45,16 @@ public abstract class ArduinoManager extends SimpleDeviceManager{
 
             connect();
 
-            for (int i = 0; i < 5; i++) {
-                System.out.println("Waiting !!");
+            int max = 5;
+            for (int i = 1; i <= max; i++) {
                 if(!connection.isConnected()){
+                    log.debug("Waiting connection...");
                     Thread.sleep(1000);
-                    if(! connection.isConnected()) System.out.println("Waiting connection...");
+                    if(! connection.isConnected()){
+                        log.debug("try reconnect ["+(i)+"/"+max+"]");
+                        connect();
+                    }
+
                 }
 
                 System.out.println("Error, connection not found !");

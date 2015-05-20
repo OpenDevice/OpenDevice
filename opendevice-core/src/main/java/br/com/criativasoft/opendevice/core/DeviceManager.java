@@ -18,11 +18,14 @@ import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.filter.CommandFilter;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
+import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.model.Device;
+import br.com.criativasoft.opendevice.core.model.DeviceHistory;
 import br.com.criativasoft.opendevice.core.model.DeviceListener;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 public interface DeviceManager extends ConnectionManager{
 
@@ -73,4 +76,5 @@ public interface DeviceManager extends ConnectionManager{
 
     public boolean hasConnections();
 
+    public List<DeviceHistory> getDeviceHistory(DeviceHistoryQuery query);
 }

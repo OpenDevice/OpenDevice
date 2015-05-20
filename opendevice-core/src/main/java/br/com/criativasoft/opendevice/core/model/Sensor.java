@@ -10,6 +10,8 @@ import br.com.criativasoft.opendevice.core.command.GPIO;
  */
 public class Sensor extends Device {
 
+    private Sensor() {} // NONE: used only for persistence/load
+
     /**
      * Create new Sensor with type  {@link DeviceType#DIGITAL}
      * @param uid Must match with 'id' configured in the physical module

@@ -37,7 +37,8 @@ public class DeviceVO {
 	}
 	
 	public DeviceVO(Device device) {
-		this(device.getUid(), device.getName(), device.getType().getCode(), device.getCategory().getCode(), 
+		this(device.getUid(), device.getName(), device.getType().getCode(),
+				(device.getCategory() == null ? DeviceCategory.GENERIC.getCode() : device.getCategory().getCode()),
 		     device.getValue(), device.getLastUpdate(), device.getDateCreated());
 
         if(device instanceof Sensor){

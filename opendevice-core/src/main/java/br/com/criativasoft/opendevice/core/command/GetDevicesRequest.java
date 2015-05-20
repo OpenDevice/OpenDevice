@@ -28,11 +28,17 @@ public class GetDevicesRequest extends Command implements Request {
 
     private int filter = -1;
     private Object filterValue;
+    private boolean forceSync = false;
 
     public GetDevicesRequest(int filter, Object filterValue) {
+        this(filter, filterValue, false);
+    }
+
+    public GetDevicesRequest(int filter, Object filterValue, boolean forceSync) {
         super(CommandType.GET_DEVICES);
         this.filter = filter;
         this.filterValue = filterValue;
+        this.forceSync = forceSync;
     }
 
     public GetDevicesRequest() {
@@ -51,5 +57,13 @@ public class GetDevicesRequest extends Command implements Request {
 
     public Object getFilterValue() {
         return filterValue;
+    }
+
+    public void setForceSync(boolean forceSync) {
+        this.forceSync = forceSync;
+    }
+
+    public boolean isForceSync() {
+        return forceSync;
     }
 }

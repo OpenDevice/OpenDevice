@@ -13,7 +13,11 @@
 
 package br.com.criativasoft.opendevice.core.dao;
 
+import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.model.Device;
+import br.com.criativasoft.opendevice.core.model.DeviceHistory;
+
+import java.util.List;
 
 /**
  * @author Ricardo JL Rufino
@@ -21,5 +25,7 @@ import br.com.criativasoft.opendevice.core.model.Device;
  */
 public interface DeviceDao extends Dao<Device> {
 
-    public Device getByUID(int uid);
+    Device getByUID(int uid);
+
+    List<DeviceHistory> getDeviceHistory(DeviceHistoryQuery query);
 }

@@ -40,6 +40,8 @@ public class CommandJacksonMapper  {
             // Uses Enum.toString() for deserialization of an Enum
             mapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
 
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
             SimpleModule module = new SimpleModule("OpenDeviceModule", new Version(0, 1, 0, "alpha"));
 
             module.addSerializer(CommandType.class, new EnumCodeSerializer());

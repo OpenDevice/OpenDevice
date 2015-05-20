@@ -15,7 +15,10 @@ package br.com.criativasoft.opendevice.core.dao.memory;
 
 import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
+import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.model.Device;
+import br.com.criativasoft.opendevice.core.model.DeviceHistory;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
@@ -135,5 +138,10 @@ public class DeviceMemoryDao implements DeviceDao {
         List<Device> devices = getCurrentDevices();
         if(devices == null) return new ArrayList<Device>();
         return devices;
+    }
+
+    @Override
+    public List<DeviceHistory> getDeviceHistory(DeviceHistoryQuery query) {
+        throw new NotImplementedException();
     }
 }

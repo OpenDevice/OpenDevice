@@ -17,18 +17,18 @@ package br.com.criativasoft.opendevice.restapi;
 import br.com.criativasoft.opendevice.connection.ServerConnection;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.TenantProvider;
-import br.com.criativasoft.opendevice.core.command.CommandStatus;
-import br.com.criativasoft.opendevice.core.command.CommandType;
-import br.com.criativasoft.opendevice.core.command.DeviceCommand;
-import br.com.criativasoft.opendevice.core.command.ResponseCommand;
+import br.com.criativasoft.opendevice.core.command.*;
+import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceVO;
 import br.com.criativasoft.opendevice.core.model.Device;
+import br.com.criativasoft.opendevice.core.model.DeviceHistory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -45,9 +45,6 @@ import java.util.List;
 public class DeviceRest {
 
     private static final Logger log = LoggerFactory.getLogger(DeviceRest.class);
-
-//    @Inject
-//    private DeviceService service;
 
     @Inject
     private DeviceManager manager;
@@ -108,22 +105,21 @@ public class DeviceRest {
         }
 
         return null;
-
     }
 
     @DELETE
     @Path("/{uid}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String delete(@PathParam("uid") int uid){
+    public Response delete(@PathParam("uid") int uid){
 
         Device device = manager.findDeviceByUID(uid);
 
         if(device != null){
             manager.getDeviceDao().delete(device);
-            return "SUCCESS"; // TODO: return SUCCESS ?
+            return Response.status(Response.Status.OK).build();
         }
 
-        return ""; // TODO: return error ?
+        return Response.status(Response.Status.NOT_FOUND).build();
     }
 
     @GET
@@ -145,6 +141,23 @@ public class DeviceRest {
         return devices;
     }
 
+
+    @POST
+    @Path("/{uid}/history")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<DeviceHistory> getDeviceHistory(@PathParam("uid") int uid, DeviceHistoryQuery query) {
+        query.setDeviceID(uid);
+        return manager.getDeviceHistory(query);
+    }
+
+    @GET
+    @Path("/sync")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response sync() throws  IOException{
+        manager.send(new GetDevicesRequest());
+        return Response.status(Response.Status.OK).build();
+    }
+
     private String getApplicationID(){
 
         if(applicationID != null && applicationID.length() != 0) return applicationID;
@@ -159,13 +172,4 @@ public class DeviceRest {
 
     }
 
-//    private DeviceService getService(){
-//
-//        if(service == null){
-//            service = new DeviceServiceImpl();
-//            log.warn("@Injection not working !!");
-//        }
-//
-//        return service;
-//    }
 }

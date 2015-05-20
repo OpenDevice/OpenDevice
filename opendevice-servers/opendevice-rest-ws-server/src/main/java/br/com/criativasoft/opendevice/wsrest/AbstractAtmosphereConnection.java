@@ -27,6 +27,8 @@ import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.wsrest.io.CrossOriginInterceptor;
+import com.google.inject.Module;
+import com.sun.jersey.spi.inject.InjectableProvider;
 import org.atmosphere.cpr.*;
 import org.atmosphere.nettosphere.Config;
 import org.atmosphere.nettosphere.Nettosphere;
@@ -99,7 +101,6 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             conf.host("0.0.0.0"); // bind all local IPs
             configure(conf);
 
-            conf.resource(GuiceModule.class);
             conf.resource(CommandJacksonProvider.class);
 
             //conf.resource("./webapp");  // For *-distrubution

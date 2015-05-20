@@ -19,11 +19,11 @@ import org.atmosphere.websocket.WebSocketEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EventsLogger implements WebSocketEventListener {
+public class WSEventsLogger implements WebSocketEventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(EventsLogger.class);
+    private static final Logger logger = LoggerFactory.getLogger(WSEventsLogger.class);
 
-    public EventsLogger() {
+    public WSEventsLogger() {
     }
 
     @Override

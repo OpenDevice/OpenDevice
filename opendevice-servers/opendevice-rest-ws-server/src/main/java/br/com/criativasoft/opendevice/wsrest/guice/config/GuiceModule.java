@@ -67,15 +67,15 @@ package br.com.criativasoft.opendevice.wsrest.guice.config;
 
 import br.com.criativasoft.opendevice.connection.ServerConnection;
 import br.com.criativasoft.opendevice.core.DeviceManager;
-import br.com.criativasoft.opendevice.wsrest.guice.GuiceResourceProvider;
+import br.com.criativasoft.opendevice.wsrest.guice.GuiceInjectProvider;
 import br.com.criativasoft.opendevice.restapi.service.DeviceService;
 import br.com.criativasoft.opendevice.restapi.service.DeviceServiceImpl;
 import com.google.inject.Binder;
 
 import javax.ws.rs.ext.Provider;
 
-@Provider /** JAX-RS Provider */
-public class GuiceModule extends GuiceResourceProvider {
+//@Provider /** JAX-RS Provider */
+public class GuiceModule extends GuiceInjectProvider {
 
     @Override
     public void configure(Binder binder) {

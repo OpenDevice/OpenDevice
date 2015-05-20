@@ -14,7 +14,7 @@
 package br.com.criativasoft.opendevice.wsrest;
 
 import br.com.criativasoft.opendevice.connection.ServerConnection;
-import br.com.criativasoft.opendevice.wsrest.io.EventsLogger;
+import br.com.criativasoft.opendevice.wsrest.io.WSEventsLogger;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.CommandStatus;
 import br.com.criativasoft.opendevice.core.command.ResponseCommand;
@@ -29,6 +29,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  * TODO: PENDING DOC
@@ -37,9 +38,9 @@ import javax.ws.rs.core.MediaType;
  * @date 08/07/14.
  */
 @Path("/device/connection/{topic}")
-public class DeviceConnectionResource {
+public class WebSocketResource {
 
-    private static final Logger log = LoggerFactory.getLogger(DeviceConnectionResource.class);
+    private static final Logger log = LoggerFactory.getLogger(WebSocketResource.class);
 
     private @PathParam("topic") Broadcaster topic;
 
@@ -49,16 +50,16 @@ public class DeviceConnectionResource {
     private ServerConnection connection;
 
     @GET
-    @Suspend(contentType = "application/json", listeners = EventsLogger.class)
-    public String suspend() {
-        return null;
+    @Suspend(contentType = "application/json", listeners = WSEventsLogger.class)
+    public Response onConnect() {
+        return Response.status(Response.Status.OK).build();
     }
 
 
     @POST
     // @Broadcast(writeEntity = true)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseCommand publish(Command command, @Context HttpHeaders headers) {
+    public ResponseCommand onMessageReceived(Command command, @Context HttpHeaders headers) {
 
         if(log.isTraceEnabled()) log.trace("Command receivend in topic:{} -> {}", topic.getID(), command);
 

@@ -13,13 +13,15 @@
 
 package br.com.criativasoft.opendevice.wsrest.guice;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
+import com.google.inject.*;
+import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.lang.reflect.Type;
@@ -28,7 +30,9 @@ import java.lang.reflect.Type;
  * JAX-RS Provider - Guice Integration. <br/>
  * @author Ricardo JL Rufino
  */
-public abstract class GuiceResourceProvider implements InjectableProvider<Inject, Type>, Module {
+public abstract class GuiceInjectProvider implements InjectableProvider<Inject, Type>, Module {
+
+    private static final Logger log = LoggerFactory.getLogger(GuiceInjectProvider.class);
 
     @Override
     public ComponentScope getScope() {
@@ -38,15 +42,18 @@ public abstract class GuiceResourceProvider implements InjectableProvider<Inject
     private static Injector injector;
 
     private void initInjector() {
+        log.info("Initializing Guice Configuration: " + GuiceInjectProvider.this.getClass());
         injector = Guice.createInjector(this);
     }
+
+
 
     @Override
     public Injectable getInjectable(final ComponentContext context, final Inject annotation, final Type targetClass) {
         if (injector == null) initInjector();
-        return new Injectable<Object>() {
+        return new AbstractHttpContextInjectable() {
             @Override
-            public Object getValue() {
+            public Object getValue(HttpContext c) {
                 return injector.getInstance((Class) targetClass);
             }
         };

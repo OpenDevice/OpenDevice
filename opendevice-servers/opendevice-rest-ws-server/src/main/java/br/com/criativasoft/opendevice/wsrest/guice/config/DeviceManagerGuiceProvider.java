@@ -15,7 +15,6 @@
 
 package br.com.criativasoft.opendevice.wsrest.guice.config;
 
-import br.com.criativasoft.opendevice.connection.ServerConnection;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import com.google.inject.Provider;
 

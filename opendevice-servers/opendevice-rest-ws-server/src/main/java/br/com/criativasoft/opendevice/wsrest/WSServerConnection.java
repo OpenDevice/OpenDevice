@@ -43,7 +43,7 @@ public class WSServerConnection extends AbstractAtmosphereConnection implements 
     @Override
     protected void configure(Config.Builder conf) {
         conf.resource(DeviceRest.class);
-        conf.resource(DeviceConnectionResource.class);
+        conf.resource(WebSocketResource.class);
 
         conf.initParam("org.atmosphere.websocket.messageContentType", "application/json");
         conf.initParam("org.atmosphere.websocket.messageMethod", "POST");

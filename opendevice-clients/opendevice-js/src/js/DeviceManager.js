@@ -73,6 +73,10 @@ od.DeviceManager = function(connection){
 
     };
 
+    this.send = function(cmd){
+        _this.connection.send(cmd);
+    }
+
     this.addDevice = function(){
         // Isso teria no final que salvar na EPROM/Servidor do arduino.
     };
@@ -83,7 +87,7 @@ od.DeviceManager = function(connection){
         if(devices && devices.length > 0) return devices; // return from cache...
 
         // load remote.
-        devices = sync(false);
+        devices = this.sync(false);
 
         return devices;
     };
@@ -105,9 +109,11 @@ od.DeviceManager = function(connection){
     /**
      * Sync Devices with server
      * @param {Boolean} notify - if true notify listeners
+     * @param {Boolean} forceSync - force sync with physical module
      * @returns {Array}
      */
-     function sync(notify){
+    this.sync = function(notify, forceSync){
+
 
         // try local storage
         devices =  _getDevicesLocalStorege();
@@ -115,6 +121,12 @@ od.DeviceManager = function(connection){
 
         // load remote.
         devices = _getDevicesRemote();
+
+        // fire sync (GetDeviceRequest) on server
+        if(forceSync || (devices && devices.length == 0)) {
+            // OpenDevice.devices.sync();
+            _this.send({type : CType.GET_DEVICES, forceSync : forceSync});
+        }
 
         if(notify === true) notifyListeners(DEvent.DEVICE_LIST_UPDATE, devices);
 
@@ -230,6 +242,15 @@ od.DeviceManager = function(connection){
             // TODO: store changes localstore..
         }
 
+        // Force load new list from server
+        // TODO: It would be interesting if the devices list were already in response
+        if(message.type == CType.GET_DEVICES_RESPONSE){
+            // load remote.
+            var devices = _getDevicesRemote();
+
+            notifyListeners(DEvent.DEVICE_LIST_UPDATE, devices);
+        }
+
     }
 
     function updateDevice(message){
@@ -245,8 +266,7 @@ od.DeviceManager = function(connection){
         notifyListeners(DEvent.CONNECTION_CHANGE, newStatus);
 
         if(od.ConnectionStatus.CONNECTED == newStatus){
-            sync(true);
-            notifyListeners(DEvent.CONNECTED);
+            notifyListeners(DEvent.CONNECTED, _this.getDevices());
         }
 
         if(od.ConnectionStatus.CONNECTED == newStatus){

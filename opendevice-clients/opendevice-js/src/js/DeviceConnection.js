@@ -177,7 +177,8 @@ od.DeviceConnection = function(config){
         try {
             data = JSON.parse(response.responseBody);
         }catch(err) {
-                console.error("Can't parse response. Error: " + err);
+            console.warn("Can't parse response: " + response.responseBody, err.stack);
+
         }
 
         if(data) {

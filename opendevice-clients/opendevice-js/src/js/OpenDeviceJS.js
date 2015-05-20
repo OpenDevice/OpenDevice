@@ -39,6 +39,8 @@ return {
     setValue : manager.setValue,
     toggleValue : manager.toggleValue,
     contains : manager.contains,
+    sync : manager.sync,
+    send : manager.send,
 
     setAppID : function(appID){
         od.appID = appID;
@@ -65,12 +67,33 @@ return {
                 headers : {
                     'X-AppID' : od.appID
                 },
-                async: false
+                async: false // FIXME: isso não é recomendado...
         }).responseText;
 
-        // TODO: fazer tratamento dos possíveis erros (como exceptions e servidor offline)
+        // TODO: fazer tratamento dos possíveis erros (como exceptions e servidor offline ou 404)
 
-        return JSON.parse(response);
+        if(response.length > 0){
+            return JSON.parse(response)
+        }else{
+            return null;
+        }
+    },
+
+
+    history : function(query, callback){
+        jQuery.ajax({
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-AppID' : od.appID
+            },
+            type: 'POST',
+            url: od.serverURL +"/device/" + query.deviceID + "/history",
+            data: JSON.stringify(query),
+            dataType: 'json',
+            async: true,
+            success: callback
+        });
     },
 
     /** Try to find APPID URL->Cookie->LocalStore */
@@ -145,8 +168,12 @@ OpenDevice.devices = {
         }
     },
 
-    list : function(deviceID){
+    list : function(){
         return OpenDevice.rest(OpenDevice.devices.path + "/list");
+    },
+
+    sync : function(){
+        return OpenDevice.rest(OpenDevice.devices.path + "/sync");
     }
 
 };

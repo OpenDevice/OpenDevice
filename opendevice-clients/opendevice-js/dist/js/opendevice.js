@@ -301,7 +301,8 @@ od.DeviceConnection = function(config){
         try {
             data = JSON.parse(response.responseBody);
         }catch(err) {
-                console.error("Can't parse response. Error: " + err);
+            console.warn("Can't parse response: " + response.responseBody, err.stack);
+
         }
 
         if(data) {
@@ -386,6 +387,10 @@ od.DeviceManager = function(connection){
 
     };
 
+    this.send = function(cmd){
+        _this.connection.send(cmd);
+    }
+
     this.addDevice = function(){
         // Isso teria no final que salvar na EPROM/Servidor do arduino.
     };
@@ -396,7 +401,7 @@ od.DeviceManager = function(connection){
         if(devices && devices.length > 0) return devices; // return from cache...
 
         // load remote.
-        devices = sync(false);
+        devices = this.sync(false);
 
         return devices;
     };
@@ -418,9 +423,11 @@ od.DeviceManager = function(connection){
     /**
      * Sync Devices with server
      * @param {Boolean} notify - if true notify listeners
+     * @param {Boolean} forceSync - force sync with physical module
      * @returns {Array}
      */
-     function sync(notify){
+    this.sync = function(notify, forceSync){
+
 
         // try local storage
         devices =  _getDevicesLocalStorege();
@@ -428,6 +435,12 @@ od.DeviceManager = function(connection){
 
         // load remote.
         devices = _getDevicesRemote();
+
+        // fire sync (GetDeviceRequest) on server
+        if(forceSync || (devices && devices.length == 0)) {
+            // OpenDevice.devices.sync();
+            _this.send({type : CType.GET_DEVICES, forceSync : forceSync});
+        }
 
         if(notify === true) notifyListeners(DEvent.DEVICE_LIST_UPDATE, devices);
 
@@ -543,6 +556,15 @@ od.DeviceManager = function(connection){
             // TODO: store changes localstore..
         }
 
+        // Force load new list from server
+        // TODO: It would be interesting if the devices list were already in response
+        if(message.type == CType.GET_DEVICES_RESPONSE){
+            // load remote.
+            var devices = _getDevicesRemote();
+
+            notifyListeners(DEvent.DEVICE_LIST_UPDATE, devices);
+        }
+
     }
 
     function updateDevice(message){
@@ -558,8 +580,7 @@ od.DeviceManager = function(connection){
         notifyListeners(DEvent.CONNECTION_CHANGE, newStatus);
 
         if(od.ConnectionStatus.CONNECTED == newStatus){
-            sync(true);
-            notifyListeners(DEvent.CONNECTED);
+            notifyListeners(DEvent.CONNECTED, _this.getDevices());
         }
 
         if(od.ConnectionStatus.CONNECTED == newStatus){
@@ -611,6 +632,8 @@ return {
     setValue : manager.setValue,
     toggleValue : manager.toggleValue,
     contains : manager.contains,
+    sync : manager.sync,
+    send : manager.send,
 
     setAppID : function(appID){
         od.appID = appID;
@@ -637,12 +660,33 @@ return {
                 headers : {
                     'X-AppID' : od.appID
                 },
-                async: false
+                async: false // FIXME: isso não é recomendado...
         }).responseText;
 
-        // TODO: fazer tratamento dos possíveis erros (como exceptions e servidor offline)
+        // TODO: fazer tratamento dos possíveis erros (como exceptions e servidor offline ou 404)
 
-        return JSON.parse(response);
+        if(response.length > 0){
+            return JSON.parse(response)
+        }else{
+            return null;
+        }
+    },
+
+
+    history : function(query, callback){
+        jQuery.ajax({
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-AppID' : od.appID
+            },
+            type: 'POST',
+            url: od.serverURL +"/device/" + query.deviceID + "/history",
+            data: JSON.stringify(query),
+            dataType: 'json',
+            async: true,
+            success: callback
+        });
     },
 
     /** Try to find APPID URL->Cookie->LocalStore */
@@ -717,8 +761,12 @@ OpenDevice.devices = {
         }
     },
 
-    list : function(deviceID){
+    list : function(){
         return OpenDevice.rest(OpenDevice.devices.path + "/list");
+    },
+
+    sync : function(){
+        return OpenDevice.rest(OpenDevice.devices.path + "/sync");
     }
 
 };

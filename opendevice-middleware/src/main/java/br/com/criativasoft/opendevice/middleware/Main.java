@@ -15,10 +15,17 @@ package br.com.criativasoft.opendevice.middleware;
 
 import br.com.criativasoft.opendevice.connection.IWSServerConnection;
 import br.com.criativasoft.opendevice.connection.discovery.DiscoveryService;
-import br.com.criativasoft.opendevice.core.SimpleDeviceManager;
+import br.com.criativasoft.opendevice.core.LocalDeviceManager;
 import br.com.criativasoft.opendevice.core.connection.Connections;
-import br.com.criativasoft.opendevice.core.model.*;
-import br.com.criativasoft.opendevice.core.dao.memory.DeviceMemoryDao;
+import br.com.criativasoft.opendevice.core.filter.FixedReadIntervalFilter;
+import br.com.criativasoft.opendevice.core.model.Device;
+import br.com.criativasoft.opendevice.core.model.DeviceCategory;
+import br.com.criativasoft.opendevice.core.model.DeviceType;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.DeviceDaoNeo4j;
+import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
+import br.com.criativasoft.opendevice.middleware.config.DependencyConfig;
+import br.com.criativasoft.opendevice.middleware.resources.DashboardRest;
+import br.com.criativasoft.opendevice.wsrest.guice.config.GuiceConfigRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +40,7 @@ import java.util.jar.JarFile;
 // URLs REST:
 // - http://localhost:8181/device/1/setvalue/1
 
-public class Main extends SimpleDeviceManager {
+public class Main extends LocalDeviceManager {
 	
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
 
@@ -43,25 +50,30 @@ public class Main extends SimpleDeviceManager {
 
 //        setApplicationID(OpenDeviceConfig.LOCAL_APP_ID);
 
-        addDevice(new Device(1, "Luz 1", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
-        addDevice(new Device(2, "Luz 2", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
-        addDevice(new Device(3, "Luz 2", DeviceType.DIGITAL, DeviceCategory.LAMP, 0));
+        setDeviceDao(new DeviceDaoNeo4j(LocalEntityManagerFactory.getInstance().createEntityManager()));
 
+        addDevice(new Device(10, Device.DIGITAL));
         // new FakeSensorSimulator(50, this, 6, 7).start(); // generate fake data
-        // addFilter(new FixedReadIntervalFilter(1000, this));
+        // addFilter(new FixedReadIntervalFilter(500, this));
 
 		// Enable UDP discovery service.
         DiscoveryService.listen(port);
+
+        // Set IoC/DI Config
+        GuiceConfigRegistry.setConfigClass(DependencyConfig.class);
 
         // Setup WebSocket (Socket.IO) with suport for simple htttpServer
         IWSServerConnection webscoket = Connections.in.websocket(port);
         String current = System.getProperty("user.dir");
 
+        // Rest Resources
+        webscoket.addResource(DashboardRest.class);
+
         // Static WebResources
         String rootWebApp = getWebAppDir();
         webscoket.addWebResource(rootWebApp);
-        log.debug("Current webresource: " + rootWebApp);
-        webscoket.addWebResource( current + "/target/classes/webapp"); //  running exec:java
+        log.debug("Current root-resource: " + rootWebApp);
+        webscoket.addWebResource(current + "/target/classes/webapp"); //  running exec:java
 
         webscoket.addWebResource("/media/Dados/Codigos/Java/Projetos/OpenDevice/opendevice-web-view/src/main/webapp");
         webscoket.addWebResource("/media/Dados/Codigos/Java/Projetos/OpenDevice/opendevice-clients/opendevice-js/dist");
@@ -69,17 +81,11 @@ public class Main extends SimpleDeviceManager {
 
 
         this.addInput(webscoket);
-
-
-//		// No modo local ele se conecta com o servidor remoto.
-//		if(MODE_LOCAL.equalsIgnoreCase(mode)){
-//			this.addConnectionIN(new WSClientConnection(remoteServer));
-//		}
-
         // OutputConnections
         // ===============================
-        addOutput(Connections.out.usb()); // Connect to first USB port available
-//        addOutput(Connections.out.bluetooth("00:13:03:14:19:07"));
+//        addOutput(Connections.out.usb()); // Connect to first USB port available
+        addOutput(Connections.out.bluetooth("00:11:06:14:04:57")); // Soldado: 00:11:06:14:04:57 / Modulo: "00:13:03:14:19:07"
+        addOutput(Connections.out.bluetooth("00:13:03:14:19:07")); //
 
         //addOutput(Connections.out.tcp("192.168.0.204:8081"));
 //        DeviceConnection conn = new RaspberryConnection() {

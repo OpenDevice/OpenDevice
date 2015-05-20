@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+        http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" version="2.0">
+
+    <persistence-unit name="neo4j_pu" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.ogm.jpa.HibernateOgmPersistence</provider>
+        <mapping-file>META-INF/mappings/opendevice-core-mappings.xml</mapping-file>
+        <class>br.com.criativasoft.opendevice.middleware.model.Dashboard</class>
+        <class>br.com.criativasoft.opendevice.middleware.model.DashboardItem</class>
+        <exclude-unlisted-classes/>
+        <properties>
+            <property name="hibernate.ogm.datastore.provider" value="neo4j_embedded"/>
+            <property name="hibernate.ogm.neo4j.database_path" value="/media/Dados/Codigos/Java/Projetos/OpenDevice/Workspace/database"/>
+            <property name="hibernate.jdbc.batch_size" value="1000" />
+            <property name="hibernate.order_inserts" value="true"/>
+        </properties>
+    </persistence-unit>
+</persistence>

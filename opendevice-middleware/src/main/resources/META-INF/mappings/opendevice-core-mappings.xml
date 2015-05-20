@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
+        http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd" version="2.1">
+    <description>OpenDevice Core Mapping</description>
+    <entity name="Device" class="br.com.criativasoft.opendevice.core.model.Device" access="FIELD">
+        <inheritance/>
+        <discriminator-value>Device</discriminator-value>
+        <discriminator-column name="classType"/>
+        <attributes>
+            <id name="uid" />
+            <one-to-one name="category" fetch="EAGER" >
+                <join-column name="categoryID"  />
+                <cascade><cascade-persist/></cascade>
+            </one-to-one>
+            <transient name="gpio" />
+            <transient name="listeners" />
+        </attributes>
+    </entity>
+    <entity name="Sensor" class="br.com.criativasoft.opendevice.core.model.Sensor" access="FIELD">
+        <discriminator-value>Sensor</discriminator-value>
+    </entity>
+    <entity name="DeviceCategory" class="br.com.criativasoft.opendevice.core.model.DeviceCategory" access="FIELD">
+        <attributes>
+            <id name="code" />
+        </attributes>
+    </entity>
+    <entity name="DeviceHistory" class="br.com.criativasoft.opendevice.core.model.DeviceHistory" access="FIELD">
+        <attributes>
+            <id name="id" />
+        </attributes>
+    </entity>
+</entity-mappings>

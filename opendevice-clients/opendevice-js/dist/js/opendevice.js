@@ -107,6 +107,22 @@ od.Device = function(data){
     this.sensor = data.sensor;
     this.manager = od.deviceManager;
 
+    this.on = function(){
+         this.setValue(1);
+    };
+
+    this.off = function(){
+         this.setValue(0);
+    };
+
+    this.isON = function(){
+        return (value == 1)
+    };
+
+    this.isOFF = function(){
+        return (value == 0)
+    };
+
     this.setValue = function(value){
         this.value = value;
 
@@ -115,12 +131,15 @@ od.Device = function(data){
         }
     };
 
-    this.toggleValue = function(){
+    this.toggle = function(){
         var value = 0;
         if(this.value == 0) value = 1;
         else if(this.value == 1) value = 0;
         this.setValue(value);
     }
+
+    /** @deprecated */
+    this.toggleValue = this.toggle;
 
 };/*
  * ******************************************************************************

@@ -142,6 +142,7 @@ od.DeviceManager = function(connection){
         _this.addListener(event, listener);
     };
 
+    // FIXME: rename to onChange
     this.onDeviceChange = function (listener){
         _this.addListener(od.Event.DEVICE_CHANGED, listener);
     };

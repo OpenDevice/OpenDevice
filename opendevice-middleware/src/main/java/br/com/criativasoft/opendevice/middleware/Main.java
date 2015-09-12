@@ -17,13 +17,9 @@ import br.com.criativasoft.opendevice.connection.IWSServerConnection;
 import br.com.criativasoft.opendevice.connection.discovery.DiscoveryService;
 import br.com.criativasoft.opendevice.core.LocalDeviceManager;
 import br.com.criativasoft.opendevice.core.connection.Connections;
-import br.com.criativasoft.opendevice.core.filter.FixedReadIntervalFilter;
-import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.DeviceCategory;
-import br.com.criativasoft.opendevice.core.model.DeviceType;
-import br.com.criativasoft.opendevice.middleware.persistence.dao.DeviceDaoNeo4j;
-import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
 import br.com.criativasoft.opendevice.middleware.config.DependencyConfig;
+import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.DeviceDaoNeo4j;
 import br.com.criativasoft.opendevice.middleware.resources.DashboardRest;
 import br.com.criativasoft.opendevice.wsrest.guice.config.GuiceConfigRegistry;
 import org.slf4j.Logger;
@@ -52,7 +48,12 @@ public class Main extends LocalDeviceManager {
 
         setDeviceDao(new DeviceDaoNeo4j(LocalEntityManagerFactory.getInstance().createEntityManager()));
 
-        addDevice(new Device(10, Device.DIGITAL));
+//        addDevice(new Device(1, "BLUE", DeviceType.DIGITAL));
+//        addDevice(new Device(2, "YELLOW", DeviceType.DIGITAL));
+//        addDevice(new Device(3, "RED", DeviceType.DIGITAL));
+//        addDevice(new Sensor(4, "SW1", DeviceType.DIGITAL));
+//        addDevice(new Sensor(5, "SW2", DeviceType.DIGITAL));
+
         // new FakeSensorSimulator(50, this, 6, 7).start(); // generate fake data
         // addFilter(new FixedReadIntervalFilter(500, this));
 
@@ -75,17 +76,17 @@ public class Main extends LocalDeviceManager {
         log.debug("Current root-resource: " + rootWebApp);
         webscoket.addWebResource(current + "/target/classes/webapp"); //  running exec:java
 
-        webscoket.addWebResource("/media/Dados/Codigos/Java/Projetos/OpenDevice/opendevice-web-view/src/main/webapp");
-        webscoket.addWebResource("/media/Dados/Codigos/Java/Projetos/OpenDevice/opendevice-clients/opendevice-js/dist");
-        // webscoket.addWebResource("/media/Dados/Codigos/Java/Projetos/OpenDevice/examples/opendevice-tutorial/src/main/resources");
+        webscoket.addWebResource("/media/ricardo/Dados/Codidos/Java/Projetos/OpenDevice/opendevice-web-view/src/main/webapp");
+        webscoket.addWebResource("/media/ricardo/Dados/Codidos/Java/Projetos/OpenDevice/opendevice-clients/opendevice-js/dist");
+        // webscoket.addWebResource("/media/Dados/Codigos/Java/ProjeJetBrainstos/OpenDevice/examples/opendevice-tutorial/src/main/resources");
 
 
         this.addInput(webscoket);
         // OutputConnections
         // ===============================
-//        addOutput(Connections.out.usb()); // Connect to first USB port available
-        addOutput(Connections.out.bluetooth("00:11:06:14:04:57")); // Soldado: 00:11:06:14:04:57 / Modulo: "00:13:03:14:19:07"
-        addOutput(Connections.out.bluetooth("00:13:03:14:19:07")); //
+        addOutput(Connections.out.usb()); // Connect to first USB port available
+//        addOutput(Connections.out.bluetooth("00:13:03:14:19:07")); // Soldado: 00:11:06:14:04:57 / Modulo: "00:13:03:14:19:07"
+//        addOutput(Connections.out.usb("/dev/ttyACM1"));
 
         //addOutput(Connections.out.tcp("192.168.0.204:8081"));
 //        DeviceConnection conn = new RaspberryConnection() {
@@ -197,8 +198,10 @@ public class Main extends LocalDeviceManager {
         });
 
         // Manual shutdown
-        log.info("OpenDevice Middleware - Server started on port {}", main.port);
-        log.info("Type quit to stop the server");
+        log.info("========================================================");
+        log.info("OpenDevice Middleware - started on port {}", main.port);
+        log.info("Type [quit] or [CTRL+C] to stop the server");
+        log.info("========================================================");
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String a = "";
         while (!("quit".equals(a))) {

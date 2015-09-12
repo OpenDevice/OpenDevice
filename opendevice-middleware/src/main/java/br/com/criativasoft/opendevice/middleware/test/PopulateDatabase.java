@@ -49,10 +49,10 @@ public class PopulateDatabase {
 //        saveDevices();
 //        saveDash();
 
-//        List<Device> devices = dao.listAll();
-//        for (Device device : devices) {
-//            saveHistory(device.getId());
-//        }
+        List<Device> devices = dao.listAll();
+        for (Device device : devices) {
+            saveHistory(device.getId());
+        }
 
         tx.commit();
         em.close();
@@ -67,9 +67,11 @@ public class PopulateDatabase {
 
     private static void saveDash(){
         Dashboard dashboard = new Dashboard();
-        dashboard.setTitle("Default");
-//        dashboard.add(new DashboardItem("Item 2.1", DashboardItem.DashboardType.LINE_CHART, ""));
-//        dashboard.add(new DashboardItem("Item 2.2", DashboardItem.DashboardType.LINE_CHART, ""));
+        dashboard.setTitle("Dash 1");
+        em.persist(dashboard);
+
+        dashboard = new Dashboard();
+        dashboard.setTitle("Dash 2");
         em.persist(dashboard);
     }
 

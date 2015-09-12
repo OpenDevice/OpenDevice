@@ -11,26 +11,28 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.engine;
+package br.com.criativasoft.opendevice.engine.js.utils;
 
-import br.com.criativasoft.opendevice.engine.js.OpenDeviceJSEngine;
-
-import javax.script.ScriptException;
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.util.stream.Collectors;
 
 /**
+ * TODO: Add Docs
+ *
  * @author Ricardo JL Rufino
- * @date 22/08/15.
+ * @date 30/08/15.
  */
-public class OpenDeviceJSEngineTest {
+public class IOUtils {
 
-    public static void main(String[] args) throws FileNotFoundException, ScriptException {
+    public static String toString(final InputStream inputStream) throws IOException {
+        try (final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+            return br.lines().collect(Collectors.joining("\n"));
+        } finally {
 
-        String dir = "/media/ricardo/Dados/Codidos/Java/Projetos/OpenDevice/opendevice-js-engine/src/test/java/";
+        }
+    }
 
-        OpenDeviceJSEngine.main(new String[]{dir+ "BlinkDeviceDemo.js"});
-
-//        OpenDeviceJSEngine.main(new String[]{"-fx", dir+ "JavaFXDemo.js"});
-
+    public static String toString(File file) throws IOException {
+        return toString(new FileInputStream(file));
     }
 }

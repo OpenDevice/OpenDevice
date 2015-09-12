@@ -11,7 +11,7 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.engine;
+package br.com.criativasoft.opendevice.engine.utils;
 
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceListener;

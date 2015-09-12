@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
+import java.io.File;
 import java.io.FileNotFoundException;
 
 /**
@@ -35,7 +36,7 @@ public class JavaScriptFXApp extends Application {
         bindings.put("stage", stage);
 
         try {
-            OpenDeviceJSEngine.run(script, bindings);
+            OpenDeviceJSEngine.run(new File(script), bindings);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (ScriptException e) {

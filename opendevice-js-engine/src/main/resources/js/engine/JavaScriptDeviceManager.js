@@ -3,9 +3,6 @@
  * @author Ricardo JL Rufino
  * @date 22/08/15.
  */
-//
-//
-//
 
 load("nashorn:mozilla_compat.js");
 

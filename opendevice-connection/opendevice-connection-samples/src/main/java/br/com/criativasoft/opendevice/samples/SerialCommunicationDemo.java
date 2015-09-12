@@ -33,8 +33,8 @@ public class SerialCommunicationDemo implements ConnectionListener {
 
     public SerialCommunicationDemo()  {
 
-        // connection = StreamConnectionFactory.createUsb("/dev/ttyACM0");
-        connection = new TCPConnection("192.168.0.11:8282");
+        connection = StreamConnectionFactory.createUsb("/dev/ttyACM0");
+        //connection = new TCPConnection("192.168.0.11:8282");
         connection.addListener(this);
 
         try {

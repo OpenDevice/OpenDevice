@@ -13,17 +13,23 @@
 
 package br.com.criativasoft.opendevice.connection.serialize;
 
-import java.io.InputStream;
-
 import br.com.criativasoft.opendevice.connection.AbstractStreamConnection;
 
+import java.io.InputStream;
+
+/**
+ * Interface for reading the information of an input controlling size of messages and flow, <br/>
+ * the parser of the information must be done by {@link MessageSerializer}
+ * @author Ricardo JL Rufino
+ * @date 18/06/2014
+ */
 public interface StreamReader {
 	
 	public void setInput(InputStream input);
 	
 	public void processPacketRead(byte read[]);
 	
-	public void checkDataAvalible();
+	public void checkDataAvailable();
 	
 	public void setConnection(AbstractStreamConnection connection);
 	

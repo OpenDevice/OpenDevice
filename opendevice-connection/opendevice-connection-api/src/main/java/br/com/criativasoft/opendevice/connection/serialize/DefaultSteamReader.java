@@ -22,7 +22,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-  
+
+/**
+ * Class responsible for reading the information of an InputStream , the parser of the information is done by {@link MessageSerializer}
+ * @author Ricardo JL Rufino
+ * @date 18/06/2014
+ */
 public class DefaultSteamReader implements Runnable, Cloneable, StreamReader {
 	
 	private static Logger log = LoggerFactory.getLogger(StreamSerializer.class);
@@ -80,7 +85,7 @@ public class DefaultSteamReader implements Runnable, Cloneable, StreamReader {
 	@Override
 	public void run() {
 		while(connection.isConnected()){
-			checkDataAvalible();
+			checkDataAvailable();
 		}
 	}
 	
@@ -88,7 +93,7 @@ public class DefaultSteamReader implements Runnable, Cloneable, StreamReader {
 	/**
 	 * Método chamado pela connection informando que deve ser lido os dados da serial
 	 */
-	public void checkDataAvalible() {
+	public void checkDataAvailable() {
 		
 		synchronized (input) {
 			try {

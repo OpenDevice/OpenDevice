@@ -15,10 +15,8 @@ package br.com.criativasoft.opendevice.core.model;
 
 import br.com.criativasoft.opendevice.core.BaseDeviceManager;
 import br.com.criativasoft.opendevice.core.DeviceManager;
-import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.CommandType;
 import br.com.criativasoft.opendevice.core.command.DeviceCommand;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,6 +170,14 @@ public class Device implements Serializable {
     }
 
     /**
+     * Check if the value is LOW
+     * @return true if value > 0
+     */
+    public boolean isOFF(){
+        return getValue() == 0;
+    }
+
+    /**
      * Set value 1(HIGH).
      * shorthand call to setValue(HIGH)
      */
@@ -223,6 +229,10 @@ public class Device implements Serializable {
 	}
 
     public boolean addListener(DeviceListener e) {
+        return listeners.add(e);
+    }
+
+    public boolean onChange(DeviceListener e) {
         return listeners.add(e);
     }
 

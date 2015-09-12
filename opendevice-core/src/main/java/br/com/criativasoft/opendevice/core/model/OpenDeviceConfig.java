@@ -28,6 +28,8 @@ public class OpenDeviceConfig {
 
     private boolean supportTenants = false;
 
+    private boolean broadcastInputs = true;
+
     /**
      * Checks whether the support for multi-tenant is active. This setting should only be enabled when using the platform as a service.
      * @return if multi-tenant is active
@@ -42,5 +44,17 @@ public class OpenDeviceConfig {
         }
 
         return INSTANCE;
+    }
+
+    /**
+     * Sets whether to make the broadcast of a command {@link br.com.criativasoft.opendevice.core.command.DeviceCommand} received by an incoming connection to the other incoming connections
+     * @param broadcastInputs (Default = true)
+     */
+    public void setBroadcastInputs(boolean broadcastInputs) {
+        this.broadcastInputs = broadcastInputs;
+    }
+
+    public boolean isBroadcastInputs() {
+        return broadcastInputs;
     }
 }

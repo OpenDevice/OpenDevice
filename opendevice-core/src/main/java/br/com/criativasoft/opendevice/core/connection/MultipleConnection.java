@@ -20,7 +20,6 @@ import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.connection.serialize.MessageSerializer;
-import br.com.criativasoft.opendevice.core.command.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,10 +86,12 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 				try{
 					connection.connect();
 				}catch(IOException e){
-                    e.printStackTrace();
+					lastException = e;
 				}
 			}
 		}
+
+		if(lastException != null) throw new ConnectionException(lastException.getMessage(), lastException);
 		
 	}
 

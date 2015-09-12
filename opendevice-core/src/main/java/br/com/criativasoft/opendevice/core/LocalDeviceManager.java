@@ -15,6 +15,9 @@ package br.com.criativasoft.opendevice.core;
 
 import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.core.command.Command;
+import br.com.criativasoft.opendevice.core.connection.Connections;
+import br.com.criativasoft.opendevice.core.connection.InputContections;
+import br.com.criativasoft.opendevice.core.connection.OutputConnections;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.dao.memory.DeviceMemoryDao;
 import br.com.criativasoft.opendevice.core.model.Device;
@@ -23,7 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * TODO: PENDING DOC
@@ -38,6 +43,10 @@ public class LocalDeviceManager extends BaseDeviceManager {
     private String applicationID = OpenDeviceConfig.LOCAL_APP_ID;
 
     private Set<Device> runtimeDevices = new LinkedHashSet<Device>();
+
+    // Aliases to factory connections
+    protected OutputConnections out = Connections.out;
+    protected InputContections in = Connections.in;
 
     public void setApplicationID(String applicationID) {
         TenantProvider.setCurrentID(applicationID);
@@ -97,6 +106,15 @@ public class LocalDeviceManager extends BaseDeviceManager {
         runtimeDevices.add(device);
     }
 
+    /**
+     * Alias to {@link #findDeviceByUID(int)}
+     * @param deviceUID
+     * @return Device
+     */
+    public Device findDevice(int deviceUID) {
+        return findDeviceByUID(deviceUID);
+    }
+
     @Override
     public Device findDeviceByUID(int deviceUID) {
 
@@ -125,4 +143,65 @@ public class LocalDeviceManager extends BaseDeviceManager {
 
         return super.getValidDeviceDao();
     }
+
+    public static void main(String[] args) throws Exception {
+        launch(args);
+    }
+
+    public static void launch(String... args) {
+        // Figure out the right class to call
+        StackTraceElement[] cause = Thread.currentThread().getStackTrace();
+
+        boolean foundThisMethod = false;
+        String callingClassName = null;
+        for (StackTraceElement se : cause) {
+            // Skip entries until we get to the entry for this class
+            String className = se.getClassName();
+            String methodName = se.getMethodName();
+            // System.out.println("-className" + className + ", methodName: " + methodName);
+            if (foundThisMethod) {
+                callingClassName = className;
+                break;
+            } else if ("launch".equals(methodName)) {
+                foundThisMethod = true;
+            }
+        }
+
+        if (callingClassName == null) {
+            throw new RuntimeException("Error: unable to determine Application class");
+        }
+
+        try {
+            Class theClass = Class.forName(callingClassName, true,
+                    Thread.currentThread().getContextClassLoader());
+            if (LocalDeviceManager.class.isAssignableFrom(theClass)) {
+                Class<? extends LocalDeviceManager> appClass = theClass;
+                launchApplication(appClass, args);
+            } else {
+                throw new RuntimeException("Error: " + theClass + " is not a subclass of " + LocalDeviceManager.class.getName());
+            }
+        } catch (RuntimeException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public static void launchApplication(Class<? extends LocalDeviceManager> appClass, String... args) {
+        try {
+            appClass.newInstance().start();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void start() throws IOException {
+        log.info("Method start not implemented");
+    }
+
 }

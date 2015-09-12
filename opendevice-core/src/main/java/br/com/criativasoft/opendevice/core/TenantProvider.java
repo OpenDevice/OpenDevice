@@ -20,17 +20,25 @@ package br.com.criativasoft.opendevice.core;
  *
  * @author Ricardo JL Rufino on 05/10/14.
  */
-public class TenantProvider {
+public abstract class TenantProvider {
 
-    private static ThreadLocal<String> threadLocal = new ThreadLocal<String>();
+    private static TenantProvider provider = new LocalTenantProvider();
 
     public static final String HTTP_HEADER_KEY = "X-AppID";
 
+    public static void setProvider(TenantProvider provider) {
+        TenantProvider.provider = provider;
+    }
+
     public static synchronized void setCurrentID(String appID){
-        threadLocal.set(appID);
+        provider.setTenantID(appID);
     }
 
     public static String getCurrentID(){
-        return threadLocal.get();
+        return provider.getTenantID();
     }
+
+    public abstract void setTenantID(String appID);
+
+    public abstract String getTenantID();
 }

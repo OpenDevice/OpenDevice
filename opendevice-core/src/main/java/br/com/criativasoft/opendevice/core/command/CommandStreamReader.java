@@ -13,13 +13,12 @@
 
 package br.com.criativasoft.opendevice.core.command;
 
-import java.io.ByteArrayOutputStream;
-
+import br.com.criativasoft.opendevice.connection.message.Message;
+import br.com.criativasoft.opendevice.connection.serialize.DefaultSteamReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import br.com.criativasoft.opendevice.connection.message.Message;
-import br.com.criativasoft.opendevice.connection.serialize.DefaultSteamReader;
+import java.io.ByteArrayOutputStream;
 
 /**
  * Parser to convert byte[] into {@link Command}
@@ -50,9 +49,9 @@ public class CommandStreamReader extends DefaultSteamReader {
                 continue;
             } else if (checkEndOfMessage(read[i], inputBuffer)) {
                 byte[] array = inputBuffer.toByteArray();
-                
+
                 if(log.isTraceEnabled())log.trace("Command Data: " + new String(array));
-                
+
                 Message event = parse(array);
                 if(event != null){
                     notifyOnDataRead(event);

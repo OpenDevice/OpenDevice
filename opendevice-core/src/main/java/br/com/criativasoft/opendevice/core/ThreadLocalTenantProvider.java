@@ -11,22 +11,24 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.core.metamodel;
+package br.com.criativasoft.opendevice.core;
 
-public enum PeriodType {
+/**
+ * TODO: Add Docs
+ *
+ * @author Ricardo JL Rufino
+ * @date 29/08/15.
+ */
+public class ThreadLocalTenantProvider extends TenantProvider {
 
-    RECORDS(0), SECOND(13), MINUTE(12), HOUR(11), DAY(5), WEEK(4), MONTH(2), YEAR(1);
+    private static ThreadLocal<String> threadLocal = new ThreadLocal<String>();
 
-    PeriodType(int value) {
-        this.value = value;
+    public void setTenantID(String appID){
+        threadLocal.set(appID);
     }
 
-    int value;
-
-    /**
-     * @return java.util.Calendar Value
-     */
-    public int getValue() {
-        return value;
+    public String getTenantID(){
+        return threadLocal.get();
     }
+
 }

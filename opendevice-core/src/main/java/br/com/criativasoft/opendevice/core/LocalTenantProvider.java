@@ -11,22 +11,23 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.core.metamodel;
+package br.com.criativasoft.opendevice.core;
 
-public enum PeriodType {
+import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 
-    RECORDS(0), SECOND(13), MINUTE(12), HOUR(11), DAY(5), WEEK(4), MONTH(2), YEAR(1);
+/**
+ * Provider that is used for local applications without support muti-tenant
+ * @author Ricardo JL Rufino
+ * @date 29/08/15.
+ */
+public class LocalTenantProvider extends TenantProvider {
 
-    PeriodType(int value) {
-        this.value = value;
+    @Override
+    public void setTenantID(String appID) {
     }
 
-    int value;
-
-    /**
-     * @return java.util.Calendar Value
-     */
-    public int getValue() {
-        return value;
+    @Override
+    public String getTenantID() {
+        return OpenDeviceConfig.LOCAL_APP_ID;
     }
 }

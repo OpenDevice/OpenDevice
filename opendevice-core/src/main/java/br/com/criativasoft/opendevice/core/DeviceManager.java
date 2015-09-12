@@ -33,7 +33,7 @@ public interface DeviceManager extends ConnectionManager{
 
     public DeviceDao getDeviceDao();
 
-	public Collection<Device> getDevices() ;
+	public Collection<Device> getDevices();
 	
 	public Device findDeviceByUID(int deviceUID);
 

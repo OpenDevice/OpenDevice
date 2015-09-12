@@ -1,6 +1,7 @@
 package br.com.criativasoft.opendevice.core.connection;
 
 import br.com.criativasoft.opendevice.connection.IRestServerConnection;
+import br.com.criativasoft.opendevice.connection.ITcpServerConnection;
 import br.com.criativasoft.opendevice.connection.IWSServerConnection;
 
 import java.util.Iterator;
@@ -26,6 +27,12 @@ public class InputContections {
         return connection;
     }
 
+    public ITcpServerConnection tcp(int port){
+        ITcpServerConnection connection = load(ITcpServerConnection.class);
+        if(connection != null) connection.setPort(port);
+        return connection;
+    }
+
     private <T> T load(Class<T> klass){
 
         try{
@@ -34,7 +41,7 @@ public class InputContections {
             throw new RuntimeException("This java version don't support dynamic loading (ServiceLoader), you need use direct class ex: new BluetoothConnection(addr)");
         }
 
-        // lonkup....
+        // lockup....
         ServiceLoader<T> service = ServiceLoader.load(klass);
 
         Iterator<T> iterator = service.iterator();

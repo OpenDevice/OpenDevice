@@ -32,7 +32,6 @@ public class DeviceMemoryDao implements DeviceDao {
 
     private Map<String, List<Device>> deviceMap = new HashMap<String, List<Device>>();
 
-
     private List<Device> getCurrentDevices(){
 
         return deviceMap.get(TenantProvider.getCurrentID());

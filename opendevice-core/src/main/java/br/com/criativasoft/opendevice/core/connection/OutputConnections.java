@@ -75,7 +75,7 @@ public class OutputConnections {
             throw new RuntimeException("This java version don't support dynamic loading (ServiceLoader), you need use direct class ex: new BluetoothConnection(addr)");
         }
 
-        // lonkup....
+        // lockup....
         ServiceLoader<T> service = ServiceLoader.load(klass);
 
         Iterator<T> iterator = service.iterator();

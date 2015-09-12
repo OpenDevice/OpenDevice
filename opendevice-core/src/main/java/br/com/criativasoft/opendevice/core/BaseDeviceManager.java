@@ -20,10 +20,10 @@ import br.com.criativasoft.opendevice.core.command.*;
 import br.com.criativasoft.opendevice.core.connection.EmbeddedGPIO;
 import br.com.criativasoft.opendevice.core.connection.MultipleConnection;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
+import br.com.criativasoft.opendevice.core.event.EventHookManager;
 import br.com.criativasoft.opendevice.core.filter.CommandFilter;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.model.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,9 +39,11 @@ import java.util.*;
  */
 public abstract class BaseDeviceManager implements ConnectionListener, DeviceManager {
 
-    public static DeviceManager instance;
+    private static DeviceManager instance;
 	
 	private static final Logger log = LoggerFactory.getLogger(BaseDeviceManager.class);
+
+    private List<OpenDeviceExtension> extensions  = new LinkedList<OpenDeviceExtension>();
 	
 	/** Client connections: Websockets, http, rest, etc ...*/
 	private MultipleConnection inputConnections = new MultipleConnection();
@@ -53,6 +55,8 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
 	
 	private CommandDelivery delivery = new CommandDelivery(this);
 
+    private EventHookManager eventManager;
+
     private DeviceDao deviceDao;
 
     private Message lastMessage;
@@ -61,6 +65,37 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
 
     public BaseDeviceManager(){
         instance = this;
+        eventManager = new EventHookManager();
+        addListener(eventManager);
+
+        // Load Extensions
+        loadExtensions();
+
+    }
+
+    /**
+     * @see OpenDeviceExtension
+     */
+    protected void loadExtensions(){
+
+        try{
+            Class.forName("java.util.ServiceLoader");
+        }catch(ClassNotFoundException ex){
+            log.error("This java version don't support dynamic loading (ServiceLoader), you need use direct class ex: new BluetoothConnection(addr)");
+        }
+
+        // lockup....
+        ServiceLoader<OpenDeviceExtension> service = ServiceLoader.load(OpenDeviceExtension.class);
+
+        Iterator<OpenDeviceExtension> iterator = service.iterator();
+
+        if(iterator.hasNext()){
+            OpenDeviceExtension extension = iterator.next();
+            log.info("Loading Extension: " + extension.getName() + ", class: " + extension.getClass());
+            extension.init();
+            extensions.add(extension);
+        }
+
     }
 
     /**
@@ -69,6 +104,10 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
      */
     public static DeviceManager getInstance() {
         return instance;
+    }
+
+    public EventHookManager getEventManager() {
+        return eventManager;
     }
 
     @Override
@@ -127,14 +166,17 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
         filters.add(filter);
     }
 
+    public void onConnected(OnConnectListener e) {
+        addConnectionListener(e);
+    }
+
     public void addConnectionListener(ConnectionListener e) {
-        if(inputConnections.getSize() == 0 && outputConnections.getSize() == 0) throw new IllegalStateException("No connection to add listeners");
         if(inputConnections != null) inputConnections.addListener(e);
         if(outputConnections != null) outputConnections.addListener(e);
     }
 
     /**
-     * Notify All Listeners about received command.
+     * Notify All Listeners about device change
      */
     public void notifyListeners(Device device) {
 
@@ -229,6 +271,14 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
 		
 		if(inputConnections.getSize() == 0) initInputConnections();
 
+        if(connection instanceof StreamConnection){
+            StreamConnection streamConnection = (StreamConnection) connection;
+            if(! (streamConnection.getSerializer() instanceof CommandStreamSerializer)){
+                streamConnection.setSerializer(new CommandStreamSerializer()); // data conversion..
+                streamConnection.setStreamReader(new CommandStreamReader()); // data protocol..
+            }
+        }
+
         connection.setConnectionManager(this);
         connection.setApplicationID(TenantProvider.getCurrentID());
 		inputConnections.addConnection(connection);
@@ -268,6 +318,8 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
 
         Command command = (Command) message;
 
+        OpenDeviceConfig config = OpenDeviceConfig.get();
+
         if(command.getApplicationID() == null || command.getApplicationID().length() == 0){
             command.setApplicationID(connection.getApplicationID());
         }
@@ -305,8 +357,6 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
             if (device != null && device.getValue() != value) {
 
                 device.setValue(value);
-                notifyListeners(device);
-
             }
 
             // Se foi recebido pelo modulo físico(Bluetooth/USB/Wifi), não precisa ser gerenciado pelo CommandDelivery
@@ -325,14 +375,33 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
             // Comando recebido pelos clientes (WebSockets / Rest / etc...)
             // Ele deve ser enviado para o modulo físico, e monitorar a resposta.
             if (inputConnections != null && inputConnections.exist(connection)) {
-                    if(outputConnections.hasConnections()){
-                        log.debug("Sending to output connections...");
-                        try {
-                            sendTo(deviceCommand, outputConnections);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+
+                if(outputConnections.hasConnections()){
+                    log.debug("Sending to output connections...");
+                    try {
+                        sendTo(deviceCommand, outputConnections);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
+
+                if(config.isBroadcastInputs()){
+                    try {
+                        Set<DeviceConnection> inputs = inputConnections.getConnections();
+                        for (DeviceConnection input : inputs) {
+                            if(input != connection) inputConnections.send(deviceCommand);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else if (type == CommandType.PING) {
+
+            Command pingResponse = new SimpleCommand(CommandType.PING_RESPONSE, 0);
+            try {
+                connection.send(pingResponse);
+            } catch (IOException e) {
             }
 
         } else if (type == CommandType.GET_DEVICES) {
@@ -462,7 +531,7 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
      * @param millis
      * @see Thread#sleep(long)
      */
-    protected void delay(int millis){
+    public void delay(int millis){
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
@@ -476,6 +545,8 @@ public abstract class BaseDeviceManager implements ConnectionListener, DeviceMan
         public void onDeviceChanged(Device device) {
 
             try {
+
+                notifyListeners(device);
 
                 // Ignore changes fired in 'onMessageReceived'
                 if(lastMessage instanceof  DeviceCommand){

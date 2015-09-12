@@ -81,12 +81,16 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
             if(getConnectionURI() == null) setConnectionURI(getFirstAvailable());
 
 			String uri = getDeviceURLConnection();
+
+            if(uri == null) throw new ConnectionException("Bluetooth device not found or busy");
+
 			log.debug("Connecting to: " + uri);
 			connection = (StreamConnection) Connector.open(uri);
 		}
 	}
 	
 	public String getDeviceURLConnection(){
+        if(getConnectionURI() == null) return null;
 		return "btspp://"+getConnectionURI()+":1;authenticate=false;encrypt=false;master=false";
 	}
 

@@ -5,8 +5,6 @@
  * @type JavaScript
  */
 
-// Sensor de presença ativado
-// Quando alguem passar na sala a noite.
 
 print("RUNNING CODE for: " + testdesc);
 

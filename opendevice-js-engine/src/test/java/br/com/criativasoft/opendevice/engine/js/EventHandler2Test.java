@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.script.SimpleBindings;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
@@ -64,6 +65,8 @@ public class EventHandler2Test {
             if (device == led2 && device.isON()) System.out.println("manager led(2) change.... " + led2.getName());
         });
 
+        // Initialize
+        OpenDeviceJSEngine.run("print(\"Setup\")",  new SimpleBindings());
     }
 
 
@@ -91,9 +94,4 @@ public class EventHandler2Test {
 
     }
 
-    @Test
-    public void testTEste1() throws Exception {
-
-
-    }
 }

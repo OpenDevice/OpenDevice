@@ -11,20 +11,17 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.core.event;
+package no_unit;
 
+import br.com.criativasoft.opendevice.core.event.EventHook;
+import br.com.criativasoft.opendevice.core.event.EventHookManager;
 import br.com.criativasoft.opendevice.core.event.impl.JavaEventHandler;
 import br.com.criativasoft.opendevice.core.model.Device;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
 
-/**
- * TODO: Add Docs
- *
- * @author Ricardo JL Rufino
- * @date 28/08/15.
- */
+
 public class JavaEventHandlerTest extends TestCase {
 
     public void testExecute(){

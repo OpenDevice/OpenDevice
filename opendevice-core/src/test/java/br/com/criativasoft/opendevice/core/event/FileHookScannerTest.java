@@ -20,12 +20,6 @@ import java.net.URL;
 
 import static org.junit.Assert.*;
 
-/**
- * TODO: Add Docs
- *
- * @author Ricardo JL Rufino
- * @date 29/08/15.
- */
 public class FileHookScannerTest {
 
     private FileHookScanner scanner;

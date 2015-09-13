@@ -11,19 +11,15 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.core.event;
+package no_unit;
 
 import br.com.criativasoft.opendevice.core.dao.EventHookDao;
+import br.com.criativasoft.opendevice.core.event.EventHook;
 
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * TODO: Add Docs
- *
- * @author Ricardo JL Rufino
- * @date 28/08/15.
- */
+
 public class EventHookDaoFake implements EventHookDao {
 
     private EventHook hook;

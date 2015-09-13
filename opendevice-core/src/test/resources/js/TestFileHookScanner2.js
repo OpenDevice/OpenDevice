@@ -4,4 +4,5 @@
  * @description TestCase for EventHookTest
  * @type JavaScript
  */
-..... code .....
+
+// ..... code .....

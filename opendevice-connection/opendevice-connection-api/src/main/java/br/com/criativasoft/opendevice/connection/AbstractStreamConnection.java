@@ -169,7 +169,7 @@ public abstract class AbstractStreamConnection extends AbstractConnection implem
 	public void disconnect() throws ConnectionException {
 		try {
 			closeStreams();
-			getListeners().clear();
+			// getListeners().clear(); (not remove , this will break the system)
 			setStatus(ConnectionStatus.DISCONNECTED);
 		} catch (IOException e) {
 			throw new ConnectionException(e);

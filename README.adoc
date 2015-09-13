@@ -1,4 +1,4 @@
-image:https://buildhive.cloudbees.com/job/CriativaSoft/job/OpenDevice/badge/icon[]
+image:https://travis-ci.org/OpenDevice/OpenDevice.svg?branch=master[Status]
 
 == What is OpenDevice?
 

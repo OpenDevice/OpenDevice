@@ -21,12 +21,7 @@ import junit.framework.TestCase;
 
 import java.util.Arrays;
 
-/**
- * TODO: Add Docs
- *
- * @author Ricardo JL Rufino
- * @date 28/08/15.
- */
+
 public class SystemEventHandlerTest extends TestCase {
 
     public void testExecute(){

@@ -105,7 +105,7 @@ public class DefaultSteamReader implements Runnable, Cloneable, StreamReader {
 			} catch (Exception e) {
 				if(e.getMessage() != null && e.getMessage().contains("closed")){
 					try {
-						log.info("connection closed, forcing disconnect !");
+						log.info("Connection closed, forcing disconnect !");
 						this.connection.disconnect();
 					} catch (ConnectionException e1) {
 						throw new RuntimeException(e);

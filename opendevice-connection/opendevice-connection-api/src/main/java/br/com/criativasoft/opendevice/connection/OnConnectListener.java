@@ -16,8 +16,6 @@ package br.com.criativasoft.opendevice.connection;
 import br.com.criativasoft.opendevice.connection.message.Message;
 
 /**
- * TODO: Add Docs
- *
  * @author Ricardo JL Rufino
  * @date 23/08/15.
  */

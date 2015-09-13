@@ -14,6 +14,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <opendevice-version>0.1.2-SNAPSHOT</opendevice-version>
+        <skipTests>true</skipTests>
     </properties>
 
     <scm>

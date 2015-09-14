@@ -74,4 +74,5 @@ Contributions are 10,000% welcome. If you discover a bug or would like to propos
 
 To contribute, fork this repository and create a new topic branch for the bug, feature or other existing issue you are addressing. Submit the pull request against the master branch.
 
+Are you using the library? Let us know and add your project to https://github.com/OpenDevice/OpenDevice/wiki/Projects-Using-OpenDevice[List:Projects-Using-OpenDevice]
 

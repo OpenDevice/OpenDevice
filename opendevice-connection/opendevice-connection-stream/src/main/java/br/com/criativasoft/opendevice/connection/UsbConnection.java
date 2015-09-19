@@ -15,7 +15,6 @@ package br.com.criativasoft.opendevice.connection;
 
 
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
-import br.com.criativasoft.opendevice.connection.serialize.DefaultSteamReader;
 import jssc.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +54,8 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
 	// ===============================================
 	
 	private SerialPort serialPort;
+
+    private boolean automaticPort = false;
 	
     /**
      * Create a usb connection with physical device on first available port (@{link #getFirstAvailable})
@@ -106,6 +107,8 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
             if(deviceURI == null) throw new ConnectionException("Serial port name is NULL ! (It's busy , not have access or not found)");
 
             serialPort = new SerialPort(deviceURI);
+
+            automaticPort = true;
 		}
 
 		try {
@@ -158,6 +161,8 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
             } finally {
                 super.disconnect();
             }
+
+            if(automaticPort) deviceURI = null;
             setStatus(ConnectionStatus.DISCONNECTED);
         }
     }

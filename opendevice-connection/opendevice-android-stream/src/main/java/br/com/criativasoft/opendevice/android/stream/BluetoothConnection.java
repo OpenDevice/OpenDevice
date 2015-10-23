@@ -20,23 +20,20 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
-
-import android.os.Build;
+import android.provider.Settings;
 import br.com.criativasoft.opendevice.android.AndroidContextSupport;
+import br.com.criativasoft.opendevice.connection.AbstractStreamConnection;
+import br.com.criativasoft.opendevice.connection.ConnectionStatus;
 import br.com.criativasoft.opendevice.connection.IBluetoothConnection;
+import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
+import br.com.criativasoft.opendevice.connection.serialize.DefaultSteamReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.UUID;
-
-import br.com.criativasoft.opendevice.connection.AbstractStreamConnection;
-import br.com.criativasoft.opendevice.connection.ConnectionStatus;
-import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
-import br.com.criativasoft.opendevice.connection.serialize.DefaultSteamReader;
 
 
 /**
@@ -71,131 +68,39 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
     @Override
     public void connect() throws ConnectionException {
 
-        if(bluetoothAdapter == null) bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        bluetoothAdapter = getBluetoothAdapter();
 
         if (!isConnected()) {
-            ConnectThread connectThread = new ConnectThread(getBluetoothDevice());
-            connectThread.start();
-        }
 
-    }
-
-    public void connect2() throws ConnectionException {
-
-        try {
-
-            if(!isConnected()){
-
-                if(bluetoothAdapter == null) bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-                // try enable bluetooth.
-                if (!bluetoothAdapter.isEnabled()) {
-
-                    if(context != null){
-//                        ActivityManager am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
-//                        List<ActivityManager.RunningTaskInfo> runningTasks = am.getRunningTasks(1);
-//                        if(!runningTasks.isEmpty()){
-//                            ComponentName cn = runningTasks.get(0).topActivity;
-//                             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//                        }
-
-                        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                        context.startActivity(enableBtIntent);
-                        // startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-                    }
-
-
-                }
-
-                log.info("Connecting to: " + getConnectionURI());
-
-                initConnection(); // Setup
-
-                // Make a connection to the BluetoothSocket
-                try {
-
-                    // Always cancel discovery because it will slow down a connection
-                    bluetoothAdapter.cancelDiscovery();
-
-                    // This is a blocking call and will only return on a successful connection or an exception
-                    connection.connect();
-
-                    log.debug("Conected !");
-
-                } catch (IOException e) {
-
-                    log.error("Connection Error: " + e.getMessage(), e);
-
-                    // Close the socket
-                    try {
-                        connection.close();
-                    } catch (IOException e2) {
-                        log.error("unable to close() socket during connection failure", e2);
-                    }
-                    setStatus(ConnectionStatus.FAIL);
-
-                    connection = null;
-                    throw new ConnectionException(e);
-                }
-
-                // open the streams
-                setInput(connection.getInputStream());
-                setOutput(connection.getOutputStream());
-
-                getStreamReader().setInput(input);
-
-                if(reader instanceof DefaultSteamReader){
-                    ((DefaultSteamReader)reader).startReading();
-                }
-
-                setStatus(ConnectionStatus.CONNECTED);
+            // try enable bluetooth.
+            if (!bluetoothAdapter.isEnabled()) {
+                bluetoothAdapter.enable();
             }
 
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-            throw new ConnectionException(e.getMessage());
-        }
-
-    }
-
-
-    private void initConnection() throws IOException{
-
-        if(connection == null){
-
-            // If no URL specified , find first device available
-            if(getConnectionURI() == null) setConnectionURI(getFirstAvailable());
-
-            BluetoothDevice device = getBluetoothDevice();
-
-            // Get a BluetoothSocket for a connection with the given BluetoothDevice
-            try {
-
-//                boolean withSdp = device.fetchUuidsWithSdp();
-//                UUID uuid;
-//                if(withSdp && device.getUuids() != null){
-//                    uuid = device.getUuids()[0].getUuid();
-//                }else{
-//                    uuid = SPP_UUID;
-//                }
-
-                //connection = device.createRfcommSocketToServiceRecord(UUID_SPP);
-                // connection = device.createRfcommSocketToServiceRecord(UUID_SPP);
-
-                // for galaxy tab 2 with:bxabyyyyyyyxxxxb
-                Method m = device.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
-                connection = (BluetoothSocket) m.invoke(device, 1);
-
-                log.info("Internal Socket (insecure) : " + connection);
-
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                throw new ConnectionException(e);
+            // Check paired
+            if(!isPaired()){
+                Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            }else{
+                ConnectThread connectThread = new ConnectThread(getBluetoothDevice());
+                connectThread.start();
             }
-
-
         }
+
     }
+
+    public boolean isPaired(){
+//        Set<BluetoothDevice> bondedDevices = getBluetoothAdapter().getBondedDevices();
+//        boolean paired = false;
+//        for (BluetoothDevice device : bondedDevices) {
+//            if(device.getAddress().equals(getConnectionURI())){
+//                paired = true;
+//            }
+//        }
+        return getBluetoothDevice().getBondState() == BluetoothDevice.BOND_BONDED;
+    }
+
 
     @Override
     public boolean isConnected() {
@@ -233,6 +138,15 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
         return bluetoothAdapter.getRemoteDevice(getConnectionURI());
     }
 
+    public BluetoothAdapter getBluetoothAdapter(){
+
+        if(bluetoothAdapter == null) {
+            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        }
+
+        return bluetoothAdapter;
+    }
+
     /**
      * Returns the first available bluetooth device
      * @return If none is available returns NULL
@@ -259,7 +173,7 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
             // Get a BluetoothSocket for a connection with the
             // given BluetoothDevice
             try {
-                log.trace("Creating connection scoket to: " + device);
+                log.trace("Creating connection socket to: " + device);
 
                 Method m = device.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
                 tmp = (BluetoothSocket) m.invoke(device, 1);
@@ -280,6 +194,9 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
 
             // Make a connection to the BluetoothSocket
             try {
+
+                if(bluetoothAdapter.isEnabled())
+
                 // This is a blocking call and will only return on a
                 // successful connection or an exception
                 mmSocket.connect();

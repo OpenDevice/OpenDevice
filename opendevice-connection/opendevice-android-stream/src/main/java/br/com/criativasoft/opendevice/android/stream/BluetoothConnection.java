@@ -91,13 +91,6 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
     }
 
     public boolean isPaired(){
-//        Set<BluetoothDevice> bondedDevices = getBluetoothAdapter().getBondedDevices();
-//        boolean paired = false;
-//        for (BluetoothDevice device : bondedDevices) {
-//            if(device.getAddress().equals(getConnectionURI())){
-//                paired = true;
-//            }
-//        }
         return getBluetoothDevice().getBondState() == BluetoothDevice.BOND_BONDED;
     }
 

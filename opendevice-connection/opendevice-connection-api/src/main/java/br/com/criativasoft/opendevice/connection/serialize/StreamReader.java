@@ -27,7 +27,7 @@ public interface StreamReader {
 	
 	public void setInput(InputStream input);
 	
-	public void processPacketRead(byte read[]);
+	public void processPacketRead(byte read[], int length);
 	
 	public void checkDataAvailable();
 	

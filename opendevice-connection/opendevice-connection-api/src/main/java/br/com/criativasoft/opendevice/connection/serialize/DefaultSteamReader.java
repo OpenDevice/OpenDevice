@@ -78,6 +78,8 @@ public class DefaultSteamReader implements Runnable, Cloneable, StreamReader {
 	public void startReading(){
 		if(readingThread == null || ! readingThread.isAlive()){
 			readingThread = new Thread(this);
+            readingThread.setName("Conn:" +connection.getConnectionURI());
+            readingThread.setDaemon(true);
 			readingThread.start();
 		}
 	}
@@ -94,14 +96,12 @@ public class DefaultSteamReader implements Runnable, Cloneable, StreamReader {
 	 * Método chamado pela connection informando que deve ser lido os dados da serial
 	 */
 	public void checkDataAvailable() {
-		
+
 		synchronized (input) {
 			try {
-				int available = input.available();
-				if(available == 0) return;
-				byte chunk[] = new byte[available];
-				int count = input.read(chunk, 0, available);
-				if(count > 0) processPacketRead(chunk);
+				byte chunk[] = new byte[128];
+				int count = input.read(chunk);
+				if(count > 0) processPacketRead(chunk, count);
 			} catch (Exception e) {
 				if(e.getMessage() != null && e.getMessage().contains("closed")){
 					try {
@@ -118,12 +118,12 @@ public class DefaultSteamReader implements Runnable, Cloneable, StreamReader {
 
 	}
 	
-	public void processPacketRead(byte read[]){
+	public void processPacketRead(byte read[], int length){
         if(log.isTraceEnabled()) {
             log.trace("processPacketRead: " + new String(read) + " (size: " + read.length + ")");
         }
 		
-		for (int i = 0; i < read.length; i++) {
+		for (int i = 0; i < length; i++) {
 			// Quebra de linha, processar comandos
 			if (checkEndOfMessage(read[i], inputBuffer)) {
 				byte[] array = inputBuffer.toByteArray();

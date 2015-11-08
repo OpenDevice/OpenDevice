@@ -13,6 +13,8 @@
 
 package br.com.criativasoft.opendevice.connection;
 
+import br.com.criativasoft.opendevice.connection.discovery.DiscoveryService;
+import br.com.criativasoft.opendevice.connection.discovery.NetworkDeviceInfo;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.serialize.DefaultSteamReader;
 import org.slf4j.Logger;
@@ -20,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Set;
 
 /**
  * TCP Socket bases connection
@@ -27,8 +30,12 @@ import java.net.Socket;
 public class TCPConnection extends AbstractStreamConnection implements ITcpConnection{
 	
 	private static final Logger log = LoggerFactory.getLogger(TCPConnection.class);
-	
+
+	public static final long DISCOVERY_TIMEOUT = 5000;
+
     private Socket connection;
+
+    private DiscoveryService discoveryService;
 
     public TCPConnection() {
         super();
@@ -50,7 +57,7 @@ public class TCPConnection extends AbstractStreamConnection implements ITcpConne
 			if(!isConnected()){
 				
 				initConnection(); // Setup
-			
+
 				// open the streams
 				setInput(connection.getInputStream());
 				setOutput(connection.getOutputStream());
@@ -74,20 +81,36 @@ public class TCPConnection extends AbstractStreamConnection implements ITcpConne
 	private void initConnection() throws IOException{
 		if(connection == null){
 
-            int index = deviceURI.lastIndexOf(":");
-            String port = (index > 0 ?  deviceURI.substring(index + 1, deviceURI.length()) : "80");
-            String host = deviceURI.substring(0, index);
+            String fdeviceURI = this.deviceURI;
 
-            log.debug("Connecting to: " + deviceURI + ", port:" + port);
+            // Automatic discovery
+			if(fdeviceURI.endsWith("local.opendevice")){
+				int indexOf = fdeviceURI.indexOf(".local.opendevice");
+				Set<NetworkDeviceInfo> devices = discoveryService.scan(DISCOVERY_TIMEOUT, fdeviceURI.substring(0, indexOf));
+                if(devices.size() > 0){
+                    NetworkDeviceInfo info = devices.iterator().next();
+                    fdeviceURI = info.getIp() + ":" + info.getPort();
+                }
+			}
+
+            int index = fdeviceURI.lastIndexOf(":");
+            String port = (index > 0 ?  fdeviceURI.substring(index + 1, fdeviceURI.length()) : "80");
+            String host = fdeviceURI.substring(0, index);
+
+            log.debug("Connecting to: " + fdeviceURI + ", port:" + port);
 
             connection = new Socket(host, Integer.parseInt(port));
 
 			log.debug("Connectend !");
 		}
 	}
-	
 
-	public String getDeviceURI() {
+    @Override
+    public void setDiscoveryService(DiscoveryService discoveryService) {
+        this.discoveryService = discoveryService;
+    }
+
+    public String getDeviceURI() {
 		return deviceURI;
 	}
 

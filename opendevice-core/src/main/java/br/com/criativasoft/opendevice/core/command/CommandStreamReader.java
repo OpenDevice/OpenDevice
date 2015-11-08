@@ -32,21 +32,20 @@ public class CommandStreamReader extends DefaultSteamReader {
 
     @Override
     protected boolean checkEndOfMessage(byte lastByte,ByteArrayOutputStream readBuffer) {
-        return lastByte == Command.ACK_FLAG;
+        return lastByte == Command.ACK_FLAG || lastByte == '\n';
     }
 
-    public void processPacketRead(byte read[]){
+    public void processPacketRead(byte read[], int length){
 
         if(log.isTraceEnabled()) {
-            log.trace("processPacketRead: " + new String(read) + ", size: " + read.length);
+            log.trace("processPacketRead: " + new String(read, length) + ", size: " + length);
         }
 
-        for (int i = 0; i < read.length; i++) {
+        for (int i = 0; i < length; i++) {
 
             // NOTE: Start bit is equals to the SEPARATOR
             if(read[i] == Command.START_FLAG && !processing){
                 processing = true;
-                continue;
             } else if (checkEndOfMessage(read[i], inputBuffer)) {
                 byte[] array = inputBuffer.toByteArray();
 

@@ -190,7 +190,7 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
             byte[] data;
             try {
                 data = serialPort.readBytes(event.getEventValue());
-                getStreamReader().processPacketRead(data);
+                getStreamReader().processPacketRead(data, data.length);
             } catch (SerialPortException e) {
                 log.error(e.getMessage(), e);
                 throw new RuntimeException(e);

@@ -134,8 +134,13 @@ public abstract class AbstractStreamConnection extends AbstractConnection implem
             return;
         }
 
-		output.write(value);
-		output.flush();	
+		try{
+			output.write(value);
+			output.flush();
+		}catch (IOException ex){
+			disconnect();
+			throw ex;
+		}
 	}
 	
 	@Override

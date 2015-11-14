@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Set;
 
@@ -99,7 +100,8 @@ public class TCPConnection extends AbstractStreamConnection implements ITcpConne
 
             log.debug("Connecting to: " + fdeviceURI + ", port:" + port);
 
-            connection = new Socket(host, Integer.parseInt(port));
+            connection = new Socket();
+            connection.connect(new InetSocketAddress(host, Integer.parseInt(port)), 5000);
 
 			log.debug("Connectend !");
 		}

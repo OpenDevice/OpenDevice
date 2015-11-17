@@ -54,10 +54,11 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
         $(function(){
 
             $dashboards = $('.dashboards');
+            ODev.connect();
 
         });
 
-        OpenDevice.connect(function(devices){
+        ODev.onConnect(function(devices){
             //var list = devices.filter(function(obj) {
             //    return obj.type == od.DeviceType.DIGITAL;
             //});
@@ -65,7 +66,7 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
         });
 
 
-        OpenDevice.onDeviceChange(function(device){
+        ODev.onChange(function(device){
             if(device) {
                 if (device.type == od.DeviceType.DIGITAL) {
                     playSound(device);
@@ -77,7 +78,7 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
             }
         });
 
-        OpenDevice.on(od.Event.DEVICE_LIST_UPDATE, function(devices){
+        ODev.on(od.Event.DEVICE_LIST_UPDATE, function(devices){
             _this.devices = devices;
         });
 

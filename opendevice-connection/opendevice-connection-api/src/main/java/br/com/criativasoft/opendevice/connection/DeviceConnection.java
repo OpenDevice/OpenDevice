@@ -34,7 +34,13 @@ public interface DeviceConnection {
 	public boolean isConnected();
 	
 	public ConnectionStatus getStatus();
-	
+
+	/**
+	 * Send a command to connection.</br>
+	 * Is not recommended direct call to this method, it should be done by DeviceManager.
+	 * @param message
+	 * @throws IOException
+	 */
 	public void send(Message message) throws IOException;
 	
 	public boolean addListener(ConnectionListener listener);

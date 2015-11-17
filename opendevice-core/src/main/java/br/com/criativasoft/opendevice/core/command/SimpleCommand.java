@@ -20,8 +20,8 @@ public class SimpleCommand extends Command {
         return value;
     }
 
-        /**@see br.com.criativasoft.opendevice.core.command.CommandType#isDeviceCommand(CommandType) */
-    public static final boolean isCompatible(CommandType type){
+    /**@see br.com.criativasoft.opendevice.core.command.CommandType#isDeviceCommand(CommandType) */
+    public static boolean isCompatible(CommandType type){
         return CommandType.isSimpleCommand(type);
     }
     

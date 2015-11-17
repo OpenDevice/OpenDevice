@@ -13,7 +13,6 @@
 
 package br.com.criativasoft.opendevice.core.command;
 
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.UUID;
 
 
@@ -21,7 +20,11 @@ import java.util.UUID;
 public class ResponseCommand extends Command {
 	
 	private static final long serialVersionUID = 1891204618345540528L;
-	
+
+    public ResponseCommand(CommandType type) {
+        super(type);
+    }
+
     public ResponseCommand(){
         super(CommandType.DEVICE_COMMAND_RESPONSE);
     }

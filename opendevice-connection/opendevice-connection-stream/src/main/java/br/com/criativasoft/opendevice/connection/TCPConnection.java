@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.NoRouteToHostException;
 import java.net.Socket;
 import java.util.Set;
 
@@ -91,7 +92,9 @@ public class TCPConnection extends AbstractStreamConnection implements ITcpConne
                 if(devices.size() > 0){
                     NetworkDeviceInfo info = devices.iterator().next();
                     fdeviceURI = info.getIp() + ":" + info.getPort();
-                }
+                }else{
+					throw new NoRouteToHostException("Can't find device");
+				}
 			}
 
             int index = fdeviceURI.lastIndexOf(":");

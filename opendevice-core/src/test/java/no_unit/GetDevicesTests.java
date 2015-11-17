@@ -19,7 +19,6 @@ import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.core.LocalDeviceManager;
 import br.com.criativasoft.opendevice.core.command.Command;
-import br.com.criativasoft.opendevice.core.command.GetDevicesRequest;
 import br.com.criativasoft.opendevice.core.command.GetDevicesResponse;
 
 import java.io.IOException;
@@ -43,7 +42,8 @@ public class GetDevicesTests extends LocalDeviceManager implements ConnectionLis
 
         addConnectionListener(this);
 
-        connect(out.bluetooth("00:11:06:14:04:57"));
+        connect(out.usb());
+//        connect(out.bluetooth("00:11:06:14:04:57"));
 
     }
 
@@ -56,7 +56,6 @@ public class GetDevicesTests extends LocalDeviceManager implements ConnectionLis
                 @Override
                 public void run() {
                     try {
-                        send(new GetDevicesRequest());
                         count.incrementAndGet();
                         delay(500);
                         disconnect();

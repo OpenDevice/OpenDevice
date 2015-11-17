@@ -14,10 +14,11 @@
 package br.com.criativasoft.opendevice.core.command;
 
 import br.com.criativasoft.opendevice.core.model.Device;
+import br.com.criativasoft.opendevice.core.model.Sensor;
 
 import java.util.Collection;
 
-public class GetDevicesResponse extends ResponseCommand {
+public class GetDevicesResponse extends ResponseCommand implements ExtendedCommand {
 
 	public static final CommandType TYPE = CommandType.GET_DEVICES_RESPONSE;
 
@@ -34,4 +35,39 @@ public class GetDevicesResponse extends ResponseCommand {
 		return devices;
 	}
 
+	@Override
+	public void deserializeExtraData(String extradata) {
+
+	}
+
+	@Override
+	public String serializeExtraData() {
+		StringBuffer sb = new StringBuffer();
+        // [ID, PIN, VALUE, TARGET, SENSOR?, TYPE]
+
+        sb.append(devices.size());
+        sb.append(Command.DELIMITER);
+
+        for (Device device : devices) {
+            sb.append("[");
+            sb.append(device.getId()).append(",");
+            if(device.getGpio() != null){
+                sb.append(device.getGpio().getPin()).append(",");
+            }else {
+                sb.append(0).append(",");
+            }
+            sb.append(device.getValue()).append(",");
+            sb.append(-1).append(",");
+            sb.append((device instanceof Sensor ? 1 : 0)).append(",");
+            sb.append(device.getType().getCode());
+            sb.append("]");
+            sb.append(";");
+        }
+
+        if(! devices.isEmpty()){
+            sb.deleteCharAt(sb.length()-1);
+        }
+
+		return sb.toString();
+	}
 }

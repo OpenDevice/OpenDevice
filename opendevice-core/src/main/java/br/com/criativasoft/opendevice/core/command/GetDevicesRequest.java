@@ -66,4 +66,6 @@ public class GetDevicesRequest extends Command implements Request {
     public boolean isForceSync() {
         return forceSync;
     }
+
 }
+

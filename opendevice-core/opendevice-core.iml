@@ -16,6 +16,10 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.3.3" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.3.0" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.3.3" level="project" />
+    <orderEntry type="module" module-name="opendevice-connection-stream" scope="TEST" />
+    <orderEntry type="library" scope="TEST" name="Maven: br.com.criativasoft.opendevice.ext:bluecove:2.1.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: br.com.criativasoft.opendevice.ext:bluecove-gpl:2.1.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.scream3r:jssc:2.8.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: ch.qos.logback:logback-classic:1.0.13" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: ch.qos.logback:logback-core:1.0.13" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-core:2.0.31-beta" level="project" />

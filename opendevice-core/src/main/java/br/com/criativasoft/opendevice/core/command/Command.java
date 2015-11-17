@@ -23,7 +23,9 @@ import java.util.UUID;
  * @date 04/09/2011 13:48:57
  */
 public abstract class Command implements Message{
-	
+
+    public static int DEFAULT_TIMEOUT = 3000;
+
     public static final char START_FLAG = '/';
     public static final char ACK_FLAG = '\r';
     public static final char DELIMITER_FLAG = '/'; // used to separate data strings
@@ -38,7 +40,9 @@ public abstract class Command implements Message{
 	
 	private CommandType type;
 	private Date timestamp;
+	private int timeout = DEFAULT_TIMEOUT;
 	private CommandStatus status = CommandStatus.CREATED;
+    private ResponseCommand response;
 
     public Command() {
         this(CommandType.DIGITAL, UUID.randomUUID().toString(), null);
@@ -111,6 +115,41 @@ public abstract class Command implements Message{
 
     public int getTrackingID() {
         return trackingID;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
+
+    public void setResponse(ResponseCommand response) {
+        this.response = response;
+    }
+
+    /**
+     * Returns the response associated with the command. By default commands are executed in asynchronous way,
+     * and managed by {@link br.com.criativasoft.opendevice.core.CommandDelivery}, this method will force the synchronous mode (using a timeout).
+     * @param <T>
+     * @return
+     */
+    public <T> T getResponse() {
+
+        if(response == null){
+            try {
+                synchronized(this) {
+                    this.wait(this.getTimeout() + 100);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return (T) response;
     }
 
     @Override

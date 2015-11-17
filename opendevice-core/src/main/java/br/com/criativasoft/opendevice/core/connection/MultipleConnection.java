@@ -165,7 +165,7 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 	public <T> T getConnection(Class<T> klass){
 		for (DeviceConnection connection : connections) {
 
-			if(connection.getClass().equals(klass)){
+			if(connection.getClass().equals(klass) || klass.isAssignableFrom(connection.getClass())){
 				return (T) connection;
 			}
 			

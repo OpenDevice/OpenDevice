@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -90,7 +89,35 @@ public abstract class AbstractConnection implements DeviceConnection {
 
         }
 	}
-	
+
+    public boolean tryReconnect(int times, long interval){
+
+        if(isConnected()) return true;
+
+        try{
+
+            log.debug("try reconnect["+times+"] ...");
+
+            connect();
+
+            return isConnected();
+
+        }catch (Exception ex){
+            times--;
+
+            try {
+                Thread.sleep(interval);
+            } catch (InterruptedException e) {}
+
+            if(times == 0) return false;
+
+            tryReconnect(times, interval);
+
+        }
+
+        return false;
+    }
+
 	protected boolean hasListeners(){
 		return ! listeners.isEmpty();
 	}

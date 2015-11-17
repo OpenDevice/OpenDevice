@@ -18,6 +18,7 @@ import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.CommandStatus;
 import br.com.criativasoft.opendevice.core.command.ResponseCommand;
+import br.com.criativasoft.opendevice.core.connection.MultipleConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,9 +49,7 @@ public class CommandDelivery implements ConnectionListener {
 	
 	public static int MAX_CMD_COUNT = 9999;
 	
-	/** Timeout in miliseconds */
-	public static int MAX_TIMEOUT = 3000;
-	
+
 	public CommandDelivery(DeviceManager manager) {
 		super();
 		this.manager = manager;
@@ -65,7 +64,12 @@ public class CommandDelivery implements ConnectionListener {
 		
 		command.setStatus(CommandStatus.DELIVERED);
 
-        if(connection instanceof StreamConnection && !(command instanceof ResponseCommand)){
+        if(connection instanceof MultipleConnection){
+            Set<DeviceConnection> connections = ((MultipleConnection) connection).getConnections();
+            for (DeviceConnection deviceConnection : connections) {
+                sendTo(command, deviceConnection);
+            }
+        }else if(connection instanceof StreamConnection && !(command instanceof ResponseCommand)){
             sendWithTimeout(command, connection);
         }else{
             connection.send(command);
@@ -106,7 +110,11 @@ public class CommandDelivery implements ConnectionListener {
 		return id;
 	}
 
-	private void sendWithTimeout(Command command, DeviceConnection connection){
+    public AtomicInteger getCmdCount() {
+        return cmdCount;
+    }
+
+    private void sendWithTimeout(Command command, DeviceConnection connection){
 
         if(!connection.isConnected()){
             log.warn(connection.getClass().getSimpleName() + " not Connected!");
@@ -134,14 +142,13 @@ public class CommandDelivery implements ConnectionListener {
 	
 	private class SendTask implements Runnable, ConnectionListener{
 		
-		private Command command;
+		private final Command command;
 		private DeviceConnection connection;
         private CommandDelivery commandDelivery;
 
         private int originalID;
 		private int newID;
 		
-		private final Object lock = new Object();
         private long start;
 
         public SendTask(Command command, DeviceConnection connection, CommandDelivery commandDelivery) {
@@ -154,10 +161,6 @@ public class CommandDelivery implements ConnectionListener {
 		public Command getCommand() {
 			return command;
 		}
-		
-		public DeviceConnection getConnection() {
-			return connection;
-		}
 
         @Override
         public void run() {
@@ -167,14 +170,14 @@ public class CommandDelivery implements ConnectionListener {
 
             command.setTrackingID(newID);
 
-            log.debug("Send and Wait :: SEQ <" + this.newID + ">:"+command.getType()+", UID: "+command.getUid());
+            log.debug("Send and Wait :: "+command.getType() + ", ID:<" + this.newID + ">");
 
             try {
 
                 start = System.currentTimeMillis();
                 connection.send(command);
-                synchronized(lock){
-                    lock.wait(MAX_TIMEOUT);
+                synchronized(command){
+                    command.wait(command.getTimeout());
                 }
 
                 // If not received response...
@@ -199,8 +202,8 @@ public class CommandDelivery implements ConnectionListener {
 		 */
 		public void restoreComand(){
 			
-			synchronized(lock){
-				lock.notifyAll();
+			synchronized(command){
+                command.notifyAll();
 			}
 
             command.setStatus(CommandStatus.SUCCESS);
@@ -210,26 +213,25 @@ public class CommandDelivery implements ConnectionListener {
 		@Override
         public void onMessageReceived(Message message, DeviceConnection connection) {
 
-            if(!(message instanceof Command)){
+            if(!(message instanceof ResponseCommand)){
                 return;
             }
 
-            Command received = (Command) message;
+            ResponseCommand received = (ResponseCommand) message;
 
-			if(received instanceof ResponseCommand){
+            int requestUID = received.getTrackingID();
 
-				int requestUID = received.getTrackingID();
+            if(requestUID == this.newID){
 
-				if(requestUID == this.newID){
+                long time = System.currentTimeMillis() - start;
+                log.debug("Response received ("+received.getStatus()+") :: ID:<" + this.newID + "> , time: " + time + "ms");
 
-                    long time = System.currentTimeMillis() - start;
-					log.debug("Response received :: SEQ:<" + this.newID + "> , time: " + time + "ms");
+                command.setResponse(received);
 
-					restoreComand(); // release lock and restore ID
+                restoreComand(); // release lock and restore ID
 
-				}
+            }
 
-			}
 
 		}
 		

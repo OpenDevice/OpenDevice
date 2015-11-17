@@ -1,9 +1,9 @@
 package br.com.criativasoft.opendevice.core.connection;
 
 import br.com.criativasoft.opendevice.connection.*;
+import br.com.criativasoft.opendevice.core.BaseDeviceManager;
 import br.com.criativasoft.opendevice.core.command.CommandStreamReader;
 import br.com.criativasoft.opendevice.core.command.CommandStreamSerializer;
-import br.com.criativasoft.opendevice.core.model.Device;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -19,7 +19,7 @@ public class OutputConnections {
     /**
      * Create a USB connection with first serial port available
      */
-    public IUsbConnection usb(){
+    public <T extends DeviceConnection> T  usb(){
         return usb(null);
     }
 
@@ -27,17 +27,17 @@ public class OutputConnections {
      * Create a USB connection.
      * @param port - The serial port like: "COM3", "/dev/ttyUSB0", "/dev/ttyACM0"
      */
-    public IUsbConnection usb(String port){
+    public <T extends DeviceConnection> T  usb(String port){
         IUsbConnection connection = load(IUsbConnection.class);
         if(connection != null) connection.setConnectionURI(port);
-        return connection;
+        return (T) connection;
     }
 
     /**
      * Create a bluetooth connection with first device available. <br/>
      * Do not forget that you must pair with the PC first.
      */
-    public IBluetoothConnection bluetooth(){
+    public <T extends DeviceConnection> T  bluetooth(){
         return bluetooth(null);
     }
 
@@ -47,27 +47,32 @@ public class OutputConnections {
      * Do not forget that you must pair with the PC first.
      * @param uri bluetooth address:
      */
-    public IBluetoothConnection bluetooth(String uri){
+    public <T extends DeviceConnection> T  bluetooth(String uri){
         IBluetoothConnection connection = load(IBluetoothConnection.class);
         if(connection != null) connection.setConnectionURI(uri);
-        return connection;
+        return (T) connection;
     }
 
-    public DeviceConnection tcp(String address){
+    public <T extends DeviceConnection> T tcp(String address){
         ITcpConnection connection = load(ITcpConnection.class);
-        if(connection != null) connection.setConnectionURI(address);
-        return connection;
+        if(connection != null){
+            BaseDeviceManager deviceManager = (BaseDeviceManager) BaseDeviceManager.getInstance();
+            if(deviceManager != null){
+                connection.setDiscoveryService(deviceManager.getDiscoveryService());
+            }
+            connection.setConnectionURI(address);
+        }
+        return (T) connection;
     }
 
-    public DeviceConnection websocket(String address){
+    public <T extends DeviceConnection> T  websocket(String address){
         IWSConnection connection = load(IWSConnection.class);
         if(connection != null) connection.setConnectionURI(address);
-        return connection;
+        return (T) connection;
     }
 
 
     private <T> T load(Class<T> klass){
-
 
         try{
             Class.forName("java.util.ServiceLoader");

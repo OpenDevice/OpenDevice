@@ -157,7 +157,7 @@
         </profile>
 
         <profile>
-            <id>binary</id>
+            <id>windows</id>
             <build>
                 <plugins>
                      <plugin>

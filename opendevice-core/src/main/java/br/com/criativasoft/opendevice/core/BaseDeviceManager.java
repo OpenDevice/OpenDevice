@@ -14,12 +14,14 @@
 package br.com.criativasoft.opendevice.core;
 
 import br.com.criativasoft.opendevice.connection.*;
+import br.com.criativasoft.opendevice.connection.discovery.DiscoveryService;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.core.command.*;
 import br.com.criativasoft.opendevice.core.connection.EmbeddedGPIO;
 import br.com.criativasoft.opendevice.core.connection.MultipleConnection;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
+import br.com.criativasoft.opendevice.core.discovery.DiscoveryServiceImpl;
 import br.com.criativasoft.opendevice.core.event.EventHookManager;
 import br.com.criativasoft.opendevice.core.filter.CommandFilter;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
@@ -54,6 +56,8 @@ public abstract class BaseDeviceManager implements DeviceManager {
     private Set<CommandFilter> filters = new LinkedHashSet<CommandFilter>();
 	
 	private CommandDelivery delivery = new CommandDelivery(this);
+
+    private DiscoveryService discoveryService = new DiscoveryServiceImpl();
 
     private EventHookManager eventManager;
 
@@ -107,6 +111,14 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     public EventHookManager getEventManager() {
         return eventManager;
+    }
+
+    public DiscoveryService getDiscoveryService() {
+        return discoveryService;
+    }
+
+    public CommandDelivery getCommandDelivery() {
+        return delivery;
     }
 
     @Override
@@ -318,6 +330,14 @@ public abstract class BaseDeviceManager implements DeviceManager {
 	 */
 	@Override
 	public void send(Command command) throws IOException {
+        send(command, false);
+	}
+
+    /*
+     * (non-Javadoc)
+     * @see br.com.criativasoft.opendevice.core.DeviceManager#send(br.com.criativasoft.opendevice.core.command.Command)
+     */
+    public void send(Command command, boolean onlyToOutput) throws IOException {
 
         if(outputConnections.hasConnections()){
 
@@ -326,19 +346,19 @@ public abstract class BaseDeviceManager implements DeviceManager {
                 delivery.sendTo(command, connection);
             }
 
-		}
-		
-		if(inputConnections.hasConnections()){
+        }
+
+        if(!onlyToOutput && inputConnections.hasConnections()){
 
             Set<DeviceConnection> connections = inputConnections.getConnections();
             for (DeviceConnection connection : connections) {
                 delivery.sendTo(command, connection);
             }
 
-		}
-		
-	}
-	
+        }
+
+    }
+
 	/*
 	 * (non-Javadoc)
 	 * @see br.com.criativasoft.opendevice.core.DeviceManager#sendCommand(java.lang.String, java.lang.Object[])
@@ -460,7 +480,6 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
             lastMessage = message;
 
-
             if (!(message instanceof Command)) {
                 log.debug("Message received : " + message);
                 return;
@@ -515,7 +534,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
                     try {
                         if(inputConnections != null){
                             log.debug("Sending to input connections...");
-                            inputConnections.send(command); // Não precisa de time-out.
+                            inputConnections.send(command);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -527,7 +546,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
                 if (inputConnections != null && inputConnections.exist(connection)) {
 
                     if(outputConnections.hasConnections()){
-                        log.debug("Sending to output connections...");
+                        log.debug("Sending to output connections ("+outputConnections.getSize()+")...");
                         try {
                             sendTo(deviceCommand, outputConnections);
                         } catch (IOException e) {
@@ -595,8 +614,8 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
             } else if (type == CommandType.DEVICE_COMMAND_RESPONSE) {
 
-                ResponseCommand responseCommand = (ResponseCommand) command;
-                log.debug("ResponseStatus: " + responseCommand.getStatus());
+//                ResponseCommand responseCommand = (ResponseCommand) command;
+                // log.debug("ResponseStatus: " + responseCommand.getStatus());
 
             } else if (type == CommandType.GET_DEVICES_RESPONSE) {
 

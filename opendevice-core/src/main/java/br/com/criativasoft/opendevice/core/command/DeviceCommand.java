@@ -47,16 +47,16 @@ public class DeviceCommand extends Command {
 	}
 
     /**@see br.com.criativasoft.opendevice.core.command.CommandType#isDeviceCommand(CommandType) */
-    public static final boolean isCompatible(Command command){
+    public static boolean isCompatible(Command command){
         return CommandType.isDeviceCommand(command.getType());
     }
 
     /**@see br.com.criativasoft.opendevice.core.command.CommandType#isDeviceCommand(CommandType) */
-	public static final boolean isCompatible(CommandType type){
+	public static boolean isCompatible(CommandType type){
 		return CommandType.isDeviceCommand(type);
 	}
 
-    public static final boolean isCompatible(int type){
+    public static boolean isCompatible(int type){
         return isCompatible(CommandType.getByCode(type));
     }
 

@@ -105,7 +105,7 @@ public class DiscoveryClientService implements Runnable {
 
             }
         } catch (SocketTimeoutException e) {
-            log.warn("Receive timed out");
+            log.debug("Scan timeout");
         }
 
         socket.close();

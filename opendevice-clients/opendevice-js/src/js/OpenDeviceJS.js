@@ -34,6 +34,8 @@ return {
     // Manager delegate
     on : manager.on,
     onDeviceChange : manager.onDeviceChange,
+    onChange : manager.onDeviceChange,
+    onConnect : manager.onConnect,
     findDevice : manager.findDevice,
     getDevices : manager.getDevices,
     setValue : manager.setValue,
@@ -50,13 +52,8 @@ return {
         od.serverURL = serverURL;
     },
 
-    connect : function(callback){
-
-        OpenDevice.on(od.Event.CONNECTED, function(){
-            var devices = OpenDevice.getDevices();
-            if(callback) callback(devices);
-        });
-
+    connect : function(_conn){
+        if(_conn) connection = _conn;
         connection.connect();
     },
 
@@ -146,6 +143,8 @@ return {
 
 })();
 
+
+var ODev = OpenDevice;
 
 /**
  * REST Interface: Devices

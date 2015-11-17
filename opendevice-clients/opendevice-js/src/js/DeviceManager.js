@@ -147,6 +147,13 @@ od.DeviceManager = function(connection){
         _this.addListener(od.Event.DEVICE_CHANGED, listener);
     };
 
+    this.onConnect = function (listener){
+        this.on(od.Event.CONNECTED, function(){
+            var devices = OpenDevice.getDevices();
+            if(listener) listener(devices);
+        });
+    };
+
     this.addListener = function(event, listener){
 
         if(listenersMap[event] === undefined) listenersMap[event] = [];

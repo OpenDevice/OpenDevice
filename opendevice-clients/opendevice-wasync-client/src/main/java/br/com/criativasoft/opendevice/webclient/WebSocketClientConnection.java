@@ -22,10 +22,7 @@ import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.webclient.io.CommandEncoderDecoder;
-import com.ning.http.client.AsyncHttpClient;
 import org.atmosphere.wasync.*;
-import org.atmosphere.wasync.impl.DefaultOptions;
-import org.atmosphere.wasync.impl.DefaultOptionsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,8 +117,8 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
             setStatus(ConnectionStatus.DISCONNECTING);
         }else{ // set 'disconnected' in case of previous connection fail.
             setStatus(ConnectionStatus.DISCONNECTED);
-            // connection = null;
         }
+        connection = null;
     }
 
     @Override

@@ -14,21 +14,18 @@
 package br.com.criativasoft.opendevice.wsrest;
 
 import br.com.criativasoft.opendevice.connection.*;
+import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
+import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.connection.message.Request;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.TenantProvider;
+import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.restapi.WaitResponseListener;
 import br.com.criativasoft.opendevice.wsrest.guice.config.ConnectionGuiceProvider;
 import br.com.criativasoft.opendevice.wsrest.guice.config.DeviceManagerGuiceProvider;
-import br.com.criativasoft.opendevice.wsrest.guice.config.GuiceModule;
 import br.com.criativasoft.opendevice.wsrest.io.CommandJacksonProvider;
-import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
-import br.com.criativasoft.opendevice.connection.message.Message;
-import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.wsrest.io.CrossOriginInterceptor;
-import com.google.inject.Module;
-import com.sun.jersey.spi.inject.InjectableProvider;
 import org.atmosphere.cpr.*;
 import org.atmosphere.nettosphere.Config;
 import org.atmosphere.nettosphere.Nettosphere;
@@ -102,7 +99,6 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             configure(conf);
 
             conf.resource(CommandJacksonProvider.class);
-
             //conf.resource("./webapp");  // For *-distrubution
             //conf.resource("./src/main/webapp"); // For mvn exec:java
 

@@ -39,7 +39,7 @@ public abstract class AbstractConnection implements DeviceConnection {
 
 	private ConnectionStatus status = ConnectionStatus.DISCONNECTED;
 	
-	private MessageSerializer<?, ?> serializer;
+	private MessageSerializer serializer;
 
     private String uid = UUID.randomUUID().toString();
 
@@ -82,7 +82,11 @@ public abstract class AbstractConnection implements DeviceConnection {
                         }
                     });
                 }else{
-                    listener.onMessageReceived(message, AbstractConnection.this);
+                    try{
+                        listener.onMessageReceived(message, AbstractConnection.this);
+                    }catch (Exception ex){
+                        log.error(ex.getMessage(), ex);
+                    }
                 }
             }
 
@@ -137,12 +141,12 @@ public abstract class AbstractConnection implements DeviceConnection {
 	}
 	
 	@Override
-	public void setSerializer(MessageSerializer<?, ?> serializer) {
+	public void setSerializer(MessageSerializer serializer) {
 		this.serializer = serializer;
 	}
 	
 	@Override
-	public MessageSerializer<?, ?> getSerializer() {
+	public MessageSerializer getSerializer() {
 		return this.serializer;
 	}
 
@@ -189,6 +193,10 @@ public abstract class AbstractConnection implements DeviceConnection {
     public DeviceConnection setApplicationID(String applicationID) {
         this.applicationID = applicationID;
         return this;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     @Override

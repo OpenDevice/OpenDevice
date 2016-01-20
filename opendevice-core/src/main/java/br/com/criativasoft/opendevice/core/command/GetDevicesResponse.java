@@ -14,15 +14,18 @@
 package br.com.criativasoft.opendevice.core.command;
 
 import br.com.criativasoft.opendevice.core.model.Device;
+import br.com.criativasoft.opendevice.core.model.DeviceCategory;
+import br.com.criativasoft.opendevice.core.model.DeviceType;
 import br.com.criativasoft.opendevice.core.model.Sensor;
 
 import java.util.Collection;
+import java.util.LinkedList;
 
 public class GetDevicesResponse extends ResponseCommand implements ExtendedCommand {
 
 	public static final CommandType TYPE = CommandType.GET_DEVICES_RESPONSE;
 
-	private Collection<Device> devices;
+	private Collection<Device> devices = new LinkedList<Device>();
 
 	private static final long serialVersionUID = -1023397181880070237L;
 
@@ -38,6 +41,25 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
 	@Override
 	public void deserializeExtraData(String extradata) {
 
+        String[] split = extradata.split(Command.DELIMITER);
+
+        for (int i = 1; i < split.length; i++) {
+            String deviceStr = split[i].substring(1, split[i].length()-1);
+            String[] deviceSplit = deviceStr.split(",");
+            int uid = Integer.parseInt(deviceSplit[0]);
+            long value = Long.parseLong(deviceSplit[2]);
+            boolean isSensor = Integer.parseInt(deviceSplit[4]) > 0;
+
+            DeviceType deviceType =  DeviceType.getByCode(Integer.parseInt(deviceSplit[5]));
+
+            if(isSensor){
+                Sensor sensor = new Sensor(uid, "Sensor " + uid, deviceType, DeviceCategory.GENERIC);
+                sensor.setValue(value);
+                devices.add(sensor);
+            }else{
+                devices.add(new Device(uid, "Device "+uid, deviceType, DeviceCategory.GENERIC, value));
+            }
+        }
 	}
 
 	@Override

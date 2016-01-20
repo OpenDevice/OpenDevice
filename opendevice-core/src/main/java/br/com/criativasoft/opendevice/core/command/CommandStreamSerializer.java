@@ -18,17 +18,15 @@ import br.com.criativasoft.opendevice.connection.message.SimpleMessage;
 import br.com.criativasoft.opendevice.connection.serialize.MessageSerializer;
 import br.com.criativasoft.opendevice.core.command.ext.IrCommand;
 import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.DeviceCategory;
-import br.com.criativasoft.opendevice.core.model.DeviceType;
-import br.com.criativasoft.opendevice.core.model.Sensor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Constructor;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CommandStreamSerializer implements MessageSerializer<byte[], byte[]> {
+public class CommandStreamSerializer implements MessageSerializer{
 
     private static Logger log = LoggerFactory.getLogger(CommandStreamSerializer.class);
 
@@ -54,9 +52,16 @@ public class CommandStreamSerializer implements MessageSerializer<byte[], byte[]
         int ctype = Integer.parseInt(split[0]);
         int id = Integer.parseInt(split[1]);
 
-		CommandType type = CommandType.getByCode(ctype);
+        Command command = null;
 
-		Command command = null;
+        CommandType type = CommandType.getByCode(ctype);
+
+        // Check from Plugins/Extensions
+        if(type == null){
+            command = CommandRegistry.getCommand(ctype);
+            assert command != null;
+            type = command.getType();
+        }
 
 		if(DeviceCommand.isCompatible(type)){
 
@@ -67,7 +72,21 @@ public class CommandStreamSerializer implements MessageSerializer<byte[], byte[]
 		}else if(SimpleCommand.isCompatible(type)){
 
 			long value = Long.parseLong(split[3]);
+
 			command = new SimpleCommand(type, value);
+        // Some clases that extend SimpleCommand
+        }else if(SimpleCommand.class.isAssignableFrom(type.getCommandClass())){
+
+            try {
+
+                Constructor<? extends Command> constructor = type.getCommandClass().getConstructor(long.class);
+
+                long value = Long.parseLong(split[3]);
+
+                command = constructor.newInstance(value);
+
+            } catch (Exception e) {
+            }
 
 		// Format: INFRA_RED;ID;VALUE;IR_PROTOCOL;LENGTH?;BYTE1...BYTEX?
 		// If IR_PROTOCOL is RAW, 'LENGTH' and BYTE ARRAY EXIST.
@@ -90,35 +109,12 @@ public class CommandStreamSerializer implements MessageSerializer<byte[], byte[]
         // Format: GET_DEVICES_RESPONSE;ID;Length;[ID, PIN, VALUE, TARGET, SENSOR?, TYPE];[ID,PIN,VALUE,...];[ID,PIN,VALUE,...]
 		// TODO: Move to ExtendedCommand model.
         }else if(type == CommandType.GET_DEVICES_RESPONSE){ // Returned list of devices.
-
 			String reqID = split[1];
 			List<Device> devices = new LinkedList<Device>();
 			command = new GetDevicesResponse(devices, reqID);
-
-			for (int i = 3; i < split.length; i++) {
-				String deviceStr = split[i].substring(1, split[i].length()-1);
-				String[] deviceSplit = deviceStr.split(",");
-				int uid = Integer.parseInt(deviceSplit[0]);
-				long value = Long.parseLong(deviceSplit[2]);
-				boolean isSensor = Integer.parseInt(deviceSplit[4]) > 0;
-
-				DeviceType deviceType =  DeviceType.getByCode(Integer.parseInt(deviceSplit[5]));
-
-				if(isSensor){
-					Sensor sensor = new Sensor(uid, "Sensor " + uid, deviceType, DeviceCategory.GENERIC);
-					sensor.setValue(value);
-					devices.add(sensor);
-				}else{
-					devices.add(new Device(uid, "Device "+uid, deviceType, DeviceCategory.GENERIC, value));
-				}
-			}
-		}else{
-
-            command = CommandRegistry.getCommand(ctype);
-
-            if(command == null)  throw new CommandException("Can't parse command type : " + type + ", cmd: " + cmd);
-
 		}
+
+        if(command == null)  throw new CommandException("Can't parse command type : " + type + ", cmd: " + cmd);
 
 		if(command instanceof ExtendedCommand){
 			ExtendedCommand extendedCommand = (ExtendedCommand) command;

@@ -12,9 +12,10 @@
     <dependencies>
 
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>br.com.criativasoft.opendevice</groupId>
             <artifactId>opendevice-connection-api</artifactId>
         </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>opendevice-core</artifactId>

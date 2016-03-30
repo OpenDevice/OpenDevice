@@ -10,10 +10,6 @@
 	</parent>
 
 	<dependencies>
-		<dependency>
-			<groupId>br.com.criativasoft.opendevice</groupId>
-			<artifactId>opendevice-connection-api</artifactId>
-		</dependency>
 
         <dependency>
             <groupId>br.com.criativasoft.opendevice</groupId>

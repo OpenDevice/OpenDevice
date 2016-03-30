@@ -12,21 +12,20 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opendevice-version>0.1.2-SNAPSHOT</opendevice-version>
     </properties>
 
     <dependencies>
+
         <dependency>
             <groupId>br.com.criativasoft.opendevice</groupId>
             <artifactId>opendevice-connection-stream</artifactId>
             <version>${project.version}</version>
         </dependency>
 
-
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.6.1</version>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.0.13</version>
         </dependency>
 
         <dependency>
@@ -98,7 +97,7 @@
                                 </goals>
                                 <configuration>
                                     <headerType>gui</headerType>
-                                    <jar>${project.build.directory}/${artifactId}-${version}-shaded.jar</jar>
+                                    <jar>${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar</jar>
                                     <outfile>${project.build.directory}/${project.name}.exe</outfile>
                                     <downloadUrl>http://java.com/download</downloadUrl>
                                     <classPath>

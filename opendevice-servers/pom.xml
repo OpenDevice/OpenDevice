@@ -17,31 +17,14 @@
     <modules>
         <module>opendevice-rest-ws-server</module>
         <module>opendevice-nanohttp-server</module>
-        <!--<module>opendevice-rest-server</module> &lt;!&ndash; real implementation: opendevice-atmosphere-server &ndash;&gt;-->
-        <!--<module>opendevice-websocket-server</module> &lt;!&ndash; real implementation: opendevice-atmosphere-server &ndash;&gt;-->
+        <module>opendevice-mqtt</module>
     </modules>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>1.6</source>
-                        <target>1.6</target>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
+            <groupId>br.com.criativasoft.opendevice</groupId>
+            <artifactId>opendevice-connection-api</artifactId>
         </dependency>
     </dependencies>
+
 </project>

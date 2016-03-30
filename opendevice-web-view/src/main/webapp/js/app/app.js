@@ -32,6 +32,12 @@ var app = angular.module('opendevice', [
 // OpenDevice.setAppID = OpenDevice.findAppID() || 'clientname-123456x';
 OpenDevice.setAppID = "*";
 
+// Global variables
+app.run(function($rootScope) {
+    $rootScope.ext = {}; // Extension support
+    $rootScope.ext.menu = [];
+});
+
 app.config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/', {templateUrl: 'pages/dashboard.html', controller: 'DashboardController',  controllerAs: 'dashCtrl'});
     //$routeProvider.when('/view2', {templateUrl: 'partials/partial2.html', controller: 'MyCtrl2'});

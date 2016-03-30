@@ -99,9 +99,35 @@ public class DefaultSteamReader implements Runnable, Cloneable, StreamReader {
 
 		synchronized (input) {
 			try {
-				byte chunk[] = new byte[128];
-				int count = input.read(chunk);
-				if(count > 0) processPacketRead(chunk, count);
+
+                int bytes = 0;
+
+                byte data[] = new byte[1024];
+
+                while(true){
+
+                    int read = input.read(data, bytes, data.length - bytes);
+
+                    if(read == -1) return; // EOL
+
+                    int len = bytes + read;
+
+                    for (int i = bytes; i < len; i++) {
+
+                        if(checkEndOfMessage(data[i], inputBuffer)){
+
+                            processPacketRead(data, len);
+
+                            return;
+
+                        }
+
+                    }
+
+                    bytes = len;
+
+                }
+
 			} catch (Exception e) {
 				if(e.getMessage() != null && e.getMessage().contains("closed")){
 					try {
@@ -133,7 +159,7 @@ public class DefaultSteamReader implements Runnable, Cloneable, StreamReader {
 				
 				inputBuffer.reset();
 				
-			// Lê ate encontrar um EOL.
+			// Read until EOL.
 		    // Ex: LF (Line feed, '\n', 0x0A, 10 in decimal) or CR (Carriage return, '\r', 0x0D, 13 in decimal)
 			}else{
 				inputBuffer.write(read[i]);

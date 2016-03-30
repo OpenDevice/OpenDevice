@@ -24,9 +24,11 @@ import java.util.Set;
  */
 public interface DiscoveryService {
 
-    void listen(int port);
+    void listen();
 
     Set<NetworkDeviceInfo> scan(long timeout, String deviceName) throws IOException;
 
     void scan(long timeout, String deviceName, DiscoveryListener listener);
+
+    void stop();
 }

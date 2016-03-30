@@ -16,7 +16,7 @@
 package br.com.criativasoft.opendevice.connection;
 
 /**
- * SPI Interface Marker for WebSocket Clients.
+ * WebSocket Clients Extension Point
  * @author Ricardo JL Rufino
  * @date 06/03/15.
  */

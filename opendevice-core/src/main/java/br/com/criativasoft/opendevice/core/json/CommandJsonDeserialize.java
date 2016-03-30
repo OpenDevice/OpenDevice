@@ -13,7 +13,9 @@
 
 package br.com.criativasoft.opendevice.core.json;
 
-import br.com.criativasoft.opendevice.core.command.*;
+import br.com.criativasoft.opendevice.core.command.Command;
+import br.com.criativasoft.opendevice.core.command.CommandType;
+import br.com.criativasoft.opendevice.core.command.DeviceCommand;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -23,8 +25,6 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * (for JSON, change NAME ??!!!)
@@ -33,16 +33,10 @@ import java.util.Map;
  * @author Ricardo JL Rufino
  * @date 27/07/14.
  */
-public class CommandDeserialize extends StdDeserializer<Command> {
+public class CommandJsonDeserialize extends StdDeserializer<Command> {
 
-    private Map<CommandType, Class<? extends Command>> registry = new HashMap<CommandType, Class<? extends Command>>();
-
-    protected CommandDeserialize() {
+    protected CommandJsonDeserialize() {
         super(Command.class);
-
-        // Default Types.
-        registry.put(CommandType.DEVICE_COMMAND_RESPONSE, ResponseCommand.class);
-        registry.put(CommandType.GET_DEVICES, GetDevicesRequest.class);
     }
 
     @Override
@@ -63,10 +57,10 @@ public class CommandDeserialize extends StdDeserializer<Command> {
             return mapper.readValue(root.toString(), DeviceCommand.class);
         }else{
 
-            Class<? extends Command> cmdClass = registry.get(commandType);
+            Class<? extends Command> cmdClass = commandType.getCommandClass();
 
             if(cmdClass == null) {
-                throw new IllegalArgumentException("Command type not supported!! You need configure in CommandDeserialize");
+                throw new IllegalArgumentException("Command type not supported!! You need configure in CommandJsonDeserialize");
             }
 
             return mapper.readValue(root.toString(), cmdClass);

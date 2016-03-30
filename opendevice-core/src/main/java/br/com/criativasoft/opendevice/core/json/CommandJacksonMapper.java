@@ -46,14 +46,12 @@ public class CommandJacksonMapper  {
 
             module.addSerializer(CommandType.class, new EnumCodeSerializer());
             module.addDeserializer(CommandType.class, new EnumCodeDeserialize.CommandTypeDeserialize());
-            mapper.registerModule(module);
-
-            module.addDeserializer(Command.class, new CommandDeserialize());
+            module.addDeserializer(Command.class, new CommandJsonDeserialize());
+//            module.addSerializer(ResponseCommand.class, new CommandJsonSerialize());
 
             //mapper.enableDefaultTyping();
             //mapper.setDefaultTyping(new ObjectMapper.DefaultTypeResolverBuilder());
-
-
+            mapper.addMixInAnnotations(Command.class, CommandJsonSerialize.ResponseCommandIgnoreMixin.class);
 //
 //            List<Class<? extends  Command>> classList = new ArrayList<Class<? extends Command>>();
 //            classList.add(Command.class);
@@ -66,6 +64,7 @@ public class CommandJacksonMapper  {
 
 
             //mapper.getSubtypeResolver().registerSubtypes(new NamedType());
+            mapper.registerModule(module);
         }
         return mapper;
     }

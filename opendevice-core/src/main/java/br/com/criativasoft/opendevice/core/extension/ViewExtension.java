@@ -11,20 +11,18 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.core;
+package br.com.criativasoft.opendevice.core.extension;
+
+import java.util.List;
 
 /**
- * OpenDevice Extension Point Interface.
- * The extension system (plugins) of OpenDevice is using SPI
+ * Extension Point for User Interface.
+ *
  * @author Ricardo JL Rufino
- * @date 30/08/15.
+ * @date 24/01/16
  */
-public interface OpenDeviceExtension {
+public interface ViewExtension {
 
-    String getName();
-
-    void init();
-
-    void destroy();
+    List<String> loadScripts();
 
 }

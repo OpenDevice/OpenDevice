@@ -31,7 +31,7 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 	private static final Logger log = LoggerFactory.getLogger(MultipleConnection.class);
 	
 	private Set<DeviceConnection> connections = new LinkedHashSet<DeviceConnection>();
-	private Set<ConnectionListener> listeners = Collections.synchronizedSet(new HashSet<ConnectionListener>());
+	private Set<ConnectionListener> listeners = new HashSet<ConnectionListener>();
 	
 	private ConnectionStatus status = ConnectionStatus.DISCONNECTED;
 
@@ -173,20 +173,25 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 		
 		return null;
 	}
+
+	public DeviceConnection findConnection(String uid){
+
+		for (DeviceConnection connection : connections) {
+
+			if(uid.equals(connection.getUID())){
+				return connection;
+			}
+
+		}
+
+		return null;
+	}
 	
 	public boolean exist(DeviceConnection conn){
 		
 		if(conn == this) return true;
 		
-		for (DeviceConnection connection : connections) {
-
-			if(connection == conn){
-				return true;
-			}
-			
-		}
-		
-		return false;		
+		return connections.contains(conn);
 		
 	}
 	
@@ -274,12 +279,12 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 
 
     @Override
-    public void setSerializer(MessageSerializer<?, ?> serializer) {
+    public void setSerializer(MessageSerializer serializer) {
         // IGNORE
     }
 
     @Override
-    public MessageSerializer<?, ?> getSerializer() {
+    public MessageSerializer getSerializer() {
         return null; // IGNORE
     }
 

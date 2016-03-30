@@ -74,4 +74,10 @@ public class Sensor extends Device {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return "Sensor[UID:"+getUid()+", Name:"+getName()+", Value:"+getValue()+", Type:" + getType()+"]";
+    }
+
+
 }

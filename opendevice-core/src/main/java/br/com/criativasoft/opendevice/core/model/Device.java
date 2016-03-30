@@ -46,7 +46,7 @@ public class Device implements Serializable {
 
     public static final DeviceType ANALOG = DeviceType.ANALOG;
     public static final DeviceType DIGITAL = DeviceType.DIGITAL;
-    public static final DeviceType SERIAL = DeviceType.SERIAL;
+    public static final DeviceType NUMERIC = DeviceType.NUMERIC;
     public static final DeviceType CHARACTER = DeviceType.CHARACTER;
 
 	private int uid; // Logic level user ID.
@@ -126,6 +126,7 @@ public class Device implements Serializable {
     }
 
 
+
 	public void setId(int id) {
 		this.uid = id;
 	}
@@ -137,6 +138,10 @@ public class Device implements Serializable {
 	public int getUid() {
 		return uid;
 	}
+
+    public void setUID(int uid) {
+        this.uid = uid;
+    }
 
 	public String getName() {
 		return name;
@@ -150,10 +155,15 @@ public class Device implements Serializable {
 	public void setType(DeviceType type) {
 		this.type = type;
 	}
-	
+
+
 	public void setValue(long value) {
 
-        if(value != this.value){
+        if(type == NUMERIC){ // fire the event 'onChange' every time a reading is taken
+            setLastUpdate(System.currentTimeMillis());
+            this.value = value;
+            notifyListeners();
+        }else if(value != this.value){
             setLastUpdate(System.currentTimeMillis());
             this.value = value;
             notifyListeners();
@@ -207,6 +217,15 @@ public class Device implements Serializable {
 	public void setCategory(DeviceCategory category) {
 		this.category = category;
 	}
+
+    public void setCategory(Class<DeviceCategory> klass) {
+
+        DeviceManager manager = BaseDeviceManager.getInstance();
+        if(manager != null){
+            this.category = manager.getCategory(klass);
+        }
+
+    }
 	
 	public DeviceCategory getCategory() {
 		return category;
@@ -232,6 +251,10 @@ public class Device implements Serializable {
         return listeners.add(e);
     }
 
+    public Set<DeviceListener> getListeners() {
+        return listeners;
+    }
+
     public boolean onChange(DeviceListener e) {
         return listeners.add(e);
     }
@@ -241,13 +264,10 @@ public class Device implements Serializable {
      */
     public void notifyListeners() {
 
-        if (listeners.isEmpty()){
-            if(log.isDebugEnabled()) log.debug("None listener registered for this device: " + this.toString());
-            return;
-        }
-
-        for (final DeviceListener listener : listeners) {
-            listener.onDeviceChanged(this);
+        DeviceManager manager = BaseDeviceManager.getInstance();
+        if(manager != null) manager.notifyListeners(this);
+        else{
+            if(log.isDebugEnabled()) log.debug("None DeviceManager registered for this device: " + this.toString());
         }
 
     }

@@ -58,7 +58,11 @@ public class UserCommand extends Command implements ExtendedCommand{
         
         while (it.hasNext()) {
             Object object =  it.next();
-            sb.append(object.toString());
+            if(object instanceof Boolean){
+                sb.append(((Boolean)object) ? 1 : 0);
+            }else{
+                sb.append(object.toString());
+            }
             if(it.hasNext()) sb.append(DELIMITER);
             
         }

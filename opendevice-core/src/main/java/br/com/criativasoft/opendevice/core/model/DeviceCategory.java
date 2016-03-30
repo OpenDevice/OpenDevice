@@ -26,14 +26,13 @@ public class DeviceCategory implements Serializable {
 	
 	private int code;
 	private String description;
-		
+
 	public static DeviceCategory LAMP = new DeviceCategory(1, "Lâmpada");
 	public static DeviceCategory FAN = new DeviceCategory(2, "Ventilador");
 	public static DeviceCategory GENERIC = new DeviceCategory(3, "Genérico");
 	public static DeviceCategory POWER_SOURCE = new DeviceCategory(4, "Tomada");
 	
 	public static DeviceCategory GENERIC_SENSOR = new DeviceCategory(50, "Sensor Genérico");
-	public static DeviceCategory IR_SENSOR = new DeviceCategory(51, "Sensor Infra-Vermelho");
 
 
     public DeviceCategory(){

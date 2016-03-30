@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 
 /**
  * Parser to convert byte[] into {@link Command}
@@ -38,7 +39,7 @@ public class CommandStreamReader extends DefaultSteamReader {
     public void processPacketRead(byte read[], int length){
 
         if(log.isTraceEnabled()) {
-            log.trace("processPacketRead: " + new String(read, length) + ", size: " + length);
+            log.trace("processPacketRead: " + new String(Arrays.copyOf(read, length-1)) + ", size: " + length);
         }
 
         for (int i = 0; i < length; i++) {
@@ -47,9 +48,8 @@ public class CommandStreamReader extends DefaultSteamReader {
             if(read[i] == Command.START_FLAG && !processing){
                 processing = true;
             } else if (checkEndOfMessage(read[i], inputBuffer)) {
-                byte[] array = inputBuffer.toByteArray();
 
-                if(log.isTraceEnabled())log.trace("Command Data: " + new String(array));
+                byte[] array = inputBuffer.toByteArray();
 
                 Message event = parse(array);
                 if(event != null){

@@ -30,6 +30,8 @@ public class OpenDeviceConfig {
 
     private boolean broadcastInputs = true;
 
+    private boolean databaseEnabled = false;
+
     /**
      * Checks whether the support for multi-tenant is active. This setting should only be enabled when using the platform as a service.
      * @return if multi-tenant is active
@@ -56,5 +58,13 @@ public class OpenDeviceConfig {
 
     public boolean isBroadcastInputs() {
         return broadcastInputs;
+    }
+
+    public void setDatabaseEnabled(boolean databaseEnabled) {
+        this.databaseEnabled = databaseEnabled;
+    }
+
+    public boolean isDatabaseEnabled() {
+        return databaseEnabled;
     }
 }

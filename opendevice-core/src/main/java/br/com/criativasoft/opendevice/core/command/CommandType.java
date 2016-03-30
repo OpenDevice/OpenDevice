@@ -25,18 +25,21 @@ public enum CommandType implements EnumCode {
     /** Indicates that the values are 0 or 1 (HIGH or LOW) */
     DIGITAL                 (1, DeviceCommand.class),
     ANALOG                  (2, DeviceCommand.class),
-    ANALOG_REPORT           (3, DeviceCommand.class),
+    NUMERIC                 (3, DeviceCommand.class),
     /** Commands sent directly to the pins (digitalWrite) */
     GPIO_DIGITAL            (4, null),
     /** Commands sent directly to the pins (analogWrite) */
     GPIO_ANALOG             (5, null),
-    PWM                     (6, null),
-    INFRA_RED               (7, IrCommand.class),
-    
-    /** Response to commands like: DIGITAL, POWER_LEVEL, INFRA RED */
-    DEVICE_COMMAND_RESPONSE (10, ResponseCommand.class),
+    INFRA_RED               (6, IrCommand.class),
 
-    PING                    (20, SimpleCommand.class),
+    /** Response to commands like: DIGITAL, ANALOG, INFRA RED */
+
+    DEVICE_COMMAND_RESPONSE (10, ResponseCommand.class),
+    COMMAND_RESPONSE        (11, null),
+    SET_PROPERTY            (12, SetPropertyCommand.class),
+    ACTION                  (13, ActionCommand.class),
+
+    PING_REQUEST            (20, SimpleCommand.class),
     PING_RESPONSE           (21, SimpleCommand.class),
     DISCOVERY_REQUEST       (22, SimpleCommand.class),
     DISCOVERY_RESPONSE      (23, DiscoveryResponse.class),
@@ -46,20 +49,16 @@ public enum CommandType implements EnumCode {
 
     GET_DEVICES             (30, GetDevicesRequest.class),
     GET_DEVICES_RESPONSE    (31, GetDevicesResponse.class),
-    CLEAR_DEVICES 			(32, null), // NOT.IMPLEMENTED
-    CLEAR_DEVICES_RESPONSE  (33, null), // NOT.IMPLEMENTED
-    DEVICE_ADD 				(34, null), // NOT.IMPLEMENTED
-    DEVICE_ADD_RESPONSE		(35, null), // NOT.IMPLEMENTED
-    DEVICE_DEL 				(36, null), // NOT.IMPLEMENTED
-    DEVICE_DEL_RESPONSE		(37, null), // NOT.IMPLEMENTED
+    DEVICE_ADD 				(32, null), // NOT.IMPLEMENTED
+    DEVICE_ADD_RESPONSE		(33, null), // NOT.IMPLEMENTED
+    DEVICE_DEL 				(34, null), // NOT.IMPLEMENTED
+    CLEAR_DEVICES 			(35, null), // NOT.IMPLEMENTED
+    GET_CONNECTIONS 		(36, null), // NOT.IMPLEMENTED
+    GET_CONNECTIONS_RESPONSE   (37, null), // NOT.IMPLEMENTED
     CONNECTION_ADD 			(38, AddConnection.class),
-    CONNECTION_ADD_RESPONSE	(39, AddConnectionResponse.class),
+    CONNECTION_ADD_RESPONSE (39, AddConnectionResponse.class),
     CONNECTION_DEL 			(40, null), // NOT.IMPLEMENTED
-    CONNECTION_DEL_RESPONSE (41, null), // NOT.IMPLEMENTED
-    GET_CONNECTIONS 		(42, null), // NOT.IMPLEMENTED
-    GET_CONNECTIONS_RESPONSE   (43, null), // NOT.IMPLEMENTED
-    CLEAR_CONNECTIONS 		   (34, null), // NOT.IMPLEMENTED
-    CLEAR_ONNECTIONS_RESPONSE  (35, null), // NOT.IMPLEMENTED
+    CLEAR_CONNECTIONS 		(41, null), // NOT.IMPLEMENTED
 
     USER_COMMAND(99, UserCommand.class);
 
@@ -93,33 +92,18 @@ public enum CommandType implements EnumCode {
 
         if (type == null) return false;
 
-        switch (type) {
-        case DIGITAL:
-            return true;
-        case ANALOG:
-            return true;
-        case ANALOG_REPORT:
-            return true;
-        default:
-            break;
-        }
+        Class<? extends Command> commandClass = type.getCommandClass();
 
-        return false;
+        return commandClass != null && commandClass == DeviceCommand.class;
     }
 
     public static boolean isSimpleCommand( CommandType type ) {
         if (type == null) return false;
 
-        switch (type) {
-        case PING:
-            return true;
-        case PING_RESPONSE:
-            return true;
-        default:
-            break;
-        }
+        Class<? extends Command> commandClass = type.getCommandClass();
 
-        return false;
+        return commandClass != null && commandClass == SimpleCommand.class;
+
     }
 
     public Class<? extends Command> getCommandClass() {

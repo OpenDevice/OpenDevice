@@ -17,6 +17,7 @@ import java.util.UUID;
 
 
 // @XmlRootElement
+//@JsonFilter("PropertyFilterMixIn")
 public class ResponseCommand extends Command {
 	
 	private static final long serialVersionUID = 1891204618345540528L;

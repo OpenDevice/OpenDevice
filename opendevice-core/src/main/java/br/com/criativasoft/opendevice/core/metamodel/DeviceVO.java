@@ -17,8 +17,12 @@ import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceCategory;
 import br.com.criativasoft.opendevice.core.model.DeviceType;
 import br.com.criativasoft.opendevice.core.model.Sensor;
+import br.com.criativasoft.opendevice.core.model.test.GenericCategory;
+import br.com.criativasoft.opendevice.core.model.test.ActionDef;
+import br.com.criativasoft.opendevice.core.model.test.GenericDevice;
+import br.com.criativasoft.opendevice.core.model.test.Property;
 
-import java.util.Date;
+import java.util.*;
 
 public class DeviceVO {
 	
@@ -31,7 +35,10 @@ public class DeviceVO {
 	
 	private long lastUpdate;
 	private Date dateCreated;
-	
+
+	private List<String> actions = new LinkedList<String>();
+	private Map<String, Object> properties = new HashMap<String, Object>();
+
 	public DeviceVO() {
 
 	}
@@ -44,6 +51,22 @@ public class DeviceVO {
         if(device instanceof Sensor){
             setSensor(true);
         }
+
+		// FIXME: remove later
+		if(device instanceof GenericDevice){
+
+			GenericDevice generic = (GenericDevice) device;
+			GenericCategory category = generic.getCategory();
+
+			for (ActionDef actionDef : category.getActions()) {
+				actions.add(actionDef.getName());
+			}
+
+			for (Property property : generic.getProperties()) {
+				properties.put(property.getName(), property.getValue());
+			}
+
+		}
 	}
 
     public DeviceVO(int id, String name, DeviceType type, DeviceCategory category, long value) {
@@ -116,4 +139,20 @@ public class DeviceVO {
     public boolean isSensor() {
         return sensor;
     }
+
+	public void setProperties(Map<String, Object> properties) {
+		this.properties = properties;
+	}
+
+	public Map<String, Object> getProperties() {
+		return properties;
+	}
+
+	public void setActions(List<String> actions) {
+		this.actions = actions;
+	}
+
+	public List<String> getActions() {
+		return actions;
+	}
 }

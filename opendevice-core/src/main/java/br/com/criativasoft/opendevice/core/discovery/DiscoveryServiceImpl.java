@@ -43,6 +43,7 @@ public class DiscoveryServiceImpl extends Thread implements br.com.criativasoft.
 
     public DiscoveryServiceImpl() {
         setDaemon(true);
+        setName("DiscoveryService");
         this.httpPort = DISCOVERY_PORT;
     }
 
@@ -64,7 +65,7 @@ public class DiscoveryServiceImpl extends Thread implements br.com.criativasoft.
 			socket.setBroadcast(true);
 			log.debug("Listen for requests at:" + DISCOVERY_PORT);
 			
-			while (true) {
+			while (!isInterrupted()) {
 
 				// Receive a packet
 				byte[] recvBuf = new byte[100];
@@ -95,11 +96,10 @@ public class DiscoveryServiceImpl extends Thread implements br.com.criativasoft.
     /**
      * Start the service discovery. It allows clients to find this server
      * @see DiscoveryServiceImpl
-     * @param httpPort that should be used by clients to connect to server
      */
     @Override
-    public void listen(int httpPort){
-        new DiscoveryServiceImpl(httpPort).start();
+    public void listen(){
+        new DiscoveryServiceImpl(DISCOVERY_PORT).start();
     }
 
     /**
@@ -128,5 +128,7 @@ public class DiscoveryServiceImpl extends Thread implements br.com.criativasoft.
         DiscoveryClientService service = new DiscoveryClientService(timeout, deviceName, listener);
         new Thread(service).start();
     }
+
+
 
 }

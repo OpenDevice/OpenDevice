@@ -25,7 +25,7 @@ public enum DeviceType implements EnumCode {
 
     DIGITAL(1, "Digital"),
     ANALOG(2, "Analog"),
-    SERIAL(3, "Serial"),
+    NUMERIC(3, "Numeric"), // Similar to ANALOG , but launches the event 'onChange' every time a reading is taken
     CHARACTER(4, "Character") ;
 
 	private int code;

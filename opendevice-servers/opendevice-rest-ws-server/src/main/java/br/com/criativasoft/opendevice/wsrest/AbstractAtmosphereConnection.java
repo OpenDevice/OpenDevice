@@ -118,6 +118,7 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             // conf.initParam("com.sun.jersey.spi.container.ResourceMethodDispatchProvider", "true");
             //.initParam(ApplicationConfig.OBJECT_FACTORY, GuiceConfigFactory.class.getName())
             conf.interceptor(new CrossOriginInterceptor());
+//            conf.interceptor(new JacksonFilterInterceptor());
             conf.interceptor(this);
             conf.build();
 

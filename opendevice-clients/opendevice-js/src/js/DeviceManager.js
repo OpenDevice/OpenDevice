@@ -27,7 +27,6 @@ od.deviceManager = {};
 od.DeviceManager = function(connection){
     var _this = this;
     od.deviceManager = this; // set global reference
-
     // Alias
     var DEvent = od.Event;
     var CType = od.CommandType;
@@ -117,6 +116,7 @@ od.DeviceManager = function(connection){
 
         // try local storage
         devices =  _getDevicesLocalStorege();
+
         if(devices && devices.length > 0) return devices;
 
         // load remote.
@@ -223,10 +223,30 @@ od.DeviceManager = function(connection){
         var devices = [];
 
         for(var i = 0; i < response.length; i++ ){
-            devices.push(new od.Device(response[i]));
+            var device = new od.Device(response[i]);
+            //if(typeof Object.observe != "undefined"){
+                Object.observe(device, _onPropertyChange);
+            //}
+            devices.push(device);
         }
 
         return devices;
+    }
+
+    /**
+     *
+     * @param event
+     * @private
+     */
+    function _onPropertyChange(event){
+
+        if(event.length > 0 && event[0].type == "update"){
+
+            var device = event[0].object;
+
+            _this.send({type : CType.SET_PROPERTY, deviceID : device.id, property : event[0].name, value : device[event[0].name] });
+        }
+
     }
 
     /**

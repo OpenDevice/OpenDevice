@@ -47,7 +47,7 @@ public class CommandDelivery implements ConnectionListener {
 
     private final Set<SendTask> waitingTask =Collections.synchronizedSet(new HashSet<SendTask>());
 	
-	public static int MAX_CMD_COUNT = 9999;
+	public static int MAX_CMD_COUNT = 255;
 	
 
 	public CommandDelivery(DeviceManager manager) {
@@ -61,7 +61,7 @@ public class CommandDelivery implements ConnectionListener {
     }
 
 	public void sendTo(Command command, DeviceConnection connection) throws IOException {
-		
+
 		command.setStatus(CommandStatus.DELIVERED);
 
         if(connection instanceof MultipleConnection){
@@ -122,11 +122,10 @@ public class CommandDelivery implements ConnectionListener {
         }
 
         if(log.isTraceEnabled()) log.trace("Sends taks: {}, threads: {}", waitingTask.size(), Thread.activeCount());
-		
+
 		final SendTask sendTask = new SendTask(command, connection, this);
         waitingTask.add(sendTask);
         executor.execute(sendTask);
-
 
 //      TODO: executor.shutdownNow();		
 	}
@@ -137,7 +136,7 @@ public class CommandDelivery implements ConnectionListener {
     }
 
 	public void stop(){
-		executor.shutdown();
+		executor.shutdownNow();
 	}
 	
 	private class SendTask implements Runnable, ConnectionListener{
@@ -176,6 +175,8 @@ public class CommandDelivery implements ConnectionListener {
 
                 start = System.currentTimeMillis();
                 connection.send(command);
+
+                // Wait for response (release look) in onMessageReceived
                 synchronized(command){
                     command.wait(command.getTimeout());
                 }
@@ -197,18 +198,6 @@ public class CommandDelivery implements ConnectionListener {
         }
 
 
-		/**
-		 * release lock and restore ID
-		 */
-		public void restoreComand(){
-			
-			synchronized(command){
-                command.notifyAll();
-			}
-
-            command.setStatus(CommandStatus.SUCCESS);
-			command.setTrackingID(originalID);
-		}
 
 		@Override
         public void onMessageReceived(Message message, DeviceConnection connection) {
@@ -228,7 +217,14 @@ public class CommandDelivery implements ConnectionListener {
 
                 command.setResponse(received);
 
-                restoreComand(); // release lock and restore ID
+                synchronized(command){
+                    command.notifyAll();
+                }
+
+                command.setStatus(CommandStatus.SUCCESS); // FIXME: precisa ser o status de acorodo com a resposta,
+
+                // pois pode ser um Internal Error.
+                command.setTrackingID(originalID);
 
             }
 

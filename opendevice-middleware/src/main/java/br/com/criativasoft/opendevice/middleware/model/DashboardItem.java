@@ -53,7 +53,7 @@ public class DashboardItem {
 
     private String layout;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.EAGER)
     @JsonBackReference
     private Dashboard parent;
 

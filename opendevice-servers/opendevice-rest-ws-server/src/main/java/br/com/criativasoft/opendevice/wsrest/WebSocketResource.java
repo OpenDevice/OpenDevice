@@ -61,7 +61,7 @@ public class WebSocketResource {
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseCommand onMessageReceived(Command command, @Context HttpHeaders headers) {
 
-        if(log.isTraceEnabled()) log.trace("Command receivend in topic:{} -> {}", topic.getID(), command);
+        log.debug("Command receivend in topic:{} -> {}", topic.getID(), command);
 
         // TODO: Verificar autenticação.... (basicamente teve enviar um comando de AUTH com o Login, e isso é registrado com resource.uuid())
         // Se não tiver autenticado a respota deve ser AuthRespose(subtype: AUTH_REQUIRED)
@@ -72,7 +72,7 @@ public class WebSocketResource {
         if(command.getConnectionUUID() == null)   command.setConnectionUUID(resource.uuid());
         command.setApplicationID(topic.getID()); // This is APPLICATION ID TOKEN !
 
-        connection.notifyListeners(command); // broadcast to all clients (browser/android/desktop)
+         connection.notifyListeners(command); // broadcast to all clients (browser/android/desktop)
 
         // return new Broadcastable(params, response, topic);
         return  new ResponseCommand(CommandStatus.DELIVERED,  command.getConnectionUUID());

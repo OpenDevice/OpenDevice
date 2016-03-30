@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>OpenDevice</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/demo.css">
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="js/hammer.min.js"></script>
+
+    <script type="text/javascript" src="js/jquery.atmosphere.js"></script>
+    <!--<script type="text/javascript" src="/js/opendevice.js"></script> &lt;!&ndash; mvn:dependency &ndash;&gt;-->
+
+
+    <script type="text/javascript" src="Constants.js"></script> <!-- mvn:dependency -->
+    <script type="text/javascript" src="Device.js"></script> <!-- mvn:dependency -->
+    <script type="text/javascript" src="DeviceConnection.js"></script> <!-- mvn:dependency -->
+    <script type="text/javascript" src="DeviceManager.js"></script> <!-- mvn:dependency -->
+    <script type="text/javascript" src="OpenDeviceJS.js"></script> <!-- mvn:dependency -->
+
+
+    <script>
+
+        var currentCam;
+
+        var CamMove = {
+            UP : 0,
+            DOWN : 2,
+            LEFT : 4,
+            RIGHT : 6,
+            LEFT_UP : 90,
+            RIGHT_UP : 91,
+            LEFT_DOWN : 92,
+            RIGHT_DOWN : 93,
+            CENTER : 25,
+            STOP : 1
+        };
+
+        var currentMove = CamMove.STOP;
+
+
+        $(function(){ // JQuery ready()
+            ODev.connect();
+
+        });
+
+
+        ODev.onConnect(function(devices){
+            console.log('loaded: ', devices);
+
+            var device = devices[1];
+
+            currentCam = ODev.findDevice(10);
+
+            // select of properties
+            jQuery.each(currentCam.properties, function(k, v){
+                $('<option/>', {
+                    'value': k,
+                    'text': k
+                }).appendTo('#property');
+            });
+
+            createImageControls();
+
+        });
+
+
+        ODev.onChange(function(device){
+
+        });
+
+        function onMove(position){
+            if(position != currentMove){
+                $('.corner').css('opacity', 0.3);
+                $('.c-'+position).css('opacity', 1);
+                // executeAction('setPosition', position);
+                currentCam.setPosition(position);
+                currentMove = position;
+            }
+        }
+
+        function createImageControls(){
+            initKeyboardEvents();
+
+            $(".video-preview .corners").each(function() {
+                    var hammertime = new Hammer(this, {});
+                    hammertime.on('pan', function(ev) {
+                        $("#value").val(ev.angle);
+
+                        if(ev.isFinal){
+                            onMove(CamMove.STOP);
+                            $('.corner').css('opacity', 0.3);
+                        }else{
+                            if(ev.angle > -150 &&  ev.angle < -120) {
+                                onMove(CamMove.RIGHT_DOWN);
+                            }else if(ev.angle > -120 &&  ev.angle < -60){
+                                onMove(CamMove.DOWN);
+                            }else if(ev.angle > -60 &&  ev.angle < -30){
+                                onMove(CamMove.LEFT_DOWN);
+                            }else if(ev.angle > -30 &&  ev.angle < 30){
+                                onMove(CamMove.LEFT);
+                            }else if(ev.angle > 30 &&  ev.angle < 60){
+                                onMove(CamMove.LEFT_UP);
+                            }else if(ev.angle > 60 &&  ev.angle < 120){
+                                onMove(CamMove.UP);
+                            }else if(ev.angle > 120 &&  ev.angle < 150){
+                                onMove(CamMove.RIGHT_UP);
+                            }else if(ev.angle > 150 &&  ev.angle < 180){
+                                onMove(CamMove.RIGHT);
+                            }else if(ev.angle > -180 &&  ev.angle < -150){
+                                onMove(CamMove.RIGHT);
+                            }
+
+                        }
+
+                    });
+
+                    hammertime.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+
+                    var corners = $(".corners");
+                    $("<span class='corner c-"+CamMove.LEFT_UP+"'>&nbsp;</span>").appendTo(corners);
+                    $("<span class='corner c-"+CamMove.UP+"'>&nbsp;</span>").appendTo(corners);
+                    $("<span class='corner c-"+CamMove.RIGHT_UP+"'>&nbsp;</span>").appendTo(corners);
+                    $("<span class='corner c-"+CamMove.RIGHT+"'>&nbsp;</span>").appendTo(corners);
+                    $("<span class='corner c-"+CamMove.RIGHT_DOWN+"'>&nbsp;</span>").appendTo(corners);
+                    $("<span class='corner c-"+CamMove.DOWN+"'>&nbsp;</span>").appendTo(corners);
+                    $("<span class='corner c-"+CamMove.LEFT_DOWN+"'>&nbsp;</span>").appendTo(corners);
+                    $("<span class='corner c-"+CamMove.LEFT +"'>&nbsp;</span>").appendTo(corners);
+            });
+        }
+
+        function initKeyboardEvents(){
+            document.addEventListener('keydown', function(event) {
+                if(event.keyCode == 37) {
+                    onMove(CamMove.LEFT);
+                } else if(event.keyCode == 38) {
+                    onMove(CamMove.UP);
+                } else if(event.keyCode == 39) {
+                    onMove(CamMove.RIGHT);
+                } else if(event.keyCode == 40) {
+                    onMove(CamMove.DOWN);
+                }
+            });
+
+            document.addEventListener('keyup', function(event) {
+                if(CamMove.STOP != currentMove){
+                    onMove(CamMove.STOP);
+                }
+            });
+        }
+
+        function executeAction(action, value) {
+            var deviceID = $("#deviceID").val();
+            var url = "/action/" + deviceID + "/" + action+ "/" + value;
+            call_rest(url);
+        }
+
+        function setProperty() {
+            var deviceID = $("#deviceID").val();
+            var device = OpenDevice.findDevice(deviceID);
+            var property = $("#property").val();
+            device[property] = $("#value").val();
+        }
+
+        function call_rest(url){
+            $.get('http://'+window.location.host + url,{},function (data) {
+                $("#response").text(JSON.stringify(data));
+            });
+
+        }
+
+    </script>
+</head>
+
+<body>
+<div class="container">
+    <h1>OpenDevice Rest Sample</h1>
+
+    <div class="row">
+        <div class="col-md-4">
+            <form class="form-inline box-example">
+
+                <div class="form-group">
+                    <label>Device ID:</label>
+                    <select class="form-control" id="deviceID">
+                        <option value="10">10</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <select class="form-control" id="property" name="property">
+                    </select>
+
+                    <label>
+                        Val:
+                        <input name="value" id="value"/>
+                    </label>
+
+                    <button type="button" onclick="setProperty()" class="btn btn-success">Set</button>
+
+                    <button type="button" onclick="currentCam.snapshot()" class="btn btn-success">snapshot</button>
+                </div>
+
+            </form>
+        </div>
+        <div class="col-md-8">
+            <div class="video-preview">
+                <div class="corners"></div>
+                <img class="video-img" border="0" src="http://192.168.3.104:81/videostream.cgi?loginuse=admin&loginpas=soft2011" />
+            </div>
+
+
+        </div>
+    </div>
+    <div id="response"></div>
+
+</div>
+</body>
+</html>

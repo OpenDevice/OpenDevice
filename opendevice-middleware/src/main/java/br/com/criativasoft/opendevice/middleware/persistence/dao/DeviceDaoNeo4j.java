@@ -20,6 +20,7 @@ import br.com.criativasoft.opendevice.core.metamodel.PeriodType;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceHistory;
 
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -35,7 +36,7 @@ import java.util.List;
  */
 public class DeviceDaoNeo4j implements DeviceDao {
 
-    @PersistenceContext
+    @Inject
     private EntityManager em;
 
     public DeviceDaoNeo4j(EntityManager em) {

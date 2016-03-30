@@ -34,20 +34,26 @@ od.DeviceCategory = {
 od.CommandType = {
     DIGITAL:1,
     ANALOG:2,
-    ANALOG_REPORT:3,
+    NUMERIC:3,
     GPIO_DIGITAL:4,
     GPIO_ANALOG:5,
-    PWM:6,
-    INFRA_RED:7,
+    INFRA_RED:6,
 
     /** Response to commands like: DIGITAL, POWER_LEVEL, INFRA RED  */
     DEVICE_COMMAND_RESPONSE : 10, // Responsta para comandos como: DIGITAL, POWER_LEVEL, INFRA_RED
 
-    PING : 20,
-    PING_RESPONSE : 21,
-    MEMORY_REPORT : 22, // Report the amount of memory (displays the current and maximum).
-    CPU_TEMPERATURE_REPORT : 23,
-    CPU_USAGE_REPORT:24,
+    SET_PROPERTY:11,
+    ACTION:12,
+
+    PING                    :20,
+    PING_RESPONSE           :21,
+    DISCOVERY_REQUEST       :22,
+    DISCOVERY_RESPONSE      :23,
+    MEMORY_REPORT           :24,
+    CPU_TEMPERATURE_REPORT  :25,
+    CPU_USAGE_REPORT        :26,
+
+
     GET_DEVICES : 30,
     GET_DEVICES_RESPONSE : 31,
     USER_COMMAND : 99,
@@ -58,7 +64,7 @@ od.CommandType = {
                 return true;
             case this.ANALOG:
                 return true;
-            case this.ANALOG_REPORT:
+            case this.NUMERIC:
                 return true;
             default:
                 break;

@@ -71,14 +71,14 @@ public class TransactionFilter implements ContainerRequestFilter, ContainerRespo
 
         EntityTransaction tx = em.getTransaction();
 
-        try{
+        try {
 
-            if(tx.isActive()) tx.commit();
+            if (tx.isActive()) tx.commit();
+
+        }catch (RuntimeException e) {
+                if ( tx != null && tx.isActive() ) tx.rollback();
+                throw e; // or display error message
         } finally {
-            if (tx.isActive()) {
-                log.warn("rollback transaction");
-                tx.rollback();
-            }
             em.close();
         }
 

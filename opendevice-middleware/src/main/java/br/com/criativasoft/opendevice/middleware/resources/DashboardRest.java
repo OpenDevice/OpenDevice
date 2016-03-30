@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceUnit;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -193,10 +194,12 @@ public class DashboardRest {
 
         DashboardItem item = em.find(DashboardItem.class, itemID);
         if(item != null) {
-            //Dashboard dashboard = em.find(Dashboard.class, id);
+            Dashboard dashboard = item.getParent();
+            dashboard.getItems().remove(item);
             em.remove(item);
+            em.persist(dashboard);
         }else{
-            Response.status(Response.Status.NOT_FOUND).type(MediaType.APPLICATION_JSON).build();
+            return Response.status(Response.Status.NOT_FOUND).type(MediaType.APPLICATION_JSON).build();
         }
 
         return Response.status(Response.Status.OK).type(MediaType.APPLICATION_JSON).build();

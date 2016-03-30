@@ -15,10 +15,10 @@
 
 package br.com.criativasoft.opendevice.middleware.config;
 
+import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
 import br.com.criativasoft.opendevice.middleware.persistence.PersistenceContextInjectableProvider;
 import br.com.criativasoft.opendevice.middleware.persistence.TransactionFilter;
-import br.com.criativasoft.opendevice.wsrest.guice.config.GuiceConfigRegistry;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.ResourceConfigurator;
 import org.slf4j.Logger;
@@ -34,12 +34,18 @@ public class AppResourceConfigurator implements ResourceConfigurator {
     @Override
     public void configure(ResourceConfig config) {
 
-        log.info("configuring app.....");
+        log.info("Configuring app.....");
 
         // AUTO: config.getProviderClasses().add(DependencyConfig.class);
-        final TransactionFilter transactionFilter = new TransactionFilter(LocalEntityManagerFactory.getInstance());
-        config.getContainerRequestFilters().add(transactionFilter);
-        config.getContainerResponseFilters().add(transactionFilter);
+
+        OpenDeviceConfig odev = OpenDeviceConfig.get();
+
+        if(odev.isDatabaseEnabled()){
+            TransactionFilter transactionFilter = new TransactionFilter(LocalEntityManagerFactory.getInstance());
+            config.getContainerRequestFilters().add(transactionFilter);
+            config.getContainerResponseFilters().add(transactionFilter);
+        }
+
 
         Set<Class<?>> classes = config.getClasses();
         classes.add(PersistenceContextInjectableProvider.class);

@@ -13,6 +13,7 @@
 
 package br.com.criativasoft.opendevice.core;
 
+import br.com.criativasoft.opendevice.connection.ConnectionListener;
 import br.com.criativasoft.opendevice.connection.ConnectionManager;
 import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.core.command.Command;
@@ -20,6 +21,7 @@ import br.com.criativasoft.opendevice.core.filter.CommandFilter;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.model.Device;
+import br.com.criativasoft.opendevice.core.model.DeviceCategory;
 import br.com.criativasoft.opendevice.core.model.DeviceHistory;
 import br.com.criativasoft.opendevice.core.model.DeviceListener;
 
@@ -57,6 +59,11 @@ public interface DeviceManager extends ConnectionManager{
     public void disconnect() throws IOException;
 
     /**
+     * Stop and disconnect all
+     */
+    public void stop();
+
+    /**
      * Connect to a single output connection. <br/>
      * That way you do not need to call addOutput
      * @param connection
@@ -70,6 +77,8 @@ public interface DeviceManager extends ConnectionManager{
 
     public boolean addListener(DeviceListener e);
 
+    public void addConnectionListener(ConnectionListener e);
+
     public void addFilter(CommandFilter filter);
 
     public boolean isConnected();
@@ -77,4 +86,11 @@ public interface DeviceManager extends ConnectionManager{
     public boolean hasConnections();
 
     public List<DeviceHistory> getDeviceHistory(DeviceHistoryQuery query);
+
+    public DeviceCategory getCategory(Class<? extends DeviceCategory> klass);
+
+    /**
+     * Notify All Listeners about device change
+     */
+    public void notifyListeners(Device device);
 }

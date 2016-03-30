@@ -14,11 +14,10 @@
 package br.com.criativasoft.opendevice.middleware.test;
 
 import org.neo4j.cypher.ExecutionEngine;
-import org.neo4j.cypher.ExecutionResult;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
-import org.neo4j.kernel.impl.util.StringLogger;
+import org.neo4j.logging.NullLogProvider;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
@@ -35,7 +34,7 @@ public class UpdateDataNative {
                 .newGraphDatabase();
         final Transaction tx = graphDb.beginTx();
 
-        ExecutionEngine engine = new ExecutionEngine(graphDb, StringLogger.SYSTEM_DEBUG);
+        ExecutionEngine engine = new ExecutionEngine(graphDb, NullLogProvider.getInstance());
 
 //        ExecutionResult result = engine.execute("MATCH (n:DeviceHistory) DELETE n");
 //        System.out.println("ExecutionResult:" + result);

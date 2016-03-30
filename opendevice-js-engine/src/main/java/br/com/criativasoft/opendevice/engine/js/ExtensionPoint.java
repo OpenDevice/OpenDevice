@@ -13,7 +13,8 @@
 
 package br.com.criativasoft.opendevice.engine.js;
 
-import br.com.criativasoft.opendevice.core.OpenDeviceExtension;
+import br.com.criativasoft.opendevice.core.DeviceManager;
+import br.com.criativasoft.opendevice.core.extension.OpenDeviceExtension;
 import br.com.criativasoft.opendevice.core.event.EventHookManager;
 
 /**
@@ -29,7 +30,7 @@ public class ExtensionPoint implements OpenDeviceExtension {
     }
 
     @Override
-    public void init() {
+    public void init(DeviceManager manager) {
         EventHookManager.registerHandler(JavaScriptEventHandler.class);
     }
 

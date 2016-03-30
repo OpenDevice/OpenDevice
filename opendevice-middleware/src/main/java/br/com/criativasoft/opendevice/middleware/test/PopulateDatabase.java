@@ -46,8 +46,8 @@ public class PopulateDatabase {
         EntityTransaction tx = em.getTransaction();
         tx.begin();
 
-//        saveDevices();
-//        saveDash();
+        saveDevices();
+        saveDash();
 
         List<Device> devices = dao.listAll();
         for (Device device : devices) {

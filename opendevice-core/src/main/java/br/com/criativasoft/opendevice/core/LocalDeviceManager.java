@@ -25,7 +25,9 @@ import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -42,6 +44,7 @@ public class LocalDeviceManager extends BaseDeviceManager {
 
     private String applicationID = OpenDeviceConfig.LOCAL_APP_ID;
 
+    // ToDo: use only if dao is not memory
     private Set<Device> runtimeDevices = new LinkedHashSet<Device>();
 
     // Aliases to factory connections
@@ -103,7 +106,10 @@ public class LocalDeviceManager extends BaseDeviceManager {
     @Override
     public void addDevice(Device device) {
         super.addDevice(device);
-        runtimeDevices.add(device);
+
+        if(findDeviceByUID(device.getUid()) == null) {
+            runtimeDevices.add(device);
+        }
     }
 
     /**
@@ -189,14 +195,36 @@ public class LocalDeviceManager extends BaseDeviceManager {
 
     public static void launchApplication(Class<? extends LocalDeviceManager> appClass, String... args) {
         try {
-            appClass.newInstance().start();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+            final LocalDeviceManager main = appClass.newInstance();
+            main.start();
+
+            // Automatic shutdown
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
+                public void run() {
+                    main.stop();
+                }
+            });
+
+            // Manual shutdown
+            log.info("========================================================");
+            log.info("Application - started ");
+            log.info("Type [quit] or [CTRL+C] to stop the server");
+            log.info("========================================================");
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            String a = "";
+            while (!("quit".equals(a))) {
+                a = br.readLine();
+            }
+
+            System.out.println("Disconnecting all...");
+            main.stop();
+            Thread.sleep(800);
+        } catch (Exception e) {
             e.printStackTrace();
         }
+
+        System.exit(-1);
     }
 
 

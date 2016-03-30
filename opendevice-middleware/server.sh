@@ -1,17 +1,20 @@
 
+WEB_PATH="/media/ricardo/Dados/Codidos/Java/Projetos/OpenDevice/opendevice-web-view/src/main/webapp"
+
+
 case $1 in
 start)
-java -Dapp.port=8181 -Dapp.dir=/media/Ricardo/Codigos/Java/Projetos/OpenHouse/openhouse-web-view/src/main/webapp -Dapp.mode=local -jar target/openhouse-server-standalone.jar
+java -cp "target/opendevice-middleware.jar:target/lib/*" -Dapp.port=8181 -Dapp.dir=$WEB_PATH -Dapp.mode=local  br.com.criativasoft.opendevice.middleware.Main
 ;;
 debug)
-java -Dapp.port=8181 -Dapp.dir=web -Dapp.mode=remote -Xdebug -Xrunjdwp:transport=dt_socket,address=8998,server=y -jar target/openhouse-server-standalone.jar
+java -Dapp.port=8181 -Dapp.dir=web -Dapp.mode=remote -Xdebug -Xrunjdwp:transport=dt_socket,address=8998,server=y -cp "lib/*" -jar target/opendevice-middleware-standalone.jar
 ;;
 compile)
-mvn package -P build-standalone -DskipTests
+mvn -o package -P standalone -DskipTests
 ;;
 
 *)
-echo "Usage: XXXX"
+echo "Usage: ./server.sh (start|debug)"
 exit 1
  ;;
 esac

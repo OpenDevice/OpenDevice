@@ -23,13 +23,33 @@ var od = od || {};
  * @constructor
  */
 od.Device = function(data){
-    this.id = data.id;
-    this.name = data.name;
-    this.type = data.type;
-    this.category = data.category;
-    this.value = data.value;
-    this.sensor = data.sensor;
-    this.manager = od.deviceManager;
+
+    var CType = od.CommandType;
+    var _this = this;
+
+    function _init(data){
+
+        this.id = data.id;
+        this.manager = od.deviceManager;
+
+
+        // Dynamic Properties and Funtions
+
+        for (var attrname in data) this[attrname] = data[attrname];
+
+        for (var property in this.properties) this[property] = this.properties[property];
+
+        this.actions.forEach(function(method) {
+            _this[method] = function(){
+                console.log('Calling remote action: ' + method + ", params: ", arguments);
+                var paramlist = [];
+                for(var i in arguments) paramlist.push(arguments[i]);
+                _this.manager.send({type : CType.ACTION, deviceID : _this.id, action : method, params : paramlist });
+            }
+        });
+
+    }
+
 
     this.on = function(){
          this.setValue(1);
@@ -60,9 +80,11 @@ od.Device = function(data){
         if(this.value == 0) value = 1;
         else if(this.value == 1) value = 0;
         this.setValue(value);
-    }
+    };
 
     /** @deprecated */
     this.toggleValue = this.toggle;
 
+
+     _init.call(this, data);
 };

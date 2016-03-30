@@ -23,9 +23,12 @@ import br.com.criativasoft.opendevice.core.connection.MultipleConnection;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.discovery.DiscoveryServiceImpl;
 import br.com.criativasoft.opendevice.core.event.EventHookManager;
+import br.com.criativasoft.opendevice.core.extension.OpenDeviceExtension;
 import br.com.criativasoft.opendevice.core.filter.CommandFilter;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.model.*;
+import br.com.criativasoft.opendevice.core.model.test.DeviceCategoryRegistry;
+import br.com.criativasoft.opendevice.core.model.test.GenericDevice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +61,8 @@ public abstract class BaseDeviceManager implements DeviceManager {
 	private CommandDelivery delivery = new CommandDelivery(this);
 
     private DiscoveryService discoveryService = new DiscoveryServiceImpl();
+
+    private DeviceCategoryRegistry deviceCategoryRegistry = new DeviceCategoryRegistry();
 
     private EventHookManager eventManager;
 
@@ -95,7 +100,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
         if(iterator.hasNext()){
             OpenDeviceExtension extension = iterator.next();
             log.info("Loading Extension: " + extension.getName() + ", class: " + extension.getClass());
-            extension.init();
+            extension.init(this);
             extensions.add(extension);
         }
 
@@ -119,6 +124,14 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     public CommandDelivery getCommandDelivery() {
         return delivery;
+    }
+
+    public DeviceCategory getCategory(Class<? extends DeviceCategory> klass) {
+        return deviceCategoryRegistry.getCategory(klass);
+    }
+
+    public void addCategory(Class<? extends DeviceCategory> klass) {
+        deviceCategoryRegistry.add(klass);
     }
 
     @Override
@@ -150,9 +163,8 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     @Override
     public void addDevice(Device device) {
-        if(findDeviceByUID(device.getId()) == null) {
+        if(findDeviceByUID(device.getUid()) == null) {
             getValidDeviceDao().persist(device);
-            device.addListener(deviceManagerListener);
         }
     }
 
@@ -191,6 +203,14 @@ public abstract class BaseDeviceManager implements DeviceManager {
      */
     public void notifyListeners(Device device) {
 
+        deviceManagerListener.onDeviceChanged(device);
+
+        // Individual Listeners
+        for (final DeviceListener listener : device.getListeners()) {
+            listener.onDeviceChanged(device);
+        }
+
+        // Global Listeners
         if(listeners.isEmpty()) return;
 
         for (final DeviceListener listener : listeners) {
@@ -211,6 +231,17 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
         connectAll();
 
+    }
+
+    @Override
+    public void stop() {
+        try {
+            disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        getCommandDelivery().stop();
+        getDiscoveryService().stop();
     }
 
     @Override
@@ -264,34 +295,24 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     }
 
-    protected void disconnectAll(){
 
-        try {
-            inputConnections.disconnect();
-        } catch (ConnectionException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            outputConnections.disconnect();
-        } catch (ConnectionException e) {
-            e.printStackTrace();
-        }
-
-    }
-	
 	public void addInput(DeviceConnection connection){
 		
 		if(inputConnections.getSize() == 0) initInputConnections();
 
+        if(inputConnections.exist(connection)){
+            log.info("Connection with ID: " + connection.getUID()+ " already exist !");
+            return;
+        }
+
         if(connection instanceof StreamConnection){
             StreamConnection streamConnection = (StreamConnection) connection;
             if(! (streamConnection.getSerializer() instanceof CommandStreamSerializer)){
-                streamConnection.setSerializer(new CommandStreamSerializer()); // data conversion..
                 streamConnection.setStreamReader(new CommandStreamReader()); // data protocol..
             }
         }
 
+        connection.setSerializer(new CommandStreamSerializer()); // data conversion..
         connection.setConnectionManager(this);
         connection.setApplicationID(TenantProvider.getCurrentID());
 		inputConnections.addConnection(connection);
@@ -302,15 +323,23 @@ public abstract class BaseDeviceManager implements DeviceManager {
 		
 		if(outputConnections.getSize() == 0) initOutputConnections();
 
+        if(outputConnections.exist(connection)){
+            log.info("Connection with ID: " + connection.getUID()+ " already exist !");
+            return;
+        }
+
         if(connection instanceof StreamConnection){
             StreamConnection streamConnection = (StreamConnection) connection;
             if(! (streamConnection.getSerializer() instanceof CommandStreamSerializer)){
-                streamConnection.setSerializer(new CommandStreamSerializer()); // data conversion..
                 streamConnection.setStreamReader(new CommandStreamReader()); // data protocol..
             }
         }
 
         delivery.addConnection(connection);
+
+        if(connection.getSerializer() == null){
+            connection.setSerializer(new CommandStreamSerializer()); // data conversion..
+        }
 
         connection.setApplicationID(TenantProvider.getCurrentID());
         connection.setConnectionManager(this);
@@ -420,6 +449,16 @@ public abstract class BaseDeviceManager implements DeviceManager {
         return newList;
     }
 
+    @Override
+    public DeviceConnection findConnection(String uid) {
+
+        DeviceConnection connection = outputConnections.findConnection(uid);
+
+        if(connection != null) return connection;
+
+        return inputConnections.findConnection(uid);
+    }
+
     protected OpenDeviceConfig getConfig(){
         return OpenDeviceConfig.get();
     }
@@ -432,8 +471,6 @@ public abstract class BaseDeviceManager implements DeviceManager {
         public void onDeviceChanged(Device device) {
 
             try {
-
-                notifyListeners(device);
 
                 // Ignore changes fired in 'onMessageReceived'
                 if(lastMessage instanceof  DeviceCommand){
@@ -478,6 +515,8 @@ public abstract class BaseDeviceManager implements DeviceManager {
         @Override
         public void onMessageReceived(Message message, DeviceConnection connection) {
 
+            if(message == null) return;
+
             lastMessage = message;
 
             if (!(message instanceof Command)) {
@@ -507,7 +546,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
             }
 
-            if(log.isDebugEnabled()) log.debug("Command Received - Type: {} (from: " + connection.getClass().getSimpleName() + ")", CommandType.getByCode(command.getType().getCode()).toString());
+            if(log.isDebugEnabled()) log.debug("Command Received - Type: {} (from: " + connection.toString() + ")", command.getType().toString());
 
             CommandType type = command.getType();
 
@@ -521,18 +560,21 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
                 Device device = findDeviceByUID(deviceID);
 
-                if(device != null && device.getValue() == value) return; // exist but not changed !
-
-                if (device != null && device.getValue() != value) {
-
-                    device.setValue(value);
+                if(device != null){
+                    if(device.getType() == Device.NUMERIC){ // fire the event 'onChange' every time a reading is taken
+                        device.setValue(value);
+                    }else if (device.getValue() != value){ // for ANALOG, DIGITAL.
+                        device.setValue(value);
+                    }else{ // not changed
+                        return;
+                    }
                 }
 
-                // Se foi recebido pelo modulo físico(Bluetooth/USB/Wifi), não precisa ser gerenciado pelo CommandDelivery
-                // basta ser enviado para os clientes..
+                // If it is received by the physical module (Bluetooth / USB / Wifi), need not be managed by CommandDelivery
+                // just be sent to client conenctions ..
                 if (outputConnections != null && outputConnections.exist(connection)) {
                     try {
-                        if(inputConnections != null){
+                        if(inputConnections != null && inputConnections.getSize() > 0){
                             log.debug("Sending to input connections...");
                             inputConnections.send(command);
                         }
@@ -541,8 +583,8 @@ public abstract class BaseDeviceManager implements DeviceManager {
                     }
                 }
 
-                // Comando recebido pelos clientes (WebSockets / Rest / etc...)
-                // Ele deve ser enviado para o modulo físico, e monitorar a resposta.
+                // Command received by clients (WebSockets / Rest / etc ...)
+                // It must be sent to the physical module, and monitor the response.
                 if (inputConnections != null && inputConnections.exist(connection)) {
 
                     if(outputConnections.hasConnections()){
@@ -565,7 +607,47 @@ public abstract class BaseDeviceManager implements DeviceManager {
                         }
                     }
                 }
-            } else if (type == CommandType.PING) {
+            } else if (type == CommandType.SET_PROPERTY) {
+
+                SetPropertyCommand cmd = (SetPropertyCommand) command;
+
+                int deviceID = cmd.getDeviceID();
+
+                Device device = findDeviceByUID(deviceID);
+
+                if(device instanceof GenericDevice){
+                    GenericDevice genericDevice = (GenericDevice) device;
+                    genericDevice.setProperty(cmd.getProperty(), cmd.getValue());
+                    try {
+                        if(genericDevice.getConnection() == null) log.warn("Device '" + device + "'  has no connection !");
+                        else genericDevice.getConnection().send(cmd);
+                    } catch (IOException e) {
+                        e.printStackTrace(); // TODO: melhor tratamento..
+                    }
+                }
+
+                // FIXME ? oque precisa ser feito ainda
+                // no caso da camera não precisar jogar em todos imouts
+                // acho que agora vai ser a hora de fazer o mapeamento dos devices.
+            } else if (type == CommandType.ACTION) {
+
+                ActionCommand cmd = (ActionCommand) command;
+
+                Device device = findDeviceByUID(cmd.getDeviceID());
+
+                if(device instanceof GenericDevice){
+                    GenericDevice genericDevice = (GenericDevice) device;
+                    // TODO: falta a logica interna de execucao das actions... (usar listeners normais ?)
+                    //genericDevice.setProperty(cmd.getAction(), cmd.getValue());
+                    try {
+                        genericDevice.getConnection().send(cmd);
+                    } catch (IOException e) {
+                        e.printStackTrace(); // TODO: melhor tratamento..
+                    }
+                }
+
+
+            } else if (type == CommandType.PING_REQUEST) {
 
                 Command pingResponse = new SimpleCommand(CommandType.PING_RESPONSE, 0);
                 try {

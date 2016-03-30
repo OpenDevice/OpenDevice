@@ -13,15 +13,20 @@
 
 package br.com.criativasoft.opendevice.middleware.persistence;
 
+import br.com.criativasoft.opendevice.core.extension.PersistenceExtension;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.inject.Scope;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import java.util.*;
 
 @Singleton
 public class LocalEntityManagerFactory implements Provider<EntityManagerFactory> {
+
+    private static final Logger log = LoggerFactory.getLogger(LocalEntityManagerFactory.class);
 
     private static EntityManagerFactory emf;
 
@@ -31,7 +36,27 @@ public class LocalEntityManagerFactory implements Provider<EntityManagerFactory>
 
     public static EntityManagerFactory getInstance() {
         if (emf == null) {
-            emf = Persistence.createEntityManagerFactory("neo4j_pu");
+
+            Properties properties = new Properties();
+
+            // Load: Persistence Extensions
+            // ======================================
+
+            ServiceLoader<PersistenceExtension> service = ServiceLoader.load(PersistenceExtension.class);
+
+            Iterator<PersistenceExtension> iterator = service.iterator();
+            List<Class> persistentClasses = new ArrayList<Class>();
+
+            while (iterator.hasNext()) {
+                PersistenceExtension extension = iterator.next();
+                persistentClasses.addAll(extension.loadClasses());
+            }
+
+            log.info("Additional persistence classes: " + persistentClasses);
+
+            properties.put(org.hibernate.jpa.AvailableSettings.LOADED_CLASSES, persistentClasses);
+
+            emf = Persistence.createEntityManagerFactory("neo4j_pu", properties);
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {

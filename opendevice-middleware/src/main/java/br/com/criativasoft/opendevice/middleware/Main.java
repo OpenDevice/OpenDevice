@@ -14,9 +14,10 @@
 package br.com.criativasoft.opendevice.middleware;
 
 import br.com.criativasoft.opendevice.connection.IWSServerConnection;
-import br.com.criativasoft.opendevice.connection.discovery.DiscoveryService;
 import br.com.criativasoft.opendevice.core.LocalDeviceManager;
 import br.com.criativasoft.opendevice.core.connection.Connections;
+import br.com.criativasoft.opendevice.core.extension.ViewExtension;
+import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.middleware.config.DependencyConfig;
 import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.DeviceDaoNeo4j;
@@ -26,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.Enumeration;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -37,33 +38,37 @@ import java.util.jar.JarFile;
 // - http://localhost:8181/device/1/setvalue/1
 
 public class Main extends LocalDeviceManager {
-	
+
+    private IWSServerConnection webscoket;
+
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     protected int port = 8181;
 
-	public void init() throws Exception {
+	public void start() throws IOException  {
 
 //        setApplicationID(OpenDeviceConfig.LOCAL_APP_ID);
 
-        setDeviceDao(new DeviceDaoNeo4j(LocalEntityManagerFactory.getInstance().createEntityManager()));
+        OpenDeviceConfig config = OpenDeviceConfig.get();
 
-//        addDevice(new Device(1, "BLUE", DeviceType.DIGITAL));
-//        addDevice(new Device(2, "YELLOW", DeviceType.DIGITAL));
-//        addDevice(new Device(3, "RED", DeviceType.DIGITAL));
-//        addDevice(new Sensor(4, "SW1", DeviceType.DIGITAL));
-//        addDevice(new Sensor(5, "SW2", DeviceType.DIGITAL));
+        config.setDatabaseEnabled(false);
+
+
+        // TODO: EntityManager by injection
+        if(config.isDatabaseEnabled()){
+            setDeviceDao(new DeviceDaoNeo4j(LocalEntityManagerFactory.getInstance().createEntityManager()));
+        }
 
         // new FakeSensorSimulator(50, this, 6, 7).start(); // generate fake data
         // addFilter(new FixedReadIntervalFilter(500, this));
 
 		// Enable UDP discovery service.
-        DiscoveryService.listen(port);
+        getDiscoveryService().listen();
 
         // Set IoC/DI Config
         GuiceConfigRegistry.setConfigClass(DependencyConfig.class);
 
-        // Setup WebSocket (Socket.IO) with suport for simple htttpServer
+        // Setup WebSocket  Server with suport for Http and Rest
         IWSServerConnection webscoket = Connections.in.websocket(port);
         String current = System.getProperty("user.dir");
 
@@ -76,18 +81,26 @@ public class Main extends LocalDeviceManager {
         log.debug("Current root-resource: " + rootWebApp);
         webscoket.addWebResource(current + "/target/classes/webapp"); //  running exec:java
 
-        webscoket.addWebResource("/media/ricardo/Dados/Codidos/Java/Projetos/OpenDevice/opendevice-web-view/src/main/webapp");
-        webscoket.addWebResource("/media/ricardo/Dados/Codidos/Java/Projetos/OpenDevice/opendevice-clients/opendevice-js/dist");
-        // webscoket.addWebResource("/media/Dados/Codigos/Java/ProjeJetBrainstos/OpenDevice/examples/opendevice-tutorial/src/main/resources");
+        // Running from IDE
+        // TODO Remove later
+        if(System.getProperty("idea.launcher.port") != null){
+            webscoket.addWebResource("/media/ricardo/Dados/Codidos/Java/Projetos/OpenDevice/opendevice-web-view/src/main/webapp");
+            webscoket.addWebResource("/media/ricardo/Dados/Codidos/Java/Projetos/OpenDevice/opendevice-clients/opendevice-js/dist");
+            webscoket.addWebResource("/media/ricardo/Dados/Codidos/Java/Projetos/OpenDevice/opendevice-examples/opendevice-access-control-v2/src/main/resources/webapp");
+        }
 
 
         this.addInput(webscoket);
         // OutputConnections
         // ===============================
-        addOutput(Connections.out.usb()); // Connect to first USB port available
-//        addOutput(Connections.out.bluetooth("00:13:03:14:19:07")); // Soldado: 00:11:06:14:04:57 / Modulo: "00:13:03:14:19:07"
-//        addOutput(Connections.out.usb("/dev/ttyACM1"));
+        //addOutput(Connections.out.usb()); // Connect to first USB port available
+//        addOutput(Connections.out.bluetooth("20:13:01:24:01:93"));
+//        addOutput(new MQTTServerConnection());
+        addOutput(out.tcp("192.168.3.100:8182"));
+//        addOutput(out.bluetooth("20:13:01:24:01:93"));
+//        addOutput(out.tcp("Controlador-Quarto.local.opendevice"));
 
+        // Neo4j rasberry config: https://gist.github.com/widged/8329039
         //addOutput(Connections.out.tcp("192.168.0.204:8081"));
 //        DeviceConnection conn = new RaspberryConnection() {
 //            @Override
@@ -135,83 +148,99 @@ public class Main extends LocalDeviceManager {
 		return null;
 	}
 
-    public static boolean extractResources() {
+    protected boolean extractResources() {
         try {
 
             String destPath = System.getProperty("user.dir") +  File.separator + "target" + File.separator;
 
-            if(new File(destPath + "webapp").exists()){
-                return false;
-            }
+            extractResources(Main.class, destPath);
 
-            String jarSource = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-            log.debug("Extracting contents to: " + destPath);
-            log.debug("Source: " + jarSource);
+            // Load: User Interface Extensions
+            // ======================================
 
-            if(!jarSource.endsWith(".jar") && !jarSource.endsWith(".war")) return false;
+            ServiceLoader<ViewExtension> service = ServiceLoader.load(ViewExtension.class);
 
-            JarFile jarFile = new JarFile(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-            Enumeration<JarEntry> enums = jarFile.entries();
-            while (enums.hasMoreElements()) {
-                JarEntry entry = enums.nextElement();
-                if (entry.getName().startsWith("webapp")) {
-                    File toWrite = new File(destPath + entry.getName());
-                    if (entry.isDirectory()) {
-                        toWrite.mkdirs();
-                        continue;
-                    }
-                    InputStream in = new BufferedInputStream(jarFile.getInputStream(entry));
-                    OutputStream out = new BufferedOutputStream(new FileOutputStream(toWrite));
-                    byte[] buffer = new byte[2048];
-                    for (;;) {
-                        int nBytes = in.read(buffer);
-                        if (nBytes <= 0) {
-                            break;
-                        }
-                        out.write(buffer, 0, nBytes);
-                    }
-                    out.flush();
-                    out.close();
-                    in.close();
-                    log.debug("Extracting: {}", entry.getName());
+            Iterator<ViewExtension> iterator = service.iterator();
+            List<String> userExtensions = new ArrayList<String>();
+
+            PrintWriter dynamic_plugins = new PrintWriter(new File(destPath, "webapp/ext/dynamic_plugins.js"));
+
+            while (iterator.hasNext()) {
+                ViewExtension extension = iterator.next();
+                boolean extracted = extractResources(extension.getClass(), destPath);
+                if (extracted){
+                    dynamic_plugins.println("$.getScript('"+extension.loadScripts().get(0)+"', function(){\n" +
+                            "\n" +
+                            "   console.log('Additional user interface extension: "+extension.loadScripts().get(0)+"');\n" +
+                            "\n" +
+                            "});");
                 }
+                userExtensions.addAll(extension.loadScripts());
             }
+
+            dynamic_plugins.close();
+
+            log.info("Additional user interface extension: " + userExtensions);
+
         } catch (IOException ex) {
             log.error(ex.getMessage(), ex);
             return false;
         }
         return true;
     }
+
+    protected boolean extractResources(Class klass, String destPath) throws IOException {
+
+        String jarSource = klass.getProtectionDomain().getCodeSource().getLocation().getPath();
+        log.debug("Extracting contents to: " + destPath);
+        log.debug("Source: " + jarSource);
+
+        if(!jarSource.endsWith(".jar") && !jarSource.endsWith(".war")) return false;
+
+        // Check if has extracted
+        File extensionMarker = new File(destPath, "webapp/ext/." + klass.getSimpleName()+".properties");
+        if(extensionMarker.exists()){
+            log.debug("Ignoring webapp content for extension: " + klass);
+            return false;
+        }else{
+            extensionMarker.getParentFile().mkdirs();
+            PrintWriter dynamic_plugins = new PrintWriter(extensionMarker);
+            dynamic_plugins.println("install.date = " + new Date());
+            dynamic_plugins.close();
+        }
+
+        JarFile jarFile = new JarFile(klass.getProtectionDomain().getCodeSource().getLocation().getPath());
+        Enumeration<JarEntry> enums = jarFile.entries();
+        while (enums.hasMoreElements()) {
+            JarEntry entry = enums.nextElement();
+            if (entry.getName().startsWith("webapp")) {
+                File toWrite = new File(destPath + entry.getName());
+                if (entry.isDirectory()) {
+                    toWrite.mkdirs();
+                    continue;
+                }
+                InputStream in = new BufferedInputStream(jarFile.getInputStream(entry));
+                OutputStream out = new BufferedOutputStream(new FileOutputStream(toWrite));
+                byte[] buffer = new byte[2048];
+                for (;;) {
+                    int nBytes = in.read(buffer);
+                    if (nBytes <= 0) {
+                        break;
+                    }
+                    out.write(buffer, 0, nBytes);
+                }
+                out.flush();
+                out.close();
+                in.close();
+                log.debug("Extracting: {}", entry.getName());
+            }
+        }
+        return true;
+    }
 	
 
 	public static void main(String[] args) throws Exception {
-
-        final Main main = new Main();
-        main.init();
-
-        // Automatic shutdown
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                main.disconnectAll();
-            }
-        });
-
-        // Manual shutdown
-        log.info("========================================================");
-        log.info("OpenDevice Middleware - started on port {}", main.port);
-        log.info("Type [quit] or [CTRL+C] to stop the server");
-        log.info("========================================================");
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String a = "";
-        while (!("quit".equals(a))) {
-            a = br.readLine();
-        }
-
-        System.out.println("Disconnecting all...");
-        main.disconnectAll();
-        Thread.sleep(800);
-        System.exit(-1);
+        launchApplication(Main.class, args);
     }
 	
 

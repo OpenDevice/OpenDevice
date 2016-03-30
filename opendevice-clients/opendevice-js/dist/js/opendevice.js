@@ -34,20 +34,26 @@ od.DeviceCategory = {
 od.CommandType = {
     DIGITAL:1,
     ANALOG:2,
-    ANALOG_REPORT:3,
+    NUMERIC:3,
     GPIO_DIGITAL:4,
     GPIO_ANALOG:5,
-    PWM:6,
-    INFRA_RED:7,
+    INFRA_RED:6,
 
     /** Response to commands like: DIGITAL, POWER_LEVEL, INFRA RED  */
     DEVICE_COMMAND_RESPONSE : 10, // Responsta para comandos como: DIGITAL, POWER_LEVEL, INFRA_RED
 
-    PING : 20,
-    PING_RESPONSE : 21,
-    MEMORY_REPORT : 22, // Report the amount of memory (displays the current and maximum).
-    CPU_TEMPERATURE_REPORT : 23,
-    CPU_USAGE_REPORT:24,
+    SET_PROPERTY:11,
+    ACTION:12,
+
+    PING                    :20,
+    PING_RESPONSE           :21,
+    DISCOVERY_REQUEST       :22,
+    DISCOVERY_RESPONSE      :23,
+    MEMORY_REPORT           :24,
+    CPU_TEMPERATURE_REPORT  :25,
+    CPU_USAGE_REPORT        :26,
+
+
     GET_DEVICES : 30,
     GET_DEVICES_RESPONSE : 31,
     USER_COMMAND : 99,
@@ -58,7 +64,7 @@ od.CommandType = {
                 return true;
             case this.ANALOG:
                 return true;
-            case this.ANALOG_REPORT:
+            case this.NUMERIC:
                 return true;
             default:
                 break;
@@ -99,13 +105,33 @@ var od = od || {};
  * @constructor
  */
 od.Device = function(data){
-    this.id = data.id;
-    this.name = data.name;
-    this.type = data.type;
-    this.category = data.category;
-    this.value = data.value;
-    this.sensor = data.sensor;
-    this.manager = od.deviceManager;
+
+    var CType = od.CommandType;
+    var _this = this;
+
+    function _init(data){
+
+        this.id = data.id;
+        this.manager = od.deviceManager;
+
+
+        // Dynamic Properties and Funtions
+
+        for (var attrname in data) this[attrname] = data[attrname];
+
+        for (var property in this.properties) this[property] = this.properties[property];
+
+        this.actions.forEach(function(method) {
+            _this[method] = function(){
+                console.log('Calling remote action: ' + method + ", params: ", arguments);
+                var paramlist = [];
+                for(var i in arguments) paramlist.push(arguments[i]);
+                _this.manager.send({type : CType.ACTION, deviceID : _this.id, action : method, params : paramlist });
+            }
+        });
+
+    }
+
 
     this.on = function(){
          this.setValue(1);
@@ -136,11 +162,13 @@ od.Device = function(data){
         if(this.value == 0) value = 1;
         else if(this.value == 1) value = 0;
         this.setValue(value);
-    }
+    };
 
     /** @deprecated */
     this.toggleValue = this.toggle;
 
+
+     _init.call(this, data);
 };/*
  * ******************************************************************************
  *  Copyright (c) 2013-2014 CriativaSoft (www.criativasoft.com.br)
@@ -360,7 +388,6 @@ od.deviceManager = {};
 od.DeviceManager = function(connection){
     var _this = this;
     od.deviceManager = this; // set global reference
-
     // Alias
     var DEvent = od.Event;
     var CType = od.CommandType;
@@ -450,6 +477,7 @@ od.DeviceManager = function(connection){
 
         // try local storage
         devices =  _getDevicesLocalStorege();
+
         if(devices && devices.length > 0) return devices;
 
         // load remote.
@@ -556,10 +584,30 @@ od.DeviceManager = function(connection){
         var devices = [];
 
         for(var i = 0; i < response.length; i++ ){
-            devices.push(new od.Device(response[i]));
+            var device = new od.Device(response[i]);
+            //if(typeof Object.observe != "undefined"){
+                Object.observe(device, _onPropertyChange);
+            //}
+            devices.push(device);
         }
 
         return devices;
+    }
+
+    /**
+     *
+     * @param event
+     * @private
+     */
+    function _onPropertyChange(event){
+
+        if(event.length > 0 && event[0].type == "update"){
+
+            var device = event[0].object;
+
+            _this.send({type : CType.SET_PROPERTY, deviceID : device.id, property : event[0].name, value : device[event[0].name] });
+        }
+
     }
 
     /**

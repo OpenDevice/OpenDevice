@@ -49,9 +49,9 @@ public interface DeviceConnection {
 	
 	public void notifyListeners(Message message);
 	
-	public void setSerializer(MessageSerializer<?, ?> serializer);
+	public void setSerializer(MessageSerializer serializer);
 	
-	public MessageSerializer<?, ?> getSerializer();
+	public MessageSerializer getSerializer();
 
     public String getUID();
 

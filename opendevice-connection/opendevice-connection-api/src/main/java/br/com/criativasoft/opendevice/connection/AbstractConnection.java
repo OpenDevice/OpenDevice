@@ -214,4 +214,22 @@ public abstract class AbstractConnection implements DeviceConnection {
         return this.manager;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AbstractConnection that = (AbstractConnection) o;
+
+        if (!uid.equals(that.uid)) return false;
+        return applicationID.equals(that.applicationID);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = uid.hashCode();
+        result = 31 * result + applicationID.hashCode();
+        return result;
+    }
 }

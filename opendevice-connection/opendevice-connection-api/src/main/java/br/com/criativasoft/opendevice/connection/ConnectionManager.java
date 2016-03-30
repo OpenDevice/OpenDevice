@@ -25,4 +25,6 @@ public interface ConnectionManager {
 
     public Collection<DeviceConnection> getConnections();
 
+    public DeviceConnection findConnection(String uid);
+
 }

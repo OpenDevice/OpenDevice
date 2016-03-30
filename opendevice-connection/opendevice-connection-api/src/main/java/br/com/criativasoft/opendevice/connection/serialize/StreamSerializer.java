@@ -16,7 +16,7 @@ package br.com.criativasoft.opendevice.connection.serialize;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.connection.message.SimpleMessage;
   
-public class StreamSerializer implements MessageSerializer<byte[], byte[]> {
+public class StreamSerializer implements MessageSerializer {
 	
 	@Override
 	public Message parse(byte[] data) {

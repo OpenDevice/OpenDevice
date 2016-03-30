@@ -19,13 +19,11 @@ import br.com.criativasoft.opendevice.connection.message.Message;
  * Base interface to make serialization and deserialization of Commands and Messages that are sent through connections. <br/>
  * You can implement your own protocol implementing this interface (ex: CommandStreamSerializer in opendevice-core).
  * @author Ricardo JL Rufino
- * @param <I> Input data type
- * @param <O> Output data type
  */
-public interface MessageSerializer<I, O> {
+public interface MessageSerializer {
 	
-	public Message parse(I data);
+	Message parse(byte data[]);
 	
-	public O serialize(Message message);
+	byte[] serialize(Message message);
 
 }

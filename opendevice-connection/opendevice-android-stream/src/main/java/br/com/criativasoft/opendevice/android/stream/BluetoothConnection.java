@@ -75,16 +75,19 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
             // try enable bluetooth.
             if (!bluetoothAdapter.isEnabled()) {
                 bluetoothAdapter.enable();
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {}
             }
 
             // Check paired
-            if(!isPaired()){
+            if(isPaired()){
+                ConnectThread connectThread = new ConnectThread(getBluetoothDevice());
+                connectThread.start();
+            }else{
                 Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
-            }else{
-                ConnectThread connectThread = new ConnectThread(getBluetoothDevice());
-                connectThread.start();
             }
         }
 
@@ -193,8 +196,6 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
                 // This is a blocking call and will only return on a
                 // successful connection or an exception
                 mmSocket.connect();
-
-                setStatus(ConnectionStatus.CONNECTED);
 
             } catch (IOException e) {
 

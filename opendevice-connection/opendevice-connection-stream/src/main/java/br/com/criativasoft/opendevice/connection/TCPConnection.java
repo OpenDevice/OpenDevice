@@ -34,6 +34,7 @@ public class TCPConnection extends AbstractStreamConnection implements ITcpConne
 	private static final Logger log = LoggerFactory.getLogger(TCPConnection.class);
 
 	public static final long DISCOVERY_TIMEOUT = 5000;
+	public static final long DEFAULT_PORT = 8182;
 
     private Socket connection;
 

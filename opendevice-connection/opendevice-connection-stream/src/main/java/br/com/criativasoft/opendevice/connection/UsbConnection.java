@@ -72,6 +72,12 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
 		this.deviceURI = portName;
 	}
 
+
+	public static List<String> listAvailable() {
+        return listAvailablePortNames();
+	}
+
+    @Deprecated
 	public static List<String> listAvailablePortNames() {
 		String[] portNames = SerialPortList.getPortNames();
 		return Arrays.asList(portNames);
@@ -212,9 +218,13 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
                 log.error(ex.getMessage(), ex);
             }
         } else if (event.isRING()) {///If DSR line has changed state
-            log.debug("SerialEvent - isRING");
+            log.debug("SerialEvent - isRING :" + event.getEventValue());
         }
 
     }
-	
+
+    @Override
+    public String toString() {
+        return "UsbConnection["+getConnectionURI()+"]";
+    }
 }

@@ -240,7 +240,7 @@ od.DeviceManager = function(connection){
      */
     function _onPropertyChange(event){
 
-        if(event.length > 0 && event[0].type == "update"){
+        if(event.length > 0 && event[0].type == "update" && event[0].name != "value"){
 
             var device = event[0].object;
 

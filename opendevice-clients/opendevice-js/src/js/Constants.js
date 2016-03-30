@@ -31,6 +31,8 @@ od.DeviceCategory = {
     IR_SENSOR: 51
 };
 
+
+
 od.CommandType = {
     DIGITAL:1,
     ANALOG:2,
@@ -41,11 +43,11 @@ od.CommandType = {
 
     /** Response to commands like: DIGITAL, POWER_LEVEL, INFRA RED  */
     DEVICE_COMMAND_RESPONSE : 10, // Responsta para comandos como: DIGITAL, POWER_LEVEL, INFRA_RED
+    COMMAND_RESPONSE : 11,
+    SET_PROPERTY:12,
+    ACTION:13,
 
-    SET_PROPERTY:11,
-    ACTION:12,
-
-    PING                    :20,
+    PING_REQUEST            :20,
     PING_RESPONSE           :21,
     DISCOVERY_REQUEST       :22,
     DISCOVERY_RESPONSE      :23,
@@ -54,9 +56,20 @@ od.CommandType = {
     CPU_USAGE_REPORT        :26,
 
 
-    GET_DEVICES : 30,
-    GET_DEVICES_RESPONSE : 31,
-    USER_COMMAND : 99,
+    GET_DEVICES             :30,
+    GET_DEVICES_RESPONSE    :31,
+    DEVICE_ADD              :32,
+    DEVICE_ADD_RESPONSE	    :33,
+    DEVICE_DEL              :34,
+    CLEAR_DEVICES           :35,
+    GET_CONNECTIONS         :36,
+    GET_CONNECTIONS_RESPONSE:37,
+    CONNECTION_ADD          :38,
+    CONNECTION_ADD_RESPONSE :39,
+    CONNECTION_DEL          :40,
+    CLEAR_CONNECTIONS       :41,
+
+    USER_COMMAND            :99,
 
     isDeviceCommand : function(type){
         switch (type) {

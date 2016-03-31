@@ -40,7 +40,7 @@ public enum CommandType implements EnumCode {
     ACTION                  (13, ActionCommand.class),
 
     PING_REQUEST            (20, SimpleCommand.class),
-    PING_RESPONSE           (21, SimpleCommand.class),
+    PING_RESPONSE           (21, ResponseCommand.class),
     DISCOVERY_REQUEST       (22, SimpleCommand.class),
     DISCOVERY_RESPONSE      (23, DiscoveryResponse.class),
     MEMORY_REPORT           (24, SimpleCommand.class), // Report the amount of memory (displays the current and maximum).

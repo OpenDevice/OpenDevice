@@ -37,7 +37,11 @@ public class ResponseCommand extends Command {
     public ResponseCommand(CommandStatus status, String connectionUUID) {
         this(CommandType.DEVICE_COMMAND_RESPONSE, status, connectionUUID);
     }
-	
+
+    public ResponseCommand(CommandType type, CommandStatus status) {
+        this(type, status, null);
+    }
+
 	public ResponseCommand(CommandType type, CommandStatus status, String connectionUUID) {
 		super(type, UUID.randomUUID().toString(), connectionUUID);
 		this.setStatus(status);

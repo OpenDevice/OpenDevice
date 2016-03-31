@@ -213,7 +213,7 @@ public class CommandDelivery implements ConnectionListener {
             if(requestUID == this.newID){
 
                 long time = System.currentTimeMillis() - start;
-                log.debug("Response received ("+received.getStatus()+") :: ID:<" + this.newID + "> , time: " + time + "ms");
+                log.debug("Response (" + received.getType() + ":" +received.getStatus()+") :: ID:<" + this.newID + "> , time: " + time + "ms");
 
                 command.setResponse(received);
 

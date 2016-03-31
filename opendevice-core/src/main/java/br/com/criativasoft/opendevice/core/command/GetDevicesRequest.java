@@ -22,7 +22,7 @@ import br.com.criativasoft.opendevice.connection.message.Request;
  * @author ricardo
  * @date 28/06/14.
  */
-public class GetDevicesRequest extends Command implements Request {
+public class GetDevicesRequest extends SimpleCommand implements Request {
 
     public static final int FILTER_BY_ID = 1;
 
@@ -35,14 +35,14 @@ public class GetDevicesRequest extends Command implements Request {
     }
 
     public GetDevicesRequest(int filter, Object filterValue, boolean forceSync) {
-        super(CommandType.GET_DEVICES);
+        super(CommandType.GET_DEVICES, 0);
         this.filter = filter;
         this.filterValue = filterValue;
         this.forceSync = forceSync;
     }
 
     public GetDevicesRequest() {
-        super(CommandType.GET_DEVICES);
+        super(CommandType.GET_DEVICES, 0);
     }
 
     @Override

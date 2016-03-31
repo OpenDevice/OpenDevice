@@ -79,19 +79,19 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 	}
 
 	public void connect() throws ConnectionException {
-		IOException lastException = null;
+		ConnectionException lastException = null;
 	
 		for (DeviceConnection connection : connections) {
 			if(connection != null && ! connection.isConnected()){
 				try{
 					connection.connect();
-				}catch(IOException e){
+				}catch(ConnectionException e){
 					lastException = e;
 				}
 			}
 		}
 
-		if(lastException != null) throw new ConnectionException(lastException.getMessage(), lastException);
+		if(lastException != null) throw lastException;
 		
 	}
 

@@ -19,8 +19,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.content.Intent;
-import android.provider.Settings;
 import br.com.criativasoft.opendevice.android.AndroidContextSupport;
 import br.com.criativasoft.opendevice.connection.AbstractStreamConnection;
 import br.com.criativasoft.opendevice.connection.ConnectionStatus;
@@ -31,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.UUID;
 
@@ -81,14 +78,15 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
             }
 
             // Check paired
-            if(isPaired()){
+//            if(isPaired()){
                 ConnectThread connectThread = new ConnectThread(getBluetoothDevice());
                 connectThread.start();
-            }else{
-                Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
-            }
+//            }else{
+//                setStatus(ConnectionStatus.DISCONNECTED);
+//                Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                context.startActivity(intent);
+//            }
         }
 
     }
@@ -159,30 +157,29 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
      * succeeds or fails.
      */
     private class ConnectThread extends Thread {
-        private final BluetoothSocket mmSocket;
-        private final BluetoothDevice mmDevice;
+        private BluetoothSocket socket;
+        private BluetoothDevice device;
 
         public ConnectThread(BluetoothDevice device) {
-            mmDevice = device;
-            BluetoothSocket tmp = null;
+            this.device = device;
+
 
             // Get a BluetoothSocket for a connection with the
             // given BluetoothDevice
             try {
                 log.trace("Creating connection socket to: " + device);
 
-                Method m = device.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
-                tmp = (BluetoothSocket) m.invoke(device, 1);
+                socket = device.createRfcommSocketToServiceRecord(UUID_SPP);
 
-                // tmp = device.createRfcommSocketToServiceRecord(UUID_SPP);
             } catch (Exception e) {
                log.error(e.getMessage(), e);
             }
-            mmSocket = tmp;
-            connection = tmp;
+
+            connection = socket;
         }
 
         public void run() {
+
             setName("ConnectThread");
 
             // Always cancel discovery because it will slow down a connection
@@ -191,11 +188,10 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
             // Make a connection to the BluetoothSocket
             try {
 
-                if(bluetoothAdapter.isEnabled())
-
                 // This is a blocking call and will only return on a
                 // successful connection or an exception
-                mmSocket.connect();
+                socket.connect();
+
 
             } catch (IOException e) {
 
@@ -205,7 +201,7 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
 
                 // Close the socket
                 try {
-                    mmSocket.close();
+                    socket.close();
                 } catch (IOException e2) {
                     log.error(e.getMessage(), e);
                 }

@@ -11,9 +11,8 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.connection.server;
+package br.com.criativasoft.opendevice.connection;
 
-import br.com.criativasoft.opendevice.connection.*;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.connection.message.Request;
@@ -258,9 +257,9 @@ public class TCPServerConnection extends AbstractStreamConnection implements ITc
                     throw new ConnectionException(e);
                 }
 
-                log.debug("Disconnected !");
+                AbstractStreamConnection.log.debug("Disconnected !");
             }else{
-                log.info("not connected !");
+                AbstractStreamConnection.log.info("not connected !");
             }
         }
     }

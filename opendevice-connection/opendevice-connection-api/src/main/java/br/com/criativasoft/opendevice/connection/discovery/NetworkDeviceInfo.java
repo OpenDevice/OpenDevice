@@ -21,9 +21,14 @@ import java.io.Serializable;
  */
 public class NetworkDeviceInfo implements Serializable {
 
+
     private String name;
 
     private String ip;
+
+    private int type;
+
+    private int deviceLength;
 
     private int port;
 
@@ -61,6 +66,21 @@ public class NetworkDeviceInfo implements Serializable {
         this.port = port;
     }
 
+    public void setDeviceLength(int deviceLength) {
+        this.deviceLength = deviceLength;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public int getDeviceLength() {
+        return deviceLength;
+    }
+
+    public int getType() {
+        return type;
+    }
 
     @Override
     public boolean equals(Object o) {

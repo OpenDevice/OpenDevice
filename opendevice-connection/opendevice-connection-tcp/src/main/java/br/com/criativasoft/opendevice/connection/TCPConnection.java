@@ -75,6 +75,7 @@ public class TCPConnection extends AbstractStreamConnection implements ITcpConne
 			}
 			
 		} catch (IOException e) {
+			connection = null;
             setStatus(ConnectionStatus.FAIL);
 			throw new ConnectionException(e.getMessage(), e);
 		}
@@ -89,7 +90,8 @@ public class TCPConnection extends AbstractStreamConnection implements ITcpConne
             // Automatic discovery
 			if(fdeviceURI.endsWith("local.opendevice")){
 				int indexOf = fdeviceURI.indexOf(".local.opendevice");
-				Set<NetworkDeviceInfo> devices = discoveryService.scan(DISCOVERY_TIMEOUT, fdeviceURI.substring(0, indexOf));
+				String name = fdeviceURI.substring(0, indexOf);
+				Set<NetworkDeviceInfo> devices = discoveryService.scan(DISCOVERY_TIMEOUT, name);
                 if(devices.size() > 0){
                     NetworkDeviceInfo info = devices.iterator().next();
                     fdeviceURI = info.getIp() + ":" + info.getPort();
@@ -107,7 +109,6 @@ public class TCPConnection extends AbstractStreamConnection implements ITcpConne
             connection = new Socket();
             connection.connect(new InetSocketAddress(host, Integer.parseInt(port)), 5000);
 
-			log.debug("Connectend !");
 		}
 	}
 
@@ -138,4 +139,8 @@ public class TCPConnection extends AbstractStreamConnection implements ITcpConne
 	}
 
 
+	@Override
+	public String toString() {
+		return "TCPConnection["+getConnectionURI().replaceAll("\\.local\\.opendevice","")+"]";
+	}
 }

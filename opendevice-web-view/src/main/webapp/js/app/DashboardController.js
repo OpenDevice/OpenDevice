@@ -56,6 +56,14 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
             $dashboards = $('.dashboards');
             ODev.connect();
 
+            $(document.body).on("keydown", function(event){
+                if(event.keyCode > 48 && event.keyCode < 58){
+                    var deviceID = event.keyCode - 48;
+                    ODev.toggleValue(deviceID);
+                }
+
+            });
+
         });
 
         ODev.onConnect(function(devices){
@@ -69,7 +77,7 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
         ODev.onChange(function(device){
             if(device) {
                 if (device.type == od.DeviceType.DIGITAL) {
-                    playSound(device);
+                    // playSound(device);
                 }
 
                 $timeout(function(){
@@ -368,6 +376,7 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
         return cname;
     };
+
 
     _public.isChartView = function(type){
         return DashItemView.isCompatibleChart(type);

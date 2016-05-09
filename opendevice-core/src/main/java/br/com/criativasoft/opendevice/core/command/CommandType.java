@@ -106,6 +106,33 @@ public enum CommandType implements EnumCode {
 
     }
 
+    public static boolean allowBroadcast( CommandType type ) {
+
+        switch (type) {
+            case DIGITAL:
+                return true;
+            case ANALOG:
+                return true;
+            case NUMERIC:
+                return true;
+            case GPIO_DIGITAL:
+                return true;
+            case GPIO_ANALOG:
+                return true;
+            case INFRA_RED:
+                return true;
+            case SET_PROPERTY:
+                return true;
+            case ACTION:
+                return true;
+            case USER_COMMAND:
+                return true;
+        }
+
+        return false;
+
+    }
+
     public Class<? extends Command> getCommandClass() {
         return commandClass;
     }

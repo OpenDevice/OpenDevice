@@ -74,12 +74,13 @@ public class CommandStreamSerializer implements MessageSerializer{
 			long value = Long.parseLong(split[3]);
 
 			command = new SimpleCommand(type, value);
-		// Simple Reponse
+		// Simple Response
 		}else if(ResponseCommand.class.equals(type.getCommandClass())){
 
 			int value = Integer.parseInt(split[3]);
 
 			command = new ResponseCommand(type, CommandStatus.getByCode(value));
+
 
         // Some clases that extend SimpleCommand
         }else if(SimpleCommand.class.isAssignableFrom(type.getCommandClass())){
@@ -114,12 +115,23 @@ public class CommandStreamSerializer implements MessageSerializer{
 			command = new GetDevicesRequest();
 
         // Format: GET_DEVICES_RESPONSE;ID;Length;[ID, PIN, VALUE, TARGET, SENSOR?, TYPE];[ID,PIN,VALUE,...];[ID,PIN,VALUE,...]
-		// TODO: Move to ExtendedCommand model.
+
         }else if(type == CommandType.GET_DEVICES_RESPONSE) { // Returned list of devices.
 			String reqID = split[1];
 			List<Device> devices = new LinkedList<Device>();
 			command = new GetDevicesResponse(devices, reqID);
-		}
+
+		// Custom Response (this must be in te end.)
+        }else if(ResponseCommand.class.isAssignableFrom(type.getCommandClass())){
+
+            try {
+
+                command = type.getCommandClass().newInstance();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
 
         if(command == null)  throw new CommandException("Can't parse command type : " + type + ", cmd: " + cmd);

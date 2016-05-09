@@ -35,16 +35,20 @@ public class DiscoveryClientService implements Runnable {
     private Logger log = LoggerFactory.getLogger(DiscoveryClientService.class);
 
     private long timeout;
+    private boolean closeOnFinish = true;
     private String deviceName;
+    private DatagramSocket socket;
     private DiscoveryListener listener;
     private Set<NetworkDeviceInfo> devices = new HashSet<NetworkDeviceInfo>();
 
     final CommandStreamSerializer serializer = new CommandStreamSerializer();
 
-    public DiscoveryClientService(long timeout, String deviceName, DiscoveryListener listener) {
+    public DiscoveryClientService(long timeout, String deviceName, DiscoveryListener listener , DatagramSocket socket) {
         this.timeout = timeout;
         this.deviceName = deviceName;
         this.listener = listener;
+        this.socket = socket;
+        this.closeOnFinish = false; // shared instance.
     }
 
     @Override
@@ -57,9 +61,11 @@ public class DiscoveryClientService implements Runnable {
     }
 
     public void scan() throws IOException {
-        DatagramSocket socket = new DatagramSocket(DISCOVERY_PORT);
-        socket.setBroadcast(true);
-        socket.setSoTimeout((int)timeout);
+        if(socket == null) {
+            socket = new DatagramSocket(DISCOVERY_PORT);
+            socket.setBroadcast(true);
+            socket.setSoTimeout((int) timeout);
+        }
         sendDiscoveryRequest(socket);
         listenForResponses(socket);
     }
@@ -89,6 +95,7 @@ public class DiscoveryClientService implements Runnable {
         try {
             while (true) {
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                socket.setSoTimeout((int) timeout);
                 socket.receive(packet);
 
                 log.debug("Received response from <<" + packet.getAddress().getHostAddress() + ">> " + new String(packet.getData()));
@@ -97,18 +104,30 @@ public class DiscoveryClientService implements Runnable {
                     final DiscoveryResponse response = (DiscoveryResponse) serializer.parse(packet.getData());
                     NetworkDeviceInfo deviceInfo = response.getDeviceInfo();
                     deviceInfo.setIp(packet.getAddress().getHostAddress());
-                    devices.add(deviceInfo);
-                    notifyListeners(deviceInfo);
 
-                    if (deviceName != null && deviceInfo.getName().equals(deviceName)) break;
+                    log.info("Found Device: " + deviceInfo);
+
+                    if(deviceName == null || "*".equals(deviceName) || deviceName.equals(deviceInfo.getName())) {
+                        devices.add(deviceInfo);
+                        notifyListeners(deviceInfo);
+                    }
+
+                    if (deviceName != null && deviceInfo.getName().equals(deviceName)){
+                        break;
+                    }
                 }
 
             }
         } catch (SocketTimeoutException e) {
             log.debug("Scan timeout");
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
 
-        socket.close();
+
+        if(this.closeOnFinish) {
+            socket.close();
+        }
     }
 
 

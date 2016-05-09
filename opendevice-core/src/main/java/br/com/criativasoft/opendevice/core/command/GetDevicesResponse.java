@@ -29,6 +29,10 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
 
 	private static final long serialVersionUID = -1023397181880070237L;
 
+    public GetDevicesResponse() {
+        super(TYPE, CommandStatus.CREATED);
+    }
+
 	public GetDevicesResponse(Collection<Device> devices, String connectionUUID) {
 		super(TYPE, CommandStatus.CREATED, connectionUUID);
 		this.devices = devices;

@@ -33,7 +33,9 @@ public class DiscoveryResponse extends ResponseCommand implements ExtendedComman
         String[] data = extradata.split(Command.DELIMITER);
         deviceInfo = new NetworkDeviceInfo();
         deviceInfo.setName(data[0]);
-        deviceInfo.setPort(Integer.parseInt(data[1]));
+        deviceInfo.setType(Integer.parseInt(data[1]));
+        deviceInfo.setDeviceLength(Integer.parseInt(data[2]));
+        deviceInfo.setPort(Integer.parseInt(data[3]));
     }
 
     public NetworkDeviceInfo getDeviceInfo() {

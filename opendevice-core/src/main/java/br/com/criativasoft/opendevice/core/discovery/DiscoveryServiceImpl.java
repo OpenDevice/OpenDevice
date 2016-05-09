@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 import java.util.Set;
 
 /**
@@ -40,6 +41,8 @@ public class DiscoveryServiceImpl extends Thread implements br.com.criativasoft.
 	private static final String DISCOVER_SERVER_RESPONSE = "DISCOVER_SERVER_RESPONSE";
 
     private int httpPort;
+
+    private DatagramSocket socket;
 
     public DiscoveryServiceImpl() {
         setDaemon(true);
@@ -61,7 +64,7 @@ public class DiscoveryServiceImpl extends Thread implements br.com.criativasoft.
 		try {
 			// Keep a socket open to listen to all the UDP trafic that is
 			// destined for this port
-            DatagramSocket socket = new DatagramSocket(DISCOVERY_PORT, InetAddress.getByName("0.0.0.0"));
+            socket = new DatagramSocket(DISCOVERY_PORT, InetAddress.getByName("0.0.0.0"));
 			socket.setBroadcast(true);
 			log.debug("Listen for requests at:" + DISCOVERY_PORT);
 			
@@ -87,6 +90,8 @@ public class DiscoveryServiceImpl extends Thread implements br.com.criativasoft.
 					log.debug("Sent response to: "+ sendPacket.getAddress().getHostAddress());
 				}
 			}
+        } catch (SocketTimeoutException ex) {
+            log.debug("Discovery timedout");
 		} catch (IOException ex) {
             ex.printStackTrace();
 		}
@@ -99,7 +104,7 @@ public class DiscoveryServiceImpl extends Thread implements br.com.criativasoft.
      */
     @Override
     public void listen(){
-        new DiscoveryServiceImpl(DISCOVERY_PORT).start();
+        start();
     }
 
     /**
@@ -111,7 +116,7 @@ public class DiscoveryServiceImpl extends Thread implements br.com.criativasoft.
      */
     @Override
     public Set<NetworkDeviceInfo> scan(long timeout, String deviceName) throws IOException {
-        DiscoveryClientService service = new DiscoveryClientService(timeout, deviceName, null);
+        DiscoveryClientService service = new DiscoveryClientService(timeout, deviceName, null, socket);
         service.scan();
         return service.getDevices();
     }
@@ -125,7 +130,7 @@ public class DiscoveryServiceImpl extends Thread implements br.com.criativasoft.
      */
     @Override
     public void scan(long timeout, String deviceName, DiscoveryListener listener){
-        DiscoveryClientService service = new DiscoveryClientService(timeout, deviceName, listener);
+        DiscoveryClientService service = new DiscoveryClientService(timeout, deviceName, listener, socket);
         new Thread(service).start();
     }
 

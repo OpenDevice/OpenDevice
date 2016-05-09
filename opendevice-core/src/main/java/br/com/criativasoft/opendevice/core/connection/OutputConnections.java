@@ -56,7 +56,7 @@ public class OutputConnections {
     public <T extends DeviceConnection> T tcp(String address){
         ITcpConnection connection = load(ITcpConnection.class);
         if(connection != null){
-            BaseDeviceManager deviceManager = (BaseDeviceManager) BaseDeviceManager.getInstance();
+            BaseDeviceManager deviceManager =  BaseDeviceManager.getInstance();
             if(deviceManager != null){
                 connection.setDiscoveryService(deviceManager.getDiscoveryService());
             }

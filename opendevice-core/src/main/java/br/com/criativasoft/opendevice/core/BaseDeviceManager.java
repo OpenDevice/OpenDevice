@@ -25,6 +25,8 @@ import br.com.criativasoft.opendevice.core.discovery.DiscoveryServiceImpl;
 import br.com.criativasoft.opendevice.core.event.EventHookManager;
 import br.com.criativasoft.opendevice.core.extension.OpenDeviceExtension;
 import br.com.criativasoft.opendevice.core.filter.CommandFilter;
+import br.com.criativasoft.opendevice.core.listener.DeviceListener;
+import br.com.criativasoft.opendevice.core.listener.OnDeviceChangeListener;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.model.*;
 import br.com.criativasoft.opendevice.core.model.test.DeviceCategoryRegistry;
@@ -38,7 +40,7 @@ import java.util.*;
 /**
  * This is the base class for device management and input and output connections. <br/>
  * After adding devices ({@link #addDevice(br.com.criativasoft.opendevice.core.model.Device)}) and connections {@link #addOutput(br.com.criativasoft.opendevice.connection.DeviceConnection)},
- * you can monitor the changes by adding a DeviceListener {@link #addListener(br.com.criativasoft.opendevice.core.model.DeviceListener)}.
+ * you can monitor the changes by adding a DeviceListener {@link #addListener(DeviceListener)}.
  * @since 0.1.2
  * @date 23/06/2013
  */
@@ -49,7 +51,10 @@ public abstract class BaseDeviceManager implements DeviceManager {
 	private static final Logger log = LoggerFactory.getLogger(BaseDeviceManager.class);
 
     private List<OpenDeviceExtension> extensions  = new LinkedList<OpenDeviceExtension>();
-	
+
+    private volatile Set<DeviceListener> listeners = new HashSet<DeviceListener>();
+
+
 	/** Client connections: Websockets, http, rest, etc ...*/
 	private MultipleConnection inputConnections = new MultipleConnection();
 	
@@ -110,8 +115,8 @@ public abstract class BaseDeviceManager implements DeviceManager {
      * Get shared global instance of DevinceManager.
      * @return
      */
-    public static DeviceManager getInstance() {
-        return instance;
+    public static BaseDeviceManager getInstance() {
+        return (BaseDeviceManager) instance;
     }
 
     public EventHookManager getEventManager() {
@@ -159,12 +164,16 @@ public abstract class BaseDeviceManager implements DeviceManager {
         return deviceDao;
     }
 
-    private volatile Set<DeviceListener> listeners = new HashSet<DeviceListener>();
+
 
     @Override
     public void addDevice(Device device) {
+        if(device == null) throw new IllegalArgumentException("Device is null");
         if(findDeviceByUID(device.getUid()) == null) {
             getValidDeviceDao().persist(device);
+            for(DeviceListener listener: listeners){
+                listener.onDeviceRegistred(device);
+            }
         }
     }
 
@@ -200,13 +209,30 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     /**
      * Notify All Listeners about device change
+     * @param sync - sync state with server
      */
-    public void notifyListeners(Device device) {
+    public void notifyListeners(Device device, boolean sync) {
 
-        deviceManagerListener.onDeviceChanged(device);
+        if(sync){
+
+            try {
+                if (device.getType() == DeviceType.DIGITAL) {
+                    DeviceCommand cmd = new DeviceCommand(CommandType.DIGITAL, device.getUid(), device.getValue());
+                    send(cmd);
+                }
+
+                if (device.getType() == DeviceType.ANALOG) {
+                    DeviceCommand cmd = new DeviceCommand(CommandType.ANALOG, device.getUid(), device.getValue());
+                    send(cmd);
+                }
+            }catch (IOException ex){
+                log.error(ex.getMessage(), ex);
+            }
+
+        }
 
         // Individual Listeners
-        for (final DeviceListener listener : device.getListeners()) {
+        for (final OnDeviceChangeListener listener : device.getListeners()) {
             listener.onDeviceChanged(device);
         }
 
@@ -280,7 +306,8 @@ public abstract class BaseDeviceManager implements DeviceManager {
             }
         }
 
-        if(connection instanceof StreamConnection && outputConnections.exist(connection)){
+        if((connection instanceof StreamConnection || connection instanceof IWSConnection )
+                && outputConnections.exist(connection)){
             try {
                 sendTo(new GetDevicesRequest(), connection);
             } catch (IOException e) {}
@@ -333,6 +360,10 @@ public abstract class BaseDeviceManager implements DeviceManager {
             if(! (streamConnection.getSerializer() instanceof CommandStreamSerializer)){
                 streamConnection.setStreamReader(new CommandStreamReader()); // data protocol..
             }
+        }
+
+        if(connection instanceof ITcpConnection){
+            ((ITcpConnection) connection).setDiscoveryService(discoveryService);
         }
 
         delivery.addConnection(connection);
@@ -449,6 +480,14 @@ public abstract class BaseDeviceManager implements DeviceManager {
         return newList;
     }
 
+    public MultipleConnection getOutputConnections() {
+        return outputConnections;
+    }
+
+    public MultipleConnection getInputConnections() {
+        return inputConnections;
+    }
+
     @Override
     public DeviceConnection findConnection(String uid) {
 
@@ -465,46 +504,13 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
 
 
-    DeviceListener deviceManagerListener = new DeviceListener() {
-
-        @Override
-        public void onDeviceChanged(Device device) {
-
-            try {
-
-                // Ignore changes fired in 'onMessageReceived'
-                if(lastMessage instanceof  DeviceCommand){
-
-                    DeviceCommand command = (DeviceCommand) lastMessage;
-
-                    if(device.getUid() == command.getDeviceID() && device.getValue() == command.getValue()){
-                        return;
-                    }
-                }
-
-                if (device.getType() == DeviceType.DIGITAL) {
-                    DeviceCommand cmd = new DeviceCommand(CommandType.DIGITAL, device.getUid(), device.getValue());
-                    send(cmd);
-                }
-
-                if (device.getType() == DeviceType.ANALOG) {
-                    DeviceCommand cmd = new DeviceCommand(CommandType.ANALOG, device.getUid(), device.getValue());
-                    send(cmd);
-                }
-
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
-    };
-
     private ConnectionListener connectionListener = new ConnectionListener() {
 
         @Override
         public void connectionStateChanged(DeviceConnection connection, ConnectionStatus status) {
             log.debug("connectionStateChanged :: "+ connection.getClass().getSimpleName() + ", status = " + status);
 
-            if(status == ConnectionStatus.CONNECTED && connection instanceof StreamConnection){
+            if(status == ConnectionStatus.CONNECTED && outputConnections.exist(connection)){
 
                 syncDevices(connection);
 
@@ -546,9 +552,10 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
             }
 
-            if(log.isDebugEnabled()) log.debug("Command Received - Type: {} (from: " + connection.toString() + ")", command.getType().toString());
 
             CommandType type = command.getType();
+
+            if(log.isDebugEnabled()) log.debug("Command Received - Type: {} (from: " + connection.toString() + ")", type.toString());
 
             // Comandos de DIGITAL e similares..
             if (DeviceCommand.isCompatible(type) || type == CommandType.INFRA_RED) {
@@ -560,11 +567,13 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
                 Device device = findDeviceByUID(deviceID);
 
+                if(log.isDebugEnabled()) log.debug("Device Change. ID:{}, Value:{}", deviceID, value);
+
                 if(device != null){
                     if(device.getType() == Device.NUMERIC){ // fire the event 'onChange' every time a reading is taken
-                        device.setValue(value);
+                        device.setValue(value, false);
                     }else if (device.getValue() != value){ // for ANALOG, DIGITAL.
-                        device.setValue(value);
+                        device.setValue(value, false);
                     }else{ // not changed
                         return;
                     }
@@ -682,6 +691,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
                     GetDevicesResponse response = new GetDevicesResponse(devices, command.getConnectionUUID());
                     response.setApplicationID(command.getApplicationID());
+                    response.setConnectionUUID(command.getConnectionUUID());
 
                     try {
 
@@ -711,7 +721,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
                     log.debug(" - " + device.toString());
                     Device found = dao.getByUID(device.getUid());
                     if(found == null){
-                        addDevice(found);
+                        addDevice(device);
                     }else{
                         found.setValue(device.getValue());
                     }

@@ -17,6 +17,7 @@ import br.com.criativasoft.opendevice.core.BaseDeviceManager;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.command.CommandType;
 import br.com.criativasoft.opendevice.core.command.DeviceCommand;
+import br.com.criativasoft.opendevice.core.listener.OnDeviceChangeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +59,7 @@ public class Device implements Serializable {
 	
 	private long value = VALUE_LOW;
 
-    private volatile Set<DeviceListener> listeners = new HashSet<DeviceListener>();
+    private volatile Set<OnDeviceChangeListener> listeners = new HashSet<OnDeviceChangeListener>();
 
     protected volatile GpioInfo gpio;
 
@@ -157,16 +158,25 @@ public class Device implements Serializable {
 	}
 
 
-	public void setValue(long value) {
+    public void setValue(long value) {
+        this.setValue(value, true);
+    }
+
+    /**
+     *
+     * @param value
+     * @param sync - sync state with server
+     */
+	public void setValue(long value, boolean sync) {
 
         if(type == NUMERIC){ // fire the event 'onChange' every time a reading is taken
             setLastUpdate(System.currentTimeMillis());
             this.value = value;
-            notifyListeners();
+            notifyListeners(sync);
         }else if(value != this.value){
             setLastUpdate(System.currentTimeMillis());
             this.value = value;
-            notifyListeners();
+            notifyListeners(sync);
         }
 
 	}
@@ -218,7 +228,7 @@ public class Device implements Serializable {
 		this.category = category;
 	}
 
-    public void setCategory(Class<DeviceCategory> klass) {
+    public void setCategoryClass(Class<DeviceCategory> klass) {
 
         DeviceManager manager = BaseDeviceManager.getInstance();
         if(manager != null){
@@ -247,25 +257,25 @@ public class Device implements Serializable {
 		return dateCreated;
 	}
 
-    public boolean addListener(DeviceListener e) {
+    public boolean addListener(OnDeviceChangeListener e) {
         return listeners.add(e);
     }
 
-    public Set<DeviceListener> getListeners() {
+    public Set<OnDeviceChangeListener> getListeners() {
         return listeners;
     }
 
-    public boolean onChange(DeviceListener e) {
-        return listeners.add(e);
+    public boolean onChange(OnDeviceChangeListener e) {
+        return addListener(e);
     }
 
     /**
      * Notify All Listeners about received command.
      */
-    public void notifyListeners() {
+    public void notifyListeners(boolean sync) {
 
         DeviceManager manager = BaseDeviceManager.getInstance();
-        if(manager != null) manager.notifyListeners(this);
+        if(manager != null) manager.notifyListeners(this, sync);
         else{
             if(log.isDebugEnabled()) log.debug("None DeviceManager registered for this device: " + this.toString());
         }

@@ -15,7 +15,7 @@ package br.com.criativasoft.opendevice.core.model;
 
 import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.core.LocalDeviceManager;
-import junit.framework.Assert;
+import br.com.criativasoft.opendevice.core.listener.DeviceListener;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -58,6 +58,11 @@ public class DeviceListenerTest {
                     if(led1.isOFF()) manager.findDevice(2).off(); // using dao.
 
                 }
+            }
+
+            @Override
+            public void onDeviceRegistred(Device device) {
+                //
             }
         });
     }

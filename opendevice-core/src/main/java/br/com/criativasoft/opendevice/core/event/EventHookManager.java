@@ -19,11 +19,10 @@ import br.com.criativasoft.opendevice.core.event.impl.JavaDelegateEventHandler;
 import br.com.criativasoft.opendevice.core.event.impl.SystemEventHandler;
 import br.com.criativasoft.opendevice.core.filter.OnlyFilesWithExtension;
 import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.DeviceListener;
+import br.com.criativasoft.opendevice.core.listener.DeviceListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.script.ScriptException;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
@@ -82,6 +81,11 @@ public class EventHookManager implements DeviceListener {
             }
 
         }
+
+    }
+
+    @Override
+    public void onDeviceRegistred(Device device) {
 
     }
 

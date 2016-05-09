@@ -156,11 +156,11 @@ public class LocalDeviceManager extends BaseDeviceManager {
 
     public static void launch(String... args) {
         // Figure out the right class to call
-        StackTraceElement[] cause = Thread.currentThread().getStackTrace();
+        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
 
         boolean foundThisMethod = false;
         String callingClassName = null;
-        for (StackTraceElement se : cause) {
+        for (StackTraceElement se : stack) {
             // Skip entries until we get to the entry for this class
             String className = se.getClassName();
             String methodName = se.getMethodName();

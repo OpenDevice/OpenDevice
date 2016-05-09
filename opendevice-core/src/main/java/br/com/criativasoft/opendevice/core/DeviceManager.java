@@ -23,7 +23,7 @@ import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceCategory;
 import br.com.criativasoft.opendevice.core.model.DeviceHistory;
-import br.com.criativasoft.opendevice.core.model.DeviceListener;
+import br.com.criativasoft.opendevice.core.listener.DeviceListener;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -91,6 +91,7 @@ public interface DeviceManager extends ConnectionManager{
 
     /**
      * Notify All Listeners about device change
+     * @param sync - sync state with server
      */
-    public void notifyListeners(Device device);
+    public void notifyListeners(Device device, boolean sync);
 }

@@ -14,8 +14,8 @@
 package br.com.criativasoft.opendevice.core.listener.impl;
 
 import br.com.criativasoft.opendevice.core.BaseDeviceManager;
+import br.com.criativasoft.opendevice.core.listener.OnDeviceChangeListener;
 import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.DeviceListener;
 
 import java.util.Collection;
 
@@ -25,7 +25,7 @@ import java.util.Collection;
  * @author Ricardo JL Rufino
  * @date 09/01/16
  */
-public class DeviceMappingListener implements DeviceListener {
+public class DeviceMappingListener implements OnDeviceChangeListener {
 
     public static final int MAP_VALUE_TO_ID = 1;
     public static final int MAP_VALUE_TO_VALUE = 2;
@@ -47,7 +47,7 @@ public class DeviceMappingListener implements DeviceListener {
                 if(mappingType == MAP_VALUE_TO_ID && found.getUid() == device.getValue()){
                     found.setValue(found.getValue()+1);
                 }else if(mappingType == MAP_VALUE_TO_VALUE && found.getValue() == device.getValue()){
-                    found.notifyListeners();
+                    found.notifyListeners(true);
                 }
 
             }

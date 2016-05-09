@@ -64,7 +64,7 @@ public class PingResponseTest extends LocalDeviceManager implements ConnectionLi
                     System.err.println("TIMEOUT");
                     timeouts.incrementAndGet();
                     try {
-                        send(new SimpleCommand(CommandType.PING_REQUEST, 0));
+                        sendTo(new SimpleCommand(CommandType.PING_REQUEST, 0), getOutputConnections());
                         qsend.incrementAndGet();
                     } catch (IOException e) {
                         e.printStackTrace();

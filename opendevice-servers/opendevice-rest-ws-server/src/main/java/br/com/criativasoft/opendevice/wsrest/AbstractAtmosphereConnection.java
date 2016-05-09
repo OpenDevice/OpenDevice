@@ -20,6 +20,8 @@ import br.com.criativasoft.opendevice.connection.message.Request;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.command.Command;
+import br.com.criativasoft.opendevice.core.command.CommandType;
+import br.com.criativasoft.opendevice.core.command.ResponseCommand;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.restapi.WaitResponseListener;
 import br.com.criativasoft.opendevice.wsrest.guice.config.ConnectionGuiceProvider;
@@ -227,14 +229,24 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
     /**
      * Used to broadcast events/commands.</br>
-     * Is fired by DeviceRest AND DeviceConnectionResource
+     * Is fired by {@linkplain br.com.criativasoft.opendevice.restapi.DeviceRest} AND {@linkplain WebSocketResource}
      *
      * @param message
      * @param connection
      */
     @Override
     public void onMessageReceived(Message message, DeviceConnection connection) {
-        broadcast(message);
+
+        if(message instanceof  Command) {
+
+            Command cmd = (Command) message;
+
+            if(CommandType.allowBroadcast(cmd.getType())){
+                broadcast(message);
+            }
+
+        }
+
     }
 
 
@@ -267,16 +279,20 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
                 for (AtmosphereResource atmosphereResource : atmosphereResources) {
 
-                    // Don't broadcast to yourself
-                    if(!atmosphereResource.uuid().equals(cmd.getConnectionUUID())){
-                        System.out.println("Broadcast ["+message+"] to -> " + atmosphereResource.uuid());
+                    if(cmd instanceof ResponseCommand){
+
+                        if(atmosphereResource.uuid().equals(cmd.getConnectionUUID())){
+                            broadcaster.broadcast(message, atmosphereResource);
+                        }
+
+                    }else if(!atmosphereResource.uuid().equals(cmd.getConnectionUUID())){
                         broadcaster.broadcast(message, atmosphereResource);
                     }
 
                 }
 
-            }else{
-                log.warn("To: " +cmd.getApplicationID()+ "( broadcast channel not found )");
+            } else {
+                log.warn("To: " + cmd.getApplicationID() + "( broadcast channel not found )");
             }
 
 

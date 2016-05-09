@@ -14,10 +14,9 @@
 package br.com.criativasoft.opendevice.wsrest;
 
 import br.com.criativasoft.opendevice.connection.ServerConnection;
-import br.com.criativasoft.opendevice.wsrest.io.WSEventsLogger;
 import br.com.criativasoft.opendevice.core.command.Command;
-import br.com.criativasoft.opendevice.core.command.CommandStatus;
 import br.com.criativasoft.opendevice.core.command.ResponseCommand;
+import br.com.criativasoft.opendevice.wsrest.io.WSEventsLogger;
 import org.atmosphere.annotation.Suspend;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.Broadcaster;
@@ -65,17 +64,17 @@ public class WebSocketResource {
 
         // TODO: Verificar autenticação.... (basicamente teve enviar um comando de AUTH com o Login, e isso é registrado com resource.uuid())
         // Se não tiver autenticado a respota deve ser AuthRespose(subtype: AUTH_REQUIRED)
-
-        ResponseCommand response = null;
+//        ResponseCommand response = null;
 
         // Find caller ID.
         if(command.getConnectionUUID() == null)   command.setConnectionUUID(resource.uuid());
         command.setApplicationID(topic.getID()); // This is APPLICATION ID TOKEN !
+        command.setConnectionUUID(this.resource.uuid());
 
          connection.notifyListeners(command); // broadcast to all clients (browser/android/desktop)
 
         // return new Broadcastable(params, response, topic);
-        return  new ResponseCommand(CommandStatus.DELIVERED,  command.getConnectionUUID());
+        return null;
     }
 
 }

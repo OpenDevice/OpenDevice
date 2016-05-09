@@ -224,9 +224,9 @@ od.DeviceManager = function(connection){
 
         for(var i = 0; i < response.length; i++ ){
             var device = new od.Device(response[i]);
-            //if(typeof Object.observe != "undefined"){
+            if(typeof Object.observe != "undefined"){
                 Object.observe(device, _onPropertyChange);
-            //}
+            }else console.warn("Object.observe not supported in this browser.");
             devices.push(device);
         }
 

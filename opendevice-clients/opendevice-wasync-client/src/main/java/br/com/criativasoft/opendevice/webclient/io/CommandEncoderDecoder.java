@@ -51,6 +51,9 @@ public class CommandEncoderDecoder implements Encoder<Command, String>, Decoder<
         if(log.isDebugEnabled()) log.debug( e + " -> " + s);
 
         if(e == Event.MESSAGE){
+
+            if("X".equalsIgnoreCase(s)) return null; // ping send from WebSocketServer
+
             try {
                 Command command = getMapper().readValue(s, Command.class);
                 return command;

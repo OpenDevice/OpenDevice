@@ -174,6 +174,10 @@ od.DeviceConnection = function(config){
     function _onMessageReceived(response){
 
         var data = null;
+
+        // KeepAlive
+        if(response.responseBody == "X") return;
+
         try {
             data = JSON.parse(response.responseBody);
         }catch(err) {

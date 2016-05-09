@@ -23,6 +23,8 @@ import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.webclient.io.CommandEncoderDecoder;
 import org.atmosphere.wasync.*;
+import org.atmosphere.wasync.impl.AtmosphereClient;
+import org.atmosphere.wasync.impl.DefaultOptionsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,6 +94,7 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
             }
 
         } catch (IOException e) {
+            // setStatus(ConnectionStatus.FAIL); (fired on 'connection.on(new Function<IOException>() {')
             throw new ConnectionException(e);
         }
 
@@ -113,6 +116,7 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
         log.debug("disconnecting... (isConnected: "+isConnected()+")");
 
         if(isConnected()){
+            // Send CLOSE request..
             connection.close();  // will fire event CLOSE on 'wrapped connection'
             setStatus(ConnectionStatus.DISCONNECTING);
         }else{ // set 'disconnected' in case of previous connection fail.
@@ -138,7 +142,7 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
     private void initConnection() throws IOException{
         if(connection == null){
             // AtmosphereClient client = ClientFactory.getDefault().newClient(AtmosphereClient.class);
-            Client client = ClientFactory.getDefault().newClient();
+            AtmosphereClient client = ClientFactory.getDefault().newClient(AtmosphereClient.class);
 
             // FIXME: Workaround for BUG: https://github.com/Atmosphere/wasync/issues/120
             System.setProperty("com.ning.http.client.AsyncHttpClientConfig.acceptAnyCertificate", "true");
@@ -153,7 +157,7 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
             CommandEncoderDecoder jacksonSerializer = new CommandEncoderDecoder();
             request.encoder(jacksonSerializer);
             request.decoder(jacksonSerializer);
-            OptionsBuilder clientOptions = client.newOptionsBuilder()
+            DefaultOptionsBuilder clientOptions = client.newOptionsBuilder()
                     .reconnect(true)
                     .reconnectAttempts(10)
                     .pauseBeforeReconnectInSeconds(5);
@@ -170,9 +174,7 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
 
         connection.on(Event.CLOSE, new Function<String>() {
             public void on(String t) {
-                try {
-                    disconnect();
-                } catch (ConnectionException e) {}
+                setStatus(ConnectionStatus.DISCONNECTED);
             }
         });
         connection.on(Event.REOPENED, new Function<String>() {
@@ -188,9 +190,16 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
 
         connection.on(new Function<IOException>() {
             public void on(IOException ioe) {
+                setStatus(ConnectionStatus.FAIL);
                 ioe.printStackTrace();
+                try {
+                    disconnect();
+                } catch (ConnectionException e) {
+                    e.printStackTrace();
+                }
             }
         });
+
 
         connection.on(Event.MESSAGE, new Function<Command>() {
             public void on(Command cmd) {

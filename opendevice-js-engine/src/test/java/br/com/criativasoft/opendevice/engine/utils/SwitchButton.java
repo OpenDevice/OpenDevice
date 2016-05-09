@@ -13,8 +13,8 @@
 
 package br.com.criativasoft.opendevice.engine.utils;
 
+import br.com.criativasoft.opendevice.core.listener.OnDeviceChangeListener;
 import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.DeviceListener;
 import br.com.criativasoft.opendevice.core.model.Sensor;
 
 import javax.swing.*;
@@ -28,7 +28,7 @@ import java.awt.event.ItemListener;
  * @author Ricardo JL Rufino
  * @date 14/09/14.
  */
-public class SwitchButton extends JToggleButton implements ItemListener, DeviceListener{
+public class SwitchButton extends JToggleButton implements ItemListener, OnDeviceChangeListener{
 
     private static ImageIcon iconON = new ImageIcon(SwitchButton.class.getResource("/icons/power_circle_on.png"));
     private static ImageIcon iconOFF = new ImageIcon(SwitchButton.class.getResource("/icons/power_circle_off.png"));

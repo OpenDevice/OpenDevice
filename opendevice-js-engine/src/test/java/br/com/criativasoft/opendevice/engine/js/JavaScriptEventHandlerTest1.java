@@ -60,7 +60,7 @@ public class JavaScriptEventHandlerTest1 {
         when(connection.isConnected()).thenReturn(true);
         manager.connect();
 
-        manager.addListener(device -> {
+        led2.addListener(device -> {
             if (device == led2 && device.isON()) System.out.println("manager led(2) change.... " + led2.getName());
         });
 

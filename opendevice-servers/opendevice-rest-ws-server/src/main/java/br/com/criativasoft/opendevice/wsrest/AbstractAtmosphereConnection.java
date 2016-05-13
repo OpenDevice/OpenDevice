@@ -101,6 +101,7 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             configure(conf);
 
             conf.resource(CommandJacksonProvider.class);
+
             //conf.resource("./webapp");  // For *-distrubution
             //conf.resource("./src/main/webapp"); // For mvn exec:java
 

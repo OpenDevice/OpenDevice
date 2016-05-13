@@ -91,7 +91,7 @@ public class Main extends LocalDeviceManager {
 
         // Static WebResources
         String rootWebApp = getWebAppDir();
-//        addWebResource(rootWebApp);
+        addWebResource(rootWebApp);
         log.debug("Current root-resource: " + rootWebApp);
 
 

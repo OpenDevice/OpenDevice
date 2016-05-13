@@ -297,5 +297,27 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
     public ConnectionManager getConnectionManager() {
         return this.manager;
     }
+
+	public boolean removeConnection(DeviceConnection connection) {
+
+		if(connection != null){
+
+			boolean remove = connections.remove(connection);
+
+			if(remove){
+
+				connection.removeListener(this);
+
+				for (ConnectionListener listener : listeners) {
+					connection.removeListener(listener);
+				}
+			}
+
+			return remove;
+
+		}
+
+		return false;
+	}
 }
 

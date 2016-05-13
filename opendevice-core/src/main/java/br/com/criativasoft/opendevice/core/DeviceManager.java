@@ -75,6 +75,10 @@ public interface DeviceManager extends ConnectionManager{
 
     public void addOutput(DeviceConnection connection);
 
+    public void removeOutput(DeviceConnection connection);
+
+    public void removeInput(DeviceConnection connection);
+
     public boolean addListener(DeviceListener e);
 
     public void addConnectionListener(ConnectionListener e);

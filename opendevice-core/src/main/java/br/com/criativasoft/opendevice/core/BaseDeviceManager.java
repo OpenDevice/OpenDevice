@@ -346,7 +346,19 @@ public abstract class BaseDeviceManager implements DeviceManager {
 		
 	}
 
-	public void addOutput(DeviceConnection connection){
+    @Override
+    public void removeInput(DeviceConnection connection) {
+        log.info("Remove input connection: {}", connection);
+        inputConnections.removeConnection(connection);
+    }
+
+    @Override
+    public void removeOutput(DeviceConnection connection) {
+        log.info("Remove output connection: {}", connection);
+        outputConnections.removeConnection(connection);
+    }
+
+    public void addOutput(DeviceConnection connection){
 		
 		if(outputConnections.getSize() == 0) initOutputConnections();
 

@@ -8,11 +8,12 @@ load("nashorn:mozilla_compat.js");
 
 importPackage(
     Packages.br.com.criativasoft.opendevice.core.model,
+    Packages.br.com.criativasoft.opendevice.core.listener,
     Packages.br.com.criativasoft.opendevice.engine.js,
     Packages.br.com.criativasoft.opendevice.core.connection
 );
 
-var manager = new JavaScriptDeviceManager();
+if(!manager) manager = new JavaScriptDeviceManager();
 
 var proxy = { };
 

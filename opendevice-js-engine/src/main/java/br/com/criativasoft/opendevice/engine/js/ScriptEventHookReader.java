@@ -15,12 +15,9 @@ package br.com.criativasoft.opendevice.engine.js;
 
 import br.com.criativasoft.opendevice.engine.js.utils.IOUtils;
 
-import java.io.*;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Scanner;
+import java.io.CharArrayReader;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * TODO: Add Docs
@@ -28,11 +25,11 @@ import java.util.Scanner;
  * @author Ricardo JL Rufino
  * @date 29/08/15.
  */
-public class JavaScriptSnippetReader extends CharArrayReader {
+public class ScriptEventHookReader extends CharArrayReader {
 
     private static String template;
 
-    public JavaScriptSnippetReader(String code) {
+    public ScriptEventHookReader(String code) {
         super(new char[0]);
 
         if(template == null){

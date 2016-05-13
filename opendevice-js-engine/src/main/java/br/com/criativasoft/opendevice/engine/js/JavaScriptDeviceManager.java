@@ -17,7 +17,8 @@ import br.com.criativasoft.opendevice.connection.*;
 import br.com.criativasoft.opendevice.core.LocalDeviceManager;
 
 /**
- * Created by ricardo on 22/08/15.
+ * @author Ricardo JL Rufino
+ * @date 22/08/15
  */
 public class JavaScriptDeviceManager extends LocalDeviceManager {
 

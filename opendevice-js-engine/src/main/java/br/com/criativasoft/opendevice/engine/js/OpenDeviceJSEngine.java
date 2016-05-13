@@ -96,7 +96,7 @@ public class OpenDeviceJSEngine {
         ScriptEngine engine = getEngine();
         Compilable compilable = (Compilable) engine;
 
-        CompiledScript compiledScript = compilable.compile(new JavaScriptSnippetReader(code));
+        CompiledScript compiledScript = compilable.compile(new ScriptEventHookReader(code));
 
         Set<String> bindingsKeys = bindings.keySet();
         for (String key : bindingsKeys) {

@@ -13,22 +13,16 @@
 
 package br.com.criativasoft.opendevice.engine.js;
 
-import br.com.criativasoft.opendevice.core.BaseDeviceManager;
-import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.event.EventContext;
 import br.com.criativasoft.opendevice.core.event.EventException;
 import br.com.criativasoft.opendevice.core.event.EventHandler;
 import br.com.criativasoft.opendevice.core.event.EventHook;
-import br.com.criativasoft.opendevice.core.model.Device;
 
-import javax.script.ScriptContext;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
-import javax.script.SimpleScriptContext;
-import java.io.FileNotFoundException;
 
 /**
- * This class implements the event processing system ({@link EventHook}) using JavaScript.
+ * This class implements the event processing ({@link EventHook}) using JavaScript.
  * @author Ricardo JL Rufino
  * @date 22/08/15.
  */
@@ -43,10 +37,6 @@ public class JavaScriptEventHandler implements EventHandler {
     public void execute(String code, EventContext context) throws EventException {
 
         SimpleBindings bindings = new SimpleBindings(context);
-
-        // FIXME remove this !!!!
-        Device device = (Device) context.get("device");
-        bindings.put("testdesc", "Device " + device.getUid() + " -> " + device.getValue());
 
         try {
             OpenDeviceJSEngine.run(code, bindings);

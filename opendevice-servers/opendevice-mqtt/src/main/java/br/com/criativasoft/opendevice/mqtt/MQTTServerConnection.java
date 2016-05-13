@@ -22,8 +22,8 @@ import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.connection.message.Request;
 import br.com.criativasoft.opendevice.connection.serialize.MessageSerializer;
 import br.com.criativasoft.opendevice.core.BaseDeviceManager;
+import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.TenantProvider;
-import br.com.criativasoft.opendevice.core.command.GetDevicesRequest;
 import io.moquette.BrokerConstants;
 import io.moquette.interception.InterceptHandler;
 import io.moquette.interception.messages.*;
@@ -45,7 +45,7 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
 
     private  int port = BrokerConstants.PORT;
     private MoquetteServer server;
-    private ConnectionManager manager;
+    private DeviceManager manager;
 
     public MQTTServerConnection() {
         super();
@@ -64,7 +64,9 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
     @Override
     public void setConnectionManager(ConnectionManager manager) {
         super.setConnectionManager(manager);
-        this.manager = manager;
+        if(manager instanceof DeviceManager){
+            this.manager = (DeviceManager) manager;
+        }
     }
 
     @Override
@@ -123,7 +125,9 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
 
         @Override
         public void onConnect(InterceptConnectMessage msg) {
-            System.err.println("onConnect - " + msg.getClientID());
+            log.debug("onConnect: {}", msg.getClientID());
+
+            // MQTT ClientID: APIKEY/ModuleName
 
             String appID = msg.getClientID().split("/")[0];
             TenantProvider.setCurrentID(appID);
@@ -146,23 +150,27 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
 
             String appID = msg.getClientID().split("/")[0];
             String moduleName = msg.getClientID().split("/")[1];
-            String connUID = msg.getClientID();
+
+            String connUID = msg.getTopicName();
 
             TenantProvider.setCurrentID(appID);
 
-            MQTTResource connection = (MQTTResource) manager.findConnection(connUID);
-
-            if(connection == null){
-                log.warn("Connection not found ! ID : " + connUID);
-                return;
-            }
 
             // Received from Devices : /appID/out
             if(msg.getTopicName().contains(appID + "/out")){
 
+
+                MQTTResource connection = (MQTTResource) manager.findConnection(connUID.replaceAll("/out/", "/in/"));
+
+                if(connection == null){
+                    log.warn("Connection not found ! IDxx : " + connUID);
+                    return;
+                }
+
                 MessageSerializer serializer = getSerializer();
 
                 Message message = serializer.parse(msg.getPayload().array()); // TODO May be delay to send to clients (send direct ?).
+                message.setConnectionUUID(connection.getUID());
 
                 log.debug("Received command: " + message);
 
@@ -173,41 +181,51 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
 
         @Override
         public void onSubscribe(InterceptSubscribeMessage msg) {
-            System.err.println("onSubscribe - " + msg.getClientID() + ", on : " + msg.getTopicFilter());
+            log.debug("onSubscribe: {} on {}", msg.getClientID(), msg.getTopicFilter());
             String appID = msg.getClientID().split("/")[0];
             TenantProvider.setCurrentID(appID);
 
+            // Received from Devices ( Subscribe in ProjectID/in/ModuleName)
+            if(msg.getTopicFilter().startsWith(appID + "/in/")){
 
-            if(manager instanceof BaseDeviceManager){
+                MQTTResource resource = (MQTTResource) manager.findConnection(msg.getClientID());
 
-                BaseDeviceManager manager = (BaseDeviceManager) MQTTServerConnection.this.manager;
-
-                // Received from Devices ( Subscribe in ProjectID/in/ModuleName)
-                if(msg.getTopicFilter().startsWith(appID + "/in/")){
-
-                    MQTTResource resource = (MQTTResource) manager.findConnection(msg.getClientID());
-
-                    if(resource ==  null){
-                        resource = new MQTTResource(server, msg.getTopicFilter());
-                        resource.setUid(msg.getClientID());
-                        manager.addOutput(resource);
-                    }
-
-                    // Syncronize devices...
-                    try {
-                        resource.send(new GetDevicesRequest());
-                    } catch (IOException e) {
-                        log.error(e.getMessage(), e);
-                    }
+                if(resource ==  null){
+                    resource = new MQTTResource(server, msg.getTopicFilter());
+                    resource.setUid(msg.getTopicFilter());
+                    manager.addOutput(resource);
                 }
 
+//                    // Syncronize devices...
+//                    try {
+//                        resource.send(new GetDevicesRequest());
+//                    } catch (IOException e) {
+//                        log.error(e.getMessage(), e);
+//                    }
             }
+
 
         }
 
         @Override
         public void onUnsubscribe(InterceptUnsubscribeMessage msg) {
-            System.err.println("onUnsubscribe - " + msg.getClientID());
+            log.debug("onUnsubscribe: {} on {}", msg.getClientID(), msg.getTopicFilter());
+
+            String appID = msg.getClientID().split("/")[0];
+
+            TenantProvider.setCurrentID(appID);
+
+            BaseDeviceManager manager = (BaseDeviceManager) MQTTServerConnection.this.manager;
+
+            if(msg.getTopicFilter().startsWith(appID + "/in/")) {
+
+                MQTTResource resource = (MQTTResource) manager.findConnection(msg.getClientID());
+
+                if (resource != null) {
+                    manager.removeOutput(resource);
+                }
+            }
+
         }
     };
 }

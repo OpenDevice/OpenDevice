@@ -40,6 +40,7 @@ public class MQTTResource extends AbstractConnection {
     public MQTTResource( MoquetteServer server, String topic) {
         this.server = server;
         this.topic = topic;
+        setStatus(ConnectionStatus.CONNECTED);
     }
 
     @Override

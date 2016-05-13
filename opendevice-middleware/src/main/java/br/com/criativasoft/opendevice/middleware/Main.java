@@ -18,14 +18,17 @@ import br.com.criativasoft.opendevice.core.LocalDeviceManager;
 import br.com.criativasoft.opendevice.core.connection.Connections;
 import br.com.criativasoft.opendevice.core.extension.ViewExtension;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
+import br.com.criativasoft.opendevice.engine.js.OpenDeviceJSEngine;
 import br.com.criativasoft.opendevice.middleware.config.DependencyConfig;
 import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.DeviceDaoNeo4j;
-import br.com.criativasoft.opendevice.middleware.resources.DashboardRest;
+import br.com.criativasoft.opendevice.mqtt.MQTTServerConnection;
 import br.com.criativasoft.opendevice.wsrest.guice.config.GuiceConfigRegistry;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.script.SimpleBindings;
 import java.io.*;
 import java.util.*;
 import java.util.jar.JarEntry;
@@ -39,22 +42,35 @@ import java.util.jar.JarFile;
 
 public class Main extends LocalDeviceManager {
 
-    private IWSServerConnection webscoket;
 
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     protected int port = 8181;
 
+    private SimpleBindings jscontext;
+    private IWSServerConnection webscoket;
+
 	public void start() throws IOException  {
 
 //        setApplicationID(OpenDeviceConfig.LOCAL_APP_ID);
 
+        // Server with suport for HTTP,Rest,WebSocket
+        webscoket = Connections.in.websocket(port);
+
         OpenDeviceConfig config = OpenDeviceConfig.get();
 
-        config.setDatabaseEnabled(false);
+        jscontext = new SimpleBindings();
+        jscontext.put("manager", this);
+        jscontext.put("config", config);
 
+        // Configuration Scripts.
+        String userConfig = System.getProperty("config");
+        if(!StringUtils.isBlank(userConfig)){
+            log.info("Using config file (JS): " + userConfig);
+            loadScript(userConfig);
+        }
 
-        // TODO: EntityManager by injection
+        // TODO: use EntityManager by injection
         if(config.isDatabaseEnabled()){
             setDeviceDao(new DeviceDaoNeo4j(LocalEntityManagerFactory.getInstance().createEntityManager()));
         }
@@ -68,37 +84,20 @@ public class Main extends LocalDeviceManager {
         // Set IoC/DI Config
         GuiceConfigRegistry.setConfigClass(DependencyConfig.class);
 
-        // Setup WebSocket  Server with suport for Http and Rest
-        IWSServerConnection webscoket = Connections.in.websocket(port);
-        String current = System.getProperty("user.dir");
 
         // Rest Resources
-        webscoket.addResource(DashboardRest.class);
+        // ================
+        // webscoket.addResource(DashboardRest.class);
 
         // Static WebResources
         String rootWebApp = getWebAppDir();
-        webscoket.addWebResource(rootWebApp);
+//        addWebResource(rootWebApp);
         log.debug("Current root-resource: " + rootWebApp);
-        webscoket.addWebResource(current + "/target/classes/webapp"); //  running exec:java
-
-        // Running from IDE
-        // TODO Remove later
-        if(System.getProperty("idea.launcher.port") != null){
-            webscoket.addWebResource("/media/ricardo/Dados/Codidos/Java/Projetos/OpenDevice/opendevice-web-view/src/main/webapp");
-            webscoket.addWebResource("/media/ricardo/Dados/Codidos/Java/Projetos/OpenDevice/opendevice-clients/opendevice-js/dist");
-            webscoket.addWebResource("/media/ricardo/Dados/Codidos/Java/Projetos/OpenDevice/opendevice-examples/opendevice-access-control-v2/src/main/resources/webapp");
-        }
 
 
         this.addInput(webscoket);
-        // OutputConnections
-        // ===============================
-        //addOutput(Connections.out.usb()); // Connect to first USB port available
-//        addOutput(Connections.out.bluetooth("20:13:01:24:01:93"));
-//        addOutput(new MQTTServerConnection());
-        addOutput(out.tcp("192.168.3.100:8182"));
-//        addOutput(out.bluetooth("20:13:01:24:01:93"));
-//        addOutput(out.tcp("Controlador-Quarto.local.opendevice"));
+        this.addInput(new MQTTServerConnection());
+
 
         // Neo4j rasberry config: https://gist.github.com/widged/8329039
         //addOutput(Connections.out.tcp("192.168.0.204:8081"));
@@ -113,7 +112,7 @@ public class Main extends LocalDeviceManager {
 //        };
 //        addOutput(conn);
 
-        this.connectAll();
+        this.connect();
 
 	}
 	
@@ -122,16 +121,23 @@ public class Main extends LocalDeviceManager {
 
         extractResources();
 
-		String current = System.getProperty("user.dir");
+        String current = getClass().getResource("").getPath();
 
-		File webapp = new File(current + File.separator + "webapp" );
-		// Default app..
+        // Current directory (of JAR)
+        File webapp = new File(current + File.separator + "webapp" );
+        if(webapp.exists()){
+            return webapp.getPath();
+        }
+
+        // Current Directory
+        current = System.getProperty("user.dir");
+        webapp = new File(current + File.separator + "webapp" );
 		if(webapp.exists()){
 			return webapp.getPath();
 		}
 
+        // Using mvn exec
         webapp = new File(current + File.separator + "target"+ File.separator + "webapp" );
-        // Default app..
         if(webapp.exists()){
             return webapp.getPath();
         }
@@ -139,7 +145,6 @@ public class Main extends LocalDeviceManager {
 		// Find project in same directory...
 		File currentDir = new File(current);
 		String parent = currentDir.getParent();
-
 		webapp = new File(parent + "/target/webapp" );
 		if(webapp.exists()){
 			return webapp.getPath();
@@ -242,6 +247,20 @@ public class Main extends LocalDeviceManager {
 	public static void main(String[] args) throws Exception {
         launchApplication(Main.class, args);
     }
-	
+
+
+    private void loadScript(String file){
+
+        try {
+            OpenDeviceJSEngine.run(new File(file), jscontext);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    public void addWebResource(String staticResourcePath){
+        if(StringUtils.isBlank(staticResourcePath)) return;
+        webscoket.addWebResource(staticResourcePath);
+    }
 
 }

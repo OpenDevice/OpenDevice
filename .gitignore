@@ -2,3 +2,6 @@ Workspace/
 OLD/
 site/
 .gradle/
+extensions/
+opendevice-examples/
+opendevice-hardware-libraries/

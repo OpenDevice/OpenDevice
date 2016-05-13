@@ -5,3 +5,5 @@ site/
 extensions/
 opendevice-examples/
 opendevice-hardware-libraries/
+opendevice-tests/
+

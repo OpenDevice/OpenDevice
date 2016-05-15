@@ -107,6 +107,7 @@ public class TCPConnection extends AbstractStreamConnection implements ITcpConne
             log.debug("Connecting to: " + fdeviceURI + ", port:" + port);
 
             connection = new Socket();
+			connection.setTcpNoDelay(true);
             connection.connect(new InetSocketAddress(host, Integer.parseInt(port)), 5000);
 
 		}
@@ -125,8 +126,8 @@ public class TCPConnection extends AbstractStreamConnection implements ITcpConne
 	public void disconnect() throws ConnectionException {
 		if(isConnected()){
 			try {
-				connection.close();
 				super.disconnect();
+				connection.close();
 				connection = null;
 			} catch (IOException e) {
 				throw new ConnectionException(e);

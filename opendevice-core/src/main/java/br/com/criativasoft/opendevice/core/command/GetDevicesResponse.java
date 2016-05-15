@@ -17,6 +17,7 @@ import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceCategory;
 import br.com.criativasoft.opendevice.core.model.DeviceType;
 import br.com.criativasoft.opendevice.core.model.Sensor;
+import br.com.criativasoft.opendevice.core.util.StringUtils;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -50,18 +51,21 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
         for (int i = 1; i < split.length; i++) {
             String deviceStr = split[i].substring(1, split[i].length()-1);
             String[] deviceSplit = deviceStr.split(",");
-            int uid = Integer.parseInt(deviceSplit[0]);
-            long value = Long.parseLong(deviceSplit[2]);
-            boolean isSensor = Integer.parseInt(deviceSplit[4]) > 0;
+            String name = deviceSplit[0];
+            int uid = Integer.parseInt(deviceSplit[1]);
+            long value = Long.parseLong(deviceSplit[3]);
+            boolean isSensor = Integer.parseInt(deviceSplit[5]) > 0;
 
-            DeviceType deviceType =  DeviceType.getByCode(Integer.parseInt(deviceSplit[5]));
+            DeviceType deviceType =  DeviceType.getByCode(Integer.parseInt(deviceSplit[6]));
 
             if(isSensor){
-                Sensor sensor = new Sensor(uid, "Sensor " + uid, deviceType, DeviceCategory.GENERIC);
+                if(StringUtils.isEmpty(name)) name = "Sensor " + uid;
+                Sensor sensor = new Sensor(uid, name, deviceType, DeviceCategory.GENERIC);
                 sensor.setValue(value);
                 devices.add(sensor);
             }else{
-                devices.add(new Device(uid, "Device "+uid, deviceType, DeviceCategory.GENERIC, value));
+                if(StringUtils.isEmpty(name)) name = "Device " + uid;
+                devices.add(new Device(uid, name, deviceType, DeviceCategory.GENERIC, value));
             }
         }
 	}
@@ -76,6 +80,7 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
 
         for (Device device : devices) {
             sb.append("[");
+            sb.append(device.getName()).append(",");
             sb.append(device.getId()).append(",");
             if(device.getGpio() != null){
                 sb.append(device.getGpio().getPin()).append(",");

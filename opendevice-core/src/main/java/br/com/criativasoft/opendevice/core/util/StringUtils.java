@@ -14,4 +14,8 @@ public class StringUtils {
         return sbStr.toString();
     }
 
+    public static boolean isEmpty(final String cs) {
+        return cs == null || cs.length() == 0;
+    }
+
 }

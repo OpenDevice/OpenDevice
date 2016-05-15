@@ -24,6 +24,7 @@ import br.com.criativasoft.opendevice.connection.serialize.MessageSerializer;
 import br.com.criativasoft.opendevice.core.BaseDeviceManager;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.TenantProvider;
+import br.com.criativasoft.opendevice.core.command.GetDevicesRequest;
 import io.moquette.BrokerConstants;
 import io.moquette.interception.InterceptHandler;
 import io.moquette.interception.messages.*;
@@ -140,6 +141,8 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
 
         @Override
         public void onDisconnect(InterceptDisconnectMessage msg) {
+            log.debug("onDisconnect: {}", msg.getClientID());
+
             String appID = msg.getClientID().split("/")[1];
             TenantProvider.setCurrentID(appID);
         }
@@ -163,7 +166,7 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
                 MQTTResource connection = (MQTTResource) manager.findConnection(connUID.replaceAll("/out/", "/in/"));
 
                 if(connection == null){
-                    log.warn("Connection not found ! IDxx : " + connUID);
+                    log.warn("Connection not found ! ID: " + connUID);
                     return;
                 }
 
@@ -188,7 +191,7 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
             // Received from Devices ( Subscribe in ProjectID/in/ModuleName)
             if(msg.getTopicFilter().startsWith(appID + "/in/")){
 
-                MQTTResource resource = (MQTTResource) manager.findConnection(msg.getClientID());
+                MQTTResource resource = (MQTTResource) manager.findConnection(msg.getTopicFilter());
 
                 if(resource ==  null){
                     resource = new MQTTResource(server, msg.getTopicFilter());
@@ -196,12 +199,12 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
                     manager.addOutput(resource);
                 }
 
-//                    // Syncronize devices...
-//                    try {
-//                        resource.send(new GetDevicesRequest());
-//                    } catch (IOException e) {
-//                        log.error(e.getMessage(), e);
-//                    }
+                // Syncronize devices...
+                try {
+                    resource.send(new GetDevicesRequest());
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                }
             }
 
 

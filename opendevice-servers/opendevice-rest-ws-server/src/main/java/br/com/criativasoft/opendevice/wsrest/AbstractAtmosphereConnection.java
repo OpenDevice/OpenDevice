@@ -23,6 +23,7 @@ import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.CommandType;
 import br.com.criativasoft.opendevice.core.command.ResponseCommand;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
+import br.com.criativasoft.opendevice.core.util.StringUtils;
 import br.com.criativasoft.opendevice.restapi.WaitResponseListener;
 import br.com.criativasoft.opendevice.wsrest.guice.config.ConnectionGuiceProvider;
 import br.com.criativasoft.opendevice.wsrest.guice.config.DeviceManagerGuiceProvider;
@@ -31,9 +32,12 @@ import br.com.criativasoft.opendevice.wsrest.io.CrossOriginInterceptor;
 import org.atmosphere.cpr.*;
 import org.atmosphere.nettosphere.Config;
 import org.atmosphere.nettosphere.Nettosphere;
+import org.jboss.netty.handler.ssl.SslContext;
+import org.jboss.netty.handler.ssl.SslProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -96,15 +100,14 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
         if(server == null){
             Config.Builder conf = new Config.Builder();
             conf.port(port);
+
             //conf.host("::0"); // bind all local IPs
             conf.host("0.0.0.0"); // bind all local IPs
             configure(conf);
 
             conf.resource(CommandJacksonProvider.class);
 
-            //conf.resource("./webapp");  // For *-distrubution
-            //conf.resource("./src/main/webapp"); // For mvn exec:java
-
+            // Custom static resources
             for(String resource : webresources){
                 conf.resource(resource);
             }
@@ -123,6 +126,20 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             conf.interceptor(new CrossOriginInterceptor());
 //            conf.interceptor(new JacksonFilterInterceptor());
             conf.interceptor(this);
+
+            // SSL Support
+            OpenDeviceConfig config = OpenDeviceConfig.get();
+            String certificate = config.getCertificateFile();
+            if(!StringUtils.isEmpty(certificate)){
+                File cert = new File(certificate);
+                if(!cert.exists()) throw new IllegalArgumentException("Certificate not found !");
+                File key = new File(config.getCertificateKey());
+                if(!key.exists()) throw new IllegalArgumentException("Certificate key must be provided !");
+
+                SslContext sslContext = SslContext.newServerContext(SslProvider.JDK, cert, key, config.getCertificatePass());
+                conf.sslContext(sslContext);
+            }
+
             conf.build();
 
             server = new Nettosphere.Builder().config(conf.build()).build();

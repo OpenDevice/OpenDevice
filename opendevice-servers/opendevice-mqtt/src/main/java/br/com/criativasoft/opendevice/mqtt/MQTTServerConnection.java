@@ -25,12 +25,21 @@ import br.com.criativasoft.opendevice.core.BaseDeviceManager;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.command.GetDevicesRequest;
+import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
+import br.com.criativasoft.opendevice.core.util.StringUtils;
 import io.moquette.BrokerConstants;
 import io.moquette.interception.InterceptHandler;
 import io.moquette.interception.messages.*;
 import io.moquette.server.config.IConfig;
 import io.moquette.server.config.MemoryConfig;
+import io.moquette.spi.security.ISslContextCreator;
+import io.netty.handler.ssl.JdkSslServerContext;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslProvider;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -102,11 +111,37 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
 
         if (server == null) {
             Properties params = new Properties();
-            params.put(BrokerConstants.PORT_PROPERTY_NAME, Integer.toString(port));
+//            params.put(BrokerConstants.PORT_PROPERTY_NAME, Integer.toString(port));
+            params.put(BrokerConstants.SSL_PORT_PROPERTY_NAME, Integer.toString(8883));
 
             IConfig config = new MemoryConfig(params);
             server = new MoquetteServer(config);
             server.setHandlers(asList(serverListener));
+
+            // SSL Support
+            final OpenDeviceConfig oconfig = OpenDeviceConfig.get();
+            String certificate = oconfig.getCertificateFile();
+            if(!StringUtils.isEmpty(certificate)){
+
+                final File cert = new File(certificate);
+                if(!cert.exists()) throw new IllegalArgumentException("Certificate not found !");
+                final File key = new File(oconfig.getCertificateKey());
+                if(!key.exists()) throw new IllegalArgumentException("Certificate key must be provided !");
+
+                server.setSslCtxCreator(new ISslContextCreator() {
+                    @Override
+                    public SSLContext initSSLContext() {
+                        try {
+                            JdkSslServerContext sslContext = (JdkSslServerContext) SslContext.newServerContext(SslProvider.JDK, cert, key, oconfig.getCertificatePass());
+                            return sslContext.context();
+                        } catch (SSLException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+                });
+            }
+
         }
     }
 

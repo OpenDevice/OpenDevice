@@ -102,10 +102,9 @@ public class MoquetteServer {
         LOG.info("Persistent store file: " + config.getProperty(BrokerConstants.PERSISTENT_STORE_PROPERTY_NAME));
         final ProtocolProcessor processor = SimpleMessaging.getInstance().init(config, handlers, authenticator, authorizator);
 
-        // FIXME: make DefaultMoquetteSslContextCreator public
-//        if (sslCtxCreator == null) {
-//            sslCtxCreator = new DefaultMoquetteSslContextCreator(config);
-//        }
+        if (sslCtxCreator == null) {
+            sslCtxCreator = new DefaultMoquetteSslContextCreator(config);
+        }
 
         m_acceptor = new NettyAcceptor();
         m_acceptor.initialize(processor, config, sslCtxCreator);

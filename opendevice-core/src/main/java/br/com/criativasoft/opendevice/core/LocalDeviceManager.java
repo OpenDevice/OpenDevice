@@ -210,6 +210,10 @@ public class LocalDeviceManager extends BaseDeviceManager {
             log.info("Type [CTRL+C] to stop the server");
             log.info("========================================================");
 
+            while(true){
+                Thread.sleep(60000);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

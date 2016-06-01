@@ -65,6 +65,11 @@ public class OutputConnections {
         return (T) connection;
     }
 
+    /**
+     * Create a WebSocket Client Connection.
+     * @param address Server IP or Host (ex.: localhost:8181), for SSL use wss://server.com.br:port
+     * @return Return a connection.
+     */
     public <T extends DeviceConnection> T  websocket(String address){
         IWSConnection connection = load(IWSConnection.class);
         if(connection != null) connection.setConnectionURI(address);

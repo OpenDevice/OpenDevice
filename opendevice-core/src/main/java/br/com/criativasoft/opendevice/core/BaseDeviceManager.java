@@ -216,15 +216,9 @@ public abstract class BaseDeviceManager implements DeviceManager {
         if(sync){
 
             try {
-                if (device.getType() == DeviceType.DIGITAL) {
-                    DeviceCommand cmd = new DeviceCommand(CommandType.DIGITAL, device.getUid(), device.getValue());
-                    send(cmd);
-                }
-
-                if (device.getType() == DeviceType.ANALOG) {
-                    DeviceCommand cmd = new DeviceCommand(CommandType.ANALOG, device.getUid(), device.getValue());
-                    send(cmd);
-                }
+                CommandType type = DeviceCommand.getCommandType(device.getType());
+                DeviceCommand cmd = new DeviceCommand(type, device.getUid(), device.getValue());
+                send(cmd);
             }catch (IOException ex){
                 log.error(ex.getMessage(), ex);
             }

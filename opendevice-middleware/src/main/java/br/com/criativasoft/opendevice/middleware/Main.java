@@ -22,6 +22,7 @@ import br.com.criativasoft.opendevice.engine.js.OpenDeviceJSEngine;
 import br.com.criativasoft.opendevice.middleware.config.DependencyConfig;
 import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.DeviceDaoNeo4j;
+import br.com.criativasoft.opendevice.middleware.resources.DashboardRest;
 import br.com.criativasoft.opendevice.mqtt.MQTTServerConnection;
 import br.com.criativasoft.opendevice.wsrest.guice.config.GuiceConfigRegistry;
 import org.apache.commons.lang3.StringUtils;
@@ -87,7 +88,9 @@ public class Main extends LocalDeviceManager {
 
         // Rest Resources
         // ================
-        // webscoket.addResource(DashboardRest.class);
+        if(config.isDatabaseEnabled()){
+             webscoket.addResource(DashboardRest.class);
+        }
 
         // Static WebResources
         String rootWebApp = getWebAppDir();
@@ -168,7 +171,9 @@ public class Main extends LocalDeviceManager {
             Iterator<ViewExtension> iterator = service.iterator();
             List<String> userExtensions = new ArrayList<String>();
 
-            PrintWriter dynamic_plugins = new PrintWriter(new File(destPath, "webapp/ext/dynamic_plugins.js"));
+            File plugins = new File(destPath, "webapp/ext/dynamic_plugins.js");
+            if(!plugins.exists()) plugins.createNewFile();
+            PrintWriter dynamic_plugins = new PrintWriter(plugins);
 
             while (iterator.hasNext()) {
                 ViewExtension extension = iterator.next();

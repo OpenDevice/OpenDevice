@@ -25,9 +25,7 @@ import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -209,17 +207,9 @@ public class LocalDeviceManager extends BaseDeviceManager {
             // Manual shutdown
             log.info("========================================================");
             log.info("Application - started ");
-            log.info("Type [quit] or [CTRL+C] to stop the server");
+            log.info("Type [CTRL+C] to stop the server");
             log.info("========================================================");
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            String a = "";
-            while (!("quit".equals(a))) {
-                a = br.readLine();
-            }
 
-            System.out.println("Disconnecting all...");
-            main.stop();
-            Thread.sleep(800);
         } catch (Exception e) {
             e.printStackTrace();
         }

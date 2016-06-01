@@ -32,6 +32,16 @@ public class OpenDeviceConfig {
 
     private boolean databaseEnabled = false;
 
+
+    private String certificateFile;
+
+    private String certificateKey;
+
+    private String certificatePass;
+
+    private OpenDeviceConfig(){
+    }
+
     /**
      * Checks whether the support for multi-tenant is active. This setting should only be enabled when using the platform as a service.
      * @return if multi-tenant is active
@@ -66,5 +76,32 @@ public class OpenDeviceConfig {
 
     public boolean isDatabaseEnabled() {
         return databaseEnabled;
+    }
+
+    /**
+     * Set certificate file to enable SSL support over (MQTT, HTTP, REST, WebSocket)
+     */
+    public void setCertificateFile(String certificateFile) {
+        this.certificateFile = certificateFile;
+    }
+
+    public void setCertificateKey(String certificateKey) {
+        this.certificateKey = certificateKey;
+    }
+
+    public void setCertificatePass(String certificatePass) {
+        this.certificatePass = certificatePass;
+    }
+
+    public String getCertificateFile() {
+        return certificateFile;
+    }
+
+    public String getCertificateKey() {
+        return certificateKey;
+    }
+
+    public String getCertificatePass() {
+        return certificatePass;
     }
 }

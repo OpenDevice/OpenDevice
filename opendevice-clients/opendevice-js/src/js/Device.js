@@ -24,8 +24,13 @@ var od = od || {};
  */
 od.Device = function(data){
 
+    // Private
     var CType = od.CommandType;
     var _this = this;
+
+    // Public
+    this.type = od.DeviceType.DIGITAL;
+    this.listeners = [];
 
     function _init(data){
 
@@ -50,29 +55,41 @@ od.Device = function(data){
 
     }
 
+    function notifyListeners(){
+
+    }
 
     this.on = function(){
-         this.setValue(1);
+         this.setValue(1, true);
     };
 
     this.off = function(){
-         this.setValue(0);
+         this.setValue(0, true);
     };
 
     this.isON = function(){
-        return (value == 1)
+        return (this.value == 1)
     };
 
     this.isOFF = function(){
-        return (value == 0)
+        return (this.value == 0)
     };
 
-    this.setValue = function(value){
-        this.value = value;
+    this.setValue = function(value, sync){
 
-        if(this.manager){
-            this.manager.setValue(this.id, this.value);
+        sync = typeof sync !== 'undefined' ? sync : true; // default true
+
+        if(this.type == od.DeviceType.NUMERIC || this.value != value){
+
+            this.value = value;
+            this.lastUpdate = new Date().getTime();
+
+            if(this.manager){
+                this.manager.notifyDeviceListeners(this, sync);
+            }
+
         }
+
     };
 
     this.toggle = function(){
@@ -85,6 +102,10 @@ od.Device = function(data){
     /** @deprecated */
     this.toggleValue = this.toggle;
 
+    this.onChange = function(listener){
+        this.listeners.push(listener);
+    };
 
-     _init.call(this, data);
+    // Initialize device data.
+    _init.call(this, data);
 };

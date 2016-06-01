@@ -125,7 +125,7 @@ od.DeviceConnection = function(config){
 
     this.getUrl = function(){
         return od.serverURL + "/device/connection/" + od.appID;
-    }
+    };
 
     this.send = function(data){
         // FIX: bug no atmophere que não enviar os headers da primeira conexao // TODO: registrar ticket

@@ -18,7 +18,8 @@ var od = od || {};
 // Like OpenDevice JAVA-API
 od.DeviceType = {
     DIGITAL:1,
-    ANALOG:2
+    ANALOG:2,
+    NUMERIC:3
 };
 
 // Like OpenDevice JAVA-API

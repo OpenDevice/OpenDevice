@@ -48,14 +48,10 @@ od.DeviceManager = function(connection){
 
     this.setValue = function(deviceID, value){
 
-        var cmd = { 'type' : CType.DIGITAL , 'deviceID' :  deviceID, 'value' : value};
-        _this.connection.send(cmd);
-
         var device = _this.findDevice(deviceID);
 
         if(device){
-            device.value = value;
-            notifyListeners(DEvent.DEVICE_CHANGED, device);
+            device.setValue(value);
         }
 
         // TODO :Alterar dados locais (localstorage)
@@ -67,14 +63,14 @@ od.DeviceManager = function(connection){
         var device = _this.findDevice(deviceID);
 
         if(device && ! device.sensor){
-            device.toggleValue();
+            device.toggle();
         }
 
     };
 
     this.send = function(cmd){
         _this.connection.send(cmd);
-    }
+    };
 
     this.addDevice = function(){
         // Isso teria no final que salvar na EPROM/Servidor do arduino.
@@ -186,6 +182,22 @@ od.DeviceManager = function(connection){
         return false;
     };
 
+    this.notifyDeviceListeners = function(device, sync){
+
+        if(sync){
+            var cmd = { 'type' : device.type , 'deviceID' :  device.id, 'value' : device.value};
+            _this.connection.send(cmd);
+        }
+
+        // Notify Individual Listeners
+        for (var i = 0; i < device.listeners.length; i++) {
+            device.listeners[i](device.value);
+        }
+
+        // Notify Global Listeners
+        notifyListeners(DEvent.DEVICE_CHANGED, device);
+
+    };
 
     function notifyListeners(event, data){
 
@@ -263,9 +275,10 @@ od.DeviceManager = function(connection){
         if(CType.isDeviceCommand(message.type)){
             console.log("Device changed in another client..");
 
-            var device = updateDevice(message);
+            var device = _this.findDevice(message.deviceID);
+
             if(device){
-                notifyListeners(DEvent.DEVICE_CHANGED, device);
+                device.setValue(message.value, false);
             }
             // TODO: store changes localstore..
         }
@@ -281,13 +294,6 @@ od.DeviceManager = function(connection){
 
     }
 
-    function updateDevice(message){
-        var device = _this.findDevice(message.deviceID);
-        if(device){
-            device.value = message.value;
-        }
-        return device;
-    }
 
     function _connectionStateChanged(conn, newStatus, oldStatus){
         console.log("DeviceManager._connectionStateChanged :" + newStatus);

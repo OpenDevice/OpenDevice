@@ -18,7 +18,8 @@ var od = od || {};
 // Like OpenDevice JAVA-API
 od.DeviceType = {
     DIGITAL:1,
-    ANALOG:2
+    ANALOG:2,
+    NUMERIC:3
 };
 
 // Like OpenDevice JAVA-API
@@ -119,8 +120,13 @@ var od = od || {};
  */
 od.Device = function(data){
 
+    // Private
     var CType = od.CommandType;
     var _this = this;
+
+    // Public
+    this.type = od.DeviceType.DIGITAL;
+    this.listeners = [];
 
     function _init(data){
 
@@ -145,29 +151,41 @@ od.Device = function(data){
 
     }
 
+    function notifyListeners(){
+
+    }
 
     this.on = function(){
-         this.setValue(1);
+         this.setValue(1, true);
     };
 
     this.off = function(){
-         this.setValue(0);
+         this.setValue(0, true);
     };
 
     this.isON = function(){
-        return (value == 1)
+        return (this.value == 1)
     };
 
     this.isOFF = function(){
-        return (value == 0)
+        return (this.value == 0)
     };
 
-    this.setValue = function(value){
-        this.value = value;
+    this.setValue = function(value, sync){
 
-        if(this.manager){
-            this.manager.setValue(this.id, this.value);
+        sync = typeof sync !== 'undefined' ? sync : true; // default true
+
+        if(this.type == od.DeviceType.NUMERIC || this.value != value){
+
+            this.value = value;
+            this.lastUpdate = new Date().getTime();
+
+            if(this.manager){
+                this.manager.notifyDeviceListeners(this, sync);
+            }
+
         }
+
     };
 
     this.toggle = function(){
@@ -180,8 +198,12 @@ od.Device = function(data){
     /** @deprecated */
     this.toggleValue = this.toggle;
 
+    this.onChange = function(listener){
+        this.listeners.push(listener);
+    };
 
-     _init.call(this, data);
+    // Initialize device data.
+    _init.call(this, data);
 };/*
  * ******************************************************************************
  *  Copyright (c) 2013-2014 CriativaSoft (www.criativasoft.com.br)
@@ -309,7 +331,7 @@ od.DeviceConnection = function(config){
 
     this.getUrl = function(){
         return od.serverURL + "/device/connection/" + od.appID;
-    }
+    };
 
     this.send = function(data){
         // FIX: bug no atmophere que não enviar os headers da primeira conexao // TODO: registrar ticket
@@ -426,14 +448,10 @@ od.DeviceManager = function(connection){
 
     this.setValue = function(deviceID, value){
 
-        var cmd = { 'type' : CType.DIGITAL , 'deviceID' :  deviceID, 'value' : value};
-        _this.connection.send(cmd);
-
         var device = _this.findDevice(deviceID);
 
         if(device){
-            device.value = value;
-            notifyListeners(DEvent.DEVICE_CHANGED, device);
+            device.setValue(value);
         }
 
         // TODO :Alterar dados locais (localstorage)
@@ -445,14 +463,14 @@ od.DeviceManager = function(connection){
         var device = _this.findDevice(deviceID);
 
         if(device && ! device.sensor){
-            device.toggleValue();
+            device.toggle();
         }
 
     };
 
     this.send = function(cmd){
         _this.connection.send(cmd);
-    }
+    };
 
     this.addDevice = function(){
         // Isso teria no final que salvar na EPROM/Servidor do arduino.
@@ -564,6 +582,22 @@ od.DeviceManager = function(connection){
         return false;
     };
 
+    this.notifyDeviceListeners = function(device, sync){
+
+        if(sync){
+            var cmd = { 'type' : device.type , 'deviceID' :  device.id, 'value' : device.value};
+            _this.connection.send(cmd);
+        }
+
+        // Notify Individual Listeners
+        for (var i = 0; i < device.listeners.length; i++) {
+            device.listeners[i](device.value);
+        }
+
+        // Notify Global Listeners
+        notifyListeners(DEvent.DEVICE_CHANGED, device);
+
+    };
 
     function notifyListeners(event, data){
 
@@ -641,9 +675,10 @@ od.DeviceManager = function(connection){
         if(CType.isDeviceCommand(message.type)){
             console.log("Device changed in another client..");
 
-            var device = updateDevice(message);
+            var device = _this.findDevice(message.deviceID);
+
             if(device){
-                notifyListeners(DEvent.DEVICE_CHANGED, device);
+                device.setValue(message.value, false);
             }
             // TODO: store changes localstore..
         }
@@ -659,13 +694,6 @@ od.DeviceManager = function(connection){
 
     }
 
-    function updateDevice(message){
-        var device = _this.findDevice(message.deviceID);
-        if(device){
-            device.value = message.value;
-        }
-        return device;
-    }
 
     function _connectionStateChanged(conn, newStatus, oldStatus){
         console.log("DeviceManager._connectionStateChanged :" + newStatus);
@@ -700,9 +728,9 @@ var od = od || {};
 
 od.APP_ID_NAME = "AppID";
 
-od.version = "1.0";
+od.version = "0.3.2";
 od.appID = "*";
-od.serverURL = 'http://'+window.location.host;
+od.serverURL = window.location.origin;
 
 var OpenDevice = (function () {
 

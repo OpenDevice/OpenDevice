@@ -169,11 +169,8 @@ public class Device implements Serializable {
      */
 	public void setValue(long value, boolean sync) {
 
-        if(type == NUMERIC){ // fire the event 'onChange' every time a reading is taken
-            setLastUpdate(System.currentTimeMillis());
-            this.value = value;
-            notifyListeners(sync);
-        }else if(value != this.value){
+        // fire the event 'onChange' every time a reading is taken
+        if(type == NUMERIC || value != this.value){
             setLastUpdate(System.currentTimeMillis());
             this.value = value;
             notifyListeners(sync);

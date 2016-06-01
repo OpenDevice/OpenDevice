@@ -14,6 +14,7 @@
 package br.com.criativasoft.opendevice.core.command;
 
 import br.com.criativasoft.opendevice.core.model.Device;
+import br.com.criativasoft.opendevice.core.model.DeviceType;
 
 public class DeviceCommand extends Command {
 
@@ -80,6 +81,18 @@ public class DeviceCommand extends Command {
      */
     public static DeviceCommand OFF(int deviceID){
         return new DeviceCommand(CommandType.DIGITAL, deviceID, Device.VALUE_LOW);
+    }
+
+    public static CommandType getCommandType(DeviceType deviceType){
+        if (deviceType == DeviceType.DIGITAL) {
+            return CommandType.DIGITAL;
+        }else if (deviceType == DeviceType.ANALOG) {
+            return CommandType.ANALOG;
+        }else if (deviceType == DeviceType.NUMERIC) {
+            return CommandType.NUMERIC;
+        }else{
+            return null;
+        }
     }
 
 }

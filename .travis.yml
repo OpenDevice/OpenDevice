@@ -1,6 +1,8 @@
 language: java
 jdk:
   - oraclejdk8
+install:
+- mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 after_success:
   - echo "<settings><servers><server><id>ossrh</id><username>\${env.OSSRH_USER}</username><password>\${env.OSSRH_PASS}</password></server></servers></settings>" > ~/settings.xml
   - mvn deploy --settings ~/settings.xml

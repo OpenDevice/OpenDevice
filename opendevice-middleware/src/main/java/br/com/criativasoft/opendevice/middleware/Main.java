@@ -46,8 +46,6 @@ public class Main extends LocalDeviceManager {
 
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-    protected int port = 8181;
-
     private SimpleBindings jscontext;
     private IWSServerConnection webscoket;
 
@@ -56,9 +54,10 @@ public class Main extends LocalDeviceManager {
 //        setApplicationID(OpenDeviceConfig.LOCAL_APP_ID);
 
         // Server with suport for HTTP,Rest,WebSocket
-        webscoket = Connections.in.websocket(port);
 
         OpenDeviceConfig config = OpenDeviceConfig.get();
+
+        webscoket = Connections.in.websocket(config.getPort());
 
         jscontext = new SimpleBindings();
         jscontext.put("manager", this);
@@ -70,6 +69,8 @@ public class Main extends LocalDeviceManager {
             log.info("Using config file (JS): " + userConfig);
             loadScript(userConfig);
         }
+
+        webscoket.setPort(config.getPort()); // script can change port.
 
         // TODO: use EntityManager by injection
         if(config.isDatabaseEnabled()){

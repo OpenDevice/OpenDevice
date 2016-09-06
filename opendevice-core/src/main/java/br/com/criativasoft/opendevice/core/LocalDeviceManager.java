@@ -206,7 +206,7 @@ public class LocalDeviceManager extends BaseDeviceManager {
 
             // Manual shutdown
             log.info("========================================================");
-            log.info("Application - started ");
+            log.info("Application - started on port: " + OpenDeviceConfig.get().getPort());
             log.info("Type [CTRL+C] to stop the server");
             log.info("========================================================");
 

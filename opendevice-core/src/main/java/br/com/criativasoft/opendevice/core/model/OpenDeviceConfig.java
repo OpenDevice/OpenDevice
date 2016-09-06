@@ -24,7 +24,11 @@ public class OpenDeviceConfig {
 
     public static final String LOCAL_APP_ID = "*";
 
+    public static final int DEFAULT_PORT = 8181;
+
     private static OpenDeviceConfig INSTANCE;
+
+    private int port = DEFAULT_PORT;
 
     private boolean supportTenants = false;
 
@@ -103,5 +107,13 @@ public class OpenDeviceConfig {
 
     public String getCertificatePass() {
         return certificatePass;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public int getPort() {
+        return port;
     }
 }

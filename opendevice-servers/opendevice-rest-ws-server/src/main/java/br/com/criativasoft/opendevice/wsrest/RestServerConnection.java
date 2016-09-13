@@ -14,11 +14,10 @@
 package br.com.criativasoft.opendevice.wsrest;
 
 import br.com.criativasoft.opendevice.connection.IRestServerConnection;
-import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.restapi.DeviceRest;
+import br.com.criativasoft.opendevice.wsrest.resource.ApiInfoResource;
+import br.com.criativasoft.opendevice.wsrest.resource.AuthResource;
 import org.atmosphere.nettosphere.Config;
-
-import java.io.IOException;
 
 
 /**
@@ -38,6 +37,8 @@ public class RestServerConnection extends AbstractAtmosphereConnection implement
 
     @Override
     protected void configure(Config.Builder conf) {
+        conf.resource(ApiInfoResource.class);
+        conf.resource(AuthResource.class);
         conf.resource(DeviceRest.class);
     }
 

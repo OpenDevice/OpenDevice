@@ -11,23 +11,25 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.core;
+package br.com.criativasoft.opendevice.wsrest.auth;
 
-import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
+import org.apache.shiro.authc.AuthenticationToken;
 
-/**
- * Provider that is used for local applications <b>without</b> support muti-tenant
- * @author Ricardo JL Rufino
- * @date 29/08/15.
- */
-public class LocalTenantProvider extends TenantProvider {
+public class BearerAuthenticationToken implements AuthenticationToken {
 
-    @Override
-    public void setTenantID(String appID) {
+    private String token;
+
+    public BearerAuthenticationToken(String token) {
+        this.token = token;
     }
 
     @Override
-    public String getTenantID() {
-        return OpenDeviceConfig.LOCAL_APP_ID;
+    public Object getPrincipal() {
+        return token;
+    }
+
+    @Override
+    public Object getCredentials() {
+        return token;
     }
 }

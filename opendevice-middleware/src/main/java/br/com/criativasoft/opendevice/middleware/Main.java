@@ -23,6 +23,7 @@ import br.com.criativasoft.opendevice.middleware.config.DependencyConfig;
 import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.DeviceDaoNeo4j;
 import br.com.criativasoft.opendevice.middleware.resources.DashboardRest;
+import br.com.criativasoft.opendevice.middleware.resources.IndexRest;
 import br.com.criativasoft.opendevice.mqtt.MQTTServerConnection;
 import br.com.criativasoft.opendevice.wsrest.guice.config.GuiceConfigRegistry;
 import org.apache.commons.lang3.StringUtils;
@@ -35,11 +36,7 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-//
 // Run using Maven using: mvn compile exec:java -Dexec.mainClass=br.com.criativasoft.opendevice.middleware.Main
-// Run on firebug: app.deviceList.create({name:'Tomada DB2', value:0, category: app.DeviceCategory.POWER_SOURCE});
-// URLs REST:
-// - http://localhost:8181/device/1/setvalue/1
 
 public class Main extends LocalDeviceManager {
 
@@ -57,11 +54,14 @@ public class Main extends LocalDeviceManager {
 
         OpenDeviceConfig config = OpenDeviceConfig.get();
 
+        setDataManager(new MainDataManager());
+
         webscoket = Connections.in.websocket(config.getPort());
 
         jscontext = new SimpleBindings();
         jscontext.put("manager", this);
         jscontext.put("config", config);
+
 
         // Configuration Scripts.
         String userConfig = System.getProperty("config");
@@ -77,6 +77,7 @@ public class Main extends LocalDeviceManager {
             setDeviceDao(new DeviceDaoNeo4j(LocalEntityManagerFactory.getInstance().createEntityManager()));
         }
 
+
         // new FakeSensorSimulator(50, this, 6, 7).start(); // generate fake data
         // addFilter(new FixedReadIntervalFilter(500, this));
 
@@ -89,9 +90,11 @@ public class Main extends LocalDeviceManager {
 
         // Rest Resources
         // ================
+        webscoket.addResource(IndexRest.class);
         if(config.isDatabaseEnabled()){
-             webscoket.addResource(DashboardRest.class);
+            webscoket.addResource(DashboardRest.class);
         }
+
 
         // Static WebResources
         String rootWebApp = getWebAppDir();

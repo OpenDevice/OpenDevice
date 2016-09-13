@@ -4,8 +4,7 @@
   xmlns="http://www.zeroturnaround.com"
   xsi:schemaLocation="http://www.zeroturnaround.com http://www.zeroturnaround.com/alderaan/rebel-2_0.xsd">
   <classpath>
-    <dir name="/media/Dados/Codigos/Java/Projetos/OpenDevice/opendevice-middleware/target/classes"/>
-    <dir name="/media/Dados/Codigos/Java/Projetos/OpenDevice/opendevice-core/target/classes"/>
-    <dir name="/media/Dados/Codigos/Java/Projetos/OpenDevice/opendevice-rest-api/target/classes"/>
+    <dir name="/media/ricardo/Dados/Codidos/Java/Projetos/OpenDevice/opendevice-middleware/target/classes"/>
+    <dir name="/media/ricardo/Dados/Codidos/Java/Projetos/OpenDevice/opendevice-servers/opendevice-rest-ws-server/target/classes"/>
   </classpath>
 </application>

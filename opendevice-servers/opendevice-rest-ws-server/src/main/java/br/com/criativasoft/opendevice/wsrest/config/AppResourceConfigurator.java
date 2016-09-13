@@ -13,9 +13,14 @@
 
 package br.com.criativasoft.opendevice.wsrest.config;
 
+import br.com.criativasoft.opendevice.wsrest.filter.TokenAuthenticationFilter;
 import br.com.criativasoft.opendevice.wsrest.guice.config.GuiceConfigRegistry;
+import br.com.criativasoft.opendevice.wsrest.io.AuthenticationExceptionMap;
+import br.com.criativasoft.opendevice.wsrest.io.AuthorizationExceptionMap;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.ResourceConfigurator;
+import org.secnod.shiro.jersey.ShiroResourceFilterFactory;
+import org.secnod.shiro.jersey.SubjectInjectableProvider;
 
 import java.util.Set;
 
@@ -29,5 +34,12 @@ public class AppResourceConfigurator implements ResourceConfigurator {
     public void configure(ResourceConfig config) {
         Set<Class<?>> classes = config.getClasses();
         classes.add(GuiceConfigRegistry.getConfigClass());
+        classes.add(AuthenticationExceptionMap.class);
+        classes.add(AuthorizationExceptionMap.class);
+
+        // Shiro (Auth)
+        config.getContainerRequestFilters().add(new TokenAuthenticationFilter());
+        classes.add(SubjectInjectableProvider.class);
+        config.getResourceFilterFactories().add(new ShiroResourceFilterFactory());
     }
 }

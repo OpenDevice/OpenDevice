@@ -36,6 +36,7 @@ public class OpenDeviceConfig {
 
     private boolean databaseEnabled = false;
 
+    private boolean authRequired = false;
 
     private String certificateFile;
 
@@ -115,5 +116,13 @@ public class OpenDeviceConfig {
 
     public int getPort() {
         return port;
+    }
+
+    public void setAuthRequired(boolean authRequired) {
+        this.authRequired = authRequired;
+    }
+
+    public boolean isAuthRequired() {
+        return authRequired;
     }
 }

@@ -17,8 +17,19 @@
     </properties>
 
 
-
 	<dependencies>
+
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-web</artifactId>
+            <version>1.2.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.secnod.shiro</groupId>
+            <artifactId>shiro-jersey</artifactId>
+            <version>0.1.0</version>
+        </dependency>
 
         <dependency>
             <groupId>ch.qos.logback</groupId>

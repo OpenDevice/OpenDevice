@@ -11,7 +11,7 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.wsrest.io;
+package br.com.criativasoft.opendevice.wsrest.filter;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectWriter;

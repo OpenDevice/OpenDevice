@@ -11,23 +11,22 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.core;
+package br.com.criativasoft.opendevice.wsrest.io;
 
-import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
+import org.apache.shiro.authc.AuthenticationException;
+
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
 
 /**
- * Provider that is used for local applications <b>without</b> support muti-tenant
+ * Map AuthenticationException to Http Response
  * @author Ricardo JL Rufino
- * @date 29/08/15.
+ * @date 10/09/16
  */
-public class LocalTenantProvider extends TenantProvider {
+public class AuthenticationExceptionMap implements ExceptionMapper<AuthenticationException> {
 
     @Override
-    public void setTenantID(String appID) {
-    }
-
-    @Override
-    public String getTenantID() {
-        return OpenDeviceConfig.LOCAL_APP_ID;
+    public Response toResponse(AuthenticationException exception) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity(exception.getMessage()).build();
     }
 }

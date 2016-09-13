@@ -54,7 +54,6 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     private volatile Set<DeviceListener> listeners = new HashSet<DeviceListener>();
 
-
 	/** Client connections: Websockets, http, rest, etc ...*/
 	private MultipleConnection inputConnections = new MultipleConnection();
 	
@@ -71,10 +70,9 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     private EventHookManager eventManager;
 
-    private DeviceDao deviceDao;
+    private DataManager dataManager;
 
     private Message lastMessage;
-
 
     public BaseDeviceManager(){
         instance = this;
@@ -150,18 +148,28 @@ public abstract class BaseDeviceManager implements DeviceManager {
     }
 
     @Override
+    public void setDataManager(DataManager dataManager) {
+        this.dataManager = dataManager;
+    }
+
+    @Override
+    public DataManager getDataManager() {
+        return dataManager;
+    }
+
+    @Override
     public void setDeviceDao(DeviceDao deviceDao) {
-        this.deviceDao = deviceDao;
+        getDataManager().setDeviceDao(deviceDao);
     }
 
     @Override
     public DeviceDao getDeviceDao() {
-        return deviceDao;
+        return getDataManager().getDeviceDao();
     }
 
     public DeviceDao getValidDeviceDao() {
-        if(deviceDao == null) throw new IllegalStateException("deviceDao is NULL !");
-        return deviceDao;
+        if(getDataManager().getDeviceDao() == null) throw new IllegalStateException("deviceDao is NULL !");
+        return getDataManager().getDeviceDao();
     }
 
 

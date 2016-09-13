@@ -13,7 +13,7 @@
  *
  */
 
-package br.com.criativasoft.opendevice.wsrest.io;
+package br.com.criativasoft.opendevice.wsrest.filter;
 
 import org.atmosphere.cpr.*;
 import org.atmosphere.interceptor.InvokationOrder;

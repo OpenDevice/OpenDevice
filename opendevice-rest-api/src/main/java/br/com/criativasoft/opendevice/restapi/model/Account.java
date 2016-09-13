@@ -11,23 +11,21 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.core;
+package br.com.criativasoft.opendevice.restapi.model;
 
-import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
+import java.util.Set;
 
 /**
- * Provider that is used for local applications <b>without</b> support muti-tenant
+ *
  * @author Ricardo JL Rufino
- * @date 29/08/15.
+ * @date 10/09/16
  */
-public class LocalTenantProvider extends TenantProvider {
+public class Account {
 
-    @Override
-    public void setTenantID(String appID) {
-    }
+    private String username;
 
-    @Override
-    public String getTenantID() {
-        return OpenDeviceConfig.LOCAL_APP_ID;
-    }
+    private String password;
+
+    private Set<ApiKey> keys;
+
 }

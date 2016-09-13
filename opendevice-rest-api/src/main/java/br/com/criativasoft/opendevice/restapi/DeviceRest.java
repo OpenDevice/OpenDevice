@@ -22,6 +22,7 @@ import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceVO;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceHistory;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,7 @@ import java.util.List;
  * @date 04/07/14.
  */
 @Path("device")
+@RequiresAuthentication
 public class DeviceRest {
 
     private static final Logger log = LoggerFactory.getLogger(DeviceRest.class);

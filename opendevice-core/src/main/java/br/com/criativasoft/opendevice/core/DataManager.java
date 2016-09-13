@@ -13,21 +13,17 @@
 
 package br.com.criativasoft.opendevice.core;
 
-import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
+import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 
 /**
- * Provider that is used for local applications <b>without</b> support muti-tenant
- * @author Ricardo JL Rufino
- * @date 29/08/15.
+ * TODO: Add docs.
+ *
+ * @author Ricardo JL Rufino (10/09/16)
  */
-public class LocalTenantProvider extends TenantProvider {
+public interface DataManager {
 
-    @Override
-    public void setTenantID(String appID) {
-    }
+    DeviceDao getDeviceDao();
 
-    @Override
-    public String getTenantID() {
-        return OpenDeviceConfig.LOCAL_APP_ID;
-    }
+    void setDeviceDao(DeviceDao dao);
+
 }

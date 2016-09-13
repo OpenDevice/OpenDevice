@@ -11,23 +11,21 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.core;
+package br.com.criativasoft.opendevice.wsrest.guice.config;
 
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
+import com.google.inject.Provider;
 
 /**
- * Provider that is used for local applications <b>without</b> support muti-tenant
+ * TODO: Add docs.
+ *
  * @author Ricardo JL Rufino
- * @date 29/08/15.
+ * @date 09/09/16
  */
-public class LocalTenantProvider extends TenantProvider {
+public class OpenDeviceConfigProvider implements Provider<OpenDeviceConfig> {
 
     @Override
-    public void setTenantID(String appID) {
-    }
-
-    @Override
-    public String getTenantID() {
-        return OpenDeviceConfig.LOCAL_APP_ID;
+    public OpenDeviceConfig get() {
+        return OpenDeviceConfig.get();
     }
 }

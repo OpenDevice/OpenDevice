@@ -67,12 +67,11 @@ package br.com.criativasoft.opendevice.wsrest.guice.config;
 
 import br.com.criativasoft.opendevice.connection.ServerConnection;
 import br.com.criativasoft.opendevice.core.DeviceManager;
-import br.com.criativasoft.opendevice.wsrest.guice.GuiceInjectProvider;
+import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.restapi.service.DeviceService;
 import br.com.criativasoft.opendevice.restapi.service.DeviceServiceImpl;
+import br.com.criativasoft.opendevice.wsrest.guice.GuiceInjectProvider;
 import com.google.inject.Binder;
-
-import javax.ws.rs.ext.Provider;
 
 //@Provider /** JAX-RS Provider */
 public class GuiceModule extends GuiceInjectProvider {
@@ -81,6 +80,7 @@ public class GuiceModule extends GuiceInjectProvider {
     public void configure(Binder binder) {
         binder.bind(ServerConnection.class).toProvider(ConnectionGuiceProvider.class);
         binder.bind(DeviceManager.class).toProvider(DeviceManagerGuiceProvider.class);
+        binder.bind(OpenDeviceConfig.class).toProvider(OpenDeviceConfigProvider.class);
         binder.bind(DeviceService.class).to(DeviceServiceImpl.class);
     }
 

@@ -19,7 +19,6 @@ import br.com.criativasoft.opendevice.core.connection.Connections;
 import br.com.criativasoft.opendevice.core.connection.InputContections;
 import br.com.criativasoft.opendevice.core.connection.OutputConnections;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
-import br.com.criativasoft.opendevice.core.dao.memory.DeviceMemoryDao;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import org.slf4j.Logger;
@@ -60,7 +59,6 @@ public class LocalDeviceManager extends BaseDeviceManager {
 
     public LocalDeviceManager(){
         super();
-        setDeviceDao(new DeviceMemoryDao());
     }
 
     @Override

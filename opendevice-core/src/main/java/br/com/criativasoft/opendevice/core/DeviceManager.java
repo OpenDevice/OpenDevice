@@ -33,6 +33,10 @@ public interface DeviceManager extends ConnectionManager{
 
     public void setDeviceDao(DeviceDao deviceDao);
 
+    public void setDataManager(DataManager dataManager);
+
+    public DataManager getDataManager();
+
     public DeviceDao getDeviceDao();
 
 	public Collection<Device> getDevices();

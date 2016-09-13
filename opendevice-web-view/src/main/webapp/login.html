@@ -74,18 +74,18 @@
                 <h1>Login</h1>
                 <div class="mws-login-lock"><img src="css/icons/24/locked-2.png" alt="" /></div>
                 <div id="mws-login-form">
-                    <form class="mws-form" action="dashboard.html" method="post">
+                    <form class="mws-form" action="api/auth" method="post">
                         <div id="mws-login-error" class="mws-form-message error">
                         tes
                         </div>
                         <div class="mws-form-row">
                             <div class="mws-form-item large">
-                                <input type="text" class="mws-login-username mws-textinput" placeholder="username" />
+                                <input type="text" name="username" class="mws-login-username mws-textinput" placeholder="username" />
                             </div>
                         </div>
                         <div class="mws-form-row">
                             <div class="mws-form-item large">
-                                <input type="password" class="mws-login-password mws-textinput" placeholder="password" />
+                                <input type="password" name="password" class="mws-login-password mws-textinput" placeholder="password" />
                             </div>
                         </div>
                         <div class="mws-form-row mws-inset">

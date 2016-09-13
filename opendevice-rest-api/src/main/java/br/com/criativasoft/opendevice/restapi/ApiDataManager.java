@@ -11,23 +11,19 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.core;
+package br.com.criativasoft.opendevice.restapi;
 
-import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
+import br.com.criativasoft.opendevice.core.DataManager;
+import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
 
 /**
- * Provider that is used for local applications <b>without</b> support muti-tenant
+ * TODO: Add docs.
+ *
  * @author Ricardo JL Rufino
- * @date 29/08/15.
+ * @date 10/09/16
  */
-public class LocalTenantProvider extends TenantProvider {
+public interface ApiDataManager extends DataManager {
 
-    @Override
-    public void setTenantID(String appID) {
-    }
+    public AccountDao getAccountDao();
 
-    @Override
-    public String getTenantID() {
-        return OpenDeviceConfig.LOCAL_APP_ID;
-    }
 }

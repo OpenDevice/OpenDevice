@@ -30,11 +30,13 @@ public class OpenDeviceConfig {
 
     private int port = DEFAULT_PORT;
 
-    private boolean supportTenants = false;
+    private boolean tenantsEnabled = false;
 
     private boolean broadcastInputs = true;
 
     private boolean databaseEnabled = false;
+
+    private boolean mqttEnabled = true;
 
     private boolean authRequired = false;
 
@@ -51,8 +53,12 @@ public class OpenDeviceConfig {
      * Checks whether the support for multi-tenant is active. This setting should only be enabled when using the platform as a service.
      * @return if multi-tenant is active
      */
-    public boolean isSupportTenants() {
-        return supportTenants;
+    public boolean isTenantsEnabled() {
+        return tenantsEnabled;
+    }
+
+    public void setTenantsEnabled(boolean tenantsEnabled) {
+        this.tenantsEnabled = tenantsEnabled;
     }
 
     public static OpenDeviceConfig get(){
@@ -124,5 +130,13 @@ public class OpenDeviceConfig {
 
     public boolean isAuthRequired() {
         return authRequired;
+    }
+
+    public void setMqttEnabled(boolean mqttEnabled) {
+        this.mqttEnabled = mqttEnabled;
+    }
+
+    public boolean isMqttEnabled() {
+        return mqttEnabled;
     }
 }

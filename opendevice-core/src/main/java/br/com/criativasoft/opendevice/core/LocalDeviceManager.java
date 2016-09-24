@@ -139,7 +139,7 @@ public class LocalDeviceManager extends BaseDeviceManager {
         }
 
         // Check if tenant is valid.
-        if(TenantProvider.getCurrentID() != null && getConfig().isSupportTenants() && OpenDeviceConfig.LOCAL_APP_ID.equals(TenantProvider.getCurrentID())){
+        if(TenantProvider.getCurrentID() != null && getConfig().isTenantsEnabled() && OpenDeviceConfig.LOCAL_APP_ID.equals(TenantProvider.getCurrentID())){
             throw new IllegalStateException("In Multi-Tenant support don't allow '*' in applicationID !");
         }
 

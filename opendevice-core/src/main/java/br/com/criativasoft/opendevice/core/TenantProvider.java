@@ -16,7 +16,7 @@
 package br.com.criativasoft.opendevice.core;
 
 /**
- * TODO: Add Docs
+ * TenantProvider
  *
  * @author Ricardo JL Rufino on 05/10/14.
  */

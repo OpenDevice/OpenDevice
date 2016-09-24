@@ -14,14 +14,13 @@
 package br.com.criativasoft.opendevice.core;
 
 /**
- * TODO: Add Docs
- *
+ * TenantProvider with holds TenantID/AccountUUID in ThreadLocal
  * @author Ricardo JL Rufino
  * @date 29/08/15.
  */
 public class ThreadLocalTenantProvider extends TenantProvider {
 
-    private static ThreadLocal<String> threadLocal = new ThreadLocal<String>();
+    private static InheritableThreadLocal<String> threadLocal = new InheritableThreadLocal<String>();
 
     public void setTenantID(String appID){
         threadLocal.set(appID);

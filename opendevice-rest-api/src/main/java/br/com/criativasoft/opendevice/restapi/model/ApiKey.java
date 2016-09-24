@@ -13,17 +13,70 @@
 
 package br.com.criativasoft.opendevice.restapi.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import javax.persistence.*;
+import java.util.UUID;
+
 /**
  * TODO: Add docs.
  *
  * @author Ricardo JL Rufino
  * @date 10/09/16
  */
+@Entity
 public class ApiKey {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
     private String key;
 
-    private String appName; // Descriptive name
+    /**
+     * Name of Application
+     */
+    private String appName;
 
+    @ManyToOne(fetch= FetchType.EAGER)
+    @JsonBackReference
     private Account account;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
+    @PrePersist
+    public void generateKey(){
+        this.key = UUID.randomUUID().toString();
+    }
+
 }

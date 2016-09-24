@@ -13,6 +13,7 @@
 
 package br.com.criativasoft.opendevice.restapi.model.dao;
 
+import br.com.criativasoft.opendevice.core.dao.Dao;
 import br.com.criativasoft.opendevice.restapi.model.Account;
 
 /**
@@ -20,8 +21,10 @@ import br.com.criativasoft.opendevice.restapi.model.Account;
  * @author Ricardo JL Rufino
  * @date 10/09/16
  */
-public interface AccountDao {
+public interface AccountDao extends Dao<Account> {
 
     Account getAccountByApiKey(String key);
+
+    Account getAccount(String username, String password);
 
 }

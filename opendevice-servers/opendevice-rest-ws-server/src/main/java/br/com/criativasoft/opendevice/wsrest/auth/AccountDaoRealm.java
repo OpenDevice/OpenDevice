@@ -17,6 +17,7 @@ import br.com.criativasoft.opendevice.core.DataManager;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.restapi.ApiDataManager;
 import br.com.criativasoft.opendevice.restapi.model.Account;
+import br.com.criativasoft.opendevice.restapi.model.UserAccount;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.realm.AuthenticatingRealm;
@@ -27,20 +28,20 @@ import org.apache.shiro.realm.AuthenticatingRealm;
  * @author Ricardo JL Rufino
  * @date 22/09/16
  */
-public class AccountRealm  extends AuthenticatingRealm {
+public class AccountDaoRealm extends AuthenticatingRealm {
 
 
     private DeviceManager manager;
 
-    public AccountRealm(DeviceManager manager) {
+    public AccountDaoRealm(DeviceManager manager) {
         this.manager = manager;
-        setAuthenticationTokenClass(UsernamePasswordToken.class);
+        setAuthenticationTokenClass(AccountAuth.class);
     }
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
 
-        UsernamePasswordToken user = (UsernamePasswordToken) token;
+        AccountAuth accountAuth = (AccountAuth) token;
 
         DataManager context = manager.getDataManager();
 
@@ -48,11 +49,12 @@ public class AccountRealm  extends AuthenticatingRealm {
 
             AccountDao dao = ((ApiDataManager) context).getAccountDao();
 
-            Account account = dao.getAccount(user.getUsername(), new String(user.getPassword()));
+            UserAccount userAccount = dao.getUserAccountByID(accountAuth.getAccountID());
 
-            if(account != null){
-                // TODO: check if need return password
-                return new SimpleAuthenticationInfo(account.getUuid(), account.getPassword(), "AccountRealm");
+            if(userAccount != null){
+                Account account = userAccount.getOwner();
+                // add userAccount.getPermissionsTags // todo: load permission tags into AuthenticationInfo
+                return new SimpleAuthenticationInfo(account.getUuid(), accountAuth.getAccountID(), "AccountDaoRealm");
             }
         }
 

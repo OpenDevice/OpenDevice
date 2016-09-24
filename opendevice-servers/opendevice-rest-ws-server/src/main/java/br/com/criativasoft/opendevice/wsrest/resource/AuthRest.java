@@ -14,13 +14,16 @@
 package br.com.criativasoft.opendevice.wsrest.resource;
 
 import br.com.criativasoft.opendevice.restapi.model.Account;
+import br.com.criativasoft.opendevice.restapi.model.User;
+import br.com.criativasoft.opendevice.restapi.model.UserAccount;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
+import br.com.criativasoft.opendevice.restapi.model.dao.UserDao;
+import br.com.criativasoft.opendevice.wsrest.auth.AccountAuth;
 import com.sun.jersey.core.util.Base64;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
-import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.Session;
@@ -36,6 +39,7 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -59,7 +63,10 @@ public class AuthRest {
     public static final String SESSION_ID = "JSESSIONID";
 
     @Inject
-    private AccountDao dao;
+    private AccountDao accountDao;
+
+    @Inject
+    private UserDao userDao;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -118,8 +125,9 @@ public class AuthRest {
 
         Account account = null;
         String authtoken = null;
+        boolean logged = false;
 
-//        List<Account> list = dao.listAll();
+//        List<Account> list = accountDao.listAll();
 //        for (Account account1 : list) {
 //
 //            Set<ApiKey> keys = account1.getKeys();
@@ -131,9 +139,10 @@ public class AuthRest {
 //
 //        }
 
+        // Login using: ApiKey
         if(isToken){
 
-            account = dao.getAccountByApiKey(username);
+            account = accountDao.getAccountByApiKey(username);
 
             // Generate and cache the 'AuthToken', this will be used in AuthenticationFilter
             // TODO: Need configure expire using EhCache
@@ -142,21 +151,32 @@ public class AuthRest {
                 DefaultSecurityManager securityManager = (DefaultSecurityManager) SecurityUtils.getSecurityManager();
                 Cache<Object, Object> cache = securityManager.getCacheManager().getCache(TOKEN_CACHE);
                 cache.put(authtoken, username); // username == Api_Key
+                logged = true;
             }
 
-        // Form auth
+        // login using: Form
         }else if (!currentUser.isAuthenticated()){
 
-            UsernamePasswordToken token = new UsernamePasswordToken(username, password);
-            token.setRememberMe(false); // to be remembered across sessions
+            User user = userDao.getUser(username, password);
+            Set<UserAccount> accounts = user.getAccounts();
 
             try {
+
+                if(accounts.isEmpty()) throw new UnknownAccountException();
+
+                if(accounts.size() > 1){
+                    // TODO: Need return list and redirect to annother page...
+                    return noCache(Response.status(Status.FORBIDDEN).entity("Multiple Accounts not supported for now !! (open ticket !)"));
+                }
+
+                AccountAuth token = new AccountAuth(accounts.iterator().next().getId());
+                //token.setRememberMe(false); // to be remembered across sessions
 
                 currentUser.login(token);
 
                 // currentUser.getSession(true).setTimeout(xxxxx);
 
-                account = new Account(currentUser.getPrincipal().toString(), "x"); // fake, only to send response
+                logged = true;
 
             } catch (UnknownAccountException e) {
                 return noCache(Response.status(Status.UNAUTHORIZED).entity("Unknown Account"));
@@ -170,7 +190,7 @@ public class AuthRest {
         }
 
 
-        if (account != null) {
+        if (logged) {
             return noCache(Response.status(Status.OK).entity(authtoken));
         } else {
             return noCache(Response.status(Status.UNAUTHORIZED).entity("Authentication Fail"));

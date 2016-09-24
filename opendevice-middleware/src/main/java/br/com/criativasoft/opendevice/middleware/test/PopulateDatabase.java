@@ -20,11 +20,11 @@ import br.com.criativasoft.opendevice.core.model.*;
 import br.com.criativasoft.opendevice.middleware.model.Dashboard;
 import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j.DeviceDaoNeo4j;
-import br.com.criativasoft.opendevice.restapi.model.Account;
-import br.com.criativasoft.opendevice.restapi.model.ApiKey;
+import br.com.criativasoft.opendevice.restapi.model.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
@@ -48,9 +48,12 @@ public class PopulateDatabase {
         EntityTransaction tx = em.getTransaction();
         tx.begin();
 
-        saveUsers();
+        List<Account> accounts = saveUsers();
+        for (Account account : accounts) {
+            saveDash(account);
+        }
+
         saveDevices();
-        saveDash();
 
 //        List<Device> devices = dao.listAll();
 //        for (Device device : devices) {
@@ -69,29 +72,48 @@ public class PopulateDatabase {
     }
 
 
-    private static void saveUsers() {
-        Account account = new Account();
-        account.setUsername("admin");
-        account.setPassword("admin");
-        em.persist(account);
+    private static List<Account> saveUsers() {
+        List<Account> list = new ArrayList<Account>();
+        list.add(saveUser("admin", "admin"));
+        list.add(saveUser("user", "user"));
 
-        ApiKey key = new ApiKey();
-        key.setAccount(account);
-        key.setAppName("Dashboard");
-        account.getKeys().add(key);
-        em.persist(key);
-        em.persist(account);
+        return list;
     }
 
-    private static void saveDash(){
+    private static Account saveUser(String u, String p) {
+
+        User user = new User();
+        user.setUsername(u);
+        user.setPassword(p);
+        em.persist(user);
+
+        Account account = new Account();
+        em.persist(account);
+
+        UserAccount uaccount = new UserAccount();
+        uaccount.setType(AccountType.ACCOUNT_MANAGER);
+        uaccount.setUser(user);
+        uaccount.setOwner(account);
+        em.persist(uaccount);
+
+        ApiKey key = new ApiKey();
+        key.setAccount(uaccount);
+        key.setAppName("Dashboard : " + u);
+        uaccount.getKeys().add(key);
+        em.persist(key);
+        em.persist(account);
+        return account;
+    }
+
+    private static void saveDash(Account account){
         Dashboard dashboard = new Dashboard();
-        dashboard.setTitle("Dash 1");
-        dashboard.setTenantID("1");
+        dashboard.setTitle("Dash 1 - " + account.getId());
+        dashboard.setTenantID(account.getUuid());
         em.persist(dashboard);
 
         dashboard = new Dashboard();
-        dashboard.setTitle("Dash 2");
-        dashboard.setTenantID("2");
+        dashboard.setTitle("Dash 2 - " + account.getId());
+        dashboard.setTenantID(account.getUuid());
         em.persist(dashboard);
     }
 

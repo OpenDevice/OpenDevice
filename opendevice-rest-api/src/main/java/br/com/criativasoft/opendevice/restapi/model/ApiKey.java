@@ -40,7 +40,7 @@ public class ApiKey {
 
     @ManyToOne(fetch= FetchType.EAGER)
     @JsonBackReference
-    private Account account;
+    private UserAccount account;
 
     public long getId() {
         return id;
@@ -66,11 +66,11 @@ public class ApiKey {
         this.appName = appName;
     }
 
-    public Account getAccount() {
+    public UserAccount getAccount() {
         return account;
     }
 
-    public void setAccount(Account account) {
+    public void setAccount(UserAccount account) {
         this.account = account;
     }
 

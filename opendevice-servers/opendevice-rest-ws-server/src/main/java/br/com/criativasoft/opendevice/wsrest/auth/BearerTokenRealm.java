@@ -17,6 +17,7 @@ import br.com.criativasoft.opendevice.core.DataManager;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.restapi.ApiDataManager;
 import br.com.criativasoft.opendevice.restapi.model.Account;
+import br.com.criativasoft.opendevice.restapi.model.UserAccount;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
 import br.com.criativasoft.opendevice.wsrest.resource.AuthRest;
 import org.apache.shiro.SecurityUtils;
@@ -61,9 +62,11 @@ public class BearerTokenRealm extends AuthenticatingRealm  {
 
             AccountDao dao = ((ApiDataManager) context).getAccountDao();
 
-            Account account = dao.getAccountByApiKey(apiKey);
+            UserAccount userAccount = dao.getUserAccountByApiKey(apiKey);
 
-            if(account != null){
+            if(userAccount != null){
+                Account account = userAccount.getOwner();
+                // add userAccount.getPermissionsTags // todo: load permission tags into AuthenticationInfo
                 return new SimpleAuthenticationInfo(account.getUuid(), authToken.getCredentials(), "BearerTokenRealm");
             }
         }

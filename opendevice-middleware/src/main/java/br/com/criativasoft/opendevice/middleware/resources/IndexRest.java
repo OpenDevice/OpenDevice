@@ -13,7 +13,9 @@
 
 package br.com.criativasoft.opendevice.middleware.resources;
 
+import br.com.criativasoft.opendevice.connection.ServerConnection;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
+import br.com.criativasoft.opendevice.wsrest.WSServerConnection;
 import org.apache.shiro.subject.Subject;
 import org.atmosphere.cpr.AtmosphereRequest;
 import org.atmosphere.cpr.AtmosphereResource;
@@ -23,12 +25,16 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import java.net.URI;
+import javax.ws.rs.core.MediaType;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.List;
 
 /**
- * TODO: Add docs.
+ * Index Controller
  *
  * @author Ricardo JL Rufino
  * @date 09/09/16
@@ -39,22 +45,60 @@ public class IndexRest {
     @Inject
     OpenDeviceConfig config;
 
+    @Inject
+    private ServerConnection connection;
+
     @GET
-    public Response index(@PathParam("id") long id, @Context AtmosphereResource res) throws Exception {
+    @Produces({MediaType.TEXT_HTML})
+    public InputStream index(@PathParam("id") long id, @Context AtmosphereResource res) throws Exception {
 
         AtmosphereRequest request = res.getRequest();
         Subject subject = (Subject) request.getAttribute(FrameworkConfig.SECURITY_SUBJECT);
 
-        URI location;
+        String location;
+        File path = null;
         if(!config.isAuthRequired() || subject.isAuthenticated()){
-            location = new java.net.URI("admin.html");
+            location = "admin.html";
         }else{
-            location = new java.net.URI("login.html");
+            location = "login.html";
         }
 
-        System.out.println("Index: isAuthenticated = " + subject.isAuthenticated() + " -> " + location);
+        // Find base path
+        if(connection instanceof WSServerConnection){
+            List<String> webresources = ((WSServerConnection) connection).getWebresources();
+            path = findInWebPath(webresources, location);
+        }
 
-        return Response.temporaryRedirect(location).build();
+//        if(!config.isAuthRequired() || subject.isAuthenticated()){
+//            location = new java.net.URI("admin.html");
+//        }else{
+//            location = new java.net.URI("login.html");
+//        }
+//        return Response.temporaryRedirect(location).build();
+
+        if(path != null){
+            return new FileInputStream(path);
+        }else{
+            throw new IllegalStateException(location + " not found in webapp path");
+        }
+
+
     }
+
+
+    private File findInWebPath(List<String> webresources, String file){
+        for (String webresource : webresources) {
+            File path = new File(webresource, file);
+            if(path.exists()){
+                return path;
+            }
+        }
+
+        return null;
+    }
+
+
+
+
 
 }

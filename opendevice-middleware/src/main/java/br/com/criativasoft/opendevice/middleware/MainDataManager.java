@@ -16,6 +16,7 @@ package br.com.criativasoft.opendevice.middleware;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.restapi.ApiDataManager;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
+import br.com.criativasoft.opendevice.restapi.model.dao.UserDao;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -36,6 +37,9 @@ public class MainDataManager implements ApiDataManager {
 
     @Inject
     private AccountDao accountDao;
+
+    @Inject
+    private UserDao userDao;
 
     public MainDataManager() {
     }
@@ -59,6 +63,13 @@ public class MainDataManager implements ApiDataManager {
         this.deviceDao = dao;
     }
 
+    public UserDao getUserDao() {
+        return userDao;
+    }
+
+    public void setUserDao(UserDao userDao) {
+        this.userDao = userDao;
+    }
 
     public void setEntityManager(EntityManager em) {
         this.em = em;

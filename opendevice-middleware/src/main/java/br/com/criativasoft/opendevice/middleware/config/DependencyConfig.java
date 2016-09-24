@@ -19,9 +19,11 @@ import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.middleware.persistence.HibernateProvider;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.DashboardDao;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.AccountDaoJPA;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.UserDaoJPA;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j.DashboardDaoNeo4j;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j.DeviceDaoNeo4j;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
+import br.com.criativasoft.opendevice.restapi.model.dao.UserDao;
 import br.com.criativasoft.opendevice.wsrest.guice.config.GuiceModule;
 import com.google.inject.Binder;
 
@@ -43,6 +45,7 @@ public class DependencyConfig extends GuiceModule {
         binder.bind(DashboardDao.class).to(DashboardDaoNeo4j.class);
         binder.bind(DeviceDao.class).to(DeviceDaoNeo4j.class);
         binder.bind(AccountDao.class).to(AccountDaoJPA.class);
+        binder.bind(UserDao.class).to(UserDaoJPA.class);
 
 
     }

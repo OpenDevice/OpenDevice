@@ -16,61 +16,55 @@ package br.com.criativasoft.opendevice.restapi.model;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 /**
- *
  * @author Ricardo JL Rufino
- * @date 10/09/16
+ * @date 24/09/16
  */
 @Entity
-public class Account {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     @Column(unique = true)
-    private String uuid;
+    private String username;
 
-    @OneToMany(mappedBy= "owner")
-    private Set<UserAccount> userAccounts = new HashSet<UserAccount>();
+    private String password;
 
-    public Account() {
+    @OneToMany(mappedBy="user", fetch=FetchType.LAZY)
+    private Set<UserAccount> accounts = new HashSet<UserAccount>();
+
+    public User(){
     }
 
-    public long getId() {
-        return id;
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public String getUsername() {
+        return username;
     }
 
-    public String getUuid() {
-        return uuid;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public String getPassword() {
+        return password;
     }
 
-    @PrePersist
-    public void generateUUID(){
-        this.uuid = UUID.randomUUID().toString();
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    @Override
-    public String toString() {
-        return "Account["+uuid+"]";
+    public Set<UserAccount> getAccounts() {
+        return accounts;
     }
 
-    public Set<UserAccount> getUserAccounts() {
-        return userAccounts;
-    }
-
-    public void setUserAccounts(Set<UserAccount> userAccounts) {
-        this.userAccounts = userAccounts;
+    public void setAccounts(Set<UserAccount> accounts) {
+        this.accounts = accounts;
     }
 }
-

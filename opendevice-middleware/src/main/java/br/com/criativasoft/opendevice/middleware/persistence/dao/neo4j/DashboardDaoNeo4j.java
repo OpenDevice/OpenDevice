@@ -117,6 +117,8 @@ public class DashboardDaoNeo4j implements DashboardDao {
         TypedQuery<Dashboard> query = em.createQuery("from Dashboard where tenantID = :TENANT", Dashboard.class);
         query.setParameter("TENANT", TenantProvider.getCurrentID());
 
+        //em.getProperties().get("")
+
         return query.getResultList();
     }
 

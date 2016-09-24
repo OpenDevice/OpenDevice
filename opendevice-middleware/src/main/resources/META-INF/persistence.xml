@@ -12,6 +12,8 @@
         <class>br.com.criativasoft.opendevice.middleware.model.DashboardItem</class>
         <class>br.com.criativasoft.opendevice.restapi.model.Account</class>
         <class>br.com.criativasoft.opendevice.restapi.model.ApiKey</class>
+        <class>br.com.criativasoft.opendevice.restapi.model.User</class>
+        <class>br.com.criativasoft.opendevice.restapi.model.UserAccount</class>
         <exclude-unlisted-classes/>
         <properties>
             <property name="hibernate.ogm.datastore.provider" value="neo4j_embedded"/>

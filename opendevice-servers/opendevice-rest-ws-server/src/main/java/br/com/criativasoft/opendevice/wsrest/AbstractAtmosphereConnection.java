@@ -25,7 +25,7 @@ import br.com.criativasoft.opendevice.core.command.ResponseCommand;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.core.util.StringUtils;
 import br.com.criativasoft.opendevice.restapi.WaitResponseListener;
-import br.com.criativasoft.opendevice.wsrest.auth.AccountRealm;
+import br.com.criativasoft.opendevice.wsrest.auth.AccountDaoRealm;
 import br.com.criativasoft.opendevice.wsrest.auth.BearerTokenRealm;
 import br.com.criativasoft.opendevice.wsrest.auth.RestWebSecurityManager;
 import br.com.criativasoft.opendevice.wsrest.filter.CrossOriginInterceptor;
@@ -66,8 +66,8 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
     private Nettosphere server;
 
-    private List<String> webresources = new ArrayList<String>();
-    private List<Class<?>> resources = new ArrayList<Class<?>>();
+    private List<String> webresources = new LinkedList<String>();
+    private List<Class<?>> resources = new LinkedList<Class<?>>();
 
     private List<WaitResponseListener> waitListeners = new LinkedList<WaitResponseListener>();
 
@@ -159,7 +159,7 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
                 List<Realm> realms = new LinkedList<Realm>();
                 realms.add(new BearerTokenRealm((DeviceManager) getConnectionManager()));
-                realms.add(new AccountRealm((DeviceManager) getConnectionManager()));
+                realms.add(new AccountDaoRealm((DeviceManager) getConnectionManager()));
 
                 RestWebSecurityManager securityManager = new RestWebSecurityManager(realms);
                 securityManager.setCacheManager(new MemoryConstrainedCacheManager());
@@ -359,6 +359,11 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
 
         }
+    }
+
+
+    public List<String> getWebresources() {
+        return webresources;
     }
 
     public void destroy() {

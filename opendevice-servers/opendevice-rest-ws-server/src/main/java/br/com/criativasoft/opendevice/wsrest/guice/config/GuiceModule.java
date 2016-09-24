@@ -70,11 +70,11 @@ import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.restapi.service.DeviceService;
 import br.com.criativasoft.opendevice.restapi.service.DeviceServiceImpl;
-import br.com.criativasoft.opendevice.wsrest.guice.GuiceInjectProvider;
 import com.google.inject.Binder;
+import com.google.inject.Module;
 
 //@Provider /** JAX-RS Provider */
-public class GuiceModule extends GuiceInjectProvider {
+public class GuiceModule implements Module {
 
     @Override
     public void configure(Binder binder) {

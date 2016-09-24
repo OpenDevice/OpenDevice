@@ -13,8 +13,14 @@
 
 package br.com.criativasoft.opendevice.wsrest.auth;
 
+import br.com.criativasoft.opendevice.wsrest.filter.AuthenticationFilter;
 import org.apache.shiro.authc.AuthenticationToken;
 
+/**
+ * Autentication using token
+ * @see AuthenticationFilter
+ * @see BearerTokenRealm
+ */
 public class BearerAuthenticationToken implements AuthenticationToken {
 
     private String token;

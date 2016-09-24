@@ -13,20 +13,30 @@
 
 package br.com.criativasoft.opendevice.wsrest.resource;
 
+import br.com.criativasoft.opendevice.restapi.model.Account;
+import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
 import com.sun.jersey.core.util.Base64;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.cache.Cache;
+import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.atmosphere.cpr.AtmosphereRequest;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.FrameworkConfig;
 import org.secnod.shiro.jaxrs.Auth;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
+import java.util.UUID;
 
 
 /**
@@ -40,9 +50,16 @@ import javax.ws.rs.core.Response.Status;
  * @date 08/09/16
  */
 @Path("/api/auth")
-public class AuthResource {
+public class AuthRest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AuthRest.class);
 
     public static final String TOKEN_HEADER = "AuthToken";
+    public static final String TOKEN_CACHE = "AuthTokenCache";
+    public static final String SESSION_ID = "JSESSIONID";
+
+    @Inject
+    private AccountDao dao;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -53,17 +70,22 @@ public class AuthResource {
         AtmosphereRequest request = res.getRequest();
         Subject currentUser = (Subject) request.getAttribute(FrameworkConfig.SECURITY_SUBJECT);
 
-        // Basic Auth
+        // Basic Auth (Token)
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null) {
             // Decode Authorization header user/pass
             byte[] decode = Base64.decode(authHeader.replace("Basic ", "").getBytes());
             String auth = new String(decode);
-            username = auth.split(":")[0];
-            password = auth.split(":")[1];
+            username = auth.split(":")[0]; // ApiKey
+            //password = auth.split(":")[1]; // ingored
+
+            return doLogin(currentUser, username, null, true);
+
+        }else{ // Query param AUTH (user, pass)
+
+            return doLogin(currentUser, username, password, true);
         }
 
-        return doLogin(currentUser, username, password);
     }
 
     @POST
@@ -73,27 +95,68 @@ public class AuthResource {
                               @FormParam("username") String username,
                               @FormParam("password") String password) {
 
-        return doLogin(currentUser, username, password);
+
+        Response response = doLogin(currentUser, username, password, false);
+
+        if(currentUser.isAuthenticated()){
+
+            // Generate Cookie to indentify user on Shiro (NewShiroInterceptor)
+            Session session = currentUser.getSession(true); // this will force session creation
+            javax.servlet.http.Cookie cookie = new javax.servlet.http.Cookie(AuthRest.SESSION_ID, (String) session.getId());
+            cookie.setPath("/");
+            res.getResponse().addCookie(cookie);
+
+        }
+
+        return response;
 
     }
 
-    private Response doLogin(Subject currentUser, String username, String password){
+    private Response doLogin(Subject currentUser, String username, String password, boolean isToken){
 
-        System.out.println("isAuthenticated >>>  " + currentUser.isAuthenticated() + " || " + username + ":" + password);
+        LOG.debug("Using token ("+isToken+"), username : " + username);
 
-        // TODO: validar usuario e senha - required !!
+        Account account = null;
+        String authtoken = null;
 
-        if (!currentUser.isAuthenticated()) {
+//        List<Account> list = dao.listAll();
+//        for (Account account1 : list) {
+//
+//            Set<ApiKey> keys = account1.getKeys();
+//
+//            System.out.println(" -- Acount: " + account1.getUsername() + " > " +account1.getUuid());
+//            for (ApiKey key : keys) {
+//                System.out.println(" - " + key.getKey());
+//            }
+//
+//        }
+
+        if(isToken){
+
+            account = dao.getAccountByApiKey(username);
+
+            // Generate and cache the 'AuthToken', this will be used in AuthenticationFilter
+            // TODO: Need configure expire using EhCache
+            if(account != null){
+                authtoken = UUID.randomUUID().toString();
+                DefaultSecurityManager securityManager = (DefaultSecurityManager) SecurityUtils.getSecurityManager();
+                Cache<Object, Object> cache = securityManager.getCacheManager().getCache(TOKEN_CACHE);
+                cache.put(authtoken, username); // username == Api_Key
+            }
+
+        // Form auth
+        }else if (!currentUser.isAuthenticated()){
+
             UsernamePasswordToken token = new UsernamePasswordToken(username, password);
-            token.setRememberMe(false); //
+            token.setRememberMe(false); // to be remembered across sessions
 
             try {
+
                 currentUser.login(token);
 
-                // UUID.randomUUID().toString()
+                // currentUser.getSession(true).setTimeout(xxxxx);
 
-                // TODO: return token ?
-                currentUser.getSession().setAttribute(TOKEN_HEADER, "");
+                account = new Account(currentUser.getPrincipal().toString(), "x"); // fake, only to send response
 
             } catch (UnknownAccountException e) {
                 return noCache(Response.status(Status.UNAUTHORIZED).entity("Unknown Account"));
@@ -103,13 +166,16 @@ public class AuthResource {
                 return noCache(Response.status(Status.UNAUTHORIZED).entity("Authentication failed"));
             }
 
+
         }
 
-        if (currentUser.isAuthenticated()) {
-            return noCache(Response.status(Status.OK).entity(currentUser.getSession().getAttribute(TOKEN_HEADER)));
+
+        if (account != null) {
+            return noCache(Response.status(Status.OK).entity(authtoken));
         } else {
             return noCache(Response.status(Status.UNAUTHORIZED).entity("Authentication Fail"));
         }
+
     }
 
     /**

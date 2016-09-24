@@ -29,7 +29,7 @@ import javax.ws.rs.core.MediaType;
  * @author Ricardo JL Rufino (09/09/16)
  */
 @Path("/api")
-public class ApiInfoResource {
+public class ApiInfoRest {
 
     @Inject
     OpenDeviceConfig config;

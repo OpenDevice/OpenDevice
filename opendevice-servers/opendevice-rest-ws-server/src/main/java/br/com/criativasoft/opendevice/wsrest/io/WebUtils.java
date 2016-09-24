@@ -11,25 +11,32 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.wsrest.guice.config;
-
-import com.google.inject.Module;
+package br.com.criativasoft.opendevice.wsrest.io;
 
 /**
- * TODO: Add Docs
+ * TODO: Add docs.
  *
- * @author Ricardo JL Rufino on 14/05/15.
+ * @author Ricardo JL Rufino
+ * @date 23/09/16
  */
-public class GuiceConfigRegistry {
+public final class WebUtils {
 
-    private static Class<? extends Module> configClass = GuiceModule.class;
+    private WebUtils(){}
 
+    public static boolean isWebResource(String path){
 
-    public static void setConfigClass(Class<? extends Module> configClass) {
-        GuiceConfigRegistry.configClass = configClass;
+        // Ignore Web Resources.
+        if(path != null && ( path.endsWith(".css") ||
+                path.endsWith(".ico")  ||
+                path.endsWith(".js")  ||
+                path.endsWith(".png") ||
+                path.endsWith(".jpg")) ){
+
+            return true;
+        }
+
+        return false;
+
     }
 
-    public static Class<? extends Module> getConfigClass() {
-        return configClass;
-    }
 }

@@ -14,6 +14,7 @@
 package br.com.criativasoft.opendevice.wsrest.filter;
 
 import br.com.criativasoft.opendevice.wsrest.auth.BearerAuthenticationToken;
+import br.com.criativasoft.opendevice.wsrest.io.WebUtils;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import org.apache.shiro.SecurityUtils;
@@ -30,14 +31,19 @@ import javax.ws.rs.ext.Provider;
  * @date 10/09/16
  */
 @Provider
-public class TokenAuthenticationFilter implements ContainerRequestFilter {
+public class AuthenticationFilter implements ContainerRequestFilter {
 
 
     @Override
     public ContainerRequest filter(ContainerRequest request) {
 
-        // Extract the token from the HTTP Authorization header
+        // Ignore Web Resources.
+        String path = request.getPath();
+        if(WebUtils.isWebResource(path)){
+            return request;
+        }
 
+        // Extract the token from the HTTP Authorization header
         String authorizationHeader = request.getHeaderValue(HttpHeaders.AUTHORIZATION);
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring("Bearer".length()).trim();

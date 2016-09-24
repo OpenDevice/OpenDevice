@@ -25,8 +25,11 @@ import br.com.criativasoft.opendevice.core.command.ResponseCommand;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.core.util.StringUtils;
 import br.com.criativasoft.opendevice.restapi.WaitResponseListener;
+import br.com.criativasoft.opendevice.wsrest.auth.AccountRealm;
 import br.com.criativasoft.opendevice.wsrest.auth.BearerTokenRealm;
+import br.com.criativasoft.opendevice.wsrest.auth.RestWebSecurityManager;
 import br.com.criativasoft.opendevice.wsrest.filter.CrossOriginInterceptor;
+import br.com.criativasoft.opendevice.wsrest.filter.NewShiroInterceptor;
 import br.com.criativasoft.opendevice.wsrest.guice.config.ConnectionGuiceProvider;
 import br.com.criativasoft.opendevice.wsrest.guice.config.DeviceManagerGuiceProvider;
 import br.com.criativasoft.opendevice.wsrest.io.CommandJacksonProvider;
@@ -34,11 +37,10 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.Authenticator;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
-import org.apache.shiro.config.IniSecurityManagerFactory;
-import org.apache.shiro.mgt.DefaultSecurityManager;
-import org.apache.shiro.util.Factory;
+import org.apache.shiro.cache.MemoryConstrainedCacheManager;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.atmosphere.cpr.*;
-import org.atmosphere.interceptor.ShiroInterceptor;
 import org.atmosphere.nettosphere.Config;
 import org.atmosphere.nettosphere.Nettosphere;
 import org.jboss.netty.handler.ssl.SslContext;
@@ -133,9 +135,9 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             // conf.initParam("com.sun.jersey.spi.container.ResourceMethodDispatchProvider", "true");
             //.initParam(ApplicationConfig.OBJECT_FACTORY, GuiceConfigFactory.class.getName())
             conf.interceptor(new CrossOriginInterceptor());
-            conf.interceptor(new ShiroInterceptor());
+            conf.interceptor(new NewShiroInterceptor());
 //            conf.interceptor(new JacksonFilterInterceptor());
-            conf.interceptor(this);
+            conf.interceptor(this); // add this as interceptor
 
             // SSL Support
             OpenDeviceConfig config = OpenDeviceConfig.get();
@@ -153,9 +155,15 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             // Authentication
             if(config.isAuthRequired()){
                 // FIXME: get user configurarion/database
-                Factory<org.apache.shiro.mgt.SecurityManager> factory = new IniSecurityManagerFactory("file:///media/ricardo/Dados/Codidos/Java/Projetos/opendevice-project/data/middleware/shiro.ini");
-                DefaultSecurityManager securityManager = (DefaultSecurityManager) factory.getInstance();
-                securityManager.getRealms().add(new BearerTokenRealm((DeviceManager) getConnectionManager()));
+//                Factory<org.apache.shiro.mgt.SecurityManager> factory = new IniSecurityManagerFactory("file:///media/ricardo/Dados/Codidos/Java/Projetos/opendevice-project/data/middleware/shiro.ini");
+
+                List<Realm> realms = new LinkedList<Realm>();
+                realms.add(new BearerTokenRealm((DeviceManager) getConnectionManager()));
+                realms.add(new AccountRealm((DeviceManager) getConnectionManager()));
+
+                RestWebSecurityManager securityManager = new RestWebSecurityManager(realms);
+                securityManager.setCacheManager(new MemoryConstrainedCacheManager());
+                securityManager.setSessionManager(new DefaultWebSessionManager());
 
                 Authenticator authenticator = securityManager.getAuthenticator();
                 if(authenticator instanceof ModularRealmAuthenticator){
@@ -166,9 +174,14 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
                 // NOTE: Works with ShiroResourceFilterFactory, registred in AppResourceConfigurator
             }
 
-            conf.build();
-
             server = new Nettosphere.Builder().config(conf.build()).build();
+
+            // For Shiro WebContext
+//            EnvironmentLoader environmentLoader = new EnvironmentLoader();
+//            ServletContext servletContext = server.framework().getServletContext();
+//            servletContext.setInitParameter(EnvironmentLoader.ENVIRONMENT_CLASS_PARAM, "org.apache.shiro.web.env.DefaultWebEnvironment");
+//            environmentLoader.initEnvironment(servletContext);
+//            servletContext.addFilter("shiroFilter", new ShiroFilter());
 
         }
     }
@@ -239,6 +252,10 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
         ConnectionGuiceProvider.setConnection(this);
         DeviceManagerGuiceProvider.setInstance(manager);
 
+//        DefaultWebSubjectContext subjectContext=new DefaultWebSubjectContext();
+//        subjectContext.setServletRequest(request);
+//        SecurityUtils.getSecurityManager().createSubject(subjectContext);
+
         // atmosphereResource.getRequest().getParameterMap().put("requestUID", new String[]{atmosphereResource.uuid()});
         // atmosphereResource.getRequest().setAttribute("requestUID", atmosphereResource.uuid());
         // AtmosphereResource atmosphereHandler = atmosphereResource.getAtmosphereHandler();
@@ -308,7 +325,7 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
             // Get broadcast group for client.
             Broadcaster broadcaster;
-            if(getConfig().isSupportTenants()){
+            if(getConfig().isTenantsEnabled()){
                 broadcaster = atmosphereConfig.getBroadcasterFactory().lookup(cmd.getApplicationID());
             }else{
                 broadcaster = atmosphereConfig.getBroadcasterFactory().lookup(OpenDeviceConfig.LOCAL_APP_ID);

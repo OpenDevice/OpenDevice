@@ -15,21 +15,26 @@ package br.com.criativasoft.opendevice.middleware;
 
 import br.com.criativasoft.opendevice.connection.IWSServerConnection;
 import br.com.criativasoft.opendevice.core.LocalDeviceManager;
+import br.com.criativasoft.opendevice.core.TenantProvider;
+import br.com.criativasoft.opendevice.core.ThreadLocalTenantProvider;
 import br.com.criativasoft.opendevice.core.connection.Connections;
 import br.com.criativasoft.opendevice.core.extension.ViewExtension;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.engine.js.OpenDeviceJSEngine;
 import br.com.criativasoft.opendevice.middleware.config.DependencyConfig;
+import br.com.criativasoft.opendevice.middleware.persistence.HibernateProvider;
 import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
-import br.com.criativasoft.opendevice.middleware.persistence.dao.DeviceDaoNeo4j;
 import br.com.criativasoft.opendevice.middleware.resources.DashboardRest;
 import br.com.criativasoft.opendevice.middleware.resources.IndexRest;
 import br.com.criativasoft.opendevice.mqtt.MQTTServerConnection;
-import br.com.criativasoft.opendevice.wsrest.guice.config.GuiceConfigRegistry;
+import br.com.criativasoft.opendevice.wsrest.guice.GuiceInjectProvider;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.EntityManager;
 import javax.script.SimpleBindings;
 import java.io.*;
 import java.util.*;
@@ -54,7 +59,9 @@ public class Main extends LocalDeviceManager {
 
         OpenDeviceConfig config = OpenDeviceConfig.get();
 
-        setDataManager(new MainDataManager());
+        MainDataManager manager = new MainDataManager();
+
+        setDataManager(manager);
 
         webscoket = Connections.in.websocket(config.getPort());
 
@@ -63,7 +70,7 @@ public class Main extends LocalDeviceManager {
         jscontext.put("config", config);
 
 
-        // Configuration Scripts.
+        // Configuration Scripts (config.js)
         String userConfig = System.getProperty("config");
         if(!StringUtils.isBlank(userConfig)){
             log.info("Using config file (JS): " + userConfig);
@@ -74,18 +81,17 @@ public class Main extends LocalDeviceManager {
 
         // TODO: use EntityManager by injection
         if(config.isDatabaseEnabled()){
-            setDeviceDao(new DeviceDaoNeo4j(LocalEntityManagerFactory.getInstance().createEntityManager()));
+            EntityManager entityManager = LocalEntityManagerFactory.getInstance().createEntityManager();
+            HibernateProvider.setInstance(entityManager);
         }
-
-
-        // new FakeSensorSimulator(50, this, 6, 7).start(); // generate fake data
-        // addFilter(new FixedReadIntervalFilter(500, this));
 
 		// Enable UDP discovery service.
         getDiscoveryService().listen();
 
         // Set IoC/DI Config
-        GuiceConfigRegistry.setConfigClass(DependencyConfig.class);
+        Injector injector = Guice.createInjector(new DependencyConfig());
+        GuiceInjectProvider.setInjector(injector);
+        injector.injectMembers(manager);
 
 
         // Rest Resources
@@ -101,10 +107,17 @@ public class Main extends LocalDeviceManager {
         addWebResource(rootWebApp);
         log.debug("Current root-resource: " + rootWebApp);
 
-
         this.addInput(webscoket);
-        this.addInput(new MQTTServerConnection());
 
+        if(config.isMqttEnabled()) {
+            MQTTServerConnection mqttServerConnection = new MQTTServerConnection();
+            this.addInput(mqttServerConnection);
+        }
+
+
+
+        // new FakeSensorSimulator(50, this, 6, 7).start(); // generate fake data
+        // addFilter(new FixedReadIntervalFilter(500, this));
 
         // Neo4j rasberry config: https://gist.github.com/widged/8329039
         //addOutput(Connections.out.tcp("192.168.0.204:8081"));
@@ -121,7 +134,12 @@ public class Main extends LocalDeviceManager {
 
         this.connect();
 
-	}
+        if(config.isTenantsEnabled()){
+            TenantProvider.setProvider(new ThreadLocalTenantProvider());
+        }
+
+
+    }
 	
 	
 	private String getWebAppDir(){

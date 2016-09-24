@@ -14,10 +14,11 @@
 package br.com.criativasoft.opendevice.middleware;
 
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
-import br.com.criativasoft.opendevice.core.dao.memory.DeviceMemoryDao;
 import br.com.criativasoft.opendevice.restapi.ApiDataManager;
-import br.com.criativasoft.opendevice.restapi.model.Account;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
+
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
 
 /**
  * TODO: Add docs.
@@ -27,18 +28,25 @@ import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
  */
 public class MainDataManager implements ApiDataManager {
 
-    private DeviceDao deviceDao = new DeviceMemoryDao();
+    @Inject
+    private EntityManager em;
 
-    // TODO: Add dashboards.
+    @Inject
+    private DeviceDao deviceDao;
+
+    @Inject
+    private AccountDao accountDao;
+
+    public MainDataManager() {
+    }
+
+    public MainDataManager(EntityManager em) {
+        this.em = em;
+    }
 
     @Override
     public AccountDao getAccountDao() {
-        return new AccountDao() {
-            @Override
-            public Account getAccountByApiKey(String key) {
-                throw new IllegalStateException("not implemented");
-            }
-        };
+        return accountDao;
     }
 
     @Override
@@ -49,5 +57,10 @@ public class MainDataManager implements ApiDataManager {
     @Override
     public void setDeviceDao(DeviceDao dao) {
         this.deviceDao = dao;
+    }
+
+
+    public void setEntityManager(EntityManager em) {
+        this.em = em;
     }
 }

@@ -11,7 +11,7 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.middleware.persistence.dao;
+package br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j;
 
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.metamodel.AggregationType;
@@ -38,6 +38,8 @@ public class DeviceDaoNeo4j implements DeviceDao {
 
     @Inject
     private EntityManager em;
+
+    public DeviceDaoNeo4j(){}
 
     public DeviceDaoNeo4j(EntityManager em) {
         this.em = em;

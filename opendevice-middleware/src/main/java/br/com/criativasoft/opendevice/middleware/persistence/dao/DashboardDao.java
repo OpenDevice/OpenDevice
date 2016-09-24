@@ -26,7 +26,6 @@ import java.util.List;
  */
 public interface DashboardDao extends Dao<Dashboard> {
 
-
     public List<DashboardItem> listItems(long id);
 
     public void persistItem(DashboardItem DashboardItem);

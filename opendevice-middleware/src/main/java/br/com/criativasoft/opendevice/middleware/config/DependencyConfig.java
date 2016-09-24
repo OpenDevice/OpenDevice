@@ -15,10 +15,13 @@
 
 package br.com.criativasoft.opendevice.middleware.config;
 
+import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.middleware.persistence.HibernateProvider;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.DashboardDao;
-import br.com.criativasoft.opendevice.middleware.persistence.dao.DashboardDaoNeo4j;
-import br.com.criativasoft.opendevice.wsrest.guice.config.GuiceConfigRegistry;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.AccountDaoJPA;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j.DashboardDaoNeo4j;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j.DeviceDaoNeo4j;
+import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
 import br.com.criativasoft.opendevice.wsrest.guice.config.GuiceModule;
 import com.google.inject.Binder;
 
@@ -29,16 +32,18 @@ import javax.persistence.EntityManager;
  *
  * @author Ricardo JL Rufino on 02/05/15.
  */
-
 public class DependencyConfig extends GuiceModule {
 
     public void configure(Binder binder) {
 
         super.configure(binder);
 
-        // binder.bind(EntityManagerFactory.class).toProvider(LocalEntityManagerFactory.class);
         binder.bind(EntityManager.class).toProvider(HibernateProvider.class);
+
         binder.bind(DashboardDao.class).to(DashboardDaoNeo4j.class);
+        binder.bind(DeviceDao.class).to(DeviceDaoNeo4j.class);
+        binder.bind(AccountDao.class).to(AccountDaoJPA.class);
+
 
     }
 

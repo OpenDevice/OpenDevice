@@ -11,10 +11,13 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.middleware.persistence.dao;
+package br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j;
 
+import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.middleware.model.Dashboard;
 import br.com.criativasoft.opendevice.middleware.model.DashboardItem;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.DashboardDao;
+import com.sun.istack.internal.Nullable;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -51,7 +54,6 @@ public class DashboardDaoNeo4j implements DashboardDao {
         for (Dashboard current : dashboards) {
             if(current.getId() != dashboard.getId()) current.setActive(false);
             em.persist(current);
-
         }
 
         dashboard.setActive(true);
@@ -112,8 +114,24 @@ public class DashboardDaoNeo4j implements DashboardDao {
     @Override
     public List<Dashboard> listAll() {
 
-        TypedQuery<Dashboard> query = em.createQuery("from Dashboard", Dashboard.class);
+        TypedQuery<Dashboard> query = em.createQuery("from Dashboard where tenantID = :TENANT", Dashboard.class);
+        query.setParameter("TENANT", TenantProvider.getCurrentID());
 
         return query.getResultList();
     }
+
+
+//    @Override
+//    public List<Dashboard> listAll() {
+//
+//        TypedQuery<Dashboard> query = em.createQuery("from Dashboard", Dashboard.class);
+//
+//        List<Dashboard> list = query.getResultList();
+//
+//        for (Dashboard dashboard : list) {
+//            dashboard.setTenantID(TenantProvider.getCurrentID());
+//        }
+//
+//        return list;
+//    }
 }

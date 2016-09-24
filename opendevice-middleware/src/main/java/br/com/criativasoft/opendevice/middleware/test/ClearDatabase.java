@@ -29,7 +29,7 @@ public class ClearDatabase {
 
     public static void main(String[] args) {
 
-            final GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("/media/Dados/Codigos/Java/Projetos/OpenDevice/Workspace/database");
+            final GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("/media/ricardo/Dados/Codidos/Java/Projetos/opendevice-project/data");
             final Transaction tx = graphDb.beginTx();
 
 

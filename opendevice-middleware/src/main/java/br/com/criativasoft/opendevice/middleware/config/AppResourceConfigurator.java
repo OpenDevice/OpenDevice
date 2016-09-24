@@ -46,7 +46,6 @@ public class AppResourceConfigurator implements ResourceConfigurator {
             config.getContainerResponseFilters().add(transactionFilter);
         }
 
-
         Set<Class<?>> classes = config.getClasses();
         classes.add(PersistenceContextInjectableProvider.class);
         classes.add(EntityNotFoundMapper.class);

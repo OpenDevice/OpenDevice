@@ -18,13 +18,13 @@ package br.com.criativasoft.opendevice.middleware.resources;
 import br.com.criativasoft.opendevice.middleware.model.Dashboard;
 import br.com.criativasoft.opendevice.middleware.model.DashboardItem;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.DashboardDao;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceUnit;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -41,6 +41,7 @@ import java.util.Set;
  * @author Ricardo JL Rufino on 30/04/15.
  */
 @Path("dashboards")
+@RequiresAuthentication
 public class DashboardRest {
 
     private static final Logger log = LoggerFactory.getLogger(DashboardRest.class);
@@ -82,6 +83,7 @@ public class DashboardRest {
 
         // find default
         // FIXME: REMOVE THIS LOGIN, THIS MUST BY HANDLED IN VIEW
+        // FIXME: add TenantID
         if(dashboard == null){
             List<Dashboard> resultList = em.createQuery("from Dashboard order by id desc", Dashboard.class).setMaxResults(1).getResultList();
             if(!resultList.isEmpty()) dashboard = resultList.get(0);

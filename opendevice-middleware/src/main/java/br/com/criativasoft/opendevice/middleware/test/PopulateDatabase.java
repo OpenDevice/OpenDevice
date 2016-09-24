@@ -18,8 +18,10 @@ import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.metamodel.PeriodType;
 import br.com.criativasoft.opendevice.core.model.*;
 import br.com.criativasoft.opendevice.middleware.model.Dashboard;
-import br.com.criativasoft.opendevice.middleware.persistence.dao.DeviceDaoNeo4j;
 import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j.DeviceDaoNeo4j;
+import br.com.criativasoft.opendevice.restapi.model.Account;
+import br.com.criativasoft.opendevice.restapi.model.ApiKey;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -46,13 +48,14 @@ public class PopulateDatabase {
         EntityTransaction tx = em.getTransaction();
         tx.begin();
 
+        saveUsers();
         saveDevices();
         saveDash();
 
-        List<Device> devices = dao.listAll();
-        for (Device device : devices) {
-            saveHistory(device.getId());
-        }
+//        List<Device> devices = dao.listAll();
+//        for (Device device : devices) {
+//            saveHistory(device.getId());
+//        }
 
         tx.commit();
         em.close();
@@ -65,13 +68,30 @@ public class PopulateDatabase {
         em.persist(new Sensor(102, "Sensor 3x", DeviceType.ANALOG, DeviceCategory.GENERIC_SENSOR));
     }
 
+
+    private static void saveUsers() {
+        Account account = new Account();
+        account.setUsername("admin");
+        account.setPassword("admin");
+        em.persist(account);
+
+        ApiKey key = new ApiKey();
+        key.setAccount(account);
+        key.setAppName("Dashboard");
+        account.getKeys().add(key);
+        em.persist(key);
+        em.persist(account);
+    }
+
     private static void saveDash(){
         Dashboard dashboard = new Dashboard();
         dashboard.setTitle("Dash 1");
+        dashboard.setTenantID("1");
         em.persist(dashboard);
 
         dashboard = new Dashboard();
         dashboard.setTitle("Dash 2");
+        dashboard.setTenantID("2");
         em.persist(dashboard);
     }
 

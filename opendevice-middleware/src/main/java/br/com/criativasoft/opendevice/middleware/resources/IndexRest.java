@@ -15,12 +15,15 @@ package br.com.criativasoft.opendevice.middleware.resources;
 
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import org.apache.shiro.subject.Subject;
-import org.secnod.shiro.jaxrs.Auth;
+import org.atmosphere.cpr.AtmosphereRequest;
+import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.FrameworkConfig;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 
@@ -37,7 +40,10 @@ public class IndexRest {
     OpenDeviceConfig config;
 
     @GET
-    public Response index(@PathParam("id") long id, @Auth Subject subject) throws Exception {
+    public Response index(@PathParam("id") long id, @Context AtmosphereResource res) throws Exception {
+
+        AtmosphereRequest request = res.getRequest();
+        Subject subject = (Subject) request.getAttribute(FrameworkConfig.SECURITY_SUBJECT);
 
         URI location;
         if(!config.isAuthRequired() || subject.isAuthenticated()){
@@ -46,7 +52,7 @@ public class IndexRest {
             location = new java.net.URI("login.html");
         }
 
-        System.out.println(subject + " -> " + location);
+        System.out.println("Index: isAuthenticated = " + subject.isAuthenticated() + " -> " + location);
 
         return Response.temporaryRedirect(location).build();
     }

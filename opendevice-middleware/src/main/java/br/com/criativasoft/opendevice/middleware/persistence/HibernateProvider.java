@@ -38,7 +38,7 @@ import javax.persistence.EntityManager;
  */
 public class HibernateProvider implements Provider<EntityManager> {
 
-    private static ThreadLocal<EntityManager> threadLocal = new ThreadLocal<EntityManager>();
+    private static InheritableThreadLocal<EntityManager> threadLocal = new InheritableThreadLocal<EntityManager>();
 
     public static void setInstance(EntityManager instance){
         threadLocal.set(instance);

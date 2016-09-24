@@ -10,6 +10,8 @@
         <mapping-file>META-INF/mappings/opendevice-core-mappings.xml</mapping-file>
         <class>br.com.criativasoft.opendevice.middleware.model.Dashboard</class>
         <class>br.com.criativasoft.opendevice.middleware.model.DashboardItem</class>
+        <class>br.com.criativasoft.opendevice.restapi.model.Account</class>
+        <class>br.com.criativasoft.opendevice.restapi.model.ApiKey</class>
         <exclude-unlisted-classes/>
         <properties>
             <property name="hibernate.ogm.datastore.provider" value="neo4j_embedded"/>

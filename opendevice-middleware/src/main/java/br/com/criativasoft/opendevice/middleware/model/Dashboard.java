@@ -15,11 +15,11 @@
 
 package br.com.criativasoft.opendevice.middleware.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -33,6 +33,9 @@ public class Dashboard {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
+    @JsonIgnore
+    private String tenantID;
 
     private String title;
 
@@ -73,5 +76,13 @@ public class Dashboard {
 
     public boolean isActive() {
         return active;
+    }
+
+    public String getTenantID() {
+        return tenantID;
+    }
+
+    public void setTenantID(String tenantID) {
+        this.tenantID = tenantID;
     }
 }

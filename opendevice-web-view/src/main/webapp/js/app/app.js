@@ -26,6 +26,9 @@ var app = angular.module('opendevice', [
     'opendevice.controllers'
 ]);
 
+angular.module('opendevice.controllers', []);
+
+
 // Constants
 // ===================
 // app.constant('opendevice_url', 'http://'+window.location.host);
@@ -39,8 +42,8 @@ app.run(function($rootScope) {
 });
 
 app.config(['$routeProvider', function($routeProvider) {
-    $routeProvider.when('/', {templateUrl: 'pages/dashboard.html', controller: 'DashboardController',  controllerAs: 'dashCtrl'});
-    //$routeProvider.when('/view2', {templateUrl: 'partials/partial2.html', controller: 'MyCtrl2'});
+    $routeProvider.when('/', {templateUrl: 'pages/dashboard.html', controller: 'DashboardController',  controllerAs: 'ctrl'});
+    $routeProvider.when('/devices', {templateUrl: 'pages/devices.html', controller: 'DashboardController',  controllerAs: 'ctrl'});
     $routeProvider.otherwise({redirectTo: '/'});
 }]);
 
@@ -49,7 +52,6 @@ app.config(['$interpolateProvider', function($interpolateProvider) {
     $interpolateProvider.startSymbol('${');
     $interpolateProvider.endSymbol('}');
 }]);
-
 
 app.filter('propsFilter', function() {
     return function(items, props) {

@@ -1,0 +1,45 @@
+<span id="page-header"><i class="fa fa fa-sitemap"></i> Devices</span>
+
+<!-- Main content -->
+<section class="content" data-ng-init="ctrl.init()">
+
+    <div class="box box-solid box-primary">
+        <div class="box-header">
+            <h3 class="box-title">Devices (${ctrl.devices.length})</h3>
+
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" ng-click="ctrl.syncDevices()" title="Refresh Devices"><i class="fa fa-refresh"></i></button>
+                <button type="button" class="btn btn-box-tool" onclick="new app.VoiceCommand().init()" title="Voice Command"><i class="fa fa-microphone"></i></button>
+                <button type="button" class="btn btn-box-tool" ng-click="ctrl.sendToAll(1);" title="All On"><i class="fa fa-lightbulb-o"></i></button>
+                <button type="button" class="btn btn-box-tool" ng-click="ctrl.sendToAll(0);" title="All Off"><i class="fa fa-power-off"></i></button>
+            </div>
+
+
+        </div><!-- /.box-header -->
+        <div class="box-body">
+
+            <div id="main-device-list" class="device-view-container clearfix">
+
+                <a class="device-view"  data-deviceid="${device.id}" ng-click="ctrl.toggleValue(device.id);" ng-repeat="device in ctrl.devices | filter: ctrl.isControllableDevice">
+                    <span class="device-view-icon mws-ic ${ctrl.getIcon(device.id)}">&nbsp;</span>
+                    <div class="device-view-content">
+                        <span class="device-view-title">${device.name}</span>
+                        <span class="device-view-value" ng-class="device.value == 1 ? 'on' : 'off'">${device.value == 1 ? "ON" : "OFF"}</span>
+                    </div>
+                </a>
+
+            </div>
+
+        </div><!-- /.box-body -->
+    </div>
+
+
+
+    <ul id="page-actions" class="nav navbar-nav">
+        <li><a href="#"><i class="fa fa-plus"></i> New</a></li>
+
+        <li ng-init="page.replace('#app-header', '#page-header');page.replace('#app-header-actions', '#page-actions')"></li>
+    </ul>
+
+</section>
+<!-- /.content -->

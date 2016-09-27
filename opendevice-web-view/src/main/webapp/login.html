@@ -1,106 +1,178 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html >
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
-<!-- Required Stylesheets -->
-<link rel="stylesheet" type="text/css" href="css/reset.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="css/text.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="css/fonts/ptsans/stylesheet.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="css/fluid.css" media="screen" />
-
-<link rel="stylesheet" type="text/css" href="css/mws.style.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="css/icons/icons.css" media="screen" />
-
-<!-- Demo and Plugin Stylesheets -->
-<link rel="stylesheet" type="text/css" href="css/demo.css" media="screen" />
-
-<link rel="stylesheet" type="text/css" href="plugins/colorpicker/colorpicker.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="plugins/imgareaselect/css/imgareaselect-default.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="plugins/fullcalendar/fullcalendar.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="plugins/fullcalendar/fullcalendar.print.css" media="print" />
-<link rel="stylesheet" type="text/css" href="plugins/chosen/chosen.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="plugins/prettyphoto/css/prettyPhoto.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="plugins/tipsy/tipsy.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="plugins/sourcerer/Sourcerer-1.2.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="plugins/jgrowl/jquery.jgrowl.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="plugins/spinner/spinner.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="css/jui/jquery.ui.css" media="screen" />
-
-<!-- Theme Stylesheet -->
-<link rel="stylesheet" type="text/css" href="css/mws.theme.css" media="screen" />
-
-<!-- JavaScript Plugins -->
-
-<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
-
-<script type="text/javascript" src="plugins/imgareaselect/jquery.imgareaselect.min.js"></script>
-<script type="text/javascript" src="plugins/duallistbox/jquery.dualListBox-1.3.min.js"></script>
-<script type="text/javascript" src="plugins/jgrowl/jquery.jgrowl-min.js"></script>
-<script type="text/javascript" src="plugins/filestyle/jquery.filestyle-min.js"></script>
-<script type="text/javascript" src="plugins/fullcalendar/fullcalendar.min.js"></script>
-<script type="text/javascript" src="plugins/datatables/jquery.dataTables-min.js"></script>
-<script type="text/javascript" src="plugins/chosen/chosen.jquery.min.js"></script>
-<script type="text/javascript" src="plugins/prettyphoto/js/jquery.prettyPhoto-min.js"></script>
-<!--[if lt IE 9]>
-<script type="text/javascript" src="plugins/flot/excanvas.min.js"></script>
-<![endif]-->
-<script type="text/javascript" src="plugins/flot/jquery.flot.min.js"></script>
-<script type="text/javascript" src="plugins/flot/jquery.flot.pie.min.js"></script>
-<script type="text/javascript" src="plugins/flot/jquery.flot.stack.min.js"></script>
-<script type="text/javascript" src="plugins/flot/jquery.flot.resize.min.js"></script>
-<script type="text/javascript" src="plugins/colorpicker/colorpicker-min.js"></script>
-<script type="text/javascript" src="plugins/tipsy/jquery.tipsy-min.js"></script>
-<script type="text/javascript" src="plugins/sourcerer/Sourcerer-1.2-min.js"></script>
-<script type="text/javascript" src="plugins/placeholder/jquery.placeholder-min.js"></script>
-<script type="text/javascript" src="plugins/validate/jquery.validate-min.js"></script>
-<script type="text/javascript" src="plugins/spinner/jquery.mousewheel-min.js"></script>
-<script type="text/javascript" src="plugins/spinner/ui.spinner-min.js"></script>
-<script type="text/javascript" src="js/jquery-ui.js"></script>
-
-<script type="text/javascript" src="js/mws.js"></script>
-<script type="text/javascript" src="js/demo.js"></script>
-<script type="text/javascript" src="js/themer.js"></script>
-
-<title>MWS Admin - Login Page</title>
+    <meta charset="UTF-8">
+    <title>OpenDevice Login</title>
+    <link href='http://fonts.googleapis.com/css?family=Titillium+Web:400,300,600' rel='stylesheet' type='text/css'>
+    <link rel="icon" type="image/png" href="/images/favicon.png" />
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/login.css">
 
 </head>
 
 <body>
 
-	<div id="mws-login-bg">
-        <div id="mws-login-wrapper">
-            <div id="mws-login">
-                <h1>Login</h1>
-                <div class="mws-login-lock"><img src="css/icons/24/locked-2.png" alt="" /></div>
-                <div id="mws-login-form">
-                    <form class="mws-form" action="api/auth" method="post">
-                        <div id="mws-login-error" class="mws-form-message error">
-                        tes
-                        </div>
-                        <div class="mws-form-row">
-                            <div class="mws-form-item large">
-                                <input type="text" name="username" class="mws-login-username mws-textinput" placeholder="username" />
-                            </div>
-                        </div>
-                        <div class="mws-form-row">
-                            <div class="mws-form-item large">
-                                <input type="password" name="password" class="mws-login-password mws-textinput" placeholder="password" />
-                            </div>
-                        </div>
-                        <div class="mws-form-row mws-inset">
-                            <ul class="mws-form-list inline">
-                                <li><input type="checkbox" /> <label>Remember me</label></li>
-                            </ul>
-                        </div>
-                        <div class="mws-form-row">
-                            <input type="submit" value="Login" class="mws-button green mws-login-button" />
-                        </div>
-                    </form>
+<div class="form">
+
+    <ul class="tab-group">
+        <li class="tab active"><a href="#login">Log In</a></li>
+        <li class="tab"><a href="#signup">Sign Up</a></li>
+    </ul>
+
+    <div class="tab-content">
+
+        <div id="login">
+            <h1>OpenDevice</h1>
+
+            <form action="#" method="post">
+
+                <div class="field-wrap">
+                    <label>
+                        Email Address<span class="req">*</span>
+                    </label>
+                    <input type="text" name="username" required/>
                 </div>
-            </div>
+
+                <div class="field-wrap">
+                    <label>
+                        Password<span class="req">*</span>
+                    </label>
+                    <input type="password" name="password" required autocomplete="off"/>
+                </div>
+
+                <p class="forgot"> 
+                    <span class="message"></span>
+                    <a href="#">Forgot Password?</a>
+                </p>
+
+                <button type="submit" class="button button-block" id="btnLogin" >Log In</button>
+
+            </form>
+
         </div>
-    </div>
+
+        <div id="signup">
+            <h1>Sign Up for Free</h1>
+
+            <form action="/" method="post">
+
+                <div class="top-row">
+                    <div class="field-wrap">
+                        <label>
+                            First Name<span class="req">*</span>
+                        </label>
+                        <input type="text" required autocomplete="off" />
+                    </div>
+
+                    <div class="field-wrap">
+                        <label>
+                            Last Name<span class="req">*</span>
+                        </label>
+                        <input type="text"required autocomplete="off"/>
+                    </div>
+                </div>
+
+                <div class="field-wrap">
+                    <label>
+                        Email Address<span class="req">*</span>
+                    </label>
+                    <input type="email"required autocomplete="off"/>
+                </div>
+
+                <div class="field-wrap">
+                    <label>
+                        Set A Password<span class="req">*</span>
+                    </label>
+                    <input type="password"required autocomplete="off"/>
+                </div>
+
+                <button type="submit" class="button button-block"/>Get Started</button>
+
+            </form>
+
+        </div>
+
+    </div><!-- tab-content -->
+
+</div> <!-- /form -->
+
+
+<script src='js/jquery-2.2.3.min.js'></script>
+
+<script>
+
+    // Check message from redirects
+    if(location.search.split('message=')[1]){
+        $(".message").html(decodeURI(location.search.split('message=')[1]));
+    }
+
+
+    $("#login").find("form").submit(function(event){
+        event.preventDefault();
+
+        $(".message").html("Logging...");
+
+        $.post('/api/auth', $(this).serialize(),function() {
+                    $(".message").html("");
+//                    window.location.reload();
+                    window.location = "/new/admin.html";
+                })
+                .fail(function(err) {
+                    console.log("fail:", err);
+                    $(".message").html(err.responseText);
+                });
+
+    });
+
+    $('.form').find('input, textarea').on('keyup blur focus', function (e) {
+
+        var $this = $(this),
+                label = $this.prev('label');
+
+        if (e.type === 'keyup') {
+            if ($this.val() === '') {
+                label.removeClass('active highlight');
+            } else {
+                label.addClass('active highlight');
+            }
+        } else if (e.type === 'blur') {
+            if( $this.val() === '' ) {
+                label.removeClass('active highlight');
+            } else {
+                label.removeClass('highlight');
+            }
+        } else if (e.type === 'focus') {
+
+            if( $this.val() === '' ) {
+                label.removeClass('highlight');
+            }
+            else if( $this.val() !== '' ) {
+                label.addClass('highlight');
+            }
+        }
+
+    });
+
+    $('.tab a').on('click', function (e) {
+
+        e.preventDefault();
+
+        $(this).parent().addClass('active');
+        $(this).parent().siblings().removeClass('active');
+
+        var target = $(this).attr('href');
+
+        $('.tab-content > div').not(target).hide();
+
+        $(target).fadeIn(600);
+
+    });
+
+
+
+
+</script>
+
 
 </body>
 </html>

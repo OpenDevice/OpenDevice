@@ -13,15 +13,17 @@
 
 'use strict';
 
-var app = angular.module('opendevice.controllers', []);
-
+var pkg = angular.module('opendevice.controllers');
 
 /**
  * DashboardController for AngularJS
+ *
+ *  Note: Access this controller from Chrome Debugger
+ * angular.element(".content-wrapper").controller()
  * @author Ricardo JL Rufino
  * @date 06/07/14
  */
-app.controller('DashboardController', ['$timeout', '$http', '$scope', 'DashboardRest', function ($timeout, $http, $scope, DashboardRest /*Service*/ ) {
+pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'DashboardRest', function ($timeout, $http, $scope, DashboardRest /*Service*/ ) {
 
     // Alias / Imports
     var DCategory = od.DeviceCategory;
@@ -45,25 +47,60 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
     this.status = '';
     this.devices = [];
+    this.dashboard = null;
     this.dashboardItems = [ ]; // view
-    this.dashboard = { id : 1};
     this.dashboardList = [];
+    this.itemViewSelected = null;
 
     _public.init = function(){
 
         $(function(){
 
             $dashboards = $('.dashboards');
-            ODev.connect();
+
 
             $(document.body).on("keydown", function(event){
+
+                var Key = {
+                    LEFT: 37,  UP: 38,  RIGHT: 39, DOWN: 40, F2 : 113
+                };
+
+                // Change device value using Keyboard (fast access)
                 if(event.keyCode > 48 && event.keyCode < 58){
                     var deviceID = event.keyCode - 48;
                     ODev.toggleValue(deviceID);
                 }
 
+                if (event.keyCode == Key.UP && _this.itemViewSelected != null) {
+                    _this.updatePeriod(_this.itemViewSelected, true);
+                }
+                if (event.keyCode == Key.DOWN && _this.itemViewSelected != null) {
+                    _this.updatePeriod(_this.itemViewSelected, false);
+                }
+
+                if (event.keyCode == Key.DOWN && _this.itemViewSelected != null) {
+                    _this.updatePeriod(_this.itemViewSelected, false);
+                }
+                if(event.keyCode == Key.F2 && _this.itemViewSelected != null){
+                    _this.editItem(_this.itemViewSelected, false);
+                }
+
+
+                // Change charts
+
             });
 
+
+            $scope.$on('$viewContentLoaded', function(){
+               // View loaded...
+            });
+
+        });
+
+        ODev.connect();
+
+        ODev.on("loginFail", function(){
+            window.location = "/login.html?message=Not%20Logged%20or%20Expired";
         });
 
         ODev.onConnect(function(devices){
@@ -91,22 +128,7 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
         });
 
         // Load Dashboard's
-        DashboardRest.list({},function(values){
-
-            _this.dashboardList = values;
-
-            angular.forEach(values, function(dashboard, index) {
-
-                if(dashboard.active){
-
-                    _this.activateDash(dashboard);
-
-                    return;
-                }
-
-            });
-
-        });
+        _this.syncDashboards();
 
         // AudioContext detection
         try {
@@ -118,13 +140,12 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
         }
 
 
-
-
-    }
+    };
 
     // ============================================================================================
     // Public Functions
     // ============================================================================================
+
 
     _public.activateDash = function(dashboard){
 
@@ -140,22 +161,27 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
             DashboardRest.activate({id : dashboard.id}); // save on database
         }
 
+        var updateLayout = _this.dashboard != null; // if replace, need update grid system (insert widget)
+
         _this.dashboard = dashboard;
+        _this.itemViewSelected = null;
+
 
         var items = dashboard.items;
 
         // Remove Current
-        // Destroy LayoutManager
+        // Clean LayoutManager
         if(_this.dashboardItems.length > 0){
 
             for (var i = 0; i < _this.dashboardItems.length; i++) {
                 var itemView = _this.dashboardItems[i];
                 itemView.destroy();
             }
-            _this.dashboardItems = [];
 
-            $layoutManager.destroy();
-            $layoutManager = null;
+            $layoutManager.remove_all_widgets();
+            //$layoutManager.destroy();
+            //$(".dashboards > ul").empty();
+            _this.dashboardItems = [];
 
         }
 
@@ -164,6 +190,12 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
         $timeout(function(){
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
+                if(updateLayout) item.updateLayout = true;
+
+                if(typeof item.layout == "string") {
+                    item.layout = JSON.parse(item.layout); // convert from String to Array
+                }
+
                 _this.dashboardItems.push(new DashItemView(item));
             }
         },100);
@@ -203,13 +235,30 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
         OpenDevice.sync(true, true);
     };
 
+    _public.syncDashboards = function() {
+        // Load Dashboard's
+        DashboardRest.list({}, function (values) {
+
+            _this.dashboardList = values;
+
+            angular.forEach(values, function (dashboard, index) {
+
+                if (dashboard.active) {
+
+                    _this.activateDash(dashboard);
+
+                    return;
+                }
+
+            });
+
+        });
+    }
+
     _public.addNewDash = function(){
-        //_this.dashboardItems.push( new DashItemView({ configMode : true, title : 'Grafico 3 ', type : 'LINE_CHART', layout : [1,3,1,1], metrics : [{ deviceID : 2 , type : 'realtime'  }]}));
-        // NOTE: this will fire: renderCompleteDashItem, to setup appropriate configs
-
-        $scope.$broadcast('newItem');
-
+        $scope.$broadcast('newDash'); // fire 'open' in NewDashController
     };
+
 
     _public.addNewView = function(){
         //_this.dashboardItems.push( new DashItemView({ configMode : true, title : 'Grafico 3 ', type : 'LINE_CHART', layout : [1,3,1,1], metrics : [{ deviceID : 2 , type : 'realtime'  }]}));
@@ -257,22 +306,46 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
     };
 
-    _public.updatePeriod = function(index, add){
-        var item = _this.dashboardItems[index];
 
-        item.model.periodValue =  (add ? item.model.periodValue + 1 : item.model.periodValue - 1);
+    _public.delete = function(dasboard){
+
+        if(!dasboard) dasboard = _this.dashboard;
+
+        DashboardRest.delete(dasboard, function(){
+            _this.syncDashboards();
+        });
+
+    };
+
+
+    /**
+     * Set current Chart/View to use custom Keyboards
+     * @param item
+     */
+    _public.setItemFocus = function(item){
+        _public.itemViewSelected = item;
+    };
+
+    /**
+     * Update chart/view period
+     * Using 'throttle' to avoid multiple request at same time
+     */
+    _public.updatePeriod = Utils.throttle(function(index, add){
+        var itemView = _this.dashboardItems[index];
+
+        itemView.model.periodValue =  (add ? itemView.model.periodValue + 1 : itemView.model.periodValue - 1);
 
         // required for REST Url.
-        item.model.dashID = _this.dashboard.id;
+        itemView.model.dashID = _this.dashboard.id;
 
-        _this.notifyUpdateItem(item.model);
-        _this.updatePeriodByGroup(item.model);
+        _this.notifyUpdateItem(itemView.model);
+        _this.updatePeriodByGroup(itemView.model);
 
         // Save on server
-        DashboardRest.saveItem(item.model, function(data){
+        DashboardRest.saveItem(itemView.model, function(data){
             console.log('DashboardController::updatePeriod:', data);
         });
-    };
+    }, 200);
 
     /**
      * Update Range/Period of same group.
@@ -307,7 +380,7 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
         var $items = $dashboards.find('li');
 
-        // Wait to render/css...
+        // Wait angular render/css...
         $timeout(function(){
 
             // Check if layout manager has initialized
@@ -315,7 +388,7 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
                 configureLayoutManager();
             }
 
-            console.log('onRenderDashboardItems: length:' + $items.length);
+            console.log('onRenderDashboardItems:: (Grid) length:' + $items.length);
 
             angular.forEach(_this.dashboardItems, function(item, index) {
 
@@ -323,7 +396,7 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
                     var $item = $($items.get(index));
 
-                    if( ! $item.data('inLayoutManager')){ // new added by user
+                    if( ! $item.data('inLayoutManager') && !item.layout){ // new added by user
 
                         console.log('new added by user');
 
@@ -334,16 +407,23 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
                         var layout = $layoutManager.serialize($w)[0];
                         item.layout = layout;
                         layout.dashID = _this.dashboard.id;
-                        // Save on database.
-                        DashboardRest.updateLayout(layout);
+
+                        DashboardRest.updateLayout(layout); // Save on database.
+                    }else if(item.layout && item.updateLayout){
+
+                        delete item.updateLayout;
+                        $item.data('inLayoutManager', true);
+
+                        // HTML: data-row="${item.layout[0]}" data-col="${item.layout[1]}" data-sizex="${item.layout[2]}" data-sizey="${item.layout[3]}"
+                        $layoutManager.add_widget($item, item.layout[2], item.layout[3], item.layout[1], item.layout[0]); //  size_x, size_y, col, row
                     }
 
-                    console.log('Initializing: ', item);
+                    console.log('Initializing Chart/View: ' + item.title, item);
                     item.init($dashboards, index);
 
                 }
             });
-        }, 100);
+        }, 1);
 
     };
 
@@ -487,6 +567,7 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
             widget_margins: [5, 5],
             max_cols: 6,
             min_cols: 5,
+            // avoid_overlapped_widgets : false, // FIX: Activate new Dashboard (throws null pointer on gridister internals)
             //max_rows : 3,
             //extra_cols : 0,
             //max_size_x : 6,
@@ -537,10 +618,10 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
         };
 
         var blockWidth = $dashboards.width();
-        blockWidth = (blockWidth / gridConf.min_cols).toFixed() - 12;
+        blockWidth = (blockWidth / gridConf.min_cols).toFixed() - 3;
         gridConf.widget_base_dimensions = [blockWidth, 150];
 
-        $layoutManager = $(".dashboards > ul").gridster(gridConf).data('gridster');
+        $layoutManager = $(".gridster > ul").gridster(gridConf).data('gridster');
 
         $('li', $dashboards).each(function(){
             $(this).data('inLayoutManager', true);
@@ -551,17 +632,86 @@ app.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
 
 // =========================================================================================================
-// NewItemController (Dialog in file dashboard.html)
+// NewDashController (Dialog in file dashboard.html)
 // =========================================================================================================
 
-app.controller('NewItemController', ['$scope','$timeout', 'DashboardRest', function ($scope, $timeout, DashboardRest) {
+pkg.controller('NewDashController', ['$scope','$timeout', 'DashboardRest', function ($scope, $timeout, DashboardRest) {
 
     // Private
     // ==========================
     var _this = this;
     var _public = this;
+    var $el = $("#new-dash");
 
-    var loading;
+    var defaults = {
+        title : ''
+    };
+
+    this.current = defaults;
+
+    _public.init = function(){
+
+        // Event received form DashboardController
+        $scope.$on('editDash', function (scopeDetails, event) {
+            _this.open(event.data);
+            if(event.data.title) _this.current.titleVisible = true;
+        });
+
+        // Event received form DashboardController
+        $scope.$on('newDash', function (scopeDetails, event) {
+            _this.open(defaults);
+        });
+
+    };
+
+    _public.open = function(data){
+
+        console.log("Open Dialog", data);
+
+        if(!data) data = defaults;
+
+        _this.current = JSON.parse(JSON.stringify(data)); // clone
+
+        $el.modal('show');
+
+    };
+
+    _public.save = function(event){
+
+        var ctrl = $scope.$parent.ctrl;
+
+        var isEdit = _this.current.id;
+
+        var $btn = $el.find("button:submit");
+        $btn.data("loading-text", "Saving...");
+        $btn.button('loading');
+
+        // Save on server
+        var req = DashboardRest.save(_this.current, function(data){
+            console.log('NewDashController:: saved item: ', data);
+            if($btn) $btn.button('reset');
+            _this.current = defaults; // clear form
+            if(!isEdit){
+                ctrl.syncDashboards();
+            }
+            //else ctrl.notifyUpdateItem(data);
+            $el.modal('hide');
+        });
+
+    };
+}]);
+
+// =========================================================================================================
+// NewItemController (Dialog in file dashboard.html)
+// =========================================================================================================
+
+pkg.controller('NewItemController', ['$scope','$timeout', 'DashboardRest', function ($scope, $timeout, DashboardRest) {
+
+    // Private
+    // ==========================
+    var _this = this;
+    var _public = this;
+    var $el = $("#new-item-dialog");
 
     // Public
     // ==========================
@@ -583,22 +733,6 @@ app.controller('NewItemController', ['$scope','$timeout', 'DashboardRest', funct
     this.current = defaults;
 
     _public.init = function(){
-
-        $("#new-item-dialog").dialog({
-            autoOpen: false,
-            title: "New Dashboard View",
-            modal: true,
-            width: "640",
-            open: function( event, ui ) {},
-            buttons: [{
-                text: "Save",
-                click: function() {
-                    loading = Ladda.create($('.ui-dialog-buttonset button').get(0));
-                    loading.start();
-                    _this.save(this);
-                }
-            }]
-        });
 
         // Event received form DashboardController.editItem
         $scope.$on('editItem', function (scopeDetails, event) {
@@ -623,37 +757,43 @@ app.controller('NewItemController', ['$scope','$timeout', 'DashboardRest', funct
 
     _public.open = function(data){
 
-        console.log(data);
+        console.log("Open Dialog", data);
+
+        if(!data) data = defaults;
+
         _this.current = JSON.parse(JSON.stringify(data)); // clone
 
         _this.selectedType = {id : data.type}; // hack for select
 
-        $("#new-item-dialog").dialog("option", {modal: true}).dialog("open");
+        $('#new-item-dialog').modal('show');
 
     };
 
     _public.save = function(dialog){
 
-        var dashCtrl = $scope.$parent.dashCtrl;
+        var ctrl = $scope.$parent.ctrl;
 
         // required for REST Url.
-        _this.current.dashID = dashCtrl.dashboard.id;
+        _this.current.dashID = ctrl.dashboard.id;
 
         var isEdit = _this.current.id;
 
         _this.current.layout = null; // not update layout !
 
-        if(isEdit) dashCtrl.updatePeriodByGroup(_this.current);
+        var $btn = $el.find("button:submit");
+        $btn.data("loading-text", "Saving...");
+        $btn.button('loading');
 
-        //var itemclone = JSON.parse(JSON.toString(_this.current));
+        if(isEdit) ctrl.updatePeriodByGroup(_this.current);
 
         // Save on server
         var req = DashboardRest.saveItem(_this.current, function(data){
             console.log('NewItemController:: saved item: ', data);
-            $(dialog).dialog( "close" );
-            if(loading) loading.stop();
-            if(!isEdit) dashCtrl.insertNewItem(data);
-            else dashCtrl.notifyUpdateItem(data);
+            if($btn) $btn.button('reset');
+            $el.modal('hide');
+            if(!isEdit) ctrl.insertNewItem(data);
+            else ctrl.notifyUpdateItem(data);
+            _this.current = defaults;
         });
 
     };

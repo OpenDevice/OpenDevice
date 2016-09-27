@@ -1,15 +1,18 @@
 
+<!----------------------------------------------------------------->
+<!-- Device List                                             -->
+<!----------------------------------------------------------------->
 
-<div class="mws-panel grid_8" data-ng-init="dashCtrl.init()">
+<div class="mws-panel grid_8" data-ng-init="ctrl.init()">
     <div class="mws-panel-header">
-        <span class="mws-i-24 i-electricity-plug">Devices (${dashCtrl.devices.length})</span>
+        <span class="mws-i-24 i-electricity-plug">Devices (${ctrl.devices.length})</span>
     </div>
     <div class="mws-panel-body">
 
         <div id="main-device-list" class="device-view-container clearfix">
 
-            <a class="device-view"  data-deviceid="${device.id}" ng-click="dashCtrl.toggleValue(device.id);" ng-repeat="device in dashCtrl.devices | filter: dashCtrl.isControllableDevice">
-                <span class="device-view-icon mws-ic ${dashCtrl.getIcon(device.id)}">&nbsp;</span>
+            <a class="device-view"  data-deviceid="${device.id}" ng-click="ctrl.toggleValue(device.id);" ng-repeat="device in ctrl.devices | filter: ctrl.isControllableDevice">
+                <span class="device-view-icon mws-ic ${ctrl.getIcon(device.id)}">&nbsp;</span>
                 <div class="device-view-content">
                     <span class="device-view-title">${device.name}</span>
                     <span class="device-view-value" ng-class="device.value == 1 ? 'on' : 'off'">${device.value == 1 ? "ON" : "OFF"}</span>
@@ -21,12 +24,12 @@
         <div class="mws-panel-toolbar bottom right clearfix" data-devicegroup="1">
             <ul>
                 <!--<li><a href="#" class="mws-ic-16 ic-add" id="btn-device-add" >&nbsp;</a></li>-->
-                <li><a ng-click="dashCtrl.syncDevices()" class="mws-ic-16 ic-arrow-refresh">&nbsp;</a></li>
+                <li><a ng-click="ctrl.syncDevices()" class="mws-ic-16 ic-arrow-refresh">&nbsp;</a></li>
 
                 <li><a href="javascript:void(0);" class="mws-ic-16 ic-cross" onclick="new app.VoiceCommand().init()" >&nbsp;</a></li>
 
-                <li><a href="javascript:void(0);" class="mws-ic-16 ic-lightbulb-off" ng-click="dashCtrl.sendToAll(0);">Desligar Todos</a></li>
-                <li><a href="javascript:void(0);" class="mws-ic-16 ic-lightbulb" ng-click="dashCtrl.sendToAll(1);">Ligar Todos</a></li>
+                <li><a href="javascript:void(0);" class="mws-ic-16 ic-lightbulb-off" ng-click="ctrl.sendToAll(0);">Desligar Todos</a></li>
+                <li><a href="javascript:void(0);" class="mws-ic-16 ic-lightbulb" ng-click="ctrl.sendToAll(1);">Ligar Todos</a></li>
             </ul>
         </div>
 
@@ -38,13 +41,13 @@
         <span class="mws-i-24 i-bar-graph"> Analytics </span>
 
         <div class="mws-header-actions">
-            <button ng-click="dashCtrl.addNewView()" class="mws-button gray small"><span class="ui-icon ui-icon-image"></span>New View</button>
-            <ui-select ng-model="dashCtrl.dashboard" theme="select2" on-select="dashCtrl.activateDash($model)" close-on-select="true" style="width: 150px;cursor: pointer">
+            <button ng-click="ctrl.addNewView()" class="mws-button gray small"><span class="ui-icon ui-icon-image"></span>New View</button>
+            <ui-select ng-model="ctrl.dashboard" theme="select2" on-select="ctrl.activateDash($model)" close-on-select="true" style="width: 150px;cursor: pointer">
                 <ui-select-match placeholder="Select Dashboard...">${$select.selected.title}</ui-select-match>
-                <ui-select-choices repeat="current in dashCtrl.dashboardList | propsFilter: {title: $select.search}">
+                <ui-select-choices repeat="current in ctrl.dashboardList | propsFilter: {title: $select.search}">
                     <div ng-bind-html="current.title | highlight: $select.search"></div></ui-select-choices>
             </ui-select>
-            <button ng-click="dashCtrl.addNewDash()" class="mws-button gray small"><span class="ui-icon ui-icon-circle-plus"></span></button>
+            <button ng-click="ctrl.addNewDash()" class="mws-button gray small"><span class="ui-icon ui-icon-circle-plus"></span></button>
         </div>
     </div>
 </div>
@@ -57,8 +60,8 @@
 <div class="dashboards gridster grid_8">
     <ul>
         <li data-itemid="${item.id}" data-row="${item.layout[0]}" data-col="${item.layout[1]}" data-sizex="${item.layout[2]}" data-sizey="${item.layout[3]}"
-            ng-repeat="item in dashCtrl.dashboardItems"
-            ng-init="$last && dashCtrl.onRenderDashboardItems()" >
+            ng-repeat="item in ctrl.dashboardItems"
+            ng-init="$last && ctrl.onRenderDashboardItems()" >
             <!--ng-init="initDashItem( $index , item)" -->
 
             <div class="dash-wrapper">
@@ -67,14 +70,14 @@
                 </div>
 
                 <div class="dash-actions">
-                    <button ng-show="!item.realtime" ng-click="dashCtrl.updatePeriod($index, true)" title="Increment Period to ${item.periodValue + 1} ${item.periodType}" class="btn-circle"><span class="ui-icon ui-icon-circle-plus"></span></button>
-                    <button ng-show="!item.realtime" ng-click="dashCtrl.updatePeriod($index, false)" title="Decrement Period to ${item.periodValue - 1} ${item.periodType}" class="btn-circle"><span class="ui-icon ui-icon-circle-minus"></span></button>
+                    <button ng-show="!item.realtime" ng-click="ctrl.updatePeriod($index, true)" title="Increment Period to ${item.periodValue + 1} ${item.periodType}" class="btn-circle"><span class="ui-icon ui-icon-circle-plus"></span></button>
+                    <button ng-show="!item.realtime" ng-click="ctrl.updatePeriod($index, false)" title="Decrement Period to ${item.periodValue - 1} ${item.periodType}" class="btn-circle"><span class="ui-icon ui-icon-circle-minus"></span></button>
 
-                    <button ng-click="dashCtrl.editItem($index)" title="Configuration"><span class="ui-icon ui-icon-wrench"></span></button>
-                    <button ng-click="dashCtrl.removeItem($index)" title="Remove"><span class="ui-icon ui-icon-closethick"></span></button>
+                    <button ng-click="ctrl.editItem($index)" title="Configuration"><span class="ui-icon ui-icon-wrench"></span></button>
+                    <button ng-click="ctrl.removeItem($index)" title="Remove"><span class="ui-icon ui-icon-closethick"></span></button>
                 </div>
 
-                <div ng-if="dashCtrl.isChartView(item.type) && !item.configMode" class="dash-body">
+                <div ng-if="ctrl.isChartView(item.type) && !item.configMode" class="dash-body">
                     <!-- No content required -->
                 </div>
 
@@ -125,7 +128,7 @@
                         <div class="mws-form-item small">
                             <ui-select multiple ng-model="controller.current.monitoredDevices" theme="select2"  sortable="true" close-on-select="true" style="width: 400px;">
                                 <ui-select-match placeholder="Select device...">${$item.name}</ui-select-match>
-                                <ui-select-choices repeat="device.id as device in dashCtrl.devices  | filter: dashCtrl.isAnalogDevice | propsFilter: {name: $select.search}">
+                                <ui-select-choices repeat="device.id as device in ctrl.devices  | filter: ctrl.isAnalogDevice | propsFilter: {name: $select.search}">
                                     <div ng-bind-html="device.name | highlight: $select.search"></div></ui-select-choices>
                             </ui-select>
                         </div>

@@ -90,14 +90,16 @@ od.view.DashItemView = function(data) {
     };
 
     _public.onStartResize = function () {
-        if(chart) $(this.el).hide();
+        if(chart) $(this.el).hide(); // hide for performance reasons
     };
 
 
     _public.destroy = function () {
-        if (chart) chart.destroy();
-
         // TODO: remember to remove DEVICE LISTENERS (real-time)
+        if (chart){
+            try{chart.destroy();}catch (e){} // FIX: avoid error if chart previos fail.
+            $(this.el).remove();
+        }
     };
 
     _public.update = function (data) {

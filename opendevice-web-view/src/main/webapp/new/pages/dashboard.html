@@ -1,0 +1,234 @@
+
+<!--<span id="page-header"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</span>-->
+
+<ul id="page-header" class="nav navbar-nav">
+    <li>
+        <i class="fa fa-dashboard"></i> Dashboard :
+    </li>
+    <li class="dropdown">
+        <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">${ctrl.dashboard.title} #${ctrl.dashboard.id} <span class="caret"></span></a>
+        <ul class="dropdown-menu" role="menu">
+            <li ng-repeat="current in ctrl.dashboardList"><a href="javascript:void(0)" target="_self" ng-click="ctrl.activateDash(current);">${current.title}</a></li>
+        </ul>
+    </li>
+    <li><a href="javascript:void(0);" target="_self" ng-click="ctrl.edit()" title="Edit"><i class="fa fa-edit"></i></a></li>
+    <li><a href="javascript:void(0);" target="_self" ng-click="ctrl.delete()" title="Delete"><i class="fa fa-remove"></i></a></li>
+</ul>
+
+<!-- Main content -->
+<section class="content" data-ng-init="ctrl.init()">
+
+    <!----------------------------------------------------------------->
+    <!-- Dashboards List                                             -->
+    <!----------------------------------------------------------------->
+
+
+    <div class="dashboards gridster no_selection">
+        <ul>
+            <li data-itemid="${item.id}" data-row="${item.layout[0]}" data-col="${item.layout[1]}" data-sizex="${item.layout[2]}" data-sizey="${item.layout[3]}"
+                ng-repeat="item in ctrl.dashboardItems"
+                ng-mouseover="ctrl.setItemFocus($index)"
+                ng-click="ctrl.setItemFocus($index)"
+                ng-init="$last && ctrl.onRenderDashboardItems()" >
+
+                <div class="dash-wrapper" >
+                    <div class="dash-header dash-move" ng-if="item.title">
+                        <h3>${item.title}</h3>
+                    </div>
+
+                    <div class="dash-actions">
+                        <span ng-click="ctrl.updatePeriod($index, true)" title="Increment Period to ${item.periodValue + 1} ${item.periodType}" ng-show="!item.realtime"><i class="fa fa-plus"></i></span>
+                        <span ng-click="ctrl.updatePeriod($index, false)" title="Decrement Period to ${item.periodValue - 1} ${item.periodType}" ng-show="!item.realtime"><i class="fa fa-minus"></i></span>
+                        <span ng-click="ctrl.editItem($index)" title="Configuration"><i class="fa fa-sliders"></i></span>
+                        <span ng-click="ctrl.removeItem($index)" title="Remove"><i class="fa fa-remove"></i></span>
+                    </div>
+
+                    <div ng-if="ctrl.isChartView(item.type) && !item.configMode" class="dash-body">
+                        <!-- No content required -->
+                    </div>
+
+                    <div ng-if="item.type == 'DYNAMIC_VALUE' && !item.configMode" class="dash-body ${item.type}">
+                        <div class="dash-body-centered">
+                            <span class="text-value center-block-item">0</span>
+                        </div>
+                    </div>
+
+                    <div ng-if="item.type == 'TEXT' && !item.configMode" class="dash-body">
+                        <span>${item.title}</span>
+                    </div>
+
+                    <!--<div class="dash-footer">Footer</div>-->
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <ul id="page-actions" class="nav navbar-nav">
+
+        <li><a href="javascript:void(0);" target="_self" ng-click="ctrl.addNewView()"><i class="fa fa-plus"></i> Chart</a></li>
+        <li><a href="javascript:void(0);" target="_self" ng-click="ctrl.addNewDash()"><i class="fa fa-plus"></i> Dashboard</a></li>
+
+        <li ng-init="page.replace('#app-header', '#page-header');page.replace('#app-header-actions', '#page-actions')"></li>
+    </ul>
+
+</section>
+
+
+
+<!----------------------------------------------------------------->
+<!-- New Dashboard                                                  -->
+<!----------------------------------------------------------------->
+
+<!-- Modal -->
+<div id="new-dash" class="modal fade" ng-controller="NewDashController as controller" ng-init="controller.init()" tabindex="-1" role="dialog" aria-labelledby="newDashboardLabel">
+    <div class="modal-dialog" role="document">
+        <form class="form-horizontal" ng-submit="controller.save()">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="newDashboardLabel">Dashboard</h4>
+                </div>
+                <div class="modal-body">
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Title</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" ng-model="controller.current.title" required/>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" >Save changes</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!----------------------------------------------------------------->
+<!-- New Chart                                                  -->
+<!----------------------------------------------------------------->
+
+<!-- Modal -->
+<div id="new-item-dialog" class="modal fade" ng-controller="NewItemController as controller" ng-init="controller.init()" tabindex="-1" role="dialog" aria-labelledby="newDashboardItemLabel">
+    <div class="modal-dialog" role="document">
+        <form class="form-horizontal" ng-submit="controller.save()">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="newDashboardItemLabel">New Dashboard Chart / View</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Type</label>
+
+                            <div class="col-sm-10">
+                                <select class="form-control" ng-options="obj.id as obj.name for obj in controller.supportedTypes"
+                                        ng-model="controller.current.type">
+                                    <option>--</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Title</label>
+
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                      <input type="checkbox"  ng-model="controller.current.titleVisible" ng-change="(!controller.current.titleVisible ? controller.current.title = null : void(0))" /> Visible
+                                    </span>
+                                    <input type="text" class="form-control" ng-model="controller.current.title" ng-disabled="!controller.current.titleVisible" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="controller.current.type != 'TEXT'">
+                            <label class="col-sm-2 control-label">Device(s)</label>
+                            <div class="col-sm-10">
+                                <ui-select multiple ng-model="controller.current.monitoredDevices" theme="select2"  sortable="true" close-on-select="true" style="width: 400px;">
+                                    <ui-select-match placeholder="Select device...">${$item.name}</ui-select-match>
+                                    <ui-select-choices repeat="device.id as device in ctrl.devices  | filter: ctrl.isAnalogDevice | propsFilter: {name: $select.search}">
+                                        <div ng-bind-html="device.name | highlight: $select.search"></div></ui-select-choices>
+                                </ui-select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Real-Time</label>
+                            <div class="col-sm-10">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" ng-model="controller.current.realtime"> Enable
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="controller.current.type != 'TEXT' && !controller.current.realtime">
+                            <label class="col-sm-2 control-label">Period</label>
+                            <div class="col-sm-10 form-inline">
+                                <input type="number" style="width:60px" class="form-control" ng-model="controller.current.periodValue" value="1" />
+                                <select ng-model="controller.current.periodType" class="form-control" style="width: 120px" >
+                                    <option value="MINUTE" selected="selected">Minute(s)</option>
+                                    <option value="HOUR">Hour(s)</option>
+                                    <option value="DAY">Day(s)</option>
+                                    <option value="WEEK">Week(s)</option>
+                                    <option value="MONTH">Month(s)</option>
+                                    <option value="RECORDS">Last Records</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-show="controller.enableAggregation()">
+                            <label class="col-sm-2 control-label">Aggregation</label>
+                            <div class="col-sm-10">
+                                <select ng-model="controller.current.aggregation" class="form-control" style="max-width: 200px">
+                                    <option value="AVERAGE">Average</option>
+                                    <option value="MIN">Min</option>
+                                    <option value="MAX">Max</option>
+                                    <option value="SUM">Sum</option>
+                                    <option value="COUNT">Count</option>
+                                    <option value="STANDARD_DEVIATION">Standard deviation</option>
+                                    <option value="NONE">None</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="advancedOptionsBar" ng-click="advancedOptions = !advancedOptions">
+                            Advanced <i class="fa fa-fw fa-cog"></i>
+                        </div>
+                        <br/>
+
+                        <div class="advancedOptions" ng-show="advancedOptions">
+
+                            <div class="form-group" ng-show="!controller.current.realtime">
+                                <label class="col-sm-2 control-label">Group</label>
+                                <div class="col-sm-10">
+                                    <input type="number" style="width:60px" class="form-control" ng-model="controller.current.itemGroup" value="0" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Range</label>
+                                <div class="col-sm-10 form-inline">
+                                    <input type="number" style="width:80px" placeholder="min" class="form-control" ng-model="controller.current.viewOptions.min" value="0" />
+                                    <input type="number" style="width:80px" placeholder="max" class="form-control" ng-model="controller.current.viewOptions.max" value="0" />
+                                    (Chart options)
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" >Save changes</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- /.content -->

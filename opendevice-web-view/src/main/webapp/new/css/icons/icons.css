@@ -1,0 +1,9 @@
+
+.ic-battery-on{background-image:url(32/battery_full.png);}
+.ic-battery-off{background-image:url(32/battery_low.png);}
+
+.ic-lightbulb-on{background-image:url(32/lightbulb.png);}
+.ic-lightbulb-off{background-image:url(32/lightbulb_off.png);}
+
+.ic-sensor-on{background-image:url(32/sensor.png);}
+.ic-sensor-off{background-image:url(32/sensor_off.png);}

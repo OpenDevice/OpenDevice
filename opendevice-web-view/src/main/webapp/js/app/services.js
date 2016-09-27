@@ -2,8 +2,8 @@ var app = angular.module('opendevice.services', ['ngResource']);
 
 app.factory('DashboardRest', ['$resource', function($resource){
 
-    return $resource('dashboards/:id', { id: '@id', dashID : '@dashID' }, {
-        list: {method:'GET', url : "dashboards", isArray:true,
+    return $resource('/dashboards/:id', { id: '@id', dashID : '@dashID' }, { // configure defauls
+        list: {method:'GET', url : "/dashboards", isArray:true,
             transformResponse: function(list){
 
                 list = angular.fromJson(list);
@@ -35,19 +35,21 @@ app.factory('DashboardRest', ['$resource', function($resource){
 
                 return list;
         }},
-        activate: {method:'GET', url : "dashboards/:id/activate"},
-        items: {method:'GET', url : "dashboards/:id/items", isArray:true},
-        updateLayout: {method:'PUT', url : "dashboards/:dashID/updateLayout"},
-        saveItem: {method:'POST', url : "dashboards/:dashID/item",
+        activate: {method:'GET', url : "/dashboards/:id/activate"},
+        items: {method:'GET', url : "/dashboards/:id/items", isArray:true},
+        updateLayout: {method:'PUT', url : "/dashboards/:dashID/updateLayout"},
+        save: {method:'POST', url : "/dashboards"},
+        saveItem: {method:'POST', url : "/dashboards/:dashID/item",
             transformRequest: function(data) {
                 data.layout =  JSON.stringify(data.layout); // on server is a String
-                data.viewOptions = JSON.stringify(data.viewOptions); // on server is a String
+                if(data.viewOptions && data.viewOptions != "null")
+                    data.viewOptions = JSON.stringify(data.viewOptions); // on server is a String
                 return JSON.stringify(data);
             },transformResponse: function(item, headersGetter){
 
                 item = angular.fromJson(item);
 
-                if(typeof item.viewOptions == "string") {
+                if(typeof item.viewOptions == "string" && item.viewOptions != "null") {
                     item.viewOptions = JSON.parse(item.viewOptions); // convert from String to Array
                 }
 
@@ -58,7 +60,7 @@ app.factory('DashboardRest', ['$resource', function($resource){
                 return item;
             }
         },
-        removeItem: {method:'DELETE', url : "dashboards/:dashID/item"}
+        removeItem: {method:'DELETE', url : "/dashboards/:dashID/item"}
     });
 
 }]);

@@ -333,7 +333,11 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
     _public.updatePeriod = Utils.throttle(function(index, add){
         var itemView = _this.dashboardItems[index];
 
-        itemView.model.periodValue =  (add ? itemView.model.periodValue + 1 : itemView.model.periodValue - 1);
+        var periodValue =  (add ? itemView.model.periodValue + 1 : itemView.model.periodValue - 1);
+
+        if(periodValue < 1) return;
+
+        itemView.model.periodValue = periodValue;
 
         // required for REST Url.
         itemView.model.dashID = _this.dashboard.id;
@@ -567,7 +571,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
             widget_margins: [5, 5],
             max_cols: 6,
             min_cols: 5,
-            // avoid_overlapped_widgets : false, // FIX: Activate new Dashboard (throws null pointer on gridister internals)
+            avoid_overlapped_widgets : false, // FIX: Activate new Dashboard (throws null pointer on gridister internals)
             //max_rows : 3,
             //extra_cols : 0,
             //max_size_x : 6,

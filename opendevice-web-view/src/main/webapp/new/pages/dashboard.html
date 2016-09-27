@@ -37,9 +37,9 @@
                     </div>
 
                     <div class="dash-actions">
-                        <span ng-click="ctrl.updatePeriod($index, true)" title="Increment Period to ${item.periodValue + 1} ${item.periodType}" ng-show="!item.realtime"><i class="fa fa-plus"></i></span>
-                        <span ng-click="ctrl.updatePeriod($index, false)" title="Decrement Period to ${item.periodValue - 1} ${item.periodType}" ng-show="!item.realtime"><i class="fa fa-minus"></i></span>
-                        <span ng-click="ctrl.editItem($index)" title="Configuration"><i class="fa fa-sliders"></i></span>
+                        <span ng-click="ctrl.updatePeriod($index, true)" title="Increment Period to ${item.periodValue + 1} ${item.periodType} (UP)" ng-show="!item.realtime"><i class="fa fa-plus"></i></span>
+                        <span ng-click="ctrl.updatePeriod($index, false)" title="Decrement Period to ${item.periodValue - 1} ${item.periodType} (DOWN)" ng-show="!item.realtime"><i class="fa fa-minus"></i></span>
+                        <span ng-click="ctrl.editItem($index)" title="Configuration (F2)"><i class="fa fa-sliders"></i></span>
                         <span ng-click="ctrl.removeItem($index)" title="Remove"><i class="fa fa-remove"></i></span>
                     </div>
 

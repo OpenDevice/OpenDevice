@@ -347,6 +347,11 @@
 /* Dashboards
 ----------------------------------------------------------------------------------------------------*/
 
+
+.dashboards{
+    min-height: 500px;
+}
+
 .dashboards * {
     margin: 0;
     padding: 0;
@@ -504,8 +509,16 @@
     cursor: move;
 }
 
-.gridster .preview-holder {
+.gridster-preview-holder {
     border: 2px dashed #3ca4ff !important;
+}
+
+.handle-s , .handle-n, .handle-ne, .handle-sw, .handle-nw {
+    height: 3px !important;
+}
+
+.handle-e, .handle-w, .handle-ne, .handle-sw, .handle-nw{
+    width: 3px !important;
 }
 
 /** Avoid double click select */
@@ -516,6 +529,9 @@
     -ms-user-select: none; /* IE10+ */
 }
 
+/*.highcharts-container{*/
+    /*border: 1px solid red;*/
+/*}*/
 
 /* DashItem Views
 ----------------------------------------------------------------------------------------------------*/

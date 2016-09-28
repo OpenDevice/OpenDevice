@@ -27,7 +27,7 @@ app.factory('DashboardRest', ['$resource', function($resource){
                             }
                         }catch (e){ console.error('Error on viewOptions', e.stack); }
 
-                        if(!item.layout) item.layout = "[1,1,1,1]";
+                        // if(!item.layout) item.layout = "[1,1,1,1]";
 
                     }
 
@@ -37,7 +37,15 @@ app.factory('DashboardRest', ['$resource', function($resource){
         }},
         activate: {method:'GET', url : "/dashboards/:id/activate"},
         items: {method:'GET', url : "/dashboards/:id/items", isArray:true},
-        updateLayout: {method:'PUT', url : "/dashboards/:dashID/updateLayout"},
+        updateLayout: {method:'PUT', url : "/dashboards/:dashID/updateLayout",
+            transformRequest: function(data) {
+                var toSend = angular.copy(data);
+                toSend.layout =  JSON.stringify(toSend.layout); // on server is a String
+                if(toSend.viewOptions && toSend.viewOptions != "null")
+                    toSend.viewOptions = JSON.stringify(toSend.viewOptions); // on server is a String
+                return JSON.stringify(toSend);
+            }
+        },
         save: {method:'POST', url : "/dashboards"},
         saveItem: {method:'POST', url : "/dashboards/:dashID/item",
             transformRequest: function(data) {

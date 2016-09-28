@@ -26,6 +26,22 @@ var Utils = {
                 fn.apply(context, args);
             }
         };
+    },
+
+
+    forDelayed: function(array, delay, fn) {
+
+        var index = 0;
+        function interation(index){
+            if(index < array.length){
+                setTimeout(function () {
+                    fn.call(array, array[index], index);
+                    interation(index+1);
+                }, delay);
+            }
+        }
+
+        interation(index);
     }
 
 };

@@ -25,7 +25,6 @@ od.view.availableTypes = [
     {id:"GAUGE_CHART", name:"Gauge"}
 ];
 
-
 /**
  * Responsable to render charts and view on dashboard
  * @date 25/04/2015
@@ -47,6 +46,8 @@ od.view.DashItemView = function(data) {
     this.el; // reference to div.dash-body
     this.initialized = false;
     this.configMode = false;
+    this.resizing = false;
+    this.data = [];
 
     function DashItemView(data){
         _this.setModel(data);
@@ -60,51 +61,51 @@ od.view.DashItemView = function(data) {
 
     _public.init = function (container, index) {
 
-        this.el = $('.dash-body', container).eq(index);
+        _public.el = $('.dash-body', container).eq(index);
 
         if (od.view.DashItemView.isCompatibleChart(_this.model.type)) {
             try{
-                initChart();
+
+                loadData();
+
             }catch(e){console.error("Error initializing Chart: " +_this.model.title + "("+_this.model.type+")",e.stack);}
         }else if (_this.model.type == 'DYNAMIC_VALUE') {
 
         }
 
-        if(_this.model.realtime){
-
-            OpenDevice.onDeviceChange(updateRealtimeData);
-
-        }else{
-            loadData();
-        }
-
-
-
-        this.initialized = true;
-
     };
 
-    _public.onResize = function () {
+    _public.onResize = function (force) {
         $(this.el).show();
-        chart.setSize($(this.el).width(), $(this.el).height(), false);
+        if(chart && (_this.resizing || force) ){
+            _this.resizing = false;
+            var $el = $(this.el);
+            var $chart = $(".highcharts-container", $el);
+            //chart.setSize($(this.el).width(), $(this.el).height(), false);
+            chart.reflow ();
+        }
     };
 
     _public.onStartResize = function () {
-        if(chart) $(this.el).hide(); // hide for performance reasons
+        if(chart){
+            $(this.el).hide(); // hide for performance reasons
+        }
+
+        _this.resizing = true;
     };
 
 
     _public.destroy = function () {
         // TODO: remember to remove DEVICE LISTENERS (real-time)
         if (chart){
-            try{chart.destroy();}catch (e){} // FIX: avoid error if chart previos fail.
+            try{chart.destroy();}catch (e){ console.error(e);} // FIX: avoid error if chart previos fail.
             $(this.el).remove();
         }
     };
 
     _public.update = function (data) {
 
-        var reloadDataset = false;
+        var reloadDataset = false;  // some changes in Model, need reload chart
 
         if(data.type != _this.model.type) reloadDataset = true;
 
@@ -118,10 +119,8 @@ od.view.DashItemView = function(data) {
 
         this.setModel(data);
 
-
         if(reloadDataset){
             chart.destroy();
-            initChart();
             if(!data.realtime) loadData();
         }else{
             if(!data.realtime) loadData();
@@ -142,6 +141,8 @@ od.view.DashItemView = function(data) {
             }
         }
 
+        this["layout"] = $.extend({}, data.layout); // make copy (not reference) to detect changes.
+
         this.model = data;
     };
 
@@ -151,46 +152,28 @@ od.view.DashItemView = function(data) {
     // Private
     // ==========================================================================
 
-    function initChart() {
-
-        // Radialize the colors
-        if(!Highcharts.getOptions().global.colorSetup){
-
-            Highcharts.getOptions().colors = Highcharts.map(Highcharts.getOptions().colors, function (color) {
-                return {
-                    radialGradient: { cx: 0.5, cy: 0.3, r: 0.7 },
-                    stops: [
-                        [0, color],
-                        [1, Highcharts.Color(color).brighten(-0.3).get('rgb')] // darken
-                    ]
-                };
-            });
-
-        }
-
-        Highcharts.setOptions({
-            global: {useUTC: false, colorSetup : true}
-        });
-
+    function initChart(data) {
 
         // Create series
         var devices = _this.model.monitoredDevices;
         var deviceSeries = [];
         var showLegends = false; // TODO: FROM CONFIG
         var viewOptions = _this.model.viewOptions;
+        _this.initialized = true;
 
         if (_this.model.type == 'LINE_CHART') {
 
             for (var i = 0; i < devices.length; i++) {
-                var id = devices[i];
-                var serie = {
-                    name: OpenDevice.findDevice(id).name,
+                var device = OpenDevice.findDevice(devices[i]);
+
+                var dserie = {
+                    name: device.name,
                     showInLegend: showLegends,
-                    data: []
+                    data : data[i]
                 };
 
                 if(_this.model.realtime){
-                    serie.data = (function () {
+                    dserie.data = (function () {
                         // generate an array of random data
                         var data = [],
                             time = (new Date()).getTime(),
@@ -206,7 +189,7 @@ od.view.DashItemView = function(data) {
                     }());
                 }
 
-                deviceSeries.push(serie);
+                deviceSeries.push(dserie);
             }
 
             chart = $(_this.el).highcharts({
@@ -245,6 +228,7 @@ od.view.DashItemView = function(data) {
 
                 plotOptions: {
                     series: {
+                        animation: false,
                         states: { hover: false }
                     },
                     spline: {
@@ -384,6 +368,8 @@ od.view.DashItemView = function(data) {
 
     function loadData() {
 
+        _this.data = [];
+
         var devices = _this.model.monitoredDevices;
 
         for (var i = 0; i < devices.length; i++) {
@@ -393,7 +379,10 @@ od.view.DashItemView = function(data) {
     }
 
 
+    /**@see loadData */
     function loadDataFor(deviceID, index) {
+
+        // console.log(_this.title + ", Load: " + index);
 
         var query = {
             'deviceID' : deviceID,
@@ -407,16 +396,16 @@ od.view.DashItemView = function(data) {
         $(_this.el).append(spinner.el);
 
         OpenDevice.history(query, function (response) {
+
+
             var data = [];
             for (var i = 0; i < response.length; i++) {
-                // console.log(new Date(response[i].timestamp));
                 data.push([response[i].timestamp, response[i].value]);
             }
 
             spinner.stop();
 
             var value = 0;
-
 
             if(data.length > 0 && ( _this.model.aggregation || _this.model.aggregation != "NONE")){
                 var value  = data[0][1];
@@ -426,19 +415,15 @@ od.view.DashItemView = function(data) {
                 }
             }
 
-            // FIXME: this musb by dynamic
-            if(chart){
+            // FIXME: this musb by dynamic (detection of initialization type)
+            if(od.view.DashItemView.isCompatibleChart(_this.model.type)){
 
-                if(!_this.model.aggregation || _this.model.aggregation == "NONE"){
-                     chart.series[index].setData(data, true, true);
-                }else{ // Using Aggregation
+                // console.log(_this.title + ", Load: " + index + " [done]");
+                _this.data.push(data);
 
-                    if(_this.model.type == "PIE_CHART"){
-                        chart.series[0].data[index].update(value);
-                    }else{
-                        chart.series[index].points[0].update([0, value]);
-                    }
-
+                // all loaded
+                if(_this.data.length == _this.model.monitoredDevices.length){
+                    initChart(_this.data);
                 }
 
             }else{
@@ -510,7 +495,7 @@ od.view.DashItemView.requireAggregation = function(type){
 
 /*
 
-Problemas, dificuldade de ter variaveis privadas (elas se comportam como variáveis estáticas)
+Problemas, dificuldade de ter variaveis privadas na herança (elas se comportam como variáveis estáticas)
    - se for criar funcoes de acesso (http://stackoverflow.com/a/21862415/955857) mas tem problemas de memoria pois cria
      uma função para cada instância.
 
@@ -518,56 +503,56 @@ Problemas, dificuldade de ter variaveis privadas (elas se comportam como variáv
 
  */
 
-od.BaseService = (function() {
-
-    // private
-    // ===================
-
-    var fileExtension = 'mp3';
-
-    /**
-     *
-     * @param config
-     * @constructor
-     */
-    var MODULE = function BaseService(config) {
-
-        // Copy all Atributes
-        for (var attrname in config) { this[attrname] = config[attrname]; }
-
-        this.el;
-        this.configMode;
-
-    };
-
-    // ==========================================================================
-    // Public
-    // ==========================================================================
-
-    var _public = MODULE.prototype;
-
-    _public.init = function (episode) {
-        this.anotherPublic();
-        anotherPrivate.call(this);
-    };
-
-    _public.anotherPublic = function (episode) {
-        alert('public:' + this.id);
-     };
-
-    // ==========================================================================
-    // Private
-    // ==========================================================================
-
-    function anotherPrivate(){
-        alert('private:' + this.id);
-    }
-
-    // ==========================================================================
-    // STATIC ???????
-    // ==========================================================================
-
-    // TODO !
-
-    return MODULE;
-}());
+//od.BaseService = (function() {
+//
+//    // private
+//    // ===================
+//
+//    var fileExtension = 'mp3';
+//
+//    /**
+//     *
+//     * @param config
+//     * @constructor
+//     */
+//    var MODULE = function BaseService(config) {
+//
+//        // Copy all Atributes
+//        for (var attrname in config) { this[attrname] = config[attrname]; }
+//
+//        this.el;
+//        this.configMode;
+//
+//    };
+//
+//    // ==========================================================================
+//    // Public
+//    // ==========================================================================
+//
+//    var _public = MODULE.prototype;
+//
+//    _public.init = function (episode) {
+//        this.anotherPublic();
+//        anotherPrivate.call(this);
+//    };
+//
+//    _public.anotherPublic = function (episode) {
+//        alert('public:' + this.id);
+//     };
+//
+//    // ==========================================================================
+//    // Private
+//    // ==========================================================================
+//
+//    function anotherPrivate(){
+//        alert('private:' + this.id);
+//    }
+//
+//    // ==========================================================================
+//    // STATIC ???????
+//    // ==========================================================================
+//
+//    // TODO !
+//
+//    return MODULE;
+//}());

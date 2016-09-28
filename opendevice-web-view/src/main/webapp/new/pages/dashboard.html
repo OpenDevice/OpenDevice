@@ -23,15 +23,16 @@
     <!----------------------------------------------------------------->
 
 
-    <div class="dashboards gridster no_selection">
+    <div class="dashboards no_selection" data-gridster="ctrl.gridConf">
         <ul>
-            <li data-itemid="${item.id}" data-row="${item.layout[0]}" data-col="${item.layout[1]}" data-sizex="${item.layout[2]}" data-sizey="${item.layout[3]}"
+            <li data-gridster-item="item.layout" data-itemid="${item.id}" data-index="${$index}"
+                data-row="${item.layout.row}" data-col="${item.layout.col}" data-sizex="${item.layout.sizex}" data-sizey="${item.layout.sizey}"
                 ng-repeat="item in ctrl.dashboardItems"
                 ng-mouseover="ctrl.setItemFocus($index)"
                 ng-click="ctrl.setItemFocus($index)"
-                ng-init="$last && ctrl.onRenderDashboardItems()" >
+                ng-init="$last && ctrl.onRenderDashboardItems()">
 
-                <div class="dash-wrapper" >
+                <div class="dash-wrapper" ng-init="ctrl.addItemListener(this, item)">
                     <div class="dash-header dash-move" ng-if="item.title">
                         <h3>${item.title}</h3>
                     </div>
@@ -78,8 +79,6 @@
 <!----------------------------------------------------------------->
 <!-- New Dashboard                                                  -->
 <!----------------------------------------------------------------->
-
-<!-- Modal -->
 <div id="new-dash" class="modal fade" ng-controller="NewDashController as controller" ng-init="controller.init()" tabindex="-1" role="dialog" aria-labelledby="newDashboardLabel">
     <div class="modal-dialog" role="document">
         <form class="form-horizontal" ng-submit="controller.save()">
@@ -111,8 +110,6 @@
 <!----------------------------------------------------------------->
 <!-- New Chart                                                  -->
 <!----------------------------------------------------------------->
-
-<!-- Modal -->
 <div id="new-item-dialog" class="modal fade" ng-controller="NewItemController as controller" ng-init="controller.init()" tabindex="-1" role="dialog" aria-labelledby="newDashboardItemLabel">
     <div class="modal-dialog" role="document">
         <form class="form-horizontal" ng-submit="controller.save()">

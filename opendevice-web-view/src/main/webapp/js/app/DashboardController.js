@@ -51,6 +51,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
     this.dashboardItems = [ ]; // view
     this.dashboardList = [];
     this.itemViewSelected = null;
+    this.gridConf = {};
 
     _public.init = function(){
 
@@ -58,17 +59,16 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
             $dashboards = $('.dashboards');
 
-
             $(document.body).on("keydown", function(event){
 
                 var Key = {
                     LEFT: 37,  UP: 38,  RIGHT: 39, DOWN: 40, F2 : 113
                 };
 
-                // Change device value using Keyboard (fast access)
+                // Change chart using Keys
                 if(event.keyCode > 48 && event.keyCode < 58){
-                    var deviceID = event.keyCode - 48;
-                    ODev.toggleValue(deviceID);
+                    var index = (event.keyCode - 48) - 1;
+                    _this.activateDash(_this.dashboardList[index]);
                 }
 
                 if (event.keyCode == Key.UP && _this.itemViewSelected != null) {
@@ -127,6 +127,8 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
             _this.devices = devices;
         });
 
+        configureLayoutManager();
+
         // Load Dashboard's
         _this.syncDashboards();
 
@@ -161,11 +163,8 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
             DashboardRest.activate({id : dashboard.id}); // save on database
         }
 
-        var updateLayout = _this.dashboard != null; // if replace, need update grid system (insert widget)
-
         _this.dashboard = dashboard;
         _this.itemViewSelected = null;
-
 
         var items = dashboard.items;
 
@@ -178,27 +177,22 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
                 itemView.destroy();
             }
 
-            $layoutManager.remove_all_widgets();
-            //$layoutManager.destroy();
-            //$(".dashboards > ul").empty();
+            //$layoutManager.disable();
+            //$layoutManager.remove_all_widgets();
             _this.dashboardItems = [];
 
         }
 
-
-        // TODO: check if $timeout is required
+        // TODO: check if $timeout is required (for angular render)
         $timeout(function(){
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
-                if(updateLayout) item.updateLayout = true;
-
                 if(typeof item.layout == "string") {
                     item.layout = JSON.parse(item.layout); // convert from String to Array
                 }
-
-                _this.dashboardItems.push(new DashItemView(item));
+                _this.dashboardItems.push(new DashItemView(item)); // fire 'onRenderDashboardItems'
             }
-        },100);
+        });
 
 
     };
@@ -290,8 +284,6 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
         _this.dashboardItems.splice( index, 1 );
 
-        $layoutManager.remove_widget($('li', $dashboards).eq(index));
-
         DashboardRest.removeItem({id : item.id, dashID : this.dashboard.id});
 
     };
@@ -328,7 +320,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
     /**
      * Update chart/view period
-     * Using 'throttle' to avoid multiple request at same time
+     * Using 'throttle' to avoid multiple request at same time (on Keyboard)
      */
     _public.updatePeriod = Utils.throttle(function(index, add){
         var itemView = _this.dashboardItems[index];
@@ -381,53 +373,15 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
      * @param container
      */
     _public.onRenderDashboardItems = function() {
-
-        var $items = $dashboards.find('li');
-
-        // Wait angular render/css...
+        // Wait angular render html to initialize charts.
         $timeout(function(){
-
-            // Check if layout manager has initialized
-            if(!$layoutManager && _this.dashboardItems.length > 0){
-                configureLayoutManager();
-            }
-
-            console.log('onRenderDashboardItems:: (Grid) length:' + $items.length);
-
             angular.forEach(_this.dashboardItems, function(item, index) {
-
-                if(!item.initialized){
-
-                    var $item = $($items.get(index));
-
-                    if( ! $item.data('inLayoutManager') && !item.layout){ // new added by user
-
-                        console.log('new added by user');
-
-                        $item.data('inLayoutManager', true);
-
-                        var $w = $layoutManager.add_widget($item, 1, 1);
-
-                        var layout = $layoutManager.serialize($w)[0];
-                        item.layout = layout;
-                        layout.dashID = _this.dashboard.id;
-
-                        DashboardRest.updateLayout(layout); // Save on database.
-                    }else if(item.layout && item.updateLayout){
-
-                        delete item.updateLayout;
-                        $item.data('inLayoutManager', true);
-
-                        // HTML: data-row="${item.layout[0]}" data-col="${item.layout[1]}" data-sizex="${item.layout[2]}" data-sizey="${item.layout[3]}"
-                        $layoutManager.add_widget($item, item.layout[2], item.layout[3], item.layout[1], item.layout[0]); //  size_x, size_y, col, row
-                    }
-
-                    console.log('Initializing Chart/View: ' + item.title, item);
+                console.log('Initializing Chart/View: ' + item.title, item);
+                if(!item.initialized) {
                     item.init($dashboards, index);
-
                 }
             });
-        }, 1);
+        });
 
     };
 
@@ -477,6 +431,15 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
         if(device.type == od.DeviceType.ANALOG) return true;
 
         return false;
+    };
+
+    _public.addItemListener = function ($gridScope, itemView) {
+
+        $gridScope.$on('gridster-item-transition-end', function (event, source) {
+
+            itemView.onResize();
+
+        });
     };
 
 
@@ -562,74 +525,98 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
 
     /**
+     * Check views affected by grad-and-drop, resize
+     * @returns {Array}
+     */
+    function gridDetectLayoutChanges(){
+
+        var changes = [];
+
+        angular.forEach(_this.dashboardItems, function(item, index) {
+            var model = item.model;
+
+            if(model.layout == null){
+                model.layout = {};
+                $.extend(model.layout, item.layout); // clone;
+                changes.push(item);
+                return;
+            }
+
+            if(item.layout.col != model.layout.col ||
+                item.layout.row != model.layout.row ||
+                item.layout.sizeX != model.layout.sizeX ||
+                item.layout.sizeY != model.layout.sizeY){
+                $.extend(model.layout, item.layout); // clone;
+                changes.push(item);
+            }
+        });
+
+        return changes;
+
+    };
+
+    /**
      * Dynamic grid system configuration
      * Builds upon the plugin: jquery.gridster
      */
     function configureLayoutManager(){
-
-        var  gridConf = {
-            widget_margins: [5, 5],
-            max_cols: 6,
-            min_cols: 5,
-            avoid_overlapped_widgets : false, // FIX: Activate new Dashboard (throws null pointer on gridister internals)
-            //max_rows : 3,
-            //extra_cols : 0,
-            //max_size_x : 6,
-            serialize_params: function($w, wgd) {
-                return { id : $w.data('itemid'), layout : "["+wgd.row+","+wgd.col+","+wgd.size_x+","+wgd.size_y+"]" }
-            },
-            resize: {
+        _this.gridConf = {
+            //margins: [5, 5],
+            columns: 6,
+            avoid_overlapped_widgets : false,
+            mobileBreakPoint: 600,
+            resizable: {
                 enabled: true,
-                // @function: OnResize
-                stop : function (e, ui, $widget){
-                    var dashView = $widget.scope().item; // FIXME: remove access to scope()
-                    dashView.onResize();
-
-                    var item = {
-                        dashID : _this.dashboard.id,
-                        id : dashView.id,
-                        layout : "["+ $widget.data('row') + "," + $widget.data('col')+ "," + $widget.data('sizex')+ "," + $widget.data('sizey') + "]"
-                    };
-
-                    // Save on database.
-                    DashboardRest.updateLayout(item);
-                },
-                start: function (e, ui, $widget){
-                    var dashView = $widget.scope().item; // FIXME: remove access to scope()
+                start: function (e, $ui, $element){
+                    var dashView = _this.dashboardItems[$ui.data("index")];
                     dashView.onStartResize();
+                },
+                stop : function (e, $ui, $element){
+                    var itensChanged = gridDetectLayoutChanges();
+
+                    console.log("resize:: views changed:", itensChanged);
+
+                    angular.forEach(itensChanged, function(item, index) {
+
+                        item.model.dashID = _this.dashboard.id;
+
+                        // Hack :: force update after animations (gridster-item-transition-end) see : addItemListener
+                        $timeout(function(){
+                            item.onResize(true); // force..
+                        }, 500);
+
+                        DashboardRest.updateLayout(item.model); // Save on database.
+                    });
                 }
             },
             draggable : {
-
+                enabled: true,
                 handle: '.dash-move',
+                stop : function(){
+                    var itensChanged = gridDetectLayoutChanges();
+                    console.log("views changed:", itensChanged);
 
-                stop : function (e, ui){
-
-                    var changed = $layoutManager.serialize_changed( );
-
-                    console.log("changed:", changed)
-
-                    angular.forEach(changed, function(item, index) {
-                        item.dashID = _this.dashboard.id;
-                        // Save on database.
-                        DashboardRest.updateLayout(item);
+                    angular.forEach(itensChanged, function(item, index) {
+                        item.model.dashID = _this.dashboard.id;
+                        DashboardRest.updateLayout(item.model); // Save on database.
                     });
-
-                    $layoutManager.$changed = $([]);
-
                 }
+
             }
         };
 
-        var blockWidth = $dashboards.width();
-        blockWidth = (blockWidth / gridConf.min_cols).toFixed() - 3;
-        gridConf.widget_base_dimensions = [blockWidth, 150];
-
-        $layoutManager = $(".gridster > ul").gridster(gridConf).data('gridster');
-
-        $('li', $dashboards).each(function(){
-            $(this).data('inLayoutManager', true);
+        // Hack :: on gridster-resized (and window scrollbar shows), the layout change and affect charts
+        // This will force charts resize
+        $scope.$on("gridster-resized", function(){
+            angular.forEach(_this.dashboardItems, function(item, index) {
+                item.onResize(true);
+            });
         });
+
+        //var blockWidth = $dashboards.width();
+        //blockWidth = (blockWidth / _this.gridConf.min_cols).toFixed() - 3;
+        //_this.gridConf.widget_base_dimensions = [blockWidth, 150];
+
     }
 
 }]);

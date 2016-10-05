@@ -1,17 +1,9 @@
-@import url("ic-16.css");
-@import url("i-24.css");
-@import url("ic.css");
 
-.mws-i-24, .mws-ic-16, .mws-ic{background-repeat:no-repeat;}
+.ic-battery-on{background-image:url(32/battery_full.png);}
+.ic-battery-off{background-image:url(32/battery_low.png);}
 
+.ic-lightbulb-on{background-image:url(32/lightbulb.png);}
+.ic-lightbulb-off{background-image:url(32/lightbulb_off.png);}
 
-.mws-ic.ic-battery-on{background-image:url(32/battery_full.png);}
-.mws-ic.ic-battery-off{background-image:url(32/battery_low.png);}
-
-.mws-ic.ic-lightbulb-on{background-image:url(32/lightbulb.png);}
-.mws-ic.ic-lightbulb-off{background-image:url(32/lightbulb_off.png);}
-
-.mws-ic.ic-sensor-on{background-image:url(32/sensor.png);}
-.mws-ic.ic-sensor-off{background-image:url(32/sensor_off.png);}
-
-
+.ic-sensor-on{background-image:url(32/sensor.png);}
+.ic-sensor-off{background-image:url(32/sensor_off.png);}

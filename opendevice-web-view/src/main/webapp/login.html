@@ -115,7 +115,7 @@
         $.post('/api/auth', $(this).serialize(),function() {
                     $(".message").html("");
 //                    window.location.reload();
-                    window.location = "/new/admin.html";
+                    window.location = "/admin.html";
                 })
                 .fail(function(err) {
                     console.log("fail:", err);

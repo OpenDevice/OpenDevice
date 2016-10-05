@@ -1,3 +1,16 @@
+/*
+ * *****************************************************************************
+ * Copyright (c) 2013-2014 CriativaSoft (www.criativasoft.com.br)
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *  Ricardo JL Rufino - Initial API and Implementation
+ * *****************************************************************************
+ */
+
 /*global define:true*/
 (function(root, factory) {
 
@@ -5,7 +18,7 @@
 
 	if (typeof define === 'function' && define.amd) {
 		// AMD
-		define(['angular'], factory);
+		define([''], factory);
 	} else if (typeof exports === 'object') {
 		// CommonJS
 		module.exports = factory(require('angular'));

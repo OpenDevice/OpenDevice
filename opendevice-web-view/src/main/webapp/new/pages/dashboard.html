@@ -1,36 +1,115 @@
 
-<!--<span id="page-header"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</span>-->
-
 <ul id="page-header" class="nav navbar-nav">
     <li>
         <i class="fa fa-dashboard"></i> Dashboard :
     </li>
-    <li class="dropdown">
-        <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">${ctrl.dashboard.title} #${ctrl.dashboard.id} <span class="caret"></span></a>
+    <li class="dropdown" ng-if="!ctrl.editMode">
+        <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">${ctrl.dashboard.title}<span class="caret"></span></a>
         <ul class="dropdown-menu" role="menu">
             <li ng-repeat="current in ctrl.dashboardList"><a href="javascript:void(0)" target="_self" ng-click="ctrl.activateDash(current);">${current.title}</a></li>
         </ul>
     </li>
-    <li><a href="javascript:void(0);" target="_self" ng-click="ctrl.edit()" title="Edit"><i class="fa fa-edit"></i></a></li>
-    <li><a href="javascript:void(0);" target="_self" ng-click="ctrl.delete()" title="Delete"><i class="fa fa-remove"></i></a></li>
+
+    <li ng-if="ctrl.editMode">
+        <form ng-submit="ctrl.save($event)" class="navbar-form" role="form">
+
+            <div class="input-group">
+                <input type="text" name="title" class="form-control" ng-value="ctrl.dashboard.title" />
+                <input type="hidden" name="id" class="form-control" ng-value="ctrl.dashboard.id" />
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit" title="Save (CTRL + S)"><i class="fa fa-save"></i></button>
+                    <button class="btn btn-default" ng-click="ctrl.delete()" title="Delete Dashboard #${ctrl.dashboard.id}"><i class="fa fa-remove"></i></button>
+                </div>
+            </div>
+        </form>
+    </li>
+
+    <li><a href="javascript:void(0);" ng-if="!ctrl.editMode" ng-click="ctrl.editMode = true" title="Edit (F2)"><i class="fa fa-edit"></i></a></li>
+
+    <li><a href="javascript:void(0);" ng-if="ctrl.editMode" ng-click="ctrl.editMode = false" title="Cancel Edition (F2)"><i class="fa fa-reply"></i></a></li>
 </ul>
 
+
+
+<ul id="page-actions" class="nav navbar-nav">
+
+    <li><a href="javascript:void(0);" target="_self" ng-click="ctrl.addNewDash()"><i class="fa fa-plus"></i> Dashboard</a></li>
+
+    <li ng-init="page.replace('#app-header', '#page-header');page.replace('#app-header-actions', '#page-actions')"></li>
+</ul>
+
+
 <!-- Main content -->
-<section class="content" data-ng-init="ctrl.init()">
+<section class="content dashboard-page" data-ng-init="ctrl.init()">
+
+    <!----------------------------------------------------------------->
+    <!-- Add Dashboards Options                                             -->
+    <!----------------------------------------------------------------->
+
+    <div class="row animate-show" ng-show="ctrl.editMode">
+        <div class="col-lg-3 col-xs-6">
+            <div class="dash-add-box small-box bg-aqua" ng-click="ctrl.addNewView('LINE_CHART')" >
+                <div class="inner">
+                    <h3>Line Chart</h3>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-line-chart"></i>
+                </div>
+                <a href="javascript:void(0);"  class="small-box-footer">Add New <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-xs-6">
+            <div class="dash-add-box small-box bg-green" ng-click="ctrl.addNewView('PIE_CHART')">
+                <div class="inner">
+                    <h3>Pie Chart</h3>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-pie-chart"></i>
+                </div>
+                <a href="javascript:void(0);"  class="small-box-footer">Add New <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-xs-6">
+            <div class="dash-add-box small-box bg-yellow" ng-click="ctrl.addNewView('GAUGE_CHART')">
+                <div class="inner">
+                    <h3>Gauge</h3>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-dashboard"></i>
+                </div>
+                <a href="javascript:void(0);"  class="small-box-footer">Add New <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-xs-6">
+            <div class="dash-add-box small-box bg-red" ng-click="ctrl.addNewView('DYNAMIC_VALUE')">
+                <div class="inner">
+                    <h3>Dynamic Value</h3>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-font"></i>
+                </div>
+                <a href="javascript:void(0);"  class="small-box-footer">Add New <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
 
     <!----------------------------------------------------------------->
     <!-- Dashboards List                                             -->
     <!----------------------------------------------------------------->
 
 
-    <div class="dashboards no_selection" data-gridster="ctrl.gridConf">
-        <ul>
+    <div class="dashboards no_selection" data-gridster="ctrl.gridConf" >
+        <ul ng-init="ctrl.onGridInit(this)">
             <li data-gridster-item="item.layout" data-itemid="${item.id}" data-index="${$index}"
                 data-row="${item.layout.row}" data-col="${item.layout.col}" data-sizex="${item.layout.sizex}" data-sizey="${item.layout.sizey}"
                 ng-repeat="item in ctrl.dashboardItems"
                 ng-mouseover="ctrl.setItemFocus($index)"
                 ng-click="ctrl.setItemFocus($index)"
-                ng-init="$last && ctrl.onRenderDashboardItems()">
+                ng-init="$last && ctrl.onRenderDashboardItems(this)">
 
                 <div class="dash-wrapper" ng-init="ctrl.addItemListener(this, item)">
                     <div class="dash-header dash-move" ng-if="item.title">
@@ -41,7 +120,7 @@
                         <span ng-click="ctrl.updatePeriod($index, true)" title="Increment Period to ${item.periodValue + 1} ${item.periodType} (UP)" ng-show="!item.realtime"><i class="fa fa-plus"></i></span>
                         <span ng-click="ctrl.updatePeriod($index, false)" title="Decrement Period to ${item.periodValue - 1} ${item.periodType} (DOWN)" ng-show="!item.realtime"><i class="fa fa-minus"></i></span>
                         <span ng-click="ctrl.editItem($index)" title="Configuration (F2)"><i class="fa fa-sliders"></i></span>
-                        <span ng-click="ctrl.removeItem($index)" title="Remove"><i class="fa fa-remove"></i></span>
+                        <span ng-click="ctrl.removeItem($index)" title="Remove" ng-show="ctrl.editMode"><i class="fa fa-remove"></i></span>
                     </div>
 
                     <div ng-if="ctrl.isChartView(item.type) && !item.configMode" class="dash-body">
@@ -63,14 +142,6 @@
             </li>
         </ul>
     </div>
-
-    <ul id="page-actions" class="nav navbar-nav">
-
-        <li><a href="javascript:void(0);" target="_self" ng-click="ctrl.addNewView()"><i class="fa fa-plus"></i> Chart</a></li>
-        <li><a href="javascript:void(0);" target="_self" ng-click="ctrl.addNewDash()"><i class="fa fa-plus"></i> Dashboard</a></li>
-
-        <li ng-init="page.replace('#app-header', '#page-header');page.replace('#app-header-actions', '#page-actions')"></li>
-    </ul>
 
 </section>
 
@@ -124,7 +195,7 @@
                             <label class="col-sm-2 control-label">Type</label>
 
                             <div class="col-sm-10">
-                                <select class="form-control" ng-options="obj.id as obj.name for obj in controller.supportedTypes"
+                                <select class="form-control" ng-options="k as v for (k, v) in controller.supportedTypes"
                                         ng-model="controller.current.type">
                                     <option>--</option>
                                 </select>

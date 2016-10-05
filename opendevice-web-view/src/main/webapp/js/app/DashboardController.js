@@ -37,7 +37,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
     var audioPlay;
 
     var $dashboards; // @HtmlElement - $('.dashboards');
-    var $layoutManager; // @Object - jquery.gridster instance
+    var $layoutManager; // @Object - gridster instance
 
     var _this = this;
     var _public = this;
@@ -46,6 +46,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
     // ==========================
 
     this.status = '';
+    this.editMode = false;
     this.devices = [];
     this.dashboard = null;
     this.dashboardItems = [ ]; // view
@@ -59,11 +60,41 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
             $dashboards = $('.dashboards');
 
+
+            var Key = {
+                LEFT: 37,  UP: 38,  RIGHT: 39, DOWN: 40, F2 : 113
+            };
+
+            $(window).bind('keydown', function(event) {
+
+                if(event.keyCode == Key.F2){
+                    _this.toggleEdit();
+                }
+
+                if (event.ctrlKey || event.metaKey) {
+                    switch (String.fromCharCode(event.which).toLowerCase()) {
+                        case 's':
+                            event.preventDefault();
+                            if(_this.editMode) _this.save();
+                            break;
+                        //case 'f':
+                        //    event.preventDefault();
+                        //    alert('ctrl-f');
+                        //    break;
+                        //case 'g':
+                        //    event.preventDefault();
+                        //    alert('ctrl-g');
+                        //    break;
+                    }
+                }
+            });
+
+
             $(document.body).on("keydown", function(event){
 
-                var Key = {
-                    LEFT: 37,  UP: 38,  RIGHT: 39, DOWN: 40, F2 : 113
-                };
+                if($(event.target).is(":input")){ // avoif affect fields,selects
+                    return;
+                }
 
                 // Change chart using Keys
                 if(event.keyCode > 48 && event.keyCode < 58){
@@ -78,22 +109,16 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
                     _this.updatePeriod(_this.itemViewSelected, false);
                 }
 
-                if (event.keyCode == Key.DOWN && _this.itemViewSelected != null) {
-                    _this.updatePeriod(_this.itemViewSelected, false);
-                }
-                if(event.keyCode == Key.F2 && _this.itemViewSelected != null){
-                    _this.editItem(_this.itemViewSelected, false);
-                }
-
-
-                // Change charts
-
             });
 
 
-            $scope.$on('$viewContentLoaded', function(){
-               // View loaded...
-            });
+            $scope.$watch(
+                "ctrl.editMode", _this.toggleEdit
+            );
+
+            //$scope.$on('$viewContentLoaded', function(){
+            //   // View loaded...
+            //});
 
         });
 
@@ -254,11 +279,11 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
     };
 
 
-    _public.addNewView = function(){
+    _public.addNewView = function(type){
         //_this.dashboardItems.push( new DashItemView({ configMode : true, title : 'Grafico 3 ', type : 'LINE_CHART', layout : [1,3,1,1], metrics : [{ deviceID : 2 , type : 'realtime'  }]}));
         // NOTE: this will fire: renderCompleteDashItem, to setup appropriate configs
 
-        $scope.$broadcast('newItem');
+        $scope.$broadcast('newItem', type);
 
     };
 
@@ -299,11 +324,66 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
     };
 
 
+    /*
+     * Change edit mode
+     * This is called automatic, using watch
+     */
+    _public.toggleEdit = function(value){
+        if(value == null){
+            _this.editMode = !_this.editMode;
+            value = _this.editMode;
+        }
+
+        $layoutManager.resizable.enabled = value;
+        $layoutManager.draggable.enabled = value;
+
+        $scope.$apply();
+    };
+
+
+    /**
+     * Save changes in active dashboard
+     */
+    _public.save = function(event){
+
+        if(!_this.editMode) return;
+
+        if(event){
+
+            var inputs = $(event.target).serializeArray();
+            var data = {};
+            inputs.forEach(function (element) {
+                data[element.name] = element.value;
+            });
+
+            // Update Local
+            angular.extend(_this.dashboard, data);
+
+            // Copy properties
+            data = angular.extend({},_this.dashboard);
+
+            delete data.items; // avoid serialize
+
+            DashboardRest.save(data, function(resp){
+                _this.editMode = false;
+                $scope.$apply();
+            });
+
+        // CTRL + S  (Only save Layout)
+        }else{
+            _this.editMode = false;
+            $scope.$apply();
+        }
+
+
+    };
+
+
     _public.delete = function(dasboard){
 
         if(!dasboard) dasboard = _this.dashboard;
 
-        DashboardRest.delete(dasboard, function(){
+        DashboardRest.delete({id : dasboard.id}, function(){
             _this.syncDashboards();
         });
 
@@ -372,7 +452,8 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
      * This method is called by angularjs (ngrepeat) when you add a new item to the list: 'dashboardItems'
      * @param container
      */
-    _public.onRenderDashboardItems = function() {
+    _public.onRenderDashboardItems = function(scope) {
+
         // Wait angular render html to initialize charts.
         $timeout(function(){
             angular.forEach(_this.dashboardItems, function(item, index) {
@@ -383,6 +464,10 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
             });
         });
 
+    };
+
+    _public.onGridInit = function(scope) {
+        $layoutManager = scope.gridster;
     };
 
     /** Get Icon for device */
@@ -566,7 +651,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
             avoid_overlapped_widgets : false,
             mobileBreakPoint: 600,
             resizable: {
-                enabled: true,
+                enabled: false,
                 start: function (e, $ui, $element){
                     var dashView = _this.dashboardItems[$ui.data("index")];
                     dashView.onStartResize();
@@ -590,7 +675,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
                 }
             },
             draggable : {
-                enabled: true,
+                enabled: false,
                 handle: '.dash-move',
                 stop : function(){
                     var itensChanged = gridDetectLayoutChanges();
@@ -612,6 +697,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
                 item.onResize(true);
             });
         });
+
 
         //var blockWidth = $dashboards.width();
         //blockWidth = (blockWidth / _this.gridConf.min_cols).toFixed() - 3;
@@ -732,8 +818,10 @@ pkg.controller('NewItemController', ['$scope','$timeout', 'DashboardRest', funct
         });
 
         // Event received form DashboardController
-        $scope.$on('newItem', function (scopeDetails, event) {
-            _this.open(defaults);
+        $scope.$on('newItem', function (event, type) {
+            var options = angular.copy(defaults);
+            options.type = type;
+            _this.open(options);
         });
 
     };

@@ -19,7 +19,9 @@ var urlParams;
 var app = angular.module('opendevice', [
     'ngRoute',
     'ngSanitize',
+    'ngAnimate',
     'ui.select',
+    'gridster',
     'gridster',
     //'opendevice.filters',
     //'opendevice.directives',

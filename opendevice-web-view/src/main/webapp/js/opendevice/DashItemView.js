@@ -18,12 +18,12 @@ var od = od || {};
 
 od.view = od.view || {};
 
-od.view.availableTypes = [
-    {id:"DYNAMIC_VALUE", name:"Dynamic Value"},
-    {id:"LINE_CHART", name:"Line Chart"},
-    {id:"PIE_CHART", name:"Pie Chart"},
-    {id:"GAUGE_CHART", name:"Gauge"}
-];
+od.view.availableTypes = {
+    DYNAMIC_VALUE: "Dynamic Value",
+    LINE_CHART:"Line Chart",
+    PIE_CHART:"Pie Chart",
+    GAUGE_CHART:"Gauge"
+};
 
 /**
  * Responsable to render charts and view on dashboard

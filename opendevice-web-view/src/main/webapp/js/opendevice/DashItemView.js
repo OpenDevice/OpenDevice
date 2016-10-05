@@ -195,7 +195,8 @@ od.view.DashItemView = function(data) {
             chart = $(_this.el).highcharts({
                 chart: {
                     type: 'spline',
-                    zoomType: 'x'
+                    zoomType: 'x',
+                    margin: [ 10, 10, 25, 43]
                 },
                 title: {
                     text: '', style: {display: 'none'}
@@ -213,11 +214,12 @@ od.view.DashItemView = function(data) {
                 },
                 yAxis: {
                     title: {
-                        text: 'Value'
+                        text: null // Value title
                     },
                     min: (viewOptions && viewOptions.min ? viewOptions.min : 0),
                     max: (viewOptions && viewOptions.max ? viewOptions.max : null)
                 },
+
                 tooltip: {
                     headerFormat: '<b>{series.name}</b><br>',
                     pointFormat: '{point.x:%e. %b (%H:%M:%S)}: <b>{point.y}</b>'
@@ -252,8 +254,8 @@ od.view.DashItemView = function(data) {
                 title: null,
 
                 pane: {
-                    center: ['50%', '85%'],
-                    size: '140%',
+                    center: ['50%', '95%'],
+                    size: '180%',
                     startAngle: -90,
                     endAngle: 90,
                     background: {
@@ -280,7 +282,9 @@ od.view.DashItemView = function(data) {
                 yAxis: {
                     min: (viewOptions && viewOptions.min ? viewOptions.min : 0),
                     max: (viewOptions && viewOptions.max ? viewOptions.max : null),
-                    title: null,
+                    title: {
+                        y: -80
+                    },
                     stops: [ // TODO: FROM CONFIG
                         [0.1, '#55BF3B'], // green
                         [0.5, '#DDDF0D'], // yellow

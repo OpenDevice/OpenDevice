@@ -11,7 +11,7 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.wsrest.auth;
+package br.com.criativasoft.opendevice.restapi.auth;
 
 import br.com.criativasoft.opendevice.core.DataManager;
 import br.com.criativasoft.opendevice.core.DeviceManager;
@@ -19,7 +19,6 @@ import br.com.criativasoft.opendevice.restapi.ApiDataManager;
 import br.com.criativasoft.opendevice.restapi.model.Account;
 import br.com.criativasoft.opendevice.restapi.model.UserAccount;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
-import br.com.criativasoft.opendevice.wsrest.resource.AuthRest;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -32,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BearerTokenRealm extends AuthenticatingRealm  {
+
+    public static final String TOKEN_CACHE = "AuthTokenCache";
 
     private static final Logger log = LoggerFactory.getLogger(BearerTokenRealm.class);
 
@@ -50,7 +51,7 @@ public class BearerTokenRealm extends AuthenticatingRealm  {
         String authTokenS = (String) authToken.getPrincipal();
 
         DefaultSecurityManager securityManager = (DefaultSecurityManager) SecurityUtils.getSecurityManager();
-        Cache<Object, Object> cache = securityManager.getCacheManager().getCache(AuthRest.TOKEN_CACHE);
+        Cache<Object, Object> cache = securityManager.getCacheManager().getCache(TOKEN_CACHE);
 
         DataManager context = manager.getDataManager();
 
@@ -66,8 +67,11 @@ public class BearerTokenRealm extends AuthenticatingRealm  {
 
             if(userAccount != null){
                 Account account = userAccount.getOwner();
-                // add userAccount.getPermissionsTags // todo: load permission tags into AuthenticationInfo
-                return new SimpleAuthenticationInfo(account.getUuid(), authToken.getCredentials(), "BearerTokenRealm");
+
+                AccountPrincipal principal = new AccountPrincipal(userAccount.getUser().getId(), userAccount.getId(), account.getUuid());
+
+                // todo: load permission tags into AuthenticationInfo
+                return new SimpleAuthenticationInfo(principal, authToken.getCredentials(), "BearerTokenRealm");
             }
         }
 

@@ -143,7 +143,6 @@ public class DeviceRest {
         return devices;
     }
 
-
     @POST
     @Path("/{uid}/history")
     @Produces(MediaType.APPLICATION_JSON)

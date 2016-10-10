@@ -21,7 +21,7 @@ import java.util.Set;
 
 /**
  * A 'user' defines the relationship between user and your list of accounts and </br>
- * </>permissions that the user has to the linked accounts.
+ * permissions that the user has to the linked accounts.
  * @author Ricardo JL Rufino
  * @date 24/09/16
  */

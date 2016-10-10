@@ -11,7 +11,7 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.wsrest.auth;
+package br.com.criativasoft.opendevice.restapi.auth;
 
 import br.com.criativasoft.opendevice.core.DataManager;
 import br.com.criativasoft.opendevice.core.DeviceManager;
@@ -49,12 +49,15 @@ public class AccountDaoRealm extends AuthenticatingRealm {
 
             AccountDao dao = ((ApiDataManager) context).getAccountDao();
 
-            UserAccount userAccount = dao.getUserAccountByID(accountAuth.getAccountID());
+            UserAccount userAccount = dao.getUserAccountByID(accountAuth.getUserAccountID());
 
             if(userAccount != null){
                 Account account = userAccount.getOwner();
-                // add userAccount.getPermissionsTags // todo: load permission tags into AuthenticationInfo
-                return new SimpleAuthenticationInfo(account.getUuid(), accountAuth.getAccountID(), "AccountDaoRealm");
+
+                AccountPrincipal principal = new AccountPrincipal(userAccount.getUser().getId(), userAccount.getId(), account.getUuid());
+
+                // todo: load permission tags into AuthenticationInfo
+                return new SimpleAuthenticationInfo(principal, userAccount.getId(), "AccountDaoRealm");
             }
         }
 

@@ -11,14 +11,13 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.wsrest.auth;
+package br.com.criativasoft.opendevice.restapi.auth;
 
-import br.com.criativasoft.opendevice.wsrest.filter.AuthenticationFilter;
 import org.apache.shiro.authc.AuthenticationToken;
 
 /**
- * Autentication using token
- * @see AuthenticationFilter
+ * Autentication using token (see: AuthenticationFilter)
+ * @see
  * @see BearerTokenRealm
  */
 public class BearerAuthenticationToken implements AuthenticationToken {

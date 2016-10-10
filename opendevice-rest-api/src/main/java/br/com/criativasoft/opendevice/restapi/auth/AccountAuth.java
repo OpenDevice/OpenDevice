@@ -11,35 +11,36 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.wsrest.auth;
+package br.com.criativasoft.opendevice.restapi.auth;
 
-import br.com.criativasoft.opendevice.wsrest.filter.AuthenticationFilter;
 import org.apache.shiro.authc.AuthenticationToken;
 
 /**
- * Autentication using accountID
- * @see AuthenticationFilter
+ * Autentication using accountID (see AuthenticationFilter)
  * @see BearerTokenRealm
  */
 public class AccountAuth implements AuthenticationToken {
 
-    private long accountID;
+    private long userAccountID;
 
-    public AccountAuth(long accountID) {
-        this.accountID = accountID;
+    private long userID;
+
+    public AccountAuth(long userAccountID, long userID) {
+        this.userAccountID = userAccountID;
+        this.userID = userID;
     }
 
     @Override
     public Object getPrincipal() {
-        return accountID;
+        return userAccountID;
     }
 
     @Override
     public Object getCredentials() {
-        return accountID;
+        return userAccountID;
     }
 
-    public long getAccountID() {
-        return accountID;
+    public long getUserAccountID() {
+        return userAccountID;
     }
 }

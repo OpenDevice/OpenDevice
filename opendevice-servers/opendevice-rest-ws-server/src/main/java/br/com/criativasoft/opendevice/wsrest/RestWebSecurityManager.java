@@ -11,7 +11,7 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.wsrest.auth;
+package br.com.criativasoft.opendevice.wsrest;
 
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;

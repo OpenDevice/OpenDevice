@@ -26,9 +26,12 @@ public final class WebUtils {
     public static boolean isWebResource(String path){
 
         // Ignore Web Resources.
-        if(path != null && ( path.endsWith(".css") ||
+        if(path != null && (
+                path.endsWith(".css") ||
+                path.endsWith(".css.map") ||
                 path.endsWith(".ico")  ||
                 path.endsWith(".js")  ||
+                path.endsWith(".js.map")  ||
                 path.endsWith(".png") ||
                 path.endsWith(".jpg")) ){
 

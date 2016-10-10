@@ -13,7 +13,7 @@
 
 package br.com.criativasoft.opendevice.wsrest.filter;
 
-import br.com.criativasoft.opendevice.wsrest.auth.BearerAuthenticationToken;
+import br.com.criativasoft.opendevice.restapi.auth.BearerAuthenticationToken;
 import br.com.criativasoft.opendevice.wsrest.io.WebUtils;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
@@ -46,7 +46,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         // Extract the token from the HTTP Authorization header
         String authorizationHeader = request.getHeaderValue(HttpHeaders.AUTHORIZATION);
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String token = authorizationHeader.substring("Bearer".length()).trim();
+            String token = authorizationHeader.substring("Bearer".length()).trim(); // API_KEY
 
             Subject subject = SecurityUtils.getSubject();
 
@@ -56,6 +56,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
                 try{
                     subject.login(bearerToken); // Use BearerTokenRealm
+
                 }catch (AuthenticationException e){
                     throw new AuthenticationException("Invalid AuthToken");
                 }

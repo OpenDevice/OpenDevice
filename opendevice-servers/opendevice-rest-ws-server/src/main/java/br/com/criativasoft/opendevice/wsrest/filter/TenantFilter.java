@@ -14,6 +14,8 @@
 package br.com.criativasoft.opendevice.wsrest.filter;
 
 import br.com.criativasoft.opendevice.core.TenantProvider;
+import br.com.criativasoft.opendevice.restapi.auth.AccountPrincipal;
+import br.com.criativasoft.opendevice.wsrest.io.WebUtils;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import org.apache.shiro.SecurityUtils;
@@ -31,11 +33,18 @@ public class TenantFilter implements ContainerRequestFilter {
     @Override
     public ContainerRequest filter(ContainerRequest request) {
 
+        // Ignore Web Resources.
+        String path = request.getPath();
+        if(WebUtils.isWebResource(path)){
+            return request;
+        }
         Subject subject = SecurityUtils.getSubject();
 
         if(subject.isAuthenticated()){
-            Object principal = subject.getPrincipal(); // return UUID from Account
-            TenantProvider.setCurrentID((String) principal);
+            AccountPrincipal principal = (AccountPrincipal) subject.getPrincipal(); // return UUID from Account
+            TenantProvider.setCurrentID(principal.getAccountUUID());
+        }else{
+            TenantProvider.setCurrentID(null);
         }
 
         return request;

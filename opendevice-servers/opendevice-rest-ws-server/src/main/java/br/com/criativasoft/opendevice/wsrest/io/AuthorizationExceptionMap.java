@@ -14,7 +14,6 @@
 package br.com.criativasoft.opendevice.wsrest.io;
 
 import org.apache.shiro.authz.AuthorizationException;
-import org.apache.shiro.authz.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,11 +35,7 @@ public class AuthorizationExceptionMap implements ExceptionMapper<AuthorizationE
 
         log.debug(exception.getMessage());
 
-        if (exception instanceof UnauthorizedException) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Unauthorized").build();
-        } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Authorization Required").build();
-        }
+        return Response.status(Response.Status.UNAUTHORIZED).entity("Authorization Required").build();
 
     }
 }

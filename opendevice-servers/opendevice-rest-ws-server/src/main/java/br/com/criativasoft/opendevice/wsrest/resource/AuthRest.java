@@ -18,7 +18,7 @@ import br.com.criativasoft.opendevice.restapi.model.User;
 import br.com.criativasoft.opendevice.restapi.model.UserAccount;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
 import br.com.criativasoft.opendevice.restapi.model.dao.UserDao;
-import br.com.criativasoft.opendevice.wsrest.auth.AccountAuth;
+import br.com.criativasoft.opendevice.restapi.auth.AccountAuth;
 import com.sun.jersey.core.util.Base64;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -42,6 +42,8 @@ import javax.ws.rs.core.Response.Status;
 import java.util.Set;
 import java.util.UUID;
 
+import static br.com.criativasoft.opendevice.restapi.auth.BearerTokenRealm.TOKEN_CACHE;
+
 
 /**
  * TODO: Add docs.
@@ -57,9 +59,6 @@ import java.util.UUID;
 public class AuthRest {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthRest.class);
-
-    public static final String TOKEN_HEADER = "AuthToken";
-    public static final String TOKEN_CACHE = "AuthTokenCache";
     public static final String SESSION_ID = "JSESSIONID";
 
     @Inject
@@ -96,12 +95,13 @@ public class AuthRest {
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     public Response loginForm(@Context AtmosphereResource res,
                               @Auth Subject currentUser,
                               @FormParam("username") String username,
                               @FormParam("password") String password) {
 
+        if(currentUser.isAuthenticated()) return noCache(Response.status(Status.OK).entity("{\"messages\":[\"Already logged\"]}"));
 
         Response response = doLogin(currentUser, username, password, false);
 
@@ -127,18 +127,6 @@ public class AuthRest {
         String authtoken = null;
         boolean logged = false;
 
-//        List<Account> list = accountDao.listAll();
-//        for (Account account1 : list) {
-//
-//            Set<ApiKey> keys = account1.getKeys();
-//
-//            System.out.println(" -- Acount: " + account1.getUsername() + " > " +account1.getUuid());
-//            for (ApiKey key : keys) {
-//                System.out.println(" - " + key.getKey());
-//            }
-//
-//        }
-
         // Login using: ApiKey
         if(isToken){
 
@@ -157,38 +145,42 @@ public class AuthRest {
         // login using: Form
         }else if (!currentUser.isAuthenticated()){
 
-            User user = userDao.getUser(username, password);
-            Set<UserAccount> accounts = user.getAccounts();
-
             try {
 
-                if(accounts.isEmpty()) throw new UnknownAccountException();
+                User user = userDao.getUser(username, password);
 
-                if(accounts.size() > 1){
+                if(user == null) throw new AuthenticationException("Incorrect username/password");
+
+                Set<UserAccount> uaccounts = user.getAccounts();
+
+                if(uaccounts.isEmpty()) throw new AuthenticationException("No accounts for user");
+
+                if(uaccounts.size() > 1){
                     // TODO: Need return list and redirect to annother page...
                     return noCache(Response.status(Status.FORBIDDEN).entity("Multiple Accounts not supported for now !! (open ticket !)"));
                 }
 
-                AccountAuth token = new AccountAuth(accounts.iterator().next().getId());
+                AccountAuth token = new AccountAuth(uaccounts.iterator().next().getId(), user.getId());
                 //token.setRememberMe(false); // to be remembered across sessions
 
                 currentUser.login(token);
 
                 // currentUser.getSession(true).setTimeout(xxxxx);
 
-                logged = true;
+                if(currentUser.isAuthenticated()){
+                    logged = true;
+                    authtoken = "Success"; // form auth not require token
+                }
 
             } catch (UnknownAccountException e) {
                 return noCache(Response.status(Status.UNAUTHORIZED).entity("Unknown Account"));
             } catch (IncorrectCredentialsException e) {
                 return noCache(Response.status(Status.FORBIDDEN).entity("Incorrect Credentials"));
             } catch (AuthenticationException e) {
-                return noCache(Response.status(Status.UNAUTHORIZED).entity("Authentication failed"));
+                return noCache(Response.status(Status.UNAUTHORIZED).entity(e.getMessage()));
             }
 
-
         }
-
 
         if (logged) {
             return noCache(Response.status(Status.OK).entity(authtoken));
@@ -217,9 +209,9 @@ public class AuthRest {
 
         if (currentUser.isAuthenticated()) {
             currentUser.logout();
-            return noCache(Response.status(Status.OK).entity("Logout OK"));
+            return noCache(Response.status(Status.OK).entity("{\"messages\":[\"Logout OK\"]}"));
         } else {
-            return noCache(Response.status(Status.INTERNAL_SERVER_ERROR).entity("Not Logged"));
+            return noCache(Response.status(Status.OK).entity("{\"messages\":[\"Not Logged\"]}"));
         }
 
     }

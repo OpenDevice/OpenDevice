@@ -28,7 +28,7 @@ import java.util.*;
  * @author Ricardo JL Rufino
  * @date 27/08/14.
  */
-public class DeviceMemoryDao implements DeviceDao {
+public class DeviceDaoMemory implements DeviceDao {
 
     private Map<String, List<Device>> deviceMap = new HashMap<String, List<Device>>();
 

@@ -59,6 +59,8 @@ public enum CommandType implements EnumCode {
     CONNECTION_ADD_RESPONSE (39, AddConnectionResponse.class),
     CONNECTION_DEL 			(40, null), // NOT.IMPLEMENTED
     CLEAR_CONNECTIONS 		(41, null), // NOT.IMPLEMENTED
+    CONNECT 		        (42, null), // NOT.IMPLEMENTED
+    CONNECT_RESPONSE 		(43, ResponseCommand.class), // NOT.IMPLEMENTED
 
     USER_COMMAND(99, UserCommand.class);
 

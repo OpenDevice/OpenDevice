@@ -17,6 +17,7 @@ import br.com.criativasoft.opendevice.connection.ServerConnection;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.ResponseCommand;
 import br.com.criativasoft.opendevice.wsrest.io.WSEventsLogger;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.atmosphere.annotation.Suspend;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.Broadcaster;
@@ -36,7 +37,8 @@ import javax.ws.rs.core.Response;
  * @author Ricardo JL Rufino
  * @date 08/07/14.
  */
-@Path("/device/connection/{topic}")
+@Path("/ws/device/{topic}")
+@RequiresAuthentication
 public class WebSocketResource {
 
     private static final Logger log = LoggerFactory.getLogger(WebSocketResource.class);

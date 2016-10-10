@@ -55,10 +55,11 @@ public class PopulateDatabase {
 
         saveDevices();
 
-//        List<Device> devices = dao.listAll();
-//        for (Device device : devices) {
-//            saveHistory(device.getId());
-//        }
+        List<Device> devices = dao.listAll();
+        for (Device device : devices) {
+            if(device.getType() == DeviceType.ANALOG)
+                saveHistory(device.getId());
+        }
 
         tx.commit();
         em.close();
@@ -69,18 +70,19 @@ public class PopulateDatabase {
         em.persist(new Sensor(100, "Sensor 1x", DeviceType.ANALOG, DeviceCategory.GENERIC_SENSOR));
         em.persist(new Sensor(101, "Sensor 2x", DeviceType.ANALOG, DeviceCategory.GENERIC_SENSOR));
         em.persist(new Sensor(102, "Sensor 3x", DeviceType.ANALOG, DeviceCategory.GENERIC_SENSOR));
+        em.persist(new Device(201, "Device 4x", DeviceType.DIGITAL));
+        em.persist(new Device(202, "Device 5x", DeviceType.DIGITAL));
     }
-
 
     private static List<Account> saveUsers() {
         List<Account> list = new ArrayList<Account>();
-        list.add(saveUser("admin", "admin"));
-        list.add(saveUser("user", "user"));
+        list.add(saveUser("admin", "admin", AccountType.ACCOUNT_MANAGER));
+        list.add(saveUser("user", "user", AccountType.USER));
 
         return list;
     }
 
-    private static Account saveUser(String u, String p) {
+    private static Account saveUser(String u, String p, AccountType type) {
 
         User user = new User();
         user.setUsername(u);
@@ -91,7 +93,7 @@ public class PopulateDatabase {
         em.persist(account);
 
         UserAccount uaccount = new UserAccount();
-        uaccount.setType(AccountType.ACCOUNT_MANAGER);
+        uaccount.setType(type);
         uaccount.setUser(user);
         uaccount.setOwner(account);
         em.persist(uaccount);
@@ -107,12 +109,12 @@ public class PopulateDatabase {
 
     private static void saveDash(Account account){
         Dashboard dashboard = new Dashboard();
-        dashboard.setTitle("Dash 1 - " + account.getId());
+        dashboard.setTitle("Dash 1 Acc:" + account.getId());
         dashboard.setTenantID(account.getUuid());
         em.persist(dashboard);
 
         dashboard = new Dashboard();
-        dashboard.setTitle("Dash 2 - " + account.getId());
+        dashboard.setTitle("Dash 2 Acc:" + account.getId());
         dashboard.setTenantID(account.getUuid());
         em.persist(dashboard);
     }

@@ -36,10 +36,10 @@ public class UpdateDataNative {
 
         ExecutionEngine engine = new ExecutionEngine(graphDb, NullLogProvider.getInstance());
 
-//        ExecutionResult result = engine.execute("MATCH (n:DeviceHistory) DELETE n");
+//        ExecutionResult result = engine.execute("MATCH (l:DeviceHistory) DELETE l");
 //        System.out.println("ExecutionResult:" + result);
 
-//        ExecutionResult result = engine.execute("MATCH (n:DeviceCategory) DELETE n");
+//        ExecutionResult result = engine.execute("MATCH (l:DeviceCategory) DELETE l");
 //        System.out.println("ExecutionResult:" + result);
 
         try {
@@ -60,7 +60,7 @@ public class UpdateDataNative {
             }
 
             // remove
-//            System.out.println("Nodes : \n =========================");
+//            System.out.println("Nodes : \l =========================");
 //            ResourceIterable<Node> nodesWithLabel = GlobalGraphOperations.at(graphDb).getAllNodesWithLabel(DynamicLabel.label("Sensor"));
 //            for (Node node : nodesWithLabel) {
 //                System.out.println(" - " + node);

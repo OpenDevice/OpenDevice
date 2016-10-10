@@ -38,7 +38,7 @@ public class PrintDataNative {
         try {
             ResourceIterable<Label> labels = GlobalGraphOperations.at(graphDb).getAllLabels();
 
-//            Result result = graphDb.execute("match (n {name: 'my node'}) return n, n.name" );
+//            Result result = graphDb.execute("match (l {name: 'my node'}) return l, l.name" );
 
             System.out.println("Labels : \n =========================");
             for (Label label : labels) {

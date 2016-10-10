@@ -191,7 +191,7 @@ od.DeviceManager = function(connection){
 
         // Notify Individual Listeners
         for (var i = 0; i < device.listeners.length; i++) {
-            device.listeners[i](device.value);
+            device.listeners[i](device.value, device.id);
         }
 
         // Notify Global Listeners
@@ -270,6 +270,14 @@ od.DeviceManager = function(connection){
         if(CType.isDeviceCommand(message.type) && conn.getConnectionUUID() == message.connectionUUID ){
             return;
         }
+
+        //  Not Logged
+        if (message.type == CType.CONNECT_RESPONSE && message.status == od.CommandStatus.UNAUTHORIZED){
+            notifyListeners(DEvent.LOGIN_FAILURE, od.CommandStatus.UNAUTHORIZED);
+            return;
+        }
+
+        //od.CommandType.CONNECT_RESPONSE
 
         // Device changed in another client..
         if(CType.isDeviceCommand(message.type)){

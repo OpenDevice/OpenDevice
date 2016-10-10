@@ -106,6 +106,11 @@ od.Device = function(data){
         this.listeners.push(listener);
     };
 
+    this.removeListener = function(listener){
+        var index = this.listeners.indexOf(listener);
+        if(index > 0) this.listeners.splice(index, 1);
+    };
+
     // Initialize device data.
     _init.call(this, data);
 };

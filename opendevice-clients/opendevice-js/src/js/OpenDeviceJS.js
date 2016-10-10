@@ -37,6 +37,7 @@ return {
     onChange : manager.onDeviceChange,
     onConnect : manager.onConnect,
     findDevice : manager.findDevice,
+    get : manager.findDevice,
     getDevices : manager.getDevices,
     setValue : manager.setValue,
     toggleValue : manager.toggleValue,
@@ -57,6 +58,7 @@ return {
         connection.connect();
     },
 
+    // TODO: try do Rest over WS
     rest : function(path){
         var response = $.ajax({
                 type: "GET",
@@ -65,13 +67,13 @@ return {
                     'X-AppID' : od.appID
                 },
                 async: false // FIXME: isso não é recomendado...
-        }).responseText;
+        });
 
         // TODO: fazer tratamento dos possíveis erros (como exceptions e servidor offline ou 404)
-
-        if(response.length > 0){
-            return JSON.parse(response)
+        if(response.status == 200 && response.responseText.length > 0){
+            return JSON.parse(response.responseText)
         }else{
+            console.error("Rest fail, status ("+response.status+"): " + response.responseText );
             return null;
         }
     },
@@ -91,6 +93,11 @@ return {
             async: true,
             success: callback
         });
+    },
+
+
+    logout : function(callback){
+        return $.get(od.serverURL +"/api/auth/logout", callback);
     },
 
     /** Try to find APPID URL->Cookie->LocalStore */

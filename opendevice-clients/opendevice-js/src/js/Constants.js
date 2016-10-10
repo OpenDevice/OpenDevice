@@ -69,6 +69,8 @@ od.CommandType = {
     CONNECTION_ADD_RESPONSE :39,
     CONNECTION_DEL          :40,
     CLEAR_CONNECTIONS       :41,
+    CONNECT 		        :42,
+    CONNECT_RESPONSE 		:43,
 
     USER_COMMAND            :99,
 
@@ -88,10 +90,28 @@ od.CommandType = {
 };
 
 
+od.CommandStatus = {
+    DELIVERED           :1,
+    RECEIVED            :2,
+    FAIL                :3,
+    EMPTY_DATABASE      :4,
+    // Response...
+    SUCCESS             :200,
+    NOT_FOUND           :404,
+    BAD_REQUEST         :400,
+    UNAUTHORIZED        :401,
+    FORBIDDEN           :403,
+    PERMISSION_DENIED   :550,
+    INTERNAL_ERROR      :500,
+    NOT_IMPLEMENTED     :501
+};
+
+
 od.Event = {
-    DEVICE_LIST_UPDATE : "DEVICE_LIST_UPDATE",
-    DEVICE_CHANGED : "DEVICE_CHANGED",
-    CONNECTION_CHANGE : "CONNECTION_CHANGE",
-    CONNECTED : "CONNECTION_CHANGE_CONNECTED",
-    DISCONNECTED : "CONNECTION_CHANGE_DISCONNECTED"
+    DEVICE_LIST_UPDATE : "devicesUpdate",
+    DEVICE_CHANGED : "deviceChanged",
+    CONNECTION_CHANGE : "connectionCgange",
+    CONNECTED : "connected",
+    DISCONNECTED : "disconnected",
+    LOGIN_FAILURE : "loginFail"
 };

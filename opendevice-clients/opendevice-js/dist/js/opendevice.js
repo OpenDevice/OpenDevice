@@ -69,6 +69,8 @@ od.CommandType = {
     CONNECTION_ADD_RESPONSE :39,
     CONNECTION_DEL          :40,
     CLEAR_CONNECTIONS       :41,
+    CONNECT 		        :42,
+    CONNECT_RESPONSE 		:43,
 
     USER_COMMAND            :99,
 
@@ -88,12 +90,30 @@ od.CommandType = {
 };
 
 
+od.CommandStatus = {
+    DELIVERED           :1,
+    RECEIVED            :2,
+    FAIL                :3,
+    EMPTY_DATABASE      :4,
+    // Response...
+    SUCCESS             :200,
+    NOT_FOUND           :404,
+    BAD_REQUEST         :400,
+    UNAUTHORIZED        :401,
+    FORBIDDEN           :403,
+    PERMISSION_DENIED   :550,
+    INTERNAL_ERROR      :500,
+    NOT_IMPLEMENTED     :501
+};
+
+
 od.Event = {
-    DEVICE_LIST_UPDATE : "DEVICE_LIST_UPDATE",
-    DEVICE_CHANGED : "DEVICE_CHANGED",
-    CONNECTION_CHANGE : "CONNECTION_CHANGE",
-    CONNECTED : "CONNECTION_CHANGE_CONNECTED",
-    DISCONNECTED : "CONNECTION_CHANGE_DISCONNECTED"
+    DEVICE_LIST_UPDATE : "devicesUpdate",
+    DEVICE_CHANGED : "deviceChanged",
+    CONNECTION_CHANGE : "connectionCgange",
+    CONNECTED : "connected",
+    DISCONNECTED : "disconnected",
+    LOGIN_FAILURE : "loginFail"
 };/*
  *
  *  * ******************************************************************************
@@ -200,6 +220,11 @@ od.Device = function(data){
 
     this.onChange = function(listener){
         this.listeners.push(listener);
+    };
+
+    this.removeListener = function(listener){
+        var index = this.listeners.indexOf(listener);
+        if(index > 0) this.listeners.splice(index, 1);
     };
 
     // Initialize device data.
@@ -322,15 +347,19 @@ od.DeviceConnection = function(config){
     }
 
     this.connect = function(){
-        _this.config.url = _this.getUrl();
-        console.log("Connection to: " + _this.config.url);
-        serverConnection = socket.subscribe(_this.config);
-        setConnectionStatus(Status.CONNECTING);
+        if(_this.status != Status.CONNECTED){
+            _this.config.url = _this.getUrl();
+            console.log("Connection to: " + _this.config.url);
+            serverConnection = socket.subscribe(_this.config);
+            setConnectionStatus(Status.CONNECTING);
+        }else{
+            console.log("Already Connected");
+        }
         return _this;
     };
 
     this.getUrl = function(){
-        return od.serverURL + "/device/connection/" + od.appID;
+        return od.serverURL + "/ws/device/" + od.appID;
     };
 
     this.send = function(data){
@@ -384,10 +413,19 @@ od.DeviceConnection = function(config){
         // KeepAlive
         if(response.responseBody == "X") return;
 
+        // HACK: Atmosphere server, not allow return statuscode > 400. The 'status' is in the message
+        if(response.responseBody == "Authorization Required"){
+            console.warn("Authorization Required");
+            notifyListeners({"type" : od.CommandType.CONNECT_RESPONSE,
+                             "status" : od.CommandStatus.UNAUTHORIZED});
+            return;
+        }
+
         try {
             data = JSON.parse(response.responseBody);
         }catch(err) {
-            console.warn("Can't parse response: " + response.responseBody, err.stack);
+            console.error("Can't parse response: <<" + response.responseBody + ">>");
+            console.error(err.stack);
 
         }
 
@@ -591,7 +629,7 @@ od.DeviceManager = function(connection){
 
         // Notify Individual Listeners
         for (var i = 0; i < device.listeners.length; i++) {
-            device.listeners[i](device.value);
+            device.listeners[i](device.value, device.id);
         }
 
         // Notify Global Listeners
@@ -670,6 +708,14 @@ od.DeviceManager = function(connection){
         if(CType.isDeviceCommand(message.type) && conn.getConnectionUUID() == message.connectionUUID ){
             return;
         }
+
+        //  Not Logged
+        if (message.type == CType.CONNECT_RESPONSE && message.status == od.CommandStatus.UNAUTHORIZED){
+            notifyListeners(DEvent.LOGIN_FAILURE, od.CommandStatus.UNAUTHORIZED);
+            return;
+        }
+
+        //od.CommandType.CONNECT_RESPONSE
 
         // Device changed in another client..
         if(CType.isDeviceCommand(message.type)){
@@ -750,6 +796,7 @@ return {
     onChange : manager.onDeviceChange,
     onConnect : manager.onConnect,
     findDevice : manager.findDevice,
+    get : manager.findDevice,
     getDevices : manager.getDevices,
     setValue : manager.setValue,
     toggleValue : manager.toggleValue,
@@ -770,6 +817,7 @@ return {
         connection.connect();
     },
 
+    // TODO: try do Rest over WS
     rest : function(path){
         var response = $.ajax({
                 type: "GET",
@@ -778,13 +826,13 @@ return {
                     'X-AppID' : od.appID
                 },
                 async: false // FIXME: isso não é recomendado...
-        }).responseText;
+        });
 
         // TODO: fazer tratamento dos possíveis erros (como exceptions e servidor offline ou 404)
-
-        if(response.length > 0){
-            return JSON.parse(response)
+        if(response.status == 200 && response.responseText.length > 0){
+            return JSON.parse(response.responseText)
         }else{
+            console.error("Rest fail, status ("+response.status+"): " + response.responseText );
             return null;
         }
     },
@@ -804,6 +852,11 @@ return {
             async: true,
             success: callback
         });
+    },
+
+
+    logout : function(callback){
+        return $.get(od.serverURL +"/api/auth/logout", callback);
     },
 
     /** Try to find APPID URL->Cookie->LocalStore */

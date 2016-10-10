@@ -116,15 +116,19 @@ od.DeviceConnection = function(config){
     }
 
     this.connect = function(){
-        _this.config.url = _this.getUrl();
-        console.log("Connection to: " + _this.config.url);
-        serverConnection = socket.subscribe(_this.config);
-        setConnectionStatus(Status.CONNECTING);
+        if(_this.status != Status.CONNECTED){
+            _this.config.url = _this.getUrl();
+            console.log("Connection to: " + _this.config.url);
+            serverConnection = socket.subscribe(_this.config);
+            setConnectionStatus(Status.CONNECTING);
+        }else{
+            console.log("Already Connected");
+        }
         return _this;
     };
 
     this.getUrl = function(){
-        return od.serverURL + "/device/connection/" + od.appID;
+        return od.serverURL + "/ws/device/" + od.appID;
     };
 
     this.send = function(data){
@@ -178,10 +182,19 @@ od.DeviceConnection = function(config){
         // KeepAlive
         if(response.responseBody == "X") return;
 
+        // HACK: Atmosphere server, not allow return statuscode > 400. The 'status' is in the message
+        if(response.responseBody == "Authorization Required"){
+            console.warn("Authorization Required");
+            notifyListeners({"type" : od.CommandType.CONNECT_RESPONSE,
+                             "status" : od.CommandStatus.UNAUTHORIZED});
+            return;
+        }
+
         try {
             data = JSON.parse(response.responseBody);
         }catch(err) {
-            console.warn("Can't parse response: " + response.responseBody, err.stack);
+            console.error("Can't parse response: <<" + response.responseBody + ">>");
+            console.error(err.stack);
 
         }
 

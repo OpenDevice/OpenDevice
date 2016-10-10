@@ -32,8 +32,8 @@
     <link rel="stylesheet" href="css/skin-blue.min.css">
 
     <!-- angular ui-select-->
-    <link rel="stylesheet" type="text/css" href="../js/angular-ui-select.min.css" media="screen" />
-    <link rel="stylesheet" href="../css/plugins/select2.css"/>
+    <link rel="stylesheet" type="text/css" href="js/angular/angular-ui-select.min.css" media="screen" />
+    <link rel="stylesheet" href="css/plugins/select2.css"/>
 
     <link rel="stylesheet" href="css/app.css">
     <link rel="stylesheet" href="css/icons/icons.css">
@@ -134,7 +134,7 @@
                 <!--<li class="header">HEADER</li>-->
                 <!-- Optionally, you can add icons to the links -->
                 <li class="active"><a href="#/"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
-                <li><a href="#/devices"><i class="fa fa-sitemap"></i> <span>Devices</span></a></li>
+                <li><a href="#/devices"><i class="fa fa-sitemap"></i> <span>Boards / Devices</span></a></li>
                 <li><a href="#"><i class="fa fa-rss"></i> <span>Connections</span></a></li>
                 <li><a href="#"><i class="fa fa-history"></i> <span>Events</span></a></li>
                 <li><a href="#"><i class="fa fa-code"></i> <span>Programmer</span></a></li>
@@ -282,7 +282,10 @@
 
 
 <!-- mvn:dependency -->
+<script type="text/javascript" src="js/app/JSClass.js"></script>
 <script type="text/javascript" src="js/opendevice/DashItemView.js"></script>
+<script type="text/javascript" src="js/opendevice/ChartItemView.js"></script>
+<script type="text/javascript" src="js/opendevice/DigitalController.js"></script>
 
 <!-- ----------------------------------------------------- -->
 <!-- Jquery -->
@@ -312,7 +315,7 @@
 <script type="text/javascript" src="js/angular/angular.min-1.5.8.js"></script>
 <script type="text/javascript" src="js/angular/angular-route.min.js"></script>
 <script type="text/javascript" src="js/angular/angular-resource.min.js"></script>
-<script type="text/javascript" src="js/angular/angular-sanitize.min.js"></script>
+<script type="text/javascript" src="js/angular/angular-sanitize.min.js"></script> <!-- for ui-select -->
 <script type="text/javascript" src="js/angular/angular-ui-select.min.js"></script>
 <script type="text/javascript" src="js/angular/angular-animate.min.js"></script>
 
@@ -330,6 +333,7 @@
 <script type="text/javascript" src="js/app/services.js"></script>
 <script type="text/javascript" src="js/app/controllers.js"></script>
 <script type="text/javascript" src="js/app/DashboardController.js"></script>
+<script type="text/javascript" src="js/app/DeviceController.js"></script>
 
 
 </body>

@@ -18,10 +18,9 @@ var urlParams;
 // Declare app level module which depends on filters, and services
 var app = angular.module('opendevice', [
     'ngRoute',
-    'ngSanitize',
+    'ngSanitize', // for: ui.select
     'ngAnimate',
     'ui.select',
-    'gridster',
     'gridster',
     //'opendevice.filters',
     //'opendevice.directives',
@@ -40,13 +39,20 @@ OpenDevice.setAppID = "*";
 
 // Global variables
 app.run(function($rootScope) {
+
+    ODev.connect();
+
+    ODev.on("loginFail", function(){
+        window.location = "/login.html?message=Not%20Logged%20or%20Expired";
+    });
+
     $rootScope.ext = {}; // Extension support
     $rootScope.ext.menu = [];
 });
 
 app.config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/', {templateUrl: 'pages/dashboard.html', controller: 'DashboardController',  controllerAs: 'ctrl'});
-    $routeProvider.when('/devices', {templateUrl: 'pages/devices.html', controller: 'DashboardController',  controllerAs: 'ctrl'});
+    $routeProvider.when('/devices', {templateUrl: 'pages/devices.html', controller: 'DeviceController',  controllerAs: 'ctrl'});
     $routeProvider.otherwise({redirectTo: '/'});
 }]);
 

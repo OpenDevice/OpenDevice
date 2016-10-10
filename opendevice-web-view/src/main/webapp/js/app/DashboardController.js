@@ -16,10 +16,7 @@
 var pkg = angular.module('opendevice.controllers');
 
 /**
- * DashboardController for AngularJS
- *
- *  Note: Access this controller from Chrome Debugger
- * angular.element(".content-wrapper").controller()
+ * DeviceController for AngularJS
  * @author Ricardo JL Rufino
  * @date 06/07/14
  */
@@ -47,7 +44,6 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
     this.status = '';
     this.editMode = false;
-    this.devices = [];
     this.dashboard = null;
     this.dashboardItems = [ ]; // view
     this.dashboardList = [];
@@ -59,7 +55,6 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
         $(function(){
 
             $dashboards = $('.dashboards');
-
 
             var Key = {
                 LEFT: 37,  UP: 38,  RIGHT: 39, DOWN: 40, F2 : 113
@@ -111,61 +106,26 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
             });
 
-
-            $scope.$watch(
-                "ctrl.editMode", _this.toggleEdit
-            );
-
             //$scope.$on('$viewContentLoaded', function(){
             //   // View loaded...
             //});
 
         });
 
-        ODev.connect();
-
-        ODev.on("loginFail", function(){
-            window.location = "/login.html?message=Not%20Logged%20or%20Expired";
-        });
-
-        ODev.onConnect(function(devices){
-            //var list = devices.filter(function(obj) {
-            //    return obj.type == od.DeviceType.DIGITAL;
-            //});
-            _this.devices = devices;
-        });
 
 
-        ODev.onChange(function(device){
-            if(device) {
-                if (device.type == od.DeviceType.DIGITAL) {
-                    // playSound(device);
-                }
-
-                $timeout(function(){
-                    $scope.$apply(); // sync view
-                });
+        // Destroy Controller Event
+        $scope.$on("$destroy", function() {
+            for (var i = 0; i < _this.dashboardItems.length; i++) {
+                var itemView = _this.dashboardItems[i];
+                itemView.destroy();
             }
-        });
-
-        ODev.on(od.Event.DEVICE_LIST_UPDATE, function(devices){
-            _this.devices = devices;
         });
 
         configureLayoutManager();
 
         // Load Dashboard's
         _this.syncDashboards();
-
-        // AudioContext detection
-        try {
-            // Fix up for prefixing
-            window.AudioContext = window.AudioContext||window.webkitAudioContext;
-            audioContext = new AudioContext();
-        }catch(e) {
-            alert('Web Audio API is not supported in this browser');
-        }
-
 
     };
 
@@ -215,43 +175,13 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
                 if(typeof item.layout == "string") {
                     item.layout = JSON.parse(item.layout); // convert from String to Array
                 }
-                _this.dashboardItems.push(new DashItemView(item)); // fire 'onRenderDashboardItems'
+                var dashType = od.view.dashTypes[item.type];
+                var klass = eval(dashType.klass); // get reference to implementation class
+                _this.dashboardItems.push(new klass(item)); // fire 'onRenderDashboardItems'
             }
         });
 
 
-    };
-    _public.send = function(data){
-
-        //_this.devices = getDevices();
-        _this.$apply();
-
-    };
-
-    /**
-     * Function called by the View when a button is clicked
-     */
-    _public.toggleValue = function(id){
-        OpenDevice.toggleValue(id);
-    };
-
-    /**
-     * Send value to all devices.
-     * @param value
-     */
-    _public.sendToAll = function(value){
-
-        var devices =  OpenDevice.getDevices();
-        for(var i = 0; i < devices.length; i++){
-            if(!devices[i].sensor)
-                devices[i].setValue(value);
-        }
-
-    };
-
-    /** Force sync devices from physical module */
-    _public.syncDevices = function(){
-        OpenDevice.sync(true, true);
     };
 
     _public.syncDashboards = function() {
@@ -324,20 +254,20 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
     };
 
 
+
     /*
      * Change edit mode
      * This is called automatic, using watch
      */
     _public.toggleEdit = function(value){
+
         if(value == null){
-            _this.editMode = !_this.editMode;
-            value = _this.editMode;
+            value = !_this.editMode;
         }
 
+        _this.editMode = value;
         $layoutManager.resizable.enabled = value;
         $layoutManager.draggable.enabled = value;
-
-        $scope.$apply();
     };
 
 
@@ -459,7 +389,8 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
             angular.forEach(_this.dashboardItems, function(item, index) {
                 console.log('Initializing Chart/View: ' + item.title, item);
                 if(!item.initialized) {
-                    item.init($dashboards, index);
+                    var $el = $('.dash-body', $dashboards).eq(index);
+                    item.render($el);
                 }
             });
         });
@@ -468,54 +399,6 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
     _public.onGridInit = function(scope) {
         $layoutManager = scope.gridster;
-    };
-
-    /** Get Icon for device */
-    _public.getIcon = function(id){
-        var device = findDevice(id);
-        var cname = "";
-
-        if(device.category == DCategory.GENERIC && !(device.sensor)){
-            cname += "ic-lightbulb-";
-        }
-
-        if(device.category == DCategory.LAMP){
-            cname += "ic-lightbulb-";
-        }
-
-        if(device.category == DCategory.POWER_SOURCE){
-            cname += "ic-battery-";
-        }
-
-        if(device.sensor){
-            cname += "ic-sensor-";
-        }
-
-        if(device.value == 1){
-            cname += "on";
-        }else{
-            cname += "off";
-        }
-
-        return cname;
-    };
-
-
-    _public.isChartView = function(type){
-        return DashItemView.isCompatibleChart(type);
-    };
-
-    _public.isControllableDevice = function(device){
-
-        if(device.type == od.DeviceType.DIGITAL) return true;
-
-        return false;
-    };
-    _public.isAnalogDevice = function(device){
-
-        if(device.type == od.DeviceType.ANALOG) return true;
-
-        return false;
     };
 
     _public.addItemListener = function ($gridScope, itemView) {
@@ -564,52 +447,6 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
     }
 
     /**
-     * Find device by ID
-     * @param {Number} id
-     * @returns {*}
-     */
-    function findDevice(deviceID){
-        var devices = _this.devices;
-        if(devices){
-            for(var i = 0; i < devices.length; i++){
-                if(devices[i].id == deviceID){
-                    return devices[i];
-                }
-            }
-        } else{
-            console.warn("Devices not loaded or empty !");
-        }
-
-        return null;
-    }
-
-    function playSound(device){
-
-        if(audioContext && device.type == od.DeviceType.DIGITAL){
-            audioPlay = audioContext.createOscillator();
-            audioPlay.type = 3;
-            if(device.value == 0){
-                audioPlay.frequency.value = 700;
-            }else{
-                audioPlay.frequency.value = 800;
-            }
-            audioPlay.connect(audioContext.destination);
-
-            var now = audioContext.currentTime;
-
-            if(audioPlay && audioPlay.noteOn){
-                audioPlay.noteOn( now );
-                audioPlay.noteOff( now + 0.05 ); // "beep" (in seconds)
-            }else{
-                console.error("audioPlay not working !");
-            }
-
-
-        }
-    }
-
-
-    /**
      * Check views affected by grad-and-drop, resize
      * @returns {Array}
      */
@@ -648,6 +485,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
         _this.gridConf = {
             //margins: [5, 5],
             columns: 6,
+            rowHeight : 100,
             avoid_overlapped_widgets : false,
             mobileBreakPoint: 600,
             resizable: {
@@ -790,10 +628,11 @@ pkg.controller('NewItemController', ['$scope','$timeout', 'DashboardRest', funct
     var _public = this;
     var $el = $("#new-item-dialog");
 
+
     // Public
     // ==========================
 
-    this.supportedTypes  = od.view.availableTypes;
+    this.supportedTypes  = od.view.dashTypes;
 
     var defaults = {
         title : '',
@@ -804,10 +643,15 @@ pkg.controller('NewItemController', ['$scope','$timeout', 'DashboardRest', funct
         aggregation : "NONE",
         itemGroup : 0,
         titleVisible : true
-
     };
 
     this.current = defaults;
+
+    this.deviceIcons = [];
+
+    // ====================================
+    //  Public
+    // ====================================
 
     _public.init = function(){
 
@@ -820,16 +664,43 @@ pkg.controller('NewItemController', ['$scope','$timeout', 'DashboardRest', funct
         // Event received form DashboardController
         $scope.$on('newItem', function (event, type) {
             var options = angular.copy(defaults);
+
             options.type = type;
+
             _this.open(options);
+        });
+
+        DashboardRest.deviceIcons(function(data){
+            data.forEach(function(item){
+                _this.deviceIcons.push({id:item, name: item });
+            });
         });
 
     };
 
+    _public.onSelectType = function(){
+
+        setTypeDefaults(_this.current); //update
+
+        var fields = getAllFields();
+        if(fields) fields.each(function(){
+            var $field = $(this);
+            var name = $field.data("fname");
+            if(isEnabled(name)){
+                $field.show();
+            }else{
+                $field.hide();
+            }
+        });
+    };
+
+
+    // FIXME: Remove
     _public.enableAggregation = function(){
         return od.view.DashItemView.requireAggregation(_this.current.type) && ! _this.current.realtime;
     };
 
+    // FIXME: Remove
     _public.enableRange = function(){
         return (_this.current.type == "LINE_CHART" || _this.current.type == "GAUGE_CHART") ;
     };
@@ -838,11 +709,11 @@ pkg.controller('NewItemController', ['$scope','$timeout', 'DashboardRest', funct
 
         console.log("Open Dialog", data);
 
-        if(!data) data = defaults;
-
-        _this.current = JSON.parse(JSON.stringify(data)); // clone
+        _this.current = angular.copy(data);
 
         _this.selectedType = {id : data.type}; // hack for select
+
+        _this.onSelectType(); // show/hide fields
 
         $('#new-item-dialog').modal('show');
 
@@ -876,5 +747,51 @@ pkg.controller('NewItemController', ['$scope','$timeout', 'DashboardRest', funct
         });
 
     };
+
+    // ====================================
+    //  Private
+    // ====================================
+
+    function getAllFields(){
+        return $("[data-fname]",$el);
+    }
+
+    function setTypeDefaults(defaults){
+
+        var dashType = od.view.dashTypes[defaults.type];
+
+        if(!dashType) return defaults;
+
+        var viewOptions = defaults.viewOptions || {};
+
+        dashType.fields.forEach(function(field){
+            if(field[2] && !viewOptions[field[0]] ){
+                viewOptions[field[0]] = field[2];
+            }
+        });
+
+        defaults.viewOptions = viewOptions;
+
+        return defaults;
+    }
+
+    /**
+     * Check if field is enabled/visible
+     * @param name
+     */
+    function isEnabled(name){
+
+        var dashType = od.view.dashTypes[_this.current.type];
+
+        if(!dashType) return false;
+
+        var enabled = false;
+
+        dashType.fields.forEach(function(field){
+            if(name == field[0]) enabled = true;
+        });
+
+        return enabled;
+    }
 
 }]);

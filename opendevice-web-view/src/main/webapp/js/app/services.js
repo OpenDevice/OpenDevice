@@ -68,7 +68,8 @@ app.factory('DashboardRest', ['$resource', function($resource){
                 return item;
             }
         },
-        removeItem: {method:'DELETE', url : "/dashboards/:dashID/item"}
+        removeItem: {method:'DELETE', url : "/dashboards/:dashID/item"},
+        deviceIcons: {method:'GET', url : "/dashboards/deviceIcons", isArray:true},
     });
 
 }]);

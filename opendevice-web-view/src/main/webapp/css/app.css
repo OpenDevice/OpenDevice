@@ -264,6 +264,16 @@
     line-height: 35px;
 }
 
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none;   /* Chrome/Safari/Opera */
+    -khtml-user-select: none;    /* Konqueror */
+    -moz-user-select: none;      /* Firefox */
+    -ms-user-select: none;       /* Internet Explorer/Edge */
+    user-select: none;           /* Non-prefixed version, currently
+                                  not supported by any browser */
+}
+
 .dash-add-box{
     cursor: pointer;
 }
@@ -273,9 +283,8 @@
 }
 
 .dash-add-box.small-box h3 {
-    font-size: 25px;
+    font-size: 18px;
 }
-
 
 /* when hiding the picture */
 .animate-show.ng-hide-add         { animation:0.2s fadeOutUp ease; }
@@ -371,8 +380,8 @@
 .device-view {
     width: 18% !important;
     min-width: 167px;
-    margin: 8px 1%;
-    height: 80px;
+    margin: 8px 1% !important;
+    height: 55px;
     float: left;
     cursor: pointer;
     display: block;
@@ -388,7 +397,6 @@
     -moz-border-radius: 6px;
     -khtml-border-radius: 6px;
     border-radius: 6px;
-
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -413,6 +421,7 @@
 .device-view .device-view-icon {
     width: 48px;
     height: 100%;
+    padding: 10px;
     float: left;
     display: block;
     border-right: 1px solid #ccc;
@@ -420,10 +429,18 @@
     background-repeat: no-repeat;
 }
 
+.device-view-icon img{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 32px;
+    height: 32px;
+}
+
 .device-view .device-view-content {
     margin-left: 49px;
     display: block;
-    padding: 8px 10px
+    padding: 2px 7px;
 }
 
 .device-view .device-view-content .device-view-title {
@@ -432,9 +449,9 @@
 }
 
 .device-view .device-view-content .device-view-value {
-    font-size: 32px;
+    font-size: 21px;
     font-weight: bold;
-    display: inline-block
+    display: inline-block;
 }
 
 .device-view .device-view-content .device-view-value.on {
@@ -443,8 +460,8 @@
 }
 
 .device-view .device-view-content .device-view-value.off {
-    padding-right: 24px;
-    color: #f53809
+    /* padding-right: 0px; */
+    color: #f53809;
 }
 
 
@@ -639,7 +656,7 @@
 }
 
 /*.highcharts-container{*/
-    /*border: 1px solid red;*/
+/*border: 1px solid red;*/
 /*}*/
 
 /* DashItem Views

@@ -524,7 +524,7 @@ noop.$inject = [];
      return (fn || angular.identity)(input);
    };
 
-   getResult(function(n) { return n * 2; }, 21);   // returns 42
+   getResult(function(l) { return l * 2; }, 21);   // returns 42
    getResult(null, 21);                            // returns 21
    getResult(undefined, 21);                       // returns 21
    ```
@@ -4724,7 +4724,7 @@ function createInjector(modulesToLoad, strictDi) {
 
 
     function instantiate(Type, locals, serviceName) {
-      // Check if Type is annotated and use just the given function at n-1 as parameter
+      // Check if Type is annotated and use just the given function at l-1 as parameter
       // e.g. someModule.factory('greeter', ['$window', function(renamed$window) {}]);
       var ctor = (isArray(Type) ? Type[Type.length - 1] : Type);
       var args = injectionArgs(Type, locals, serviceName);
@@ -6586,7 +6586,7 @@ function $CacheFactoryProvider() {
       function link(nextEntry, prevEntry) {
         if (nextEntry != prevEntry) {
           if (nextEntry) nextEntry.p = prevEntry; //p stands for previous, 'prev' didn't minify
-          if (prevEntry) prevEntry.n = nextEntry; //n stands for next, 'next' didn't minify
+          if (prevEntry) prevEntry.n = nextEntry; //l stands for next, 'next' didn't minify
         }
       }
     }

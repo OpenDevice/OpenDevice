@@ -25,13 +25,14 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -72,6 +73,13 @@ public class DashboardRest {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Dashboard> list() throws IOException {
+//
+//        for (Dashboard dashboard : dao.listAll()) {
+//            for (DashboardItem item : dashboard.getItems()) {
+//                item.setLayout(null);
+//            }
+//        }
+
         return dao.listAll();
     }
 
@@ -79,50 +87,39 @@ public class DashboardRest {
     @Produces(MediaType.APPLICATION_JSON)
     public List<DashboardItem> listItems(@PathParam("id") long id) throws IOException {
 
-        Dashboard dashboard = em.find(Dashboard.class, id);
-
-        // find default
-        // FIXME: REMOVE THIS LOGIN, THIS MUST BY HANDLED IN VIEW
-        // FIXME: add TenantID
-        if(dashboard == null){
-            List<Dashboard> resultList = em.createQuery("from Dashboard order by id desc", Dashboard.class).setMaxResults(1).getResultList();
-            if(!resultList.isEmpty()) dashboard = resultList.get(0);
-        }
+        Dashboard dashboard = dao.getById(id);
 
         return dao.listItems(dashboard.getId());
 
     }
 
 
-    @GET @Path("/remove")
+    @DELETE @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String remove() throws IOException {
+    public Response remove(@PathParam("id") long id) throws IOException {
 
-        TypedQuery<Dashboard> query = em.createQuery("from Dashboard", Dashboard.class);
-        List<Dashboard> list = query.getResultList();
+        Dashboard dashboard = dao.getById(id);
 
-        TypedQuery<DashboardItem> query2 = em.createQuery("from DashboardItem", DashboardItem.class);
-        List<DashboardItem> list2 = query2.getResultList();
+        dao.delete(dashboard);
 
-        for (Dashboard dashboard : list) {
-            em.remove(dashboard);
-        }
-        for (DashboardItem item : list2) {
-            em.remove(item);
+        // change active
+        if(dashboard.isActive()){
+            List<Dashboard> list = dao.listAll();
+            if(!list.isEmpty()) dao.activate(list.get(0));
         }
 
-        return "remove";
+        return Response.status(Response.Status.OK).build();
     }
 
-    @GET @Path("/save")
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public String save() throws IOException {
+    public Dashboard save(Dashboard dashboard) throws IOException {
 
-        Dashboard dashboard = new Dashboard();
-        dashboard.setTitle("MyDash - " + new Date());
-        em.persist(dashboard);
+        if(dashboard.getId() > 0) dashboard = em.merge(dashboard);
 
-        return "Saved : " + new Date();
+        dao.persist(dashboard);
+
+        return dashboard;
 
     }
 
@@ -205,5 +202,18 @@ public class DashboardRest {
         }
 
         return Response.status(Response.Status.OK).type(MediaType.APPLICATION_JSON).build();
+    }
+
+    @GET @Path("/deviceIcons")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<String> deviceIcons() throws IOException {
+        // FIXME: get current path.
+        File path = new File("/media/ricardo/Dados/Codidos/Java/Projetos/OpenDevice/opendevice-web-view/src/main/webapp/images/devices");
+        List<String> images = new LinkedList<String>();
+        File[] files = path.listFiles();
+        for (File file : files) {
+            images.add(file.getName());
+        }
+        return images;
     }
 }

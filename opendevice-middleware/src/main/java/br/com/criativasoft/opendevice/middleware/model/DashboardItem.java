@@ -40,7 +40,7 @@ public class DashboardItem {
     }
 
     public enum DashboardType{
-        TEXT, DYNAMIC_VALUE, LINE_CHART, BAR_CHART, AREA_CHART, PIE_CHART, GAUGE_CHART
+        DIGITAL_CONTROLLER, DYNAMIC_VALUE, LINE_CHART, BAR_CHART, AREA_CHART, PIE_CHART, GAUGE_CHART
     }
 
     @Id
@@ -51,6 +51,7 @@ public class DashboardItem {
 
     private DashboardType type;
 
+    /** Generated layout from Gridister library (as JSON) */
     private String layout;
 
     @ManyToOne(fetch=FetchType.EAGER)
@@ -74,6 +75,7 @@ public class DashboardItem {
 
     private String scripts;
 
+    /** Configurations for View(Chart) like as "min, max" encoded as Json*/
     private String viewOptions;
 
     public DashboardItem(){

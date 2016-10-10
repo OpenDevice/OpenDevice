@@ -17,35 +17,17 @@ import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.middleware.model.Dashboard;
 import br.com.criativasoft.opendevice.middleware.model.DashboardItem;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.DashboardDao;
-import com.sun.istack.internal.Nullable;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.GenericJpa;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
 /**
- * TODO: Add Docs
- *
  * @author Ricardo JL Rufino on 07/05/15.
  */
-public class DashboardDaoNeo4j implements DashboardDao {
+public class DashboardDaoNeo4j extends GenericJpa<Dashboard> implements DashboardDao {
 
-    @Inject
-    private EntityManager em;
-
-    public DashboardDaoNeo4j(){
-    }
-
-    public DashboardDaoNeo4j(EntityManager em) {
-        this.em = em;
-    }
-
-    public void setEntityManager(EntityManager em) {
-        this.em = em;
-    }
 
     @Override
     public void activate(Dashboard dashboard) {
@@ -53,23 +35,14 @@ public class DashboardDaoNeo4j implements DashboardDao {
         List<Dashboard> dashboards = listAll();
         for (Dashboard current : dashboards) {
             if(current.getId() != dashboard.getId()) current.setActive(false);
-            em.persist(current);
+            em().persist(current);
         }
 
         dashboard.setActive(true);
-        em.persist(dashboard);
+        em().persist(dashboard);
 
     }
 
-    @Override
-    public List<DashboardItem> listItems(long id) {
-
-        Query query = em.createNativeQuery("MATCH (n:DashboardItem)-[:parent]->(d:Dashboard) where d.id = {dashID} RETURN n ORDER BY n.id", DashboardItem.class);
-        query.setParameter("dashID",id);
-
-        return query.getResultList();
-
-    }
 
     @Override
     public void persistItem(DashboardItem DashboardItem) {
@@ -83,57 +56,32 @@ public class DashboardDaoNeo4j implements DashboardDao {
 
     @Override
     public DashboardItem getItemByID(long id) {
-        return em.find(DashboardItem.class, id);
+        return em().find(DashboardItem.class, id);
     }
 
-    @Override
-    public Dashboard getById(long id){
-        return em.find(Dashboard.class, id);
-    }
 
     @Override
     public void persist(Dashboard entity) {
-
-    }
-
-    @Override
-    public void update(Dashboard entity) {
-
-    }
-
-    @Override
-    public void delete(Dashboard entity) {
-
-    }
-
-    @Override
-    public void refresh(Dashboard entity) {
-
+        entity.setTenantID(TenantProvider.getCurrentID());
+        super.persist(entity);
     }
 
     @Override
     public List<Dashboard> listAll() {
 
-        TypedQuery<Dashboard> query = em.createQuery("from Dashboard where tenantID = :TENANT", Dashboard.class);
-        query.setParameter("TENANT", TenantProvider.getCurrentID());
+        TypedQuery<Dashboard> query = em().createQuery("from Dashboard where tenantID = :TENANT", Dashboard.class);
 
-        //em.getProperties().get("")
+        query.setParameter("TENANT", TenantProvider.getCurrentID());
 
         return query.getResultList();
     }
 
+    @Override
+    public List<DashboardItem> listItems(long id) {
+        Query query = em().createNativeQuery("MATCH (n:DashboardItem)-[:parent]->(d:Dashboard) where d.id = {dashID} RETURN n ORDER BY n.id", DashboardItem.class);
+        query.setParameter("dashID",id);
+        // FIXME: add tenantID for security...
+        return query.getResultList();
 
-//    @Override
-//    public List<Dashboard> listAll() {
-//
-//        TypedQuery<Dashboard> query = em.createQuery("from Dashboard", Dashboard.class);
-//
-//        List<Dashboard> list = query.getResultList();
-//
-//        for (Dashboard dashboard : list) {
-//            dashboard.setTenantID(TenantProvider.getCurrentID());
-//        }
-//
-//        return list;
-//    }
+    }
 }

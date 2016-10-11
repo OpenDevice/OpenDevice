@@ -122,8 +122,8 @@ public class Device implements Serializable {
         this.category = category;
         this.value = value;
 
-        DeviceManager manager = BaseDeviceManager.getInstance();
-        if(manager != null) manager.addDevice(this);
+        BaseDeviceManager manager = BaseDeviceManager.getInstance();
+        if(manager != null && !manager.isTenantsEnabled()) manager.addDevice(this);
     }
 
 

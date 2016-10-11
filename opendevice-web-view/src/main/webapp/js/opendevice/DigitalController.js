@@ -31,12 +31,6 @@ $.extend(od.view.dashTypes,{
     },
 });
 
-// ON, OFF - Indicator
-// Custom Icon (ON,OFF)
-// Custon Text (ON, OFF)
-// Multiple Device
-
-
 od.view.DigitalController = od.view.DashItemView.extend(function() {
 
     var _this = this;

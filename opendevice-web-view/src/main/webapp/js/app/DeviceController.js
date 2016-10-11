@@ -111,6 +111,24 @@ pkg.controller('DeviceController', ['$timeout', '$http', '$scope', 'DashboardRes
     // ============================================================================================
 
 
+    _public.newBoard = function(){
+
+        $('#new-board').modal('show');
+
+        // Show ApiKeys
+        $.get("/api/account/keys", function(data){
+            if(data && data instanceof Array){
+                var $ul = $('#new-board .apiKeyList');
+                $ul.empty();
+                data.forEach(function(item){
+                    $ul.append("<li>" + item.key + " ( " + item.appName + " ) </li>")
+                });
+            }
+        });
+
+
+    }
+
     _public.send = function(data){
 
         //_this.devices = getDevices();

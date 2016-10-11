@@ -1,7 +1,7 @@
 <span id="page-header"><i class="fa fa fa-sitemap"></i> Boards / Devices</span>
 
 <ul id="page-actions" class="nav navbar-nav">
-    <li><a href="#"><i class="fa fa-plus"></i> New</a></li>
+    <li><a href ng-click="ctrl.newBoard()"><i class="fa fa-plus"></i> New</a></li>
 
     <li ng-init="page.replace('#app-header', '#page-header');page.replace('#app-header-actions', '#page-actions')"></li>
 </ul>
@@ -90,36 +90,50 @@
     </div>
 
 
-
     <!----------------------------------------------------------------->
-    <!-- New Dashboard                                                  -->
+    <!-- New Board                                                   -->
     <!----------------------------------------------------------------->
-    <div id="new-board" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="new-board-label">
+    <div id="new-board"  class="modal fade" tabindex="-1" role="dialog" >
         <div class="modal-dialog" role="document">
-            <form class="form-horizontal" ng-submit="controller.save()">
+            <form class="form-horizontal">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="board">new-board-label</h4>
+                        <h4 class="modal-title" >New Board</h4>
                     </div>
                     <div class="modal-body">
-                        <div class="box-body">
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label">Title</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control" ng-model="controller.current.title" required/>
-                                </div>
-                            </div>
-                        </div>
+                        <h4> <mark>1.</mark> Choose a compatible board</h4>
+                        <p> The boads using arduino framework (like ESP8266) are compatible with OpenDevice <br/> See
+                            <a href="https://github.com/OpenDevice/OpenDevice/wiki/Supported-Devices" target="_blank">supported devices</a> for additional information </p>
+
+                        <h4> <mark>2.</mark> Install the Library</h4>
+                        You can install the library using <a href="http://www.arduino.cc/en/guide/libraries" target="_blank">Arduino Library Manager</a> ou download current version from
+                        <a href="https://github.com/OpenDevice/opendevice-lib-arduino"  target="_blank">github</a>.
+
+                        <h4> <mark>3.</mark> Upload Code</h4>
+                        <p>You can use code samples provided in Arduino IDE (Examples > OpenDevice) <br/>
+                            More advanced projects can be found in: <a href="https://github.com/OpenDevice/opendevice-examples" target="_blank">opendevice-examples</a>
+                        </p>
+
+                        <h4> <mark>4.</mark> Change API Key</h4>
+                        <p>Use one of the keys below*:</p>
+
+                        <blockquote>
+                            <ul class="apiKeyList">
+                            </ul>
+                        </blockquote>
+                        *<i>This is not required if you are running a local server</i>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary" >Save changes</button>
+                        <button type="submit" class="btn btn-primary" >OK</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
+
 
 </section>
 <!-- /.content -->

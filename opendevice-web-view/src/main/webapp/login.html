@@ -113,14 +113,13 @@
         $(".message").html("Logging...");
 
         $.post('/api/auth', $(this).serialize(),function() {
-                    $(".message").html("");
-//                    window.location.reload();
-                    window.location = "/admin.html";
-                })
-                .fail(function(err) {
-                    console.log("fail:", err);
-                    $(".message").html(err.responseText);
-                });
+            $(".message").html("");
+            window.location = "/"; // call Index
+        })
+        .fail(function(err) {
+            console.log("fail:", err);
+            $(".message").html(err.responseText);
+        });
 
     });
 

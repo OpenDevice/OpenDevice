@@ -34,11 +34,11 @@ angular.module('opendevice.controllers', []);
 // Constants
 // ===================
 // app.constant('opendevice_url', 'http://'+window.location.host);
-// OpenDevice.setAppID = OpenDevice.findAppID() || 'clientname-123456x';
-OpenDevice.setAppID = "*";
 
 // Global variables
 app.run(function($rootScope) {
+
+    OpenDevice.setAppID(OpenDevice.findAppID()); // find in cookie/localstore
 
     ODev.connect();
 
@@ -52,7 +52,8 @@ app.run(function($rootScope) {
 
 app.config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/', {templateUrl: 'pages/dashboard.html', controller: 'DashboardController',  controllerAs: 'ctrl'});
-    $routeProvider.when('/devices', {templateUrl: 'pages/devices.html', controller: 'DeviceController',  controllerAs: 'ctrl'});
+    $routeProvider.when('/boards', {templateUrl: 'pages/boards.html', controller: 'DeviceController',  controllerAs: 'ctrl'});
+    $routeProvider.when('/new', {templateUrl: 'pages/new.html', controller: 'DeviceController',  controllerAs: 'ctrl'});
     $routeProvider.otherwise({redirectTo: '/'});
 }]);
 

@@ -772,10 +772,10 @@ od.DeviceManager = function(connection){
 
 var od = od || {};
 
-od.APP_ID_NAME = "AppID";
+od.SESSION_ID = "AuthToken"; // For cookie/localstore search
 
 od.version = "0.3.2";
-od.appID = "*";
+od.appID = "*"; // ApyKey Value
 od.serverURL = window.location.origin;
 
 var OpenDevice = (function () {
@@ -823,7 +823,7 @@ return {
                 type: "GET",
                 url: od.serverURL + path,
                 headers : {
-                    'X-AppID' : od.appID
+                    'Authorization' : "Bearer " + od.appID
                 },
                 async: false // FIXME: isso não é recomendado...
         });
@@ -843,7 +843,7 @@ return {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'X-AppID' : od.appID
+                'Authorization' : "Bearer " + od.appID
             },
             type: 'POST',
             url: od.serverURL +"/device/" + query.deviceID + "/history",
@@ -859,7 +859,7 @@ return {
         return $.get(od.serverURL +"/api/auth/logout", callback);
     },
 
-    /** Try to find APPID URL->Cookie->LocalStore */
+    /** Try to find APPID(AuthToken) URL->Cookie->LocalStore */
     findAppID : function(){
 
         /** Get URL query param */
@@ -889,16 +889,16 @@ return {
         }
 
 
-        od.appID = getQueryParam(od.APP_ID_NAME);
+        od.appID = getQueryParam(od.SESSION_ID);
 
         if(od.appID != null) return od.appID;
 
-        od.appID = getCookie(od.APP_ID_NAME);
+        od.appID = getCookie(od.SESSION_ID);
 
         if(od.appID != null) return od.appID;
 
         if( window.localStorage ){
-            od.appID = window.localStorage.getItem(od.APP_ID_NAME)
+            od.appID = window.localStorage.getItem(od.SESSION_ID)
         }
 
         return od.appID;

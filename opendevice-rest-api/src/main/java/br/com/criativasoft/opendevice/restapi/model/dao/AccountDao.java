@@ -15,7 +15,10 @@ package br.com.criativasoft.opendevice.restapi.model.dao;
 
 import br.com.criativasoft.opendevice.core.dao.Dao;
 import br.com.criativasoft.opendevice.restapi.model.Account;
+import br.com.criativasoft.opendevice.restapi.model.ApiKey;
 import br.com.criativasoft.opendevice.restapi.model.UserAccount;
+
+import java.util.List;
 
 /**
  *
@@ -29,6 +32,8 @@ public interface AccountDao extends Dao<Account> {
     UserAccount getUserAccountByID(long id);
 
     Account getAccountByApiKey(String key);
+
+    List<ApiKey> listKeys(long userAccountID);
 
 
 }

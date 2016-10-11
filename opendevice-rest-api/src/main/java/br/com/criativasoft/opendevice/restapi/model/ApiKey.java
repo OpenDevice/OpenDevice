@@ -13,7 +13,7 @@
 
 package br.com.criativasoft.opendevice.restapi.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -39,7 +39,8 @@ public class ApiKey {
     private String appName;
 
     @ManyToOne(fetch= FetchType.EAGER)
-    @JsonBackReference
+    @JsonIgnore
+//    @JsonBackReference
     private UserAccount account;
 
     public long getId() {

@@ -15,9 +15,7 @@ package br.com.criativasoft.opendevice.restapi.resources;
 
 import br.com.criativasoft.opendevice.restapi.auth.AccountPrincipal;
 import br.com.criativasoft.opendevice.restapi.model.ApiKey;
-import br.com.criativasoft.opendevice.restapi.model.UserAccount;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
-import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.subject.Subject;
 import org.secnod.shiro.jaxrs.Auth;
@@ -27,7 +25,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.Set;
+import java.util.List;
 
 /**
  * TODO: Add docs.
@@ -52,15 +50,11 @@ public class AccountRest {
 
     @GET @Path("keys")
     @Produces(MediaType.APPLICATION_JSON)
-    public Set<ApiKey> listKeys(@Auth Subject subject) {
+    public List<ApiKey> listKeys(@Auth Subject subject) {
 
         AccountPrincipal principal = (AccountPrincipal) subject.getPrincipal();
 
-        UserAccount userAccount = dao.getUserAccountByID(principal.getUserAccountID());
-
-        if(userAccount == null) throw new AuthenticationException("Invalid Account");
-
-        Set<ApiKey> keys = userAccount.getKeys();
+        List<ApiKey> keys = dao.listKeys(principal.getUserAccountID());
 
         return keys;
     }

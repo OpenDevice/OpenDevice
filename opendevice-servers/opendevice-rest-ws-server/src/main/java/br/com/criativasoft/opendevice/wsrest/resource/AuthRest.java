@@ -13,7 +13,6 @@
 
 package br.com.criativasoft.opendevice.wsrest.resource;
 
-import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.restapi.auth.AccountAuth;
 import br.com.criativasoft.opendevice.restapi.auth.AccountPrincipal;
 import br.com.criativasoft.opendevice.restapi.model.Account;
@@ -116,10 +115,10 @@ public class AuthRest {
             cookie.setPath("/");
             res.getResponse().addCookie(cookie);
 
-            // Generate Cookie to indentify ApiKey/AuthToken
-            cookie = new javax.servlet.http.Cookie(TenantProvider.HTTP_HEADER_KEY, principal.getAccountUUID()); // (String) session.getId()
-            cookie.setPath("/");
-            res.getResponse().addCookie(cookie);
+//            // Generate Cookie to indentify ApiKey/AuthToken
+//            cookie = new javax.servlet.http.Cookie(TenantProvider.HTTP_HEADER_KEY, principal.getAccountUUID()); // (String) session.getId()
+//            cookie.setPath("/");
+//            res.getResponse().addCookie(cookie);
 
         }
 
@@ -182,8 +181,9 @@ public class AuthRest {
                 // currentUser.getSession(true).setTimeout(xxxxx);
 
                 if(currentUser.isAuthenticated()){
+                    AccountPrincipal principal = (AccountPrincipal) currentUser.getPrincipal();
                     logged = true;
-                    authtoken = "Success"; // form auth not require token
+                    authtoken = principal.getAccountUUID();
                 }
 
             } catch (UnknownAccountException e) {

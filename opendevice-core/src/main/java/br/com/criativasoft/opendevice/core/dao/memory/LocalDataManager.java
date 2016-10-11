@@ -11,24 +11,28 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.core;
+package br.com.criativasoft.opendevice.core.dao.memory;
+
+import br.com.criativasoft.opendevice.core.DataManager;
+import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 
 /**
- * Provider that is used for local applications <b>without</b> support muti-tenant
+ * DataManager using {@link DeviceDaoMemory}
+ *
  * @author Ricardo JL Rufino
- * @date 29/08/15.
+ * @date 10/10/16
  */
-public class LocalTenantProvider extends TenantProvider {
+public class LocalDataManager implements DataManager {
 
-    private static String tenantID;
+    private DeviceDao deviceDao = new DeviceDaoMemory();
 
     @Override
-    public void setTenantID(String appID) {
-        this.tenantID = appID;
+    public DeviceDao getDeviceDao() {
+        return deviceDao;
     }
 
     @Override
-    public String getTenantID() {
-        return tenantID;
+    public void setDeviceDao(DeviceDao dao) {
+        this.deviceDao = dao;
     }
 }

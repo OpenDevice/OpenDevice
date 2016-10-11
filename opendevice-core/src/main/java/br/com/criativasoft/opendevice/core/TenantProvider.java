@@ -24,7 +24,7 @@ public abstract class TenantProvider {
 
     private static TenantProvider provider = new LocalTenantProvider();
 
-    public static final String HTTP_HEADER_KEY = "X-AppID";
+    public static final String HTTP_HEADER_KEY = "AuthToken";
 
     public static void setProvider(TenantProvider provider) {
         TenantProvider.provider = provider;

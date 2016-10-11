@@ -467,6 +467,10 @@ public abstract class BaseDeviceManager implements DeviceManager {
         return size > 0;
     }
 
+    public boolean isTenantsEnabled(){
+        return OpenDeviceConfig.get().isTenantsEnabled();
+    }
+
     /**
      * Checks if a connection is active. Considers the input and output
      */
@@ -515,7 +519,6 @@ public abstract class BaseDeviceManager implements DeviceManager {
     protected OpenDeviceConfig getConfig(){
         return OpenDeviceConfig.get();
     }
-
 
 
     private ConnectionListener connectionListener = new ConnectionListener() {
@@ -722,6 +725,18 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
 //                ResponseCommand responseCommand = (ResponseCommand) command;
                 // log.debug("ResponseStatus: " + responseCommand.getStatus());
+
+            } else if (type == CommandType.CONNECT_RESPONSE) {
+
+                ResponseCommand response = (ResponseCommand) command;
+
+                if(response.getStatus() == CommandStatus.UNAUTHORIZED){
+                    try {
+                        log.info("The access information is invalid or are not configured (Authorization Required)");
+                        connection.disconnect();
+                    } catch (ConnectionException e) {
+                    }
+                }
 
             } else if (type == CommandType.GET_DEVICES_RESPONSE) {
 

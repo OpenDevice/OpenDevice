@@ -19,6 +19,7 @@ import br.com.criativasoft.opendevice.core.connection.Connections;
 import br.com.criativasoft.opendevice.core.connection.InputContections;
 import br.com.criativasoft.opendevice.core.connection.OutputConnections;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
+import br.com.criativasoft.opendevice.core.dao.memory.LocalDataManager;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import org.slf4j.Logger;
@@ -30,16 +31,20 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * TODO: PENDING DOC
+ * Use this class to develop local applications, local servers or clients for OpenDevice.<br/><br/>
  *
+ * <p>You should override the method {@link #start()} and create main method:</p>
+ * <code>
+ *    public static void main(String[] args) { launch(args); }
+ * </code>
+ *
+ * @see <a href="https://opendevice.atlassian.net/wiki/display/DOC/Getting+started">Getting Started</a> for more info.
  * @author Ricardo JL Rufino
  * @date 24/08/14.
  */
 public class LocalDeviceManager extends BaseDeviceManager {
 
     protected static final Logger log = LoggerFactory.getLogger(LocalDeviceManager.class);
-
-    private String applicationID = OpenDeviceConfig.LOCAL_APP_ID;
 
     // ToDo: use only if dao is not memory
     private Set<Device> runtimeDevices = new LinkedHashSet<Device>();
@@ -48,23 +53,31 @@ public class LocalDeviceManager extends BaseDeviceManager {
     protected OutputConnections out = Connections.out;
     protected InputContections in = Connections.in;
 
+    public void setApiKey(String key) {
+        TenantProvider.setCurrentID(key);
+    }
+
+    /**
+     * @deprecated use setApiKey
+     * @param applicationID
+     */
     public void setApplicationID(String applicationID) {
-        TenantProvider.setCurrentID(applicationID);
-        this.applicationID = applicationID;
+        setApiKey(applicationID);
     }
 
     public String getApplicationID() {
-        return applicationID;
+        return TenantProvider.getCurrentID();
     }
 
     public LocalDeviceManager(){
         super();
+        setDataManager(new LocalDataManager());
     }
 
     @Override
     public void addInput(DeviceConnection connection) {
         if(connection.getApplicationID() == null) {
-            connection.setApplicationID(this.applicationID);
+            connection.setApplicationID(getApplicationID());
         }
         super.addInput(connection);
     }
@@ -72,7 +85,7 @@ public class LocalDeviceManager extends BaseDeviceManager {
     @Override
     public void addOutput(DeviceConnection connection) {
         if(connection.getApplicationID() == null) {
-            connection.setApplicationID(this.applicationID);
+            connection.setApplicationID(getApplicationID());
         }
         super.addOutput(connection);
     }
@@ -93,7 +106,6 @@ public class LocalDeviceManager extends BaseDeviceManager {
 
         devices.addAll(runtimeDevices);
         devices.addAll(dblist); // TODO: this must be enabled (comentado devido a duplicidade nos testes)
-
 
         return devices;
     }
@@ -220,6 +232,10 @@ public class LocalDeviceManager extends BaseDeviceManager {
     }
 
 
+    /**
+     * This method is called automatically when you start the application without using a main method.
+     * @throws IOException
+     */
     public void start() throws IOException {
         log.info("Method start not implemented");
     }

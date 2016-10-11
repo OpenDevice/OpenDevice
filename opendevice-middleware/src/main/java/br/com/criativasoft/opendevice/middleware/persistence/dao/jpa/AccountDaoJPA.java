@@ -62,4 +62,15 @@ public class AccountDaoJPA extends GenericJpa<Account> implements AccountDao {
         return null;
     }
 
+    @Override
+    public List<ApiKey> listKeys(long userAccountID) {
+
+        TypedQuery<ApiKey> query = em().createQuery("select x from ApiKey x where x.account.id = :p1", ApiKey.class);
+
+        query.setParameter("p1", userAccountID);
+
+        List<ApiKey> list = query.getResultList();
+
+        return list;
+    }
 }

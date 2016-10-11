@@ -53,7 +53,7 @@ public class Main extends LocalDeviceManager {
 
 	public void start() throws IOException  {
 
-//        setApplicationID(OpenDeviceConfig.LOCAL_APP_ID);
+        setApplicationID(OpenDeviceConfig.LOCAL_APP_ID); // Only for Startup
 
         // Server with suport for HTTP,Rest,WebSocket
 

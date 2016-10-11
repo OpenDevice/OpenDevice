@@ -100,7 +100,8 @@ public class PopulateDatabase {
 
         ApiKey key = new ApiKey();
         key.setAccount(uaccount);
-        key.setAppName("Dashboard : " + u);
+        key.setAppName("ApplicationID");
+        key.setKey(account.getUuid());
         uaccount.getKeys().add(key);
         em.persist(key);
         em.persist(account);

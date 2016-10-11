@@ -112,8 +112,9 @@
 
         $(".message").html("Logging...");
 
-        $.post('/api/auth', $(this).serialize(),function() {
+        $.post('/api/auth', $(this).serialize(),function(data) {
             $(".message").html("");
+            localStorage.setItem("AuthToken", data);
             window.location = "/"; // call Index
         })
         .fail(function(err) {

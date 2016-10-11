@@ -21,7 +21,12 @@ import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.command.Command;
+import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.webclient.io.CommandEncoderDecoder;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.Response;
+import com.ning.http.util.Base64;
 import org.atmosphere.wasync.*;
 import org.atmosphere.wasync.impl.AtmosphereClient;
 import org.atmosphere.wasync.impl.DefaultOptionsBuilder;
@@ -29,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Ricardo JL Rufino
@@ -66,8 +72,8 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
             uri = "ws://" + uri;
         }
 
-        if(!uri.contains("/device/connection/")){
-            uri = uri + "/device/connection/" + id;
+        if(!uri.contains("/ws/device/")){
+            uri = uri + "/ws/device/" + id;
         }
 
         return uri;
@@ -147,26 +153,66 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
             // FIXME: Workaround for BUG: https://github.com/Atmosphere/wasync/issues/120
             System.setProperty("com.ning.http.client.AsyncHttpClientConfig.acceptAnyCertificate", "true");
 
-            request = client.newRequestBuilder()
-                    .method(Request.METHOD.GET)
-                    .uri(url)
-                    // .trackMessageLength(true)
-                    .transport(Request.TRANSPORT.WEBSOCKET)
-                    .transport(Request.TRANSPORT.LONG_POLLING);
 
-            CommandEncoderDecoder jacksonSerializer = new CommandEncoderDecoder();
-            request.encoder(jacksonSerializer);
-            request.decoder(jacksonSerializer);
-            DefaultOptionsBuilder clientOptions = client.newOptionsBuilder()
-                    .reconnect(true)
-                    .reconnectAttempts(10)
-                    .pauseBeforeReconnectInSeconds(5);
+            try {
+
+                // Execute autentication using Http Request
+
+                String apiKey = TenantProvider.getCurrentID();
+                String authToken;
+
+                if(apiKey != null & ! OpenDeviceConfig.LOCAL_APP_ID.equals(apiKey)){
+
+                    String connectionURI = getConnectionURI();
+                    String host  = connectionURI.substring(connectionURI.indexOf("://") + 3, connectionURI.indexOf("/ws"));
+                    AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+                    String apiKeyBase64 = Base64.encode((apiKey + ":x").getBytes());
+                    AsyncHttpClient.BoundRequestBuilder get = asyncHttpClient.prepareGet("http://" + host + "/api/auth");
+                    get.setHeader("Authorization", "Basic " + apiKeyBase64);
+                    ListenableFuture<Response> f = get.execute();
+
+                    Response r = f.get();
+
+                    if(r.getStatusCode() != 200)  throw new ConnectionException(r.getResponseBody());
+
+                    authToken = r.getResponseBody();
+
+                    log.info("Login Success, AuthToken: " + authToken);
+                }else{
+                    authToken = OpenDeviceConfig.LOCAL_APP_ID;
+                }
+
+                // Connect to WebSocket endpoint
+
+                request = client.newRequestBuilder()
+                        .method(Request.METHOD.GET)
+                        .header("Authorization", "Bearer " + authToken)
+                        .uri(url)
+                        // .trackMessageLength(true)
+                        .transport(Request.TRANSPORT.WEBSOCKET)
+                        .transport(Request.TRANSPORT.LONG_POLLING);
+
+                CommandEncoderDecoder jacksonSerializer = new CommandEncoderDecoder();
+                request.encoder(jacksonSerializer);
+                request.decoder(jacksonSerializer);
+                DefaultOptionsBuilder clientOptions = client.newOptionsBuilder()
+                        .reconnect(true)
+                        .reconnectAttempts(10)
+                        .pauseBeforeReconnectInSeconds(5);
 
 
-            // clientOptions.runtime().getConfig().isAcceptAnyCertificate()
+                // clientOptions.runtime().getConfig().isAcceptAnyCertificate()
 
-            connection = client.create(clientOptions.build());
-            initEvents(connection);
+                connection = client.create(clientOptions.build());
+                initEvents(connection);
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+
+
         }
     }
 

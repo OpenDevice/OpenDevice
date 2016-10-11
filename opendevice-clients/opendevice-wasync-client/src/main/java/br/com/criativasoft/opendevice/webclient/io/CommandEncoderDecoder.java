@@ -14,6 +14,9 @@
 package br.com.criativasoft.opendevice.webclient.io;
 
 import br.com.criativasoft.opendevice.core.command.Command;
+import br.com.criativasoft.opendevice.core.command.CommandStatus;
+import br.com.criativasoft.opendevice.core.command.CommandType;
+import br.com.criativasoft.opendevice.core.command.ResponseCommand;
 import br.com.criativasoft.opendevice.core.json.CommandJacksonMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.atmosphere.wasync.Decoder;
@@ -53,6 +56,16 @@ public class CommandEncoderDecoder implements Encoder<Command, String>, Decoder<
         if(e == Event.MESSAGE){
 
             if("X".equalsIgnoreCase(s)) return null; // ping send from WebSocketServer
+
+            // Note: If change this logic if future, also change in DeviceConnection.js:186
+            if(s.contains("Authorization Required")) {
+                ResponseCommand response = new ResponseCommand(CommandType.CONNECT_RESPONSE,  CommandStatus.UNAUTHORIZED);
+                return response;
+            }
+            if(s.contains("Invalid AuthToken")) {
+                ResponseCommand response = new ResponseCommand(CommandType.CONNECT_RESPONSE,  CommandStatus.UNAUTHORIZED);
+                return response;
+            }
 
             try {
                 Command command = getMapper().readValue(s, Command.class);

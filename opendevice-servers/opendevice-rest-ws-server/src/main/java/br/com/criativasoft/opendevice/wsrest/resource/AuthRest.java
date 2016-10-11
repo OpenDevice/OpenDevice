@@ -13,12 +13,14 @@
 
 package br.com.criativasoft.opendevice.wsrest.resource;
 
+import br.com.criativasoft.opendevice.core.TenantProvider;
+import br.com.criativasoft.opendevice.restapi.auth.AccountAuth;
+import br.com.criativasoft.opendevice.restapi.auth.AccountPrincipal;
 import br.com.criativasoft.opendevice.restapi.model.Account;
 import br.com.criativasoft.opendevice.restapi.model.User;
 import br.com.criativasoft.opendevice.restapi.model.UserAccount;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
 import br.com.criativasoft.opendevice.restapi.model.dao.UserDao;
-import br.com.criativasoft.opendevice.restapi.auth.AccountAuth;
 import com.sun.jersey.core.util.Base64;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -40,7 +42,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
 import java.util.Set;
-import java.util.UUID;
 
 import static br.com.criativasoft.opendevice.restapi.auth.BearerTokenRealm.TOKEN_CACHE;
 
@@ -107,9 +108,16 @@ public class AuthRest {
 
         if(currentUser.isAuthenticated()){
 
-            // Generate Cookie to indentify user on Shiro (NewShiroInterceptor)
+            AccountPrincipal principal = (AccountPrincipal) currentUser.getPrincipal();
+
+            // Generate Cookie to indentify user on Shiro (see NewShiroInterceptor)
             Session session = currentUser.getSession(true); // this will force session creation
-            javax.servlet.http.Cookie cookie = new javax.servlet.http.Cookie(AuthRest.SESSION_ID, (String) session.getId());
+            javax.servlet.http.Cookie cookie = new javax.servlet.http.Cookie(AuthRest.SESSION_ID,  (String) session.getId());
+            cookie.setPath("/");
+            res.getResponse().addCookie(cookie);
+
+            // Generate Cookie to indentify ApiKey/AuthToken
+            cookie = new javax.servlet.http.Cookie(TenantProvider.HTTP_HEADER_KEY, principal.getAccountUUID()); // (String) session.getId()
             cookie.setPath("/");
             res.getResponse().addCookie(cookie);
 
@@ -119,26 +127,32 @@ public class AuthRest {
 
     }
 
-    private Response doLogin(Subject currentUser, String username, String password, boolean isToken){
+    private Response doLogin(Subject currentUser, String username, String password, boolean isApiKey){
 
-        LOG.debug("Using token ("+isToken+"), username : " + username);
+        LOG.debug("Using ApiKey ("+isApiKey+"), username : " + username);
 
         Account account = null;
         String authtoken = null;
         boolean logged = false;
 
         // Login using: ApiKey
-        if(isToken){
+        if(isApiKey){
 
             account = accountDao.getAccountByApiKey(username);
 
             // Generate and cache the 'AuthToken', this will be used in AuthenticationFilter
+            // This token will be used in BearerTokenRealm
             // TODO: Need configure expire using EhCache
             if(account != null){
-                authtoken = UUID.randomUUID().toString();
+
+                // (RR) To simplify the development of clients, AuthToken and API Key will be the AccountUUID.
+                // This can be changed in the future (issues #57)
+                // authtoken = UUID.randomUUID().toString();
+                authtoken = account.getUuid();
+
                 DefaultSecurityManager securityManager = (DefaultSecurityManager) SecurityUtils.getSecurityManager();
                 Cache<Object, Object> cache = securityManager.getCacheManager().getCache(TOKEN_CACHE);
-                cache.put(authtoken, username); // username == Api_Key
+                cache.put(authtoken, username); // username (is Api_Key in this case)
                 logged = true;
             }
 

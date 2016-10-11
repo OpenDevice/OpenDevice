@@ -70,7 +70,7 @@ public class RestWebSecurityManager extends DefaultWebSecurityManager {
     @Override
     protected Session resolveContextSession(SubjectContext context) throws InvalidSessionException {
         SessionKey key = getSessionKey(context);
-        if (key != null && key.getSessionId() != null) { // FIX: check internal sessionID
+        if (key != null && key.getSessionId() != null) { // FIXED: check internal sessionID
             return getSession(key);
         }
         return null;

@@ -66,7 +66,7 @@ public class NewShiroInterceptor extends AtmosphereInterceptorAdapter {
             try {
 
                 // Create/find Subject using Request (and cookies) to restore state/session
-                Subject currentUser = new Builder(r.getRequest(), r.getResponse()).buildWebSubject();
+                Subject currentUser = new CookieBuilder(r.getRequest(), r.getResponse()).buildWebSubject();
                 ThreadContext.bind(currentUser);
 
                 // Store to use in WebSocket / Broadcast response.
@@ -99,9 +99,9 @@ public class NewShiroInterceptor extends AtmosphereInterceptorAdapter {
         return null;
     }
 
-    public static class Builder extends WebSubject.Builder{
+    public static class CookieBuilder extends WebSubject.Builder{
 
-        public Builder(ServletRequest request, ServletResponse response) {
+        public CookieBuilder(ServletRequest request, ServletResponse response) {
             super(request, response);
 
             getSubjectContext().setSecurityManager(SecurityUtils.getSecurityManager());

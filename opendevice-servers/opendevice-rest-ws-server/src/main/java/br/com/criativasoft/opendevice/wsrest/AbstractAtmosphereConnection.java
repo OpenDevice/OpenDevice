@@ -153,9 +153,6 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
             // Authentication
             if(config.isAuthRequired()){
-                // FIXME: get user configurarion/database
-//                Factory<org.apache.shiro.mgt.SecurityManager> factory = new IniSecurityManagerFactory("file:///media/ricardo/Dados/Codidos/Java/Projetos/opendevice-project/data/middleware/shiro.ini");
-
                 List<Realm> realms = new LinkedList<Realm>();
                 realms.add(new BearerTokenRealm((DeviceManager) getConnectionManager()));
                 realms.add(new AccountDaoRealm((DeviceManager) getConnectionManager()));
@@ -169,19 +166,12 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
                     ((ModularRealmAuthenticator) authenticator).setAuthenticationStrategy(new FirstSuccessfulStrategy());
                 }
 
-                SecurityUtils.setSecurityManager(securityManager);
                 // NOTE: Works with ShiroResourceFilterFactory, registred in AppResourceConfigurator
+                SecurityUtils.setSecurityManager(securityManager);
+
             }
 
             server = new Nettosphere.Builder().config(conf.build()).build();
-
-            // For Shiro WebContext
-//            EnvironmentLoader environmentLoader = new EnvironmentLoader();
-//            ServletContext servletContext = server.framework().getServletContext();
-//            servletContext.setInitParameter(EnvironmentLoader.ENVIRONMENT_CLASS_PARAM, "org.apache.shiro.web.env.DefaultWebEnvironment");
-//            environmentLoader.initEnvironment(servletContext);
-//            servletContext.addFilter("shiroFilter", new ShiroFilter());
-
         }
     }
 

@@ -25,8 +25,9 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.ext.Provider;
 
 /**
- * Check the authentication token via the Bearer header, and performs validation using Shiro.
- * The validation is done by class: ShiroAnnotationResourceFilter using annoted resources
+ * Check the authentication token via the Bearer header, and performs validation using
+ * {@link br.com.criativasoft.opendevice.restapi.auth.BearerTokenRealm BearerTokenRealm}. <br/>
+ * Validation rules are enforced by class: {@link org.secnod.shiro.jersey.ShiroAnnotationResourceFilter ShiroAnnotationResourceFilter} using annoted resources
  * @author Ricardo JL Rufino
  * @date 10/09/16
  */

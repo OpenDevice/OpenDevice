@@ -16,7 +16,6 @@ package br.com.criativasoft.opendevice.middleware;
 import br.com.criativasoft.opendevice.connection.IWSServerConnection;
 import br.com.criativasoft.opendevice.core.LocalDeviceManager;
 import br.com.criativasoft.opendevice.core.TenantProvider;
-import br.com.criativasoft.opendevice.core.ThreadLocalTenantProvider;
 import br.com.criativasoft.opendevice.core.connection.Connections;
 import br.com.criativasoft.opendevice.core.extension.ViewExtension;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
@@ -27,6 +26,7 @@ import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerF
 import br.com.criativasoft.opendevice.middleware.resources.DashboardRest;
 import br.com.criativasoft.opendevice.middleware.resources.IndexRest;
 import br.com.criativasoft.opendevice.mqtt.MQTTServerConnection;
+import br.com.criativasoft.opendevice.restapi.model.Account;
 import br.com.criativasoft.opendevice.wsrest.guice.GuiceInjectProvider;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.script.SimpleBindings;
 import java.io.*;
 import java.util.*;
@@ -50,6 +51,7 @@ public class Main extends LocalDeviceManager {
 
     private SimpleBindings jscontext;
     private IWSServerConnection webscoket;
+    private EntityManager entityManager;
 
 	public void start() throws IOException  {
 
@@ -81,7 +83,7 @@ public class Main extends LocalDeviceManager {
 
         // TODO: use EntityManager by injection
         if(config.isDatabaseEnabled()){
-            EntityManager entityManager = LocalEntityManagerFactory.getInstance().createEntityManager();
+            entityManager = LocalEntityManagerFactory.getInstance().createEntityManager();
             HibernateProvider.setInstance(entityManager);
         }
 
@@ -135,14 +137,57 @@ public class Main extends LocalDeviceManager {
         this.connect();
 
         if(config.isTenantsEnabled()){
-            TenantProvider.setProvider(new ThreadLocalTenantProvider());
+
+            MainTenantProvider provider = new MainTenantProvider(manager);
+
+            TenantProvider.setProvider(provider);
+
+            // FIXME: this can show startup
+
+            // Init accounts
+            EntityTransaction tx = entityManager.getTransaction();
+            tx.begin();
+            List<Account> accounts = manager.getAccountDao().listAll();
+            for (Account account : accounts) {
+                provider.addNewContext(account.getUuid());
+            }
+            tx.commit();
+
         }
 
 
     }
-	
-	
-	private String getWebAppDir(){
+
+    @Override
+    protected void transactionBegin() {
+
+        if(entityManager != null){
+
+            EntityTransaction tx = entityManager.getTransaction();
+
+            tx.begin();
+        }
+
+    }
+
+    @Override
+    protected void transactionEnd() {
+        if(entityManager != null){
+
+            EntityTransaction tx = entityManager.getTransaction();
+
+            try {
+
+                if (tx.isActive()) tx.commit();
+
+            }catch (RuntimeException e) {
+                if ( tx != null && tx.isActive() ) tx.rollback();
+                throw e; // or display error message
+            }
+        }
+    }
+
+    private String getWebAppDir(){
 
         extractResources();
 

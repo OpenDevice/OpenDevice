@@ -24,7 +24,6 @@ import br.com.criativasoft.opendevice.core.dao.Dao;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 public abstract class GenericJpa<T> implements Dao<T> {
@@ -33,12 +32,12 @@ public abstract class GenericJpa<T> implements Dao<T> {
 
     private Class<T> persistentClass;
 
+    protected GenericJpa(Class<T> persistentClass) {
+        this.persistentClass = persistentClass;
+    }
+
     @Inject
     public void setEntityManager(EntityManager em) {
-
-        persistentClass = (Class<T>)
-                ((ParameterizedType)getClass().getGenericSuperclass())
-                        .getActualTypeArguments()[0];
 
         this.em = em;
     }

@@ -25,6 +25,10 @@ import java.util.List;
  */
 public class UserDaoJPA extends GenericJpa<User> implements UserDao {
 
+    public UserDaoJPA() {
+        super(User.class);
+    }
+
     @Override
     public User getUser(String username, String password) {
         TypedQuery<User> query = em().createQuery("select x from User x where x.username = :p1 and x.password = :p2", User.class);

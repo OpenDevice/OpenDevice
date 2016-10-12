@@ -29,6 +29,10 @@ import java.util.List;
 public class DashboardDaoNeo4j extends GenericJpa<Dashboard> implements DashboardDao {
 
 
+    public DashboardDaoNeo4j() {
+        super(Dashboard.class);
+    }
+
     @Override
     public void activate(Dashboard dashboard) {
 
@@ -62,14 +66,14 @@ public class DashboardDaoNeo4j extends GenericJpa<Dashboard> implements Dashboar
 
     @Override
     public void persist(Dashboard entity) {
-        entity.setTenantID(TenantProvider.getCurrentID());
+        entity.setApplicationID(TenantProvider.getCurrentID());
         super.persist(entity);
     }
 
     @Override
     public List<Dashboard> listAll() {
 
-        TypedQuery<Dashboard> query = em().createQuery("from Dashboard where tenantID = :TENANT", Dashboard.class);
+        TypedQuery<Dashboard> query = em().createQuery("from Dashboard where applicationID = :TENANT", Dashboard.class);
 
         query.setParameter("TENANT", TenantProvider.getCurrentID());
 

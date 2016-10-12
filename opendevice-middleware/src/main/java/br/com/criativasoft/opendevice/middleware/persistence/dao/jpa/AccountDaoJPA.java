@@ -13,9 +13,7 @@
 
 package br.com.criativasoft.opendevice.middleware.persistence.dao.jpa;
 
-import br.com.criativasoft.opendevice.restapi.model.Account;
-import br.com.criativasoft.opendevice.restapi.model.ApiKey;
-import br.com.criativasoft.opendevice.restapi.model.UserAccount;
+import br.com.criativasoft.opendevice.restapi.model.*;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
 
 import javax.persistence.TypedQuery;
@@ -28,6 +26,10 @@ import java.util.List;
  */
 public class AccountDaoJPA extends GenericJpa<Account> implements AccountDao {
 
+
+    public AccountDaoJPA() {
+        super(Account.class);
+    }
 
     @Override
     public UserAccount getUserAccountByApiKey(String key) {

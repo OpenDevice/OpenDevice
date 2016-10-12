@@ -35,7 +35,7 @@ public class Dashboard {
     private long id;
 
     @JsonIgnore
-    private String tenantID;
+    private String applicationID;
 
     private String title;
 
@@ -78,11 +78,11 @@ public class Dashboard {
         return active;
     }
 
-    public String getTenantID() {
-        return tenantID;
+    public String getApplicationID() {
+        return applicationID;
     }
 
-    public void setTenantID(String tenantID) {
-        this.tenantID = tenantID;
+    public void setApplicationID(String tenantID) {
+        this.applicationID = tenantID;
     }
 }

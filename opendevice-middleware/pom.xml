@@ -91,11 +91,32 @@
             <!--<scope>compile</scope>-->
         <!--</dependency>-->
 
+        <!--<dependency>-->
+            <!--<groupId>org.mapdb</groupId>-->
+            <!--<artifactId>mapdb</artifactId>-->
+            <!--<version>3.0.2</version>-->
+        <!--</dependency>-->
+
         <dependency>
             <groupId>org.hibernate.ogm</groupId>
             <artifactId>hibernate-ogm-neo4j</artifactId>
-            <version>5.0.1.Final</version>
+            <version>5.1.0.Alpha1</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>resteasy-client</artifactId>
+                    <groupId>org.jboss.resteasy</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>resteasy-jaxrs</artifactId>
+                    <groupId>org.jboss.resteasy</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>resteasy-jackson2-provider</artifactId>
+                    <groupId>org.jboss.resteasy</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
 
         <!--<dependency>-->
             <!--<groupId>org.neo4j</groupId>-->
@@ -109,12 +130,6 @@
             <version>1.1</version>
         </dependency>
 
-
-        <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.1-api</artifactId>
-            <version>1.0.0.Final</version>
-        </dependency>
         <!--<dependency>-->
             <!--<groupId>org.jboss.spec.javax.transaction</groupId>-->
             <!--<artifactId>jboss-transaction-api_1.2_spec</artifactId>-->

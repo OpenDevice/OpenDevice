@@ -18,7 +18,8 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-import org.neo4j.tooling.GlobalGraphOperations;
+
+import java.io.File;
 
 /**
  * TODO: Add Docs
@@ -29,12 +30,12 @@ public class ClearDatabase {
 
     public static void main(String[] args) {
 
-            final GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase("/media/ricardo/Dados/Codidos/Java/Projetos/opendevice-project/data");
+            final GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(new File("/media/ricardo/Dados/Codidos/Java/Projetos/opendevice-project/data"));
             final Transaction tx = graphDb.beginTx();
 
 
             try {
-                for (final Node node : GlobalGraphOperations.at(graphDb).getAllNodes()) {
+                for (final Node node : graphDb.getAllNodes()) {
 
                     Iterable<Relationship> relationships = node.getRelationships();
                     for (Relationship relationship : relationships) {
@@ -46,7 +47,7 @@ public class ClearDatabase {
                 }
                 tx.success();
             } finally {
-                tx.finish();
+                tx.close();
                 graphDb.shutdown();
             }
         }

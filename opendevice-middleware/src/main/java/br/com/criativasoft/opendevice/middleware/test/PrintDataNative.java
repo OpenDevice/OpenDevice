@@ -18,7 +18,8 @@ package br.com.criativasoft.opendevice.middleware.test;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
-import org.neo4j.tooling.GlobalGraphOperations;
+
+import java.io.File;
 
 /**
  * @author Ricardo JL Rufino on 01/05/15.
@@ -29,14 +30,14 @@ public class PrintDataNative {
 
         String path = "/media/Dados/Codigos/Java/Projetos/OpenDevice/Workspace/database";
         final GraphDatabaseService graphDb;
-        graphDb =  new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(path)
+        graphDb =  new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(new File(path))
                 .setConfig(GraphDatabaseSettings.allow_store_upgrade, "false")
                 .newGraphDatabase();
         final Transaction tx = graphDb.beginTx();
 
 
         try {
-            ResourceIterable<Label> labels = GlobalGraphOperations.at(graphDb).getAllLabels();
+            ResourceIterable<Label> labels = graphDb.getAllLabels();
 
 //            Result result = graphDb.execute("match (l {name: 'my node'}) return l, l.name" );
 
@@ -46,7 +47,7 @@ public class PrintDataNative {
             }
 
             System.out.println("Nodes : \n =========================");
-                for (final Node node : GlobalGraphOperations.at(graphDb).getAllNodes()) {
+                for (final Node node : graphDb.getAllNodes()) {
 
                         System.out.print(node.getId() + ": ");
                         for (final String key : node.getPropertyKeys()) {
@@ -56,7 +57,7 @@ public class PrintDataNative {
                 }
             tx.success();
         } finally {
-            tx.finish();
+            tx.close();
             graphDb.shutdown();
         }
     }

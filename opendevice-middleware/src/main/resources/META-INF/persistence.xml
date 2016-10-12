@@ -17,7 +17,7 @@
         <exclude-unlisted-classes/>
         <properties>
             <property name="hibernate.ogm.datastore.provider" value="neo4j_embedded"/>
-            <property name="hibernate.ogm.neo4j.database_path" value="/media/ricardo/Dados/Codidos/Java/Projetos/opendevice-project/data"/>
+            <property name="hibernate.ogm.neo4j.database_path" value="/media/ricardo/Dados/Codidos/Java/Projetos/opendevice-project/databases/graph.db"/>
             <property name="hibernate.jdbc.batch_size" value="1000" />
             <property name="hibernate.order_inserts" value="true"/>
         </properties>

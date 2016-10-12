@@ -13,7 +13,6 @@
 
 package br.com.criativasoft.opendevice.middleware.test;
 
-import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.metamodel.PeriodType;
 import br.com.criativasoft.opendevice.core.model.*;
@@ -37,14 +36,15 @@ import java.util.Random;
 public class PopulateDatabase {
 
     static EntityManager em;
-    static DeviceDao dao;
+    static DeviceDaoNeo4j dao;
 
     public static void main(String[] args) {
 
         // NOTE: must remove generated-value from DeviceHistory mapping config
 
         em = LocalEntityManagerFactory.getInstance().createEntityManager();
-        dao = new DeviceDaoNeo4j(em);
+        dao = new DeviceDaoNeo4j();
+        dao.setEntityManager(em);
         EntityTransaction tx = em.getTransaction();
         tx.begin();
 
@@ -53,25 +53,27 @@ public class PopulateDatabase {
             saveDash(account);
         }
 
-        saveDevices();
-
-        List<Device> devices = dao.listAll();
-        for (Device device : devices) {
-            if(device.getType() == DeviceType.ANALOG)
-                saveHistory(device.getId());
+        for (Account account : accounts) {
+            saveDevices(account);
         }
+
+//        List<Device> devices = dao.listAll();
+//        for (Device device : devices) {
+//            if(device.getType() == DeviceType.ANALOG)
+//                saveHistory(device.getId());
+//        }
 
         tx.commit();
         em.close();
     }
 
 
-    private static void saveDevices() {
-        em.persist(new Sensor(100, "Sensor 1x", DeviceType.ANALOG, DeviceCategory.GENERIC_SENSOR));
-        em.persist(new Sensor(101, "Sensor 2x", DeviceType.ANALOG, DeviceCategory.GENERIC_SENSOR));
-        em.persist(new Sensor(102, "Sensor 3x", DeviceType.ANALOG, DeviceCategory.GENERIC_SENSOR));
-        em.persist(new Device(201, "Device 4x", DeviceType.DIGITAL));
-        em.persist(new Device(202, "Device 5x", DeviceType.DIGITAL));
+    private static void saveDevices(Account account) {
+        em.persist(new Sensor(100, "Sensor 1."+account.getId(), DeviceType.ANALOG, DeviceCategory.GENERIC_SENSOR).setApplicationID(account.getUuid()));
+        em.persist(new Sensor(101, "Sensor 2."+account.getId(), DeviceType.ANALOG, DeviceCategory.GENERIC_SENSOR).setApplicationID(account.getUuid()));
+        em.persist(new Sensor(102, "Sensor 3."+account.getId(), DeviceType.ANALOG, DeviceCategory.GENERIC_SENSOR).setApplicationID(account.getUuid()));
+        em.persist(new Device(201, "Device 4."+account.getId(), DeviceType.DIGITAL).setApplicationID(account.getUuid()));
+        em.persist(new Device(202, "Device 5."+account.getId(), DeviceType.DIGITAL).setApplicationID(account.getUuid()));
     }
 
     private static List<Account> saveUsers() {
@@ -84,6 +86,7 @@ public class PopulateDatabase {
 
     private static Account saveUser(String u, String p, AccountType type) {
 
+        System.out.println("Saving user: "+ u);
         User user = new User();
         user.setUsername(u);
         user.setPassword(p);
@@ -105,18 +108,21 @@ public class PopulateDatabase {
         uaccount.getKeys().add(key);
         em.persist(key);
         em.persist(account);
+
+        System.out.println("AccountUID :"  + account.getUuid());
+
         return account;
     }
 
     private static void saveDash(Account account){
         Dashboard dashboard = new Dashboard();
         dashboard.setTitle("Dash 1 Acc:" + account.getId());
-        dashboard.setTenantID(account.getUuid());
+        dashboard.setApplicationID(account.getUuid());
         em.persist(dashboard);
 
         dashboard = new Dashboard();
         dashboard.setTitle("Dash 2 Acc:" + account.getId());
-        dashboard.setTenantID(account.getUuid());
+        dashboard.setApplicationID(account.getUuid());
         em.persist(dashboard);
     }
 
@@ -127,7 +133,7 @@ public class PopulateDatabase {
         }
     }
 
-    private static void saveHistory(int deviceUID){
+    private static void saveHistory(long deviceID){
         int batchSize = 1000;
         int interval = 30;
         int months = 2;
@@ -155,7 +161,7 @@ public class PopulateDatabase {
             history.setId(i + lastID); // CHANGE TO NEXT SEQUENCE
             history.setValue(random.nextInt(valueMax));
             history.setTimestamp(calendar.getTime().getTime());
-            history.setDeviceID(deviceUID);
+            history.setDeviceID(deviceID);
 
             System.out.println(i + ": " + calendar.getTime());
             em.persist(history);

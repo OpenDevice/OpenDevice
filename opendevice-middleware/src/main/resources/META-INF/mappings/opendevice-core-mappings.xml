@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
-                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
-        http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd" version="2.1">
+<entity-mappings
+        xmlns="http://java.sun.com/xml/ns/persistence/orm"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
+        version="2.0">
+
     <description>OpenDevice Core Mapping</description>
     <entity name="Device" class="br.com.criativasoft.opendevice.core.model.Device" access="FIELD">
         <inheritance/>
         <discriminator-value>Device</discriminator-value>
         <discriminator-column name="classType"/>
         <attributes>
-            <id name="uid" />
+            <id name="id">
+                <generated-value strategy="AUTO" />
+            </id>
             <one-to-one name="category" fetch="EAGER" >
                 <join-column name="categoryID"  />
                 <cascade><cascade-persist/></cascade>
@@ -28,7 +32,9 @@
     </entity>
     <entity name="DeviceHistory" class="br.com.criativasoft.opendevice.core.model.DeviceHistory" access="FIELD">
         <attributes>
-            <id name="id" />
+            <id name="id">
+                <generated-value strategy="AUTO" />
+            </id>
         </attributes>
     </entity>
 </entity-mappings>

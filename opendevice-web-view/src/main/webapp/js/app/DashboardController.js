@@ -648,6 +648,7 @@ pkg.controller('NewItemController', ['$scope','$timeout', 'DashboardRest', funct
     this.current = defaults;
 
     this.deviceIcons = [];
+    this.devices = [];
 
     // ====================================
     //  Public
@@ -710,6 +711,8 @@ pkg.controller('NewItemController', ['$scope','$timeout', 'DashboardRest', funct
         console.log("Open Dialog", data);
 
         _this.current = angular.copy(data);
+
+        _this.devices = ODev.getDevices();
 
         _this.selectedType = {id : data.type}; // hack for select
 

@@ -232,7 +232,7 @@
                             <div class="col-sm-10">
                                 <ui-select multiple ng-model="controller.current.monitoredDevices" theme="select2"  sortable="true" close-on-select="true" style="width: 400px;">
                                     <ui-select-match placeholder="Select device...">${$item.name}</ui-select-match>
-                                    <ui-select-choices repeat="device.id as device in ctrl.devices | propsFilter: {name: $select.search}">
+                                    <ui-select-choices repeat="device.id as device in controller.devices | propsFilter: {name: $select.search}">
                                         <div ng-bind-html="device.name | highlight: $select.search"></div></ui-select-choices>
                                 </ui-select>
                             </div>

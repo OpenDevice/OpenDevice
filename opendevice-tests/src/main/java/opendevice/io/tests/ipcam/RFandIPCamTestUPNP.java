@@ -16,8 +16,8 @@ package opendevice.io.tests.ipcam;
 import br.com.criativasoft.opendevice.connection.IWSServerConnection;
 import br.com.criativasoft.opendevice.core.LocalDeviceManager;
 import br.com.criativasoft.opendevice.core.connection.Connections;
+import br.com.criativasoft.opendevice.core.listener.OnDeviceChangeListener;
 import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.DeviceListener;
 import br.com.criativasoft.opendevice.core.model.Sensor;
 import opendevice.io.tests.MediaCenterDevice;
 
@@ -63,7 +63,7 @@ public class RFandIPCamTestUPNP extends LocalDeviceManager {
         clientThread.setDaemon(false);
         clientThread.start();
 
-        rf.onChange(new DeviceListener() {
+        rf.onChange(new OnDeviceChangeListener() {
             @Override
             public void onDeviceChanged(Device device) {
                 System.out.println("RF RECEIVED");

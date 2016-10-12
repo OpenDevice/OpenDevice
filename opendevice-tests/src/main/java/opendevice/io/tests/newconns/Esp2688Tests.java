@@ -12,8 +12,8 @@
  */
 
 package opendevice.io.tests.newconns;import br.com.criativasoft.opendevice.core.LocalDeviceManager;
+import br.com.criativasoft.opendevice.core.listener.OnDeviceChangeListener;
 import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.DeviceListener;
 import br.com.criativasoft.opendevice.core.model.Sensor;
 
 /**
@@ -34,7 +34,7 @@ public class Esp2688Tests extends LocalDeviceManager{
         addInput(in.rest(8181));
         connect(out.tcp("192.168.0.18:8182"));
 
-        btn.onChange(new DeviceListener() {
+        btn.onChange(new OnDeviceChangeListener() {
             @Override
             public void onDeviceChanged(Device device) {
                 if (btn.isON()) {

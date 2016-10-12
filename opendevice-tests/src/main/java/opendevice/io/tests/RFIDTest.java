@@ -14,8 +14,8 @@
 package opendevice.io.tests;
 
 import br.com.criativasoft.opendevice.core.LocalDeviceManager;
+import br.com.criativasoft.opendevice.core.listener.OnDeviceChangeListener;
 import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.DeviceListener;
 import br.com.criativasoft.opendevice.core.model.Sensor;
 
 import java.io.IOException;
@@ -34,8 +34,7 @@ public class RFIDTest extends LocalDeviceManager {
 
         Sensor rfid = new Sensor(1, Device.ANALOG);
 
-        rfid.onChange(new DeviceListener() {
-            @Override
+        rfid.onChange(new OnDeviceChangeListener() {
             public void onDeviceChanged(Device device) {
                 System.out.println(device.getValue());
             }

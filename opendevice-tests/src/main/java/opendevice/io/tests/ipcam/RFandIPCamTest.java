@@ -22,8 +22,9 @@ import br.com.criativasoft.opendevice.core.LocalDeviceManager;
 import br.com.criativasoft.opendevice.core.command.ActionCommand;
 import br.com.criativasoft.opendevice.core.command.GetDevicesRequest;
 import br.com.criativasoft.opendevice.core.connection.Connections;
+import br.com.criativasoft.opendevice.core.listener.DeviceListener;
+import br.com.criativasoft.opendevice.core.listener.OnDeviceChangeListener;
 import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.DeviceListener;
 import br.com.criativasoft.opendevice.core.model.Sensor;
 import br.com.criativasoft.opendevice.core.model.test.*;
 import org.slf4j.Logger;
@@ -55,7 +56,7 @@ public class RFandIPCamTest extends LocalDeviceManager {
 
         final Device test = new Sensor(2, Device.NUMERIC);
         test.setName("test Sensor");
-        test.onChange(new DeviceListener() {
+        test.onChange(new OnDeviceChangeListener() {
             @Override
             public void onDeviceChanged(Device device) {
                 log.debug("teste ok ... value: " + device.getValue());
@@ -113,7 +114,7 @@ public class RFandIPCamTest extends LocalDeviceManager {
             @Override
             public void onExecuteAction(GenericDevice device, ActionDef action, List<Object> values) {
                 try {
-                    ipCamConnection.send(new ActionCommand(device.getId(), action.getName(), new ArrayList<Object>(values)));
+                    ipCamConnection.send(new ActionCommand(device.getUid(), action.getName(), new ArrayList<Object>(values)));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -138,6 +139,11 @@ public class RFandIPCamTest extends LocalDeviceManager {
         });
 
         addListener(new DeviceListener() {
+            @Override
+            public void onDeviceRegistred(Device device) {
+
+            }
+
             @Override
             public void onDeviceChanged(Device device) {
                 if (device == rf && rf.getValue() > 0) {

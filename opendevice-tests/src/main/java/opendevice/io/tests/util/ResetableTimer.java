@@ -13,6 +13,9 @@
 
 package opendevice.io.tests.util;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class ResetableTimer extends Timer
 {
     private Runnable  task;

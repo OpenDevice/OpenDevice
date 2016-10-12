@@ -76,8 +76,8 @@ public class ApiKey {
     }
 
     @PrePersist
-    public void generateKey(){
-        this.key = UUID.randomUUID().toString();
+    protected void generateKey(){
+        if(this.key == null) this.key = UUID.randomUUID().toString();
     }
 
 }

@@ -18,6 +18,7 @@ import br.com.criativasoft.opendevice.connection.ServerConnection;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.command.*;
+import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceVO;
 import br.com.criativasoft.opendevice.core.model.Device;
@@ -27,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -52,10 +55,10 @@ public class DeviceRest {
     private DeviceManager manager;
 
     @Inject
-    private ServerConnection connection;
+    private DeviceDao dao;
 
-    @HeaderParam("X-AppID")
-    private String applicationID;
+    @Inject
+    private ServerConnection connection;
 
     @GET
     @Path("/{uid}/value/{value}")
@@ -160,6 +163,8 @@ public class DeviceRest {
     }
 
     private String getApplicationID(){
+
+        String applicationID = TenantProvider.getCurrentID();
 
         if(applicationID != null && applicationID.length() != 0) return applicationID;
 

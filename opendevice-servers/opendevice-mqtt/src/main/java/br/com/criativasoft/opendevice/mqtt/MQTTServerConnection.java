@@ -24,6 +24,7 @@ import br.com.criativasoft.opendevice.connection.serialize.MessageSerializer;
 import br.com.criativasoft.opendevice.core.BaseDeviceManager;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.TenantProvider;
+import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.GetDevicesRequest;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.core.util.StringUtils;
@@ -197,7 +198,6 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
             // Received from Devices : /appID/out
             if(msg.getTopicName().contains(appID + "/out")){
 
-
                 MQTTResource connection = (MQTTResource) manager.findConnection(connUID.replaceAll("/out/", "/in/"));
 
                 if(connection == null){
@@ -207,8 +207,11 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
 
                 MessageSerializer serializer = getSerializer();
 
-                Message message = serializer.parse(msg.getPayload().array()); // TODO May be delay to send to clients (send direct ?).
-                message.setConnectionUUID(connection.getUID());
+                Message message = serializer.parse(msg.getPayload().array()); // TODO May be delay to send to clients (send direct json ?).
+                if(message instanceof Command) {
+                    message.setConnectionUUID(connection.getUID());
+                    ((Command) message).setApplicationID(appID);
+                }
 
                 log.debug("Received command: " + message);
 

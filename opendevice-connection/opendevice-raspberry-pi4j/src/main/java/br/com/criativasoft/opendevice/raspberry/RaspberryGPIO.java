@@ -120,7 +120,7 @@ public class RaspberryGPIO extends AbstractConnection implements EmbeddedGPIO {
     @Override
     public void attach(Device device){
 
-        if(findPinForDevice(device.getId()) != null) return; // exist !
+        if(findPinForDevice(device.getUid()) != null) return; // exist !
 
         if(device.getGpio() ==  null) throw new IllegalStateException("Device doesn't have gpio config");
 

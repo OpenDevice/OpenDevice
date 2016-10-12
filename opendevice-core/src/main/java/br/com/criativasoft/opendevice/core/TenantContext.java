@@ -6,29 +6,29 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- * - Ricardo JL Rufino - Initial API and Implementation
+ *  Contributors:
+ *  Ricardo JL Rufino - Initial API and Implementation
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.core.dao;
+package br.com.criativasoft.opendevice.core;
 
-import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.DeviceCategory;
-import br.com.criativasoft.opendevice.core.model.DeviceHistory;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
+ * TenantContext acts as a kind of cache data for each client / application / tenant
  * @author Ricardo JL Rufino
- * @date 27/08/14.
+ * @date 12/10/16
  */
-public interface DeviceDao extends Dao<Device> {
+public interface TenantContext {
 
-    Device getByUID(int uid);
+    public Collection<Device> getDevices();
 
-    DeviceCategory getCategoryByCode(int code);
+    public void addDevice(Device device);
 
-    List<DeviceHistory> getDeviceHistory(DeviceHistoryQuery query);
+    public Device getDeviceByUID(int uid);
+
+    public String getId();
 }

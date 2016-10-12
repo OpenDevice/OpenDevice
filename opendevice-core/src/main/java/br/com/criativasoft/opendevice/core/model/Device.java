@@ -50,12 +50,14 @@ public class Device implements Serializable {
     public static final DeviceType NUMERIC = DeviceType.NUMERIC;
     public static final DeviceType CHARACTER = DeviceType.CHARACTER;
 
+    private long id; // Database ID
 	private int uid; // Logic level user ID.
 	private String name;
 	private DeviceType type;
 	private DeviceCategory category = DeviceCategory.GENERIC;
 	private long lastUpdate;
 	private Date dateCreated;
+    private String applicationID;
 	
 	private long value = VALUE_LOW;
 
@@ -127,16 +129,15 @@ public class Device implements Serializable {
     }
 
 
+    protected void setId(long id) {
+        this.id = id;
+    }
 
-	public void setId(int id) {
-		this.uid = id;
-	}
-	
-	public int getId() {
-		return uid;
-	}
-	
-	public int getUid() {
+    public long getId() {
+        return id;
+    }
+
+    public int getUid() {
 		return uid;
 	}
 
@@ -277,6 +278,15 @@ public class Device implements Serializable {
             if(log.isDebugEnabled()) log.debug("None DeviceManager registered for this device: " + this.toString());
         }
 
+    }
+
+    public String getApplicationID() {
+        return applicationID;
+    }
+
+    public Device setApplicationID(String applicationID) {
+        this.applicationID = applicationID;
+        return this;
     }
 
     @Override

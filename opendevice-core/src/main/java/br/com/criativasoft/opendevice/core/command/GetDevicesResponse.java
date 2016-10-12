@@ -81,7 +81,7 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
         for (Device device : devices) {
             sb.append("[");
             sb.append(device.getName()).append(",");
-            sb.append(device.getId()).append(",");
+            sb.append(device.getUid()).append(",");
             if(device.getGpio() != null){
                 sb.append(device.getGpio().getPin()).append(",");
             }else {

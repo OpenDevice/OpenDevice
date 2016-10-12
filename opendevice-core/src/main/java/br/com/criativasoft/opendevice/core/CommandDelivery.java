@@ -19,6 +19,7 @@ import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.CommandStatus;
 import br.com.criativasoft.opendevice.core.command.ResponseCommand;
 import br.com.criativasoft.opendevice.core.connection.MultipleConnection;
+import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +64,13 @@ public class CommandDelivery implements ConnectionListener {
 	public void sendTo(Command command, DeviceConnection connection) throws IOException {
 
 		command.setStatus(CommandStatus.DELIVERED);
+
+        if(OpenDeviceConfig.get().isTenantsEnabled() && ! (connection instanceof MultipleConnection)){
+            if(!"*".equals(connection.getApplicationID()) && ! command.getApplicationID().equals(connection.getApplicationID())){
+                log.trace("Skipping command for connection : " + connection.getApplicationID());
+                return;
+            }
+        }
 
         if(connection instanceof MultipleConnection){
             Set<DeviceConnection> connections = ((MultipleConnection) connection).getConnections();

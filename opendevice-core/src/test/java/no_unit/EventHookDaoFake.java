@@ -29,7 +29,7 @@ public class EventHookDaoFake implements EventHookDao {
     }
 
     @Override
-    public List<EventHook> listByDeviceID(int id) {
+    public List<EventHook> listByDeviceUID(int id) {
         return Arrays.asList(hook);
     }
 

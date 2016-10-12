@@ -17,6 +17,7 @@ import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.model.Device;
+import br.com.criativasoft.opendevice.core.model.DeviceCategory;
 import br.com.criativasoft.opendevice.core.model.DeviceHistory;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -36,6 +37,11 @@ public class DeviceDaoMemory implements DeviceDao {
 
         return deviceMap.get(TenantProvider.getCurrentID());
 
+    }
+
+    @Override
+    public DeviceCategory getCategoryByCode(int code) {
+        throw new IllegalStateException("Not implemented");
     }
 
     @Override

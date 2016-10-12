@@ -121,7 +121,7 @@ public class EventHookMemoryDao implements EventHookDao {
     }
 
     @Override
-    public List<EventHook> listByDeviceID(int id) {
+    public List<EventHook> listByDeviceUID(int id) {
 
         List<EventHook> foundList = new LinkedList<EventHook>();
 

@@ -23,12 +23,17 @@ public class LocalTenantProvider extends TenantProvider {
     private static String tenantID;
 
     @Override
-    public void setTenantID(String appID) {
+    public synchronized void setTenantID(String appID) {
         this.tenantID = appID;
     }
 
     @Override
-    public String getTenantID() {
+    public synchronized String getTenantID() {
         return tenantID;
+    }
+
+    @Override
+    protected TenantContext createContext(String id) {
+        return new LocalTenantContext(id);
     }
 }

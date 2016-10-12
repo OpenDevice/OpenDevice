@@ -20,9 +20,10 @@ package br.com.criativasoft.opendevice.core;
  */
 public class ThreadLocalTenantProvider extends TenantProvider {
 
+
     private static InheritableThreadLocal<String> threadLocal = new InheritableThreadLocal<String>();
 
-    public void setTenantID(String appID){
+    public void  setTenantID(String appID){
         threadLocal.set(appID);
     }
 
@@ -30,4 +31,8 @@ public class ThreadLocalTenantProvider extends TenantProvider {
         return threadLocal.get();
     }
 
+    @Override
+    protected TenantContext createContext(String id) {
+        return new LocalTenantContext(id);
+    }
 }

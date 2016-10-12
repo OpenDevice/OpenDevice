@@ -31,7 +31,6 @@ public class DeviceCategoryRegistry {
         this.categories.add(category);
     }
 
-
     public void add(Class<? extends DeviceCategory> klass) {
         try {
             DeviceCategory category = klass.newInstance();
@@ -61,5 +60,18 @@ public class DeviceCategoryRegistry {
         return null;
 
     }
+
+    public DeviceCategory getCategory(int code) {
+
+        for (DeviceCategory category : categories){
+            if(category.getCode() == code){
+                return category;
+            }
+        }
+
+        return null;
+
+    }
+
 
 }

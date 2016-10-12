@@ -63,7 +63,7 @@ public class EventHookManager implements DeviceListener {
     @Override
     public void onDeviceChanged(Device device) {
 
-        List<EventHook> hooks = getDao().listByDeviceID(device.getId());
+        List<EventHook> hooks = getDao().listByDeviceUID(device.getUid());
 
         EventContext context = new EventContext();
         context.put("device", device);

@@ -15,6 +15,9 @@
 
 package br.com.criativasoft.opendevice.core;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * TenantProvider
  *
@@ -25,6 +28,58 @@ public abstract class TenantProvider {
     private static TenantProvider provider = new LocalTenantProvider();
 
     public static final String HTTP_HEADER_KEY = "AuthToken";
+
+    // ============================
+    // Private
+    // ============================
+
+    protected Map<String, TenantContext> tenants = new ConcurrentHashMap<String, TenantContext>();
+
+
+    // ============================
+    // Abstract
+    // ============================
+
+
+    /**
+     * Create a new {@link TenantContext} with provied ID
+     */
+    protected abstract TenantContext createContext(String id);
+
+    public abstract void  setTenantID(String appID);
+
+    public abstract String getTenantID();
+
+
+    // ============================
+    // Public
+    // ============================
+
+    public boolean exist(String tenantID) {
+        return tenants.containsKey(tenantID);
+    }
+
+    /**
+     * Create a new {@link TenantContext} with provied ID if not exist
+     */
+    public TenantContext addNewContext(String id){
+        if(!exist(id)){
+            TenantContext context = createContext(id);
+            tenants.put(id,context);
+            return context;
+        }else{
+            throw new IllegalArgumentException("Context with ID already exists");
+        }
+    };
+
+
+    public TenantContext getTenantContext() {
+        return tenants.get(getTenantID());
+    }
+
+    // ============================
+    // Static
+    // ============================
 
     public static void setProvider(TenantProvider provider) {
         TenantProvider.provider = provider;
@@ -38,7 +93,7 @@ public abstract class TenantProvider {
         return provider.getTenantID();
     }
 
-    public abstract void setTenantID(String appID);
+    /** Get current tenant context */
+    public static TenantContext getCurerntContext(){ return provider.getTenantContext(); };
 
-    public abstract String getTenantID();
 }

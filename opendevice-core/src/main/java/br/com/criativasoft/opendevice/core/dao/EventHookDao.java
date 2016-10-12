@@ -25,5 +25,5 @@ import java.util.List;
  */
 public interface EventHookDao extends Dao<EventHook> {
 
-    List<EventHook> listByDeviceID(int id);
+    List<EventHook> listByDeviceUID(int uid);
 }

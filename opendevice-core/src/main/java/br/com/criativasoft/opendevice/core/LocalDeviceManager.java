@@ -104,7 +104,7 @@ public class LocalDeviceManager extends BaseDeviceManager {
         Set<Device> devices = new LinkedHashSet<Device>();
         Collection<Device> dblist = super.getDevices();
 
-        devices.addAll(runtimeDevices);
+        devices.addAll(runtimeDevices); // TODO
         devices.addAll(dblist); // TODO: this must be enabled (comentado devido a duplicidade nos testes)
 
         return devices;

@@ -33,6 +33,7 @@ import io.moquette.interception.InterceptHandler;
 import io.moquette.interception.messages.*;
 import io.moquette.server.config.IConfig;
 import io.moquette.server.config.MemoryConfig;
+import io.moquette.spi.security.IAuthenticator;
 import io.moquette.spi.security.ISslContextCreator;
 import io.netty.handler.ssl.JdkSslServerContext;
 import io.netty.handler.ssl.SslContext;
@@ -119,8 +120,19 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
             server = new MoquetteServer(config);
             server.setHandlers(asList(serverListener));
 
+
             // SSL Support
             final OpenDeviceConfig oconfig = OpenDeviceConfig.get();
+
+            if(oconfig.isAuthRequired() || oconfig.isTenantsEnabled()){
+                server.setAuthenticator(new IAuthenticator() {
+                    @Override
+                    public boolean checkValid(String username, byte[] password) {
+                        return TenantProvider.getTenantProvider().exist(username);
+                    }
+                });
+            }
+
             String certificate = oconfig.getCertificateFile();
             if(!StringUtils.isEmpty(certificate)){
 

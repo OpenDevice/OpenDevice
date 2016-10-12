@@ -14,6 +14,7 @@
 package br.com.criativasoft.opendevice.middleware.persistence;
 
 import br.com.criativasoft.opendevice.core.extension.PersistenceExtension;
+import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
@@ -55,6 +56,7 @@ public class LocalEntityManagerFactory implements Provider<EntityManagerFactory>
             log.info("Additional persistence classes: " + persistentClasses);
 
             properties.put(org.hibernate.jpa.AvailableSettings.LOADED_CLASSES, persistentClasses);
+            properties.put("hibernate.ogm.neo4j.database_path", OpenDeviceConfig.get().getDatabasePath());
 
             emf = Persistence.createEntityManagerFactory("neo4j_pu", properties);
             Runtime.getRuntime().addShutdownHook(new Thread() {

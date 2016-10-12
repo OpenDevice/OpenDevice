@@ -12,7 +12,7 @@ debug)
 java -Dapp.port=8181 -Dapp.dir=web -Dapp.mode=remote -Xdebug -Xrunjdwp:transport=dt_socket,address=8998,server=y -cp "lib/*" -jar opendevice-middleware.jar
 ;;
 compile)
-mvn package -P standalone -DskipTests
+mvn -o package -P standalone -DskipTests
 ;;
 
 *)

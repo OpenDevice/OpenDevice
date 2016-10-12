@@ -36,6 +36,8 @@ public class OpenDeviceConfig {
 
     private boolean databaseEnabled = false;
 
+    private String databasePath = "/data";
+
     private boolean mqttEnabled = true;
 
     private boolean authRequired = false;
@@ -138,5 +140,13 @@ public class OpenDeviceConfig {
 
     public boolean isMqttEnabled() {
         return mqttEnabled;
+    }
+
+    public void setDatabasePath(String databasePath) {
+        this.databasePath = databasePath;
+    }
+
+    public String getDatabasePath() {
+        return databasePath;
     }
 }

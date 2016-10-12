@@ -83,6 +83,7 @@ public class Main extends LocalDeviceManager {
 
         // TODO: use EntityManager by injection
         if(config.isDatabaseEnabled()){
+            log.info("Using database: " + config.getDatabasePath());
             entityManager = LocalEntityManagerFactory.getInstance().createEntityManager();
             HibernateProvider.setInstance(entityManager);
         }

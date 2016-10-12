@@ -70,11 +70,14 @@ public abstract class TenantProvider {
         }else{
             throw new IllegalArgumentException("Context with ID already exists");
         }
-    };
-
+    }
 
     public TenantContext getTenantContext() {
         return tenants.get(getTenantID());
+    }
+
+    public static TenantProvider getTenantProvider() {
+        return provider;
     }
 
     // ============================

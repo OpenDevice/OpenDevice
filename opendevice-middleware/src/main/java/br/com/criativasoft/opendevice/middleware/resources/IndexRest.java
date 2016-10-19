@@ -24,7 +24,6 @@ import org.atmosphere.cpr.FrameworkConfig;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -50,7 +49,7 @@ public class IndexRest {
 
     @GET
     @Produces({MediaType.TEXT_HTML})
-    public InputStream index(@PathParam("id") long id, @Context AtmosphereResource res) throws Exception {
+    public InputStream index(@Context AtmosphereResource res) throws Exception {
 
         AtmosphereRequest request = res.getRequest();
         Subject subject = (Subject) request.getAttribute(FrameworkConfig.SECURITY_SUBJECT);
@@ -83,6 +82,13 @@ public class IndexRest {
         }
 
 
+    }
+
+    @GET
+    @Path("/admin")
+    @Produces({MediaType.TEXT_HTML})
+    public InputStream admin( @Context AtmosphereResource res) throws Exception {
+        return index(res);
     }
 
 

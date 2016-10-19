@@ -22,7 +22,7 @@ public enum AccountType {
     USER;
 
     // For Rest
-    public static class Values {
+    public static class ROLES {
         public static final String ACCOUNT_MANAGER = "ACCOUNT_MANAGER";
         public static final String USER = "USER";
     }

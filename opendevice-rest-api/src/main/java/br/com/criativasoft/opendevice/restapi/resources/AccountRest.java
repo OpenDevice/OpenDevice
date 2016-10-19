@@ -65,7 +65,7 @@ public class AccountRest {
 
     @GET @Path("keys")
     @Produces(MediaType.APPLICATION_JSON)
-    @RequiresRoles(AccountType.Values.ACCOUNT_MANAGER)
+    @RequiresRoles(AccountType.ROLES.ACCOUNT_MANAGER)
     public List<ApiKey> listKeys(@Auth Subject subject) {
 
         AccountPrincipal principal = (AccountPrincipal) subject.getPrincipal();
@@ -77,7 +77,7 @@ public class AccountRest {
 
     @GET @Path("users")
     @Produces(MediaType.APPLICATION_JSON)
-    @RequiresRoles(AccountType.Values.ACCOUNT_MANAGER)
+    @RequiresRoles(AccountType.ROLES.ACCOUNT_MANAGER)
     public List<User> listUsers() {
 
         String id = TenantProvider.getCurrentID();
@@ -89,7 +89,7 @@ public class AccountRest {
 
     @POST @Path("users")
     @Produces(MediaType.APPLICATION_JSON)
-    @RequiresRoles(AccountType.Values.ACCOUNT_MANAGER)
+    @RequiresRoles(AccountType.ROLES.ACCOUNT_MANAGER)
     public User addUser(User user, @Auth Subject subject) {
 
         AccountPrincipal principal = (AccountPrincipal) subject.getPrincipal();
@@ -124,7 +124,7 @@ public class AccountRest {
 
     @DELETE @Path("users/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    @RequiresRoles(AccountType.Values.ACCOUNT_MANAGER)
+    @RequiresRoles(AccountType.ROLES.ACCOUNT_MANAGER)
     public Response deleteUser(@PathParam("id") long id, @Auth Subject subject) {
 
         AccountPrincipal principal = (AccountPrincipal) subject.getPrincipal();

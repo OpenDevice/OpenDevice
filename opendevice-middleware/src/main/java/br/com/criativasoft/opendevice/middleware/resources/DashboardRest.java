@@ -41,7 +41,7 @@ import java.util.Set;
  *
  * @author Ricardo JL Rufino on 30/04/15.
  */
-@Path("dashboards")
+@Path("/middleware/dashboards")
 @RequiresAuthentication
 public class DashboardRest {
 

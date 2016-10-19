@@ -55,15 +55,19 @@ public class SimulationTask implements Runnable {
 
         while(!Thread.interrupted()){
 
-            if(device.getType() == Device.DIGITAL){
-                device.toggle();
-            }
-            if(device.getType() == Device.ANALOG){
-                device.setValue(random.nextInt(1000));
+            try {
+                if (device.getType() == Device.DIGITAL) {
+                    device.toggle();
+                }
+                if (device.getType() == Device.ANALOG) {
+                    device.setValue(random.nextInt(1000));
+                }
+            }catch (Exception e){
+                e.printStackTrace();
             }
 
             try {
-                sleep(interval * 1000);
+                sleep(interval);
             } catch (InterruptedException e) {
                 log.info("InterruptedException - Simulation : " + device);
                 break;

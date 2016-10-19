@@ -21,10 +21,15 @@ import br.com.criativasoft.opendevice.core.metamodel.PeriodType;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceCategory;
 import br.com.criativasoft.opendevice.core.model.DeviceHistory;
+import br.com.criativasoft.opendevice.middleware.persistence.HibernateProvider;
 
+import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * TODO: Add docs.
@@ -122,9 +127,12 @@ public abstract class DeviceDaoJPA extends GenericJpa<Device> implements DeviceD
 
     @Override
     public void persistHistory(DeviceHistory history) {
-
         em().persist(history);
+    }
 
+    @Override
+    public EntityManager em() {
+        return HibernateProvider.getInstance();
     }
 }
 

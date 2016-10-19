@@ -24,6 +24,7 @@ import br.com.criativasoft.opendevice.engine.js.OpenDeviceJSEngine;
 import br.com.criativasoft.opendevice.middleware.config.DependencyConfig;
 import br.com.criativasoft.opendevice.middleware.persistence.HibernateProvider;
 import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
+import br.com.criativasoft.opendevice.middleware.resources.ConnectionsRest;
 import br.com.criativasoft.opendevice.middleware.resources.DashboardRest;
 import br.com.criativasoft.opendevice.middleware.resources.IndexRest;
 import br.com.criativasoft.opendevice.middleware.test.TestRest;
@@ -36,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.script.SimpleBindings;
 import java.io.*;
@@ -103,6 +103,7 @@ public class Main extends LocalDeviceManager {
         // ================
         webscoket.addResource(IndexRest.class);
         webscoket.addResource(TestRest.class);
+        webscoket.addResource(ConnectionsRest.class);
 
         if(config.isDatabaseEnabled()){
             webscoket.addResource(DashboardRest.class);
@@ -164,17 +165,21 @@ public class Main extends LocalDeviceManager {
     }
 
     @Override
-    public void transactionBegin() {
+    public boolean transactionBegin() {
 
-        EntityManagerFactory emf = LocalEntityManagerFactory.getInstance();
+        if(!entityManager.isOpen()){
+            entityManager = LocalEntityManagerFactory.getInstance().createEntityManager();
+        }
 
-        EntityManager em = emf.createEntityManager();
+        HibernateProvider.setInstance(entityManager);
 
-        HibernateProvider.setInstance(em);
+        EntityTransaction tx = entityManager.getTransaction();
 
-        EntityTransaction tx = em.getTransaction();
+        if(tx.isActive()) return true;
 
         tx.begin();
+
+        return false;
 
     }
 
@@ -193,7 +198,6 @@ public class Main extends LocalDeviceManager {
             if ( local != null && local.isActive() ) local.rollback();
             throw e; // or display error message
         } finally {
-            em.close();
         }
 
     }

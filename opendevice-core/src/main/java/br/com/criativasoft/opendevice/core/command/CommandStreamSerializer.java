@@ -30,6 +30,12 @@ public class CommandStreamSerializer implements MessageSerializer{
 
     private static Logger log = LoggerFactory.getLogger(CommandStreamSerializer.class);
 
+	private boolean sendTerminator = true;
+
+	public void setSendTerminator(boolean sendTerminator) {
+		this.sendTerminator = sendTerminator;
+	}
+
 	@Override
 	public Message parse(byte[] pkg) {
 
@@ -190,7 +196,7 @@ public class CommandStreamSerializer implements MessageSerializer{
             sb.append(0);       
         }
 		
-		sb.append(Command.ACK_FLAG);
+		if(sendTerminator) sb.append(Command.ACK_FLAG);
 		
 		if(log.isTraceEnabled()) log.trace("serializing: " + sb);
 		

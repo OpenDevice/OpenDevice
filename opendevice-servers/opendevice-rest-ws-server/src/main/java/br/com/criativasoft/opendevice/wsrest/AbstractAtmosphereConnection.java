@@ -22,6 +22,8 @@ import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.CommandType;
 import br.com.criativasoft.opendevice.core.command.ResponseCommand;
+import br.com.criativasoft.opendevice.core.connection.ConnectionInfo;
+import br.com.criativasoft.opendevice.core.connection.ConnectionType;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.core.util.StringUtils;
 import br.com.criativasoft.opendevice.restapi.WaitResponseListener;
@@ -350,6 +352,35 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
         }
     }
 
+    public List<ConnectionInfo> getConnections(){
+        String appID = TenantProvider.getCurrentID();
+        AtmosphereConfig atmosphereConfig = server.framework().getAtmosphereConfig();
+
+        Collection<Broadcaster> broadcasters = server.framework().getBroadcasterFactory().lookupAll();
+
+        List<ConnectionInfo> resources = new LinkedList();
+
+        for (Broadcaster broadcaster : broadcasters) {
+            Collection<AtmosphereResource> atmosphereResources = broadcaster.getAtmosphereResources();
+            for (AtmosphereResource atmosphereResource : atmosphereResources) {
+                Object message = atmosphereResource.getAtmosphereResourceEvent().getMessage();
+                AtmosphereRequest request = atmosphereResource.getRequest();
+                if(request.getPathInfo().contains("/ws/device")){
+                    Object lastConnectionDate = request.getAttribute("lastConnectionDate");
+                    ConnectionInfo info = new ConnectionInfo();
+                    info.setHost(request.getRemoteHost()+":"+ request.getRemotePort());
+                    info.setType(ConnectionType.WEBSOCKET.name());
+                    info.setApplicationID(appID);
+                    info.setUuid(atmosphereResource.uuid());
+                    info.setLastConnection((lastConnectionDate != null ? (Date) lastConnectionDate : null));
+                    info.setFistConnection((lastConnectionDate != null ? (Date) lastConnectionDate : null));
+                    resources.add(info);
+                }
+            }
+        }
+
+        return resources;
+    }
 
     public List<String> getWebresources() {
         return webresources;

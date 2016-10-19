@@ -41,6 +41,10 @@ public class GuiceInjectProvider implements InjectableProvider<Inject, Type> {
         GuiceInjectProvider.injector = injector;
     }
 
+    public static Injector getInjector() {
+        return injector;
+    }
+
     @Override
     public Injectable getInjectable(final ComponentContext context, final Inject annotation, final Type targetClass) {
 

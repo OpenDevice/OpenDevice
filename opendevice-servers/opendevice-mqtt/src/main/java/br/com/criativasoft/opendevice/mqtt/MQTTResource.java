@@ -36,10 +36,12 @@ public class MQTTResource extends AbstractConnection {
 
     private String topic;
     private MoquetteServer server;
+    private String deviceName;
 
-    public MQTTResource( MoquetteServer server, String topic) {
+    public MQTTResource(MoquetteServer server, String topic, String name) {
         this.server = server;
         this.topic = topic;
+        this.deviceName = name;
         setStatus(ConnectionStatus.CONNECTED);
     }
 
@@ -63,5 +65,13 @@ public class MQTTResource extends AbstractConnection {
         publishMessage.setQos(AbstractMessage.QOSType.MOST_ONE);
         server.internalPublish(publishMessage);
 
+    }
+
+    /**
+     * Return the name of connected device.
+     * @return
+     */
+    public String getDeviceName() {
+        return deviceName;
     }
 }

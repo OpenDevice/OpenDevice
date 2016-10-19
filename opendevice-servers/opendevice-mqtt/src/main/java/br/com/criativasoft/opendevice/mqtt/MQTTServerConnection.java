@@ -191,8 +191,20 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
         public void onDisconnect(InterceptDisconnectMessage msg) {
             log.debug("onDisconnect: {}", msg.getClientID());
 
-            String appID = msg.getClientID().split("/")[1];
+            String appID = msg.getClientID().split("/")[0];
+            String moduleName = msg.getClientID().split("/")[1];
+
             TenantProvider.setCurrentID(appID);
+
+            BaseDeviceManager manager = (BaseDeviceManager) MQTTServerConnection.this.manager;
+
+            MQTTResource resource = (MQTTResource) manager.findConnection(msg.getClientID());
+
+            if(resource == null) resource = (MQTTResource) manager.findConnection(appID +"/in/"+moduleName);
+
+            if (resource != null) {
+                manager.removeOutput(resource);
+            }
         }
 
         @Override
@@ -240,16 +252,18 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
         public void onSubscribe(InterceptSubscribeMessage msg) {
             log.debug("onSubscribe: {} on {}", msg.getClientID(), msg.getTopicFilter());
             String appID = msg.getClientID().split("/")[0];
+            String moduleName = msg.getClientID().split("/")[1];
             TenantProvider.setCurrentID(appID);
 
-            // Received from Devices ( Subscribe in ProjectID/in/ModuleName)
+            // Received from Devices ( Subscribe in ApplicationID/in/ModuleName)
             if(msg.getTopicFilter().startsWith(appID + "/in/")){
 
                 MQTTResource resource = (MQTTResource) manager.findConnection(msg.getTopicFilter());
 
                 if(resource ==  null){
-                    resource = new MQTTResource(server, msg.getTopicFilter());
+                    resource = new MQTTResource(server, msg.getTopicFilter(), moduleName);
                     resource.setUid(msg.getTopicFilter());
+                    resource.setApplicationID(appID);
                     manager.addOutput(resource);
                 }
 
@@ -266,22 +280,7 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
 
         @Override
         public void onUnsubscribe(InterceptUnsubscribeMessage msg) {
-            log.debug("onUnsubscribe: {} on {}", msg.getClientID(), msg.getTopicFilter());
 
-            String appID = msg.getClientID().split("/")[0];
-
-            TenantProvider.setCurrentID(appID);
-
-            BaseDeviceManager manager = (BaseDeviceManager) MQTTServerConnection.this.manager;
-
-            if(msg.getTopicFilter().startsWith(appID + "/in/")) {
-
-                MQTTResource resource = (MQTTResource) manager.findConnection(msg.getClientID());
-
-                if (resource != null) {
-                    manager.removeOutput(resource);
-                }
-            }
 
         }
     };

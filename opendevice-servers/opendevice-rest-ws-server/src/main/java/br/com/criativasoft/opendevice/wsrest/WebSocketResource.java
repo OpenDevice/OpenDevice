@@ -30,6 +30,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Date;
 
 /**
  * TODO: PENDING DOC
@@ -47,12 +48,13 @@ public class WebSocketResource {
 
     private @Context AtmosphereResource resource;
 
-    @Inject
+    @Inject /* Using: ConnectionGuiceProvider */
     private ServerConnection connection;
 
     @GET
     @Suspend(contentType = "application/json", listeners = WSEventsLogger.class)
     public Response onConnect() {
+        resource.getRequest().setAttribute("lastConnectionDate", new Date());
         return Response.status(Response.Status.OK).build();
     }
 

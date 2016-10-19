@@ -30,7 +30,7 @@
                     <label>
                         Email Address<span class="req">*</span>
                     </label>
-                    <input type="text" name="username" required/>
+                    <input type="text" name="username" autofocus="true" required/>
                 </div>
 
                 <div class="field-wrap">
@@ -115,7 +115,8 @@
         $.post('/api/auth', $(this).serialize(),function(data) {
             $(".message").html("");
             localStorage.setItem("AuthToken", data);
-            window.location = "/"; // call Index
+            sessionStorage.setItem("LastPath", window.location.hash);
+            window.location = "/admin";
         })
         .fail(function(err) {
             console.log("fail:", err);

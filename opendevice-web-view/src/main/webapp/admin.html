@@ -23,6 +23,7 @@
 
     <!-- Bootstrap 3.3.6 -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/animate.min.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="css/font-awesome.min.css">
     <!-- Ionicons -->
@@ -133,28 +134,31 @@
             <ul class="sidebar-menu">
                 <!--<li class="header">HEADER</li>-->
                 <!-- Optionally, you can add icons to the links -->
-                <li class="active"><a href="#/"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+                <li><a href="#/"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
                 <li><a href="#/boards"><i class="fa fa-sitemap"></i> <span>Boards / Devices</span></a></li>
                 <li><a href="#/new"><i class="fa fa-rss"></i> <span>Connections</span></a></li>
                 <li><a href="#"><i class="fa fa-history"></i> <span>Events</span></a></li>
                 <li><a href="#"><i class="fa fa-code"></i> <span>Programmer</span></a></li>
+                <li><a href="#/users"><i class="fa fa-users"></i> <span>Users</span></a></li>
 
                 <li ng-repeat="menu in ext.menu">
                     <a href="#${menu.view}" class="fa ${menu.icon}"><span>${menu.title}</span></a>
                 </li>
 
+                <li class="header">Resources</li>
+                <li><a href="https://opendevice.atlassian.net/wiki" target="_blank"><i class="fa fa-book"></i> <span>Documentation</span></a></li>
+                <li><a href="http://github.com/OpenDevice/OpenDevice" target="_blank"><i class="fa fa-github"></i> <span>Github</span></a></li>
 
                 <li class="treeview">
                     <a href="#" target="_self"><i class="fa fa-link"></i> <span>Multilevel</span>
-            <span class="pull-right-container">
-              <i class="fa fa-angle-left pull-right"></i>
-            </span>
+                        <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
                     </a>
                     <ul class="treeview-menu">
                         <li><a href="#">Link in level 2</a></li>
                         <li><a href="#" target="_self">Link in level 2</a></li>
                     </ul>
                 </li>
+
             </ul>
             <!-- /.sidebar-menu -->
         </section>
@@ -254,6 +258,9 @@
 </div>
 <!-- ./wrapper -->
 
+<!-- Confirm Dialog -->
+<div ng-include="'/pages/subpages/confirm.html'"></div>
+
 <!-- REQUIRED JS SCRIPTS -->
 
 <script src="js/jquery-2.2.3.min.js"></script>
@@ -273,26 +280,26 @@
 <!-- ----------------------------------------------------- -->
 
 <script type="text/javascript" src="js/atmosphere.js"></script>
-<script type="text/javascript" src="js/opendevice.js"></script>
-<!--<script type="text/javascript" src="js/Constants.js"></script>-->
-<!--<script type="text/javascript" src="js/Device.js"></script>-->
-<!--<script type="text/javascript" src="js/DeviceConnection.js"></script>-->
-<!--<script type="text/javascript" src="js/DeviceManager.js"></script>-->
-<!--<script type="text/javascript" src="js/OpenDeviceJS.js"></script>-->
+
+<!--<script type="text/javascript" src="js/opendevice.js"></script>-->
+<script type="text/javascript" src="js/Constants.js"></script>
+<script type="text/javascript" src="js/Device.js"></script>
+<script type="text/javascript" src="js/DeviceConnection.js"></script>
+<script type="text/javascript" src="js/DeviceManager.js"></script>
+<script type="text/javascript" src="js/OpenDeviceJS.js"></script>
 
 
 <!-- mvn:dependency -->
-<script type="text/javascript" src="js/app/JSClass.js"></script>
+<script type="text/javascript" src="js/app/extend.js"></script>
 <script type="text/javascript" src="js/opendevice/DashItemView.js"></script>
 <script type="text/javascript" src="js/opendevice/ChartItemView.js"></script>
-<script type="text/javascript" src="js/opendevice/DigitalController.js"></script>
+<script type="text/javascript" src="js/opendevice/DigitalCtrlView.js"></script>
 
 <!-- ----------------------------------------------------- -->
 <!-- Jquery -->
 <!-- ----------------------------------------------------- -->
-<script type="text/javascript" src="plugins/jgrowl/jquery.jgrowl-min.js"></script>
-<script type="text/javascript" src="plugins/validate/jquery.validate-min.js"></script>
-
+<!--<script type="text/javascript" src="plugins/jgrowl/jquery.jgrowl-min.js"></script>-->
+<!--<script type="text/javascript" src="plugins/validate/jquery.validate-min.js"></script>-->
 <script type="text/javascript" src="js/jquery.textfill.min.js"></script>
 <script src="js/fastclick.min.js"></script> <!-- library for eliminating the 300ms delay  -->
 
@@ -301,6 +308,7 @@
 <script src="js/highcharts-solid-gauge.js"></script>
 
 <script src="js/bootstrap.min.js"></script> <!-- Bootstrap 3.3.X -->
+<script src="js/plugins/bootstrap-notify.min.js"></script> <!-- Bootstrap 3.3.X -->
 
 
 <script src="js/adminlte-app.min.js"></script> <!-- AdminLTE Theme/js -->
@@ -317,12 +325,15 @@
 <script type="text/javascript" src="js/angular/angular-resource.min.js"></script>
 <script type="text/javascript" src="js/angular/angular-sanitize.min.js"></script> <!-- for ui-select -->
 <script type="text/javascript" src="js/angular/angular-ui-select.min.js"></script>
-<script type="text/javascript" src="js/angular/angular-animate.min.js"></script>
+<!--<script type="text/javascript" src="js/angular/angular-animate.min.js"></script>-->
 
 <link rel="stylesheet" type="text/css" href="js/angular/angular-gridster.min.css" media="screen"/>
 <script type="text/javascript" src="js/angular/angular-gridster-resizedep.js"></script>
 <script type="text/javascript" src="js/angular/angular-gridster.js"></script>
 
+<!-- Loading bar-->
+<!--<script type="text/javascript" src="js/plugins/nprogress.js"></script>-->
+<!--<link rel="stylesheet" type="text/css" href="js/plugins/nprogress.css" media="screen"/>-->
 
 <!-- ----------------------------------------------------- -->
 <!-- Application Code -->
@@ -334,6 +345,7 @@
 <script type="text/javascript" src="js/app/controllers.js"></script>
 <script type="text/javascript" src="js/app/DashboardController.js"></script>
 <script type="text/javascript" src="js/app/DeviceController.js"></script>
+<script type="text/javascript" src="js/app/UserController.js"></script>
 
 
 </body>

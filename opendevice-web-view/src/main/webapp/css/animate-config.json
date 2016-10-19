@@ -1,0 +1,13 @@
+{
+
+
+  "fading_entrances": [
+    "fadeInDown"
+  ],
+
+  "fading_exits": [
+    "fadeOutUp"
+  ]
+
+  
+}

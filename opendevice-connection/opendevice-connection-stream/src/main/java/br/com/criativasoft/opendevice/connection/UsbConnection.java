@@ -43,7 +43,7 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
     public static final String BAUDRATES = "9600,300,1200,2400,4800,14400,19200,28800,38400,57600,115200";
 
 	/** Default bits per second for COM port. */
-	public static int BAUDRATE = 9600;
+	public static int BAUDRATE = 115200;
 	
 	/** Tempo necessário para o arduino inicializar a USB  */
 	// TODO: Verificar se isso é necessário no windows/mac (pois o auto reset só ocorre no windows.)

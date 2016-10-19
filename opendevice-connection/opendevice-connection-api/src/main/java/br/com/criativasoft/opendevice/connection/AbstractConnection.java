@@ -47,8 +47,12 @@ public abstract class AbstractConnection implements DeviceConnection {
 
     private ConnectionManager manager;
 
+    private Date fistConnectionDate;
+
+    private Date lastConnectionDate;
+
     /**
-     * Enables notification of listeners in separate threads if the implementations of listeners slow to run (eg sending an email)
+     * Enables notification of listeners in separate threads. Consider enabling if the implementations of listeners slow to run (eg sending an email)
      * @param useThreadPool - Default false
      */
     public void setUseThreadPool(boolean useThreadPool) {
@@ -132,6 +136,13 @@ public abstract class AbstractConnection implements DeviceConnection {
 
 	protected void setStatus(ConnectionStatus status) {
 		this.status = status;
+        if(status == ConnectionStatus.CONNECTED){
+            if(this.fistConnectionDate == null){
+                fistConnectionDate = new Date();
+                lastConnectionDate = new Date();
+            }
+            else lastConnectionDate = new Date();
+        }
         if(listeners.isEmpty())  log.warn("No listener was registered ! use: addListener");
         synchronized (listeners){
             for (ConnectionListener listener : listeners) {
@@ -212,6 +223,15 @@ public abstract class AbstractConnection implements DeviceConnection {
     @Override
     public ConnectionManager getConnectionManager() {
         return this.manager;
+    }
+
+
+    public Date getFistConnectionDate() {
+        return fistConnectionDate;
+    }
+
+    public Date getLastConnectionDate() {
+        return lastConnectionDate;
     }
 
     @Override

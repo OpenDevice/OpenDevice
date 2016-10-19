@@ -18,6 +18,7 @@ import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.connection.serialize.MessageSerializer;
 
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * This interface defines the capabilities that a connection must have.
@@ -62,5 +63,10 @@ public interface DeviceConnection {
     public void setConnectionManager(ConnectionManager manager);
 
     public ConnectionManager getConnectionManager();
+
+
+	public Date getFistConnectionDate();
+
+	public Date getLastConnectionDate();
 
 }

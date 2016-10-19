@@ -1,6 +1,8 @@
 package br.com.criativasoft.opendevice.core.model;
 
 import br.com.criativasoft.opendevice.core.command.GPIO;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.Entity;
 
@@ -9,7 +11,9 @@ import javax.persistence.Entity;
  * @author Ricardo JL Rufino
  * @date 06/09/14.
  * @see br.com.criativasoft.opendevice.core.model.Device
- */@Entity
+ */
+@Entity
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="uid")
 public class Sensor extends PhysicalDevice {
 
     public Sensor() {} // NONE: used only for persistence/load

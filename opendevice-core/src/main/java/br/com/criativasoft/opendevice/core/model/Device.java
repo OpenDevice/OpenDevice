@@ -19,6 +19,10 @@ import br.com.criativasoft.opendevice.core.LocalDeviceManager;
 import br.com.criativasoft.opendevice.core.command.CommandType;
 import br.com.criativasoft.opendevice.core.command.DeviceCommand;
 import br.com.criativasoft.opendevice.core.listener.OnDeviceChangeListener;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +31,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
-import static javax.persistence.InheritanceType.JOINED;
 
 /**
  * Device is an abstraction of a physical device, which may be a lamp, socket, sensor, robot, or even a logical device. <br/>
@@ -39,6 +41,7 @@ import static javax.persistence.InheritanceType.JOINED;
  */
 @Entity
 //@Inheritance(strategy=JOINED)
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="uid")
 public class Device implements Serializable {
 
     private static final Logger log = LoggerFactory.getLogger(Device.class);
@@ -58,21 +61,25 @@ public class Device implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonIgnore
     private long id; // Database ID (internal)
 
 	private int uid; // Logic level user ID.
 	private String name;
 	private DeviceType type;
+    private long lastUpdate;
+    private Date dateCreated;
+    private long value = VALUE_LOW;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne
+    @JsonIdentityReference(alwaysAsId = true)
 	private DeviceCategory category = DeviceCategory.GENERIC;
-	private long lastUpdate;
-	private Date dateCreated;
+
+    @JsonIgnore
     private String applicationID;
 
-	private long value = VALUE_LOW;
-
     @Transient
+    @JsonIgnore
     private volatile Set<OnDeviceChangeListener> listeners = new HashSet<OnDeviceChangeListener>();
 
     public Device(){
@@ -195,6 +202,7 @@ public class Device implements Serializable {
      * Check if the value is high
      * @return true if value > 0
      */
+    @JsonIgnore
     public boolean isON(){
         return getValue() > 0;
     }
@@ -203,6 +211,7 @@ public class Device implements Serializable {
      * Check if the value is LOW
      * @return true if value > 0
      */
+    @JsonIgnore
     public boolean isOFF(){
         return getValue() == 0;
     }
@@ -211,6 +220,7 @@ public class Device implements Serializable {
      * Set value 1(HIGH).
      * shorthand call to setValue(HIGH)
      */
+    @JsonIgnore
     public void on(){
        this.setValue(Device.VALUE_HIGH);
     }
@@ -219,6 +229,7 @@ public class Device implements Serializable {
      * Set value 0 (LOW).
      * shorthand call to setValue(LOW)
      */
+    @JsonIgnore
     public void off(){
         this.setValue(Device.VALUE_LOW);
     }

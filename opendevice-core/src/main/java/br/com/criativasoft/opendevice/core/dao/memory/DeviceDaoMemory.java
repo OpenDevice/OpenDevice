@@ -13,6 +13,7 @@
 
 package br.com.criativasoft.opendevice.core.dao.memory;
 
+import br.com.criativasoft.opendevice.core.BaseDeviceManager;
 import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
@@ -41,7 +42,7 @@ public class DeviceDaoMemory implements DeviceDao {
 
     @Override
     public DeviceCategory getCategoryByCode(int code) {
-        throw new IllegalStateException("Not implemented");
+        return BaseDeviceManager.getInstance().getCategory(code);
     }
 
     @Override

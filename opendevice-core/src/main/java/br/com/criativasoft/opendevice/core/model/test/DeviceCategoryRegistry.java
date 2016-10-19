@@ -27,6 +27,15 @@ public class DeviceCategoryRegistry {
 
     private List<DeviceCategory> categories = new ArrayList<DeviceCategory>();
 
+    public DeviceCategoryRegistry() {
+
+        DeviceCategory[] values = DeviceCategory.DEFAULT_VALUES;
+        for (DeviceCategory value : values) {
+            add(value);
+        }
+
+    }
+
     public void add(DeviceCategory category){
         this.categories.add(category);
     }

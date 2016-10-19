@@ -13,6 +13,9 @@
 
 package br.com.criativasoft.opendevice.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.io.Serializable;
@@ -23,6 +26,7 @@ import java.io.Serializable;
  * @date 04/09/2011 12:44:44
  */
 @Entity
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="code")
 public class DeviceCategory implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
@@ -36,9 +40,10 @@ public class DeviceCategory implements Serializable {
 	public static DeviceCategory FAN = new DeviceCategory(2, "Ventilador");
 	public static DeviceCategory GENERIC = new DeviceCategory(3, "Genérico");
 	public static DeviceCategory POWER_SOURCE = new DeviceCategory(4, "Tomada");
-	
 	public static DeviceCategory GENERIC_SENSOR = new DeviceCategory(100, "Generic Sensor");
 	public static DeviceCategory GENERIC_BOARD = new DeviceCategory(101, "Generic Board");
+
+    public static DeviceCategory[] DEFAULT_VALUES = {  LAMP, FAN, GENERIC, POWER_SOURCE, GENERIC_SENSOR, GENERIC_BOARD};
 
     public DeviceCategory(){
 

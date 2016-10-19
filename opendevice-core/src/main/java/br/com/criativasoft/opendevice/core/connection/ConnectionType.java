@@ -23,7 +23,7 @@ import br.com.criativasoft.opendevice.core.metamodel.EnumCode;
  */
 public enum ConnectionType implements EnumCode {
 
-    USB(1), BLUETOOTH(2), WIFI(3), ETHERNET(4);
+    USB(1), BLUETOOTH(2), WIFI(3), ETHERNET(4), MQTT(5), WEBSOCKET(6);
 
     private int code;
 

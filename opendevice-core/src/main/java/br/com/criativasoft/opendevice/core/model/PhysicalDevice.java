@@ -13,6 +13,11 @@
 
 package br.com.criativasoft.opendevice.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
@@ -24,12 +29,15 @@ import javax.persistence.Transient;
  * @date 12/10/16
  */
 @Entity
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="uid")
 public class PhysicalDevice extends Device {
 
     @Transient
+    @JsonIgnore
     protected volatile GpioInfo gpio;
 
     @ManyToOne(fetch= FetchType.LAZY)
+    @JsonIdentityReference(alwaysAsId = true)
     private Board board;
 
     public PhysicalDevice() {

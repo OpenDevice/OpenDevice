@@ -15,6 +15,7 @@ package br.com.criativasoft.opendevice.core.json;
 
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.CommandType;
+import br.com.criativasoft.opendevice.core.model.DeviceCategory;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,6 +48,7 @@ public class CommandJacksonMapper  {
             module.addSerializer(CommandType.class, new EnumCodeSerializer());
             module.addDeserializer(CommandType.class, new EnumCodeDeserialize.CommandTypeDeserialize());
             module.addDeserializer(Command.class, new CommandJsonDeserialize());
+            module.addDeserializer(DeviceCategory.class, new DeviceCategoryDeserialize());
 //            module.addSerializer(ResponseCommand.class, new CommandJsonSerialize());
 
             //mapper.enableDefaultTyping();

@@ -311,6 +311,14 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 				for (ConnectionListener listener : listeners) {
 					connection.removeListener(listener);
 				}
+
+				if(connection.isConnected()) {
+					try {
+						connection.disconnect();
+					} catch (ConnectionException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 
 			return remove;
@@ -318,6 +326,16 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 		}
 
 		return false;
+	}
+
+	@Override
+	public Date getFistConnectionDate() {
+		return null;
+	}
+
+	@Override
+	public Date getLastConnectionDate() {
+		return null;
 	}
 }
 

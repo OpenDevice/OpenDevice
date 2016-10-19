@@ -13,6 +13,10 @@
 
 package br.com.criativasoft.opendevice.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -28,10 +32,11 @@ import java.util.Set;
  * @date 12/10/16
  */
 @Entity
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="uid")
 public class Board extends Device {
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch= FetchType.LAZY)
-//    @JsonManagedReference
+    @JsonIdentityReference(alwaysAsId = true)
     private Set<PhysicalDevice> devices = new LinkedHashSet<PhysicalDevice>();
 
     public Board() {
@@ -71,6 +76,16 @@ public class Board extends Device {
                 this.devices.add((PhysicalDevice) device);
             }
         }
+    }
+
+    @Override
+    public void setValue(long value) {
+        // ignore.
+    }
+
+    @Override
+    public long getValue() {
+        return 1;
     }
 
     @Override

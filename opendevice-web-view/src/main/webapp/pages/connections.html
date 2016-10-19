@@ -1,0 +1,72 @@
+<span id="page-header"><i class="fa fa fa-sitemap"></i> Connections</span>
+
+<ul id="page-actions" class="nav navbar-nav">
+    <!--<li><a href ng-click="ctrl.newBoard()"><i class="fa fa-plus"></i> New</a></li>-->
+
+    <li ng-init="page.replace('#app-header', '#page-header');page.replace('#app-header-actions', '#page-actions')"></li>
+</ul>
+
+
+<!-- Main content -->
+<section class="content" data-ng-init="ctrl.init()">
+
+
+    <div class="alert alert-info alert-dismissible" ng-if="::alertNew">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="ctrl.disableAlert('alertNew')">×</button>
+        <h4><i class="icon fa fa-info"></i> Info!</h4>
+        Most connections are initiated by customers (see Boards page). Some temporary connections can be created with devices for testing
+    </div>
+
+    <div class="box box-info">
+        <div class="box-header with-border">
+            <h3 class="box-title">Connections List</h3>
+
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" ng-click="ctrl.update()" title="Refresh"><i class="fa fa-refresh"></i></button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="table-responsive">
+                <table class="table no-margin">
+                    <thead>
+                    <tr>
+                        <th>Host / Name</th>
+                        <th>Type</th>
+                        <th>Last Connection</th>
+                        <th>Fist Connection</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    <tr ng-repeat="item in ctrl.list" >
+                        <td>${::item.host}</td>
+                        <td>${::item.type}</td>
+                        <td>${::item.lastConnection | date:'hh:mm dd/MM/yy'}</td>
+                        <td>${::item.fistConnection | date:'hh:mm dd/MM/yy'}</td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm" ng-click="ctrl.disconnect(item.uuid)">Disconnect</button>
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.table-responsive -->
+        </div>
+        <!-- /.box-body -->
+        <div class="box-footer clearfix">
+            <!--<a href="javascript:void(0)" class="btn btn-sm btn-info btn-flat pull-left">Place New Order</a>-->
+        </div>
+        <!-- /.box-footer -->
+    </div>
+
+
+    <!----------------------------------------------------------------->
+    <!-- New Diaglog                                                   -->
+    <!----------------------------------------------------------------->
+
+
+</section>
+<!-- /.content -->

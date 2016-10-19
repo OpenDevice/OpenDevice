@@ -23,7 +23,7 @@ var pkg = angular.module('opendevice.controllers');
  * @author Ricardo JL Rufino
  * @date 06/10/19
  */
-pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $http) {
+pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $http, ConnectionRest) {
 
     // Alias / Imports
     var DCategory = od.DeviceCategory;
@@ -39,6 +39,7 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
     // ==========================
 
     this.devices = [];
+    this.discoveryList = [];
     this.odevListeners = []; // required because of our simple-page-model
 
     this.sensorsCharts = []; // od.view.ChartItemView
@@ -49,6 +50,7 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
     };
 
     this.isBoardView = false;
+    this.newBordPage = 'initialHelp';
 
     this.board;
 
@@ -162,25 +164,7 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
         // Fired by Sync or by Server
 
         ODev_addListener(od.Event.DEVICE_LIST_UPDATE, function(devices){
-
-            var devices = filterLocalDevices.call(_this);
-
-            var ctrls = [];
-
-            for (var i = 0; i < _this.devicesCtrls.length; i++) {
-                var view = _this.devicesCtrls[i];
-                view.destroy();
-            }
-
-            devices.forEach(function(device){
-                var ctrl = createDeviceControler.call(_this, device)
-                if(ctrl) ctrls.push(ctrl);
-            });
-
-            _this.devicesCtrls = ctrls;
-
-            _this.devices = devices;
-
+            updateDevices();
         });
 
     };
@@ -194,6 +178,14 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
 
         $('#new-board').modal('show');
 
+        _this.updateApiKeys();
+
+        _this.newBordPage = 'initialHelp';
+
+
+    }
+
+    _public.updateApiKeys = function(){
         // Show ApiKeys
         $.get("/api/accounts/keys", function(data){
             if(data && data instanceof Array){
@@ -204,7 +196,42 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
                 });
             }
         });
-    }
+    };
+
+    _public.selectBoardConnection = function(type){
+
+        _this.newBordPage = 'local';
+
+        _this.startDiscovery(type);
+
+    };
+
+    _public.startDiscovery = function(type){
+
+        if(!type) alert("Require type param");
+
+        _this.discoveryList = ConnectionRest.discovery({type : type});
+
+    };
+
+    /**
+     * Create a new Connection (for local devices)
+     * @param connection
+     */
+    _public.boardConnect = function(info){
+
+        ConnectionRest.save(info, function(){
+            // $('#new-board').modal('hide');
+            ODev.sync(true, true); // fire: DEVICE_LIST_UPDATE
+            $.notify({message: "Saved"}, {type:"success"});
+        }, function(error) {
+            if(error.data && error.data.message){
+                $.notify({message: error.data.message});
+            }
+        });
+
+    };
+
 
     _public.startSimulation = function(deviceID, interval, start){
 
@@ -434,6 +461,28 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
     function ODev_addListener(event, listener){
         var ldef = ODev.on(event, listener);
         _this.odevListeners.push(ldef); // required to remove later
+    }
+
+    function updateDevices(){
+
+        var devices = filterLocalDevices.call(_this);
+
+        var ctrls = [];
+
+        for (var i = 0; i < _this.devicesCtrls.length; i++) {
+            var view = _this.devicesCtrls[i];
+            view.destroy();
+        }
+
+        devices.forEach(function(device){
+            var ctrl = createDeviceControler.call(_this, device)
+            if(ctrl) ctrls.push(ctrl);
+        });
+
+        _this.devicesCtrls = ctrls;
+
+        _this.devices = devices;
+
     }
 
     function updateCharts(){

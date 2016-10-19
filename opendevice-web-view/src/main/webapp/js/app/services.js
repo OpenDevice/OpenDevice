@@ -2,8 +2,8 @@ var app = angular.module('opendevice.services', ['ngResource']);
 
 app.factory('DashboardRest', ['$resource', function($resource){
 
-    return $resource('/dashboards/:id', { id: '@id', dashID : '@dashID' }, { // configure defauls
-        list: {method:'GET', url : "/dashboards", isArray:true,
+    return $resource('/middleware/dashboards/:id', { id: '@id', dashID : '@dashID' }, { // configure defauls
+        list: {method:'GET', url : "/middleware/dashboards", isArray:true,
             transformResponse: function(list){
 
                 list = angular.fromJson(list);
@@ -35,9 +35,9 @@ app.factory('DashboardRest', ['$resource', function($resource){
 
                 return list;
         }},
-        activate: {method:'GET', url : "/dashboards/:id/activate"},
-        items: {method:'GET', url : "/dashboards/:id/items", isArray:true},
-        updateLayout: {method:'PUT', url : "/dashboards/:dashID/updateLayout",
+        activate: {method:'GET', url : "/middleware/dashboards/:id/activate"},
+        items: {method:'GET', url : "/middleware/dashboards/:id/items", isArray:true},
+        updateLayout: {method:'PUT', url : "/middleware/dashboards/:dashID/updateLayout",
             transformRequest: function(data) {
                 var toSend = angular.copy(data);
                 toSend.layout =  JSON.stringify(toSend.layout); // on server is a String
@@ -46,8 +46,8 @@ app.factory('DashboardRest', ['$resource', function($resource){
                 return JSON.stringify(toSend);
             }
         },
-        save: {method:'POST', url : "/dashboards"},
-        saveItem: {method:'POST', url : "/dashboards/:dashID/item",
+        save: {method:'POST', url : "/middleware/dashboards"},
+        saveItem: {method:'POST', url : "/middleware/dashboards/:dashID/item",
             transformRequest: function(data) {
                 data.layout =  JSON.stringify(data.layout); // on server is a String
                 if(data.viewOptions && data.viewOptions != "null")
@@ -68,8 +68,8 @@ app.factory('DashboardRest', ['$resource', function($resource){
                 return item;
             }
         },
-        removeItem: {method:'DELETE', url : "/dashboards/:dashID/item"},
-        deviceIcons: {method:'GET', url : "/dashboards/deviceIcons", isArray:true},
+        removeItem: {method:'DELETE', url : "/middleware/dashboards/:dashID/item"},
+        deviceIcons: {method:'GET', url : "/middleware/dashboards/deviceIcons", isArray:true},
     });
 
 }]);
@@ -78,12 +78,22 @@ app.factory('DashboardRest', ['$resource', function($resource){
 
 app.factory('AccountRest', ['$resource', function($resource){
 
-    var PATH = "api/accounts";
+    var PATH = "/api/accounts";
 
     return $resource(PATH+'/:id', { id: '@id' }, { // configure defauls
         listUsers: {method:'GET', url : PATH+"/users", isArray:true},
         addUser: {method:'POST', url : PATH+"/users"},
         deleteUser: {method:'DELETE', url : PATH+"/users/:id"}
+    });
+
+}]);
+
+app.factory('ConnectionRest', ['$resource', function($resource){
+
+    var PATH = "/middleware/connections/:id";
+
+    return $resource(PATH, { id: '@id' }, { // configure defauls
+        discovery: {method:'GET', url : PATH+"/discovery", isArray:true},
     });
 
 }]);

@@ -1,7 +1,7 @@
 <span id="page-header"><i class="fa fa fa-sitemap"></i> Boards ${::ctrl.board ? "/ " + ctrl.board.name : "xxx"} </span>
 
 <ul id="page-actions" class="nav navbar-nav">
-    <li><a href ng-click="ctrl.newBoard()"><i class="fa fa-plus"></i> New</a></li>
+    <!--<li><a href ng-click="ctrl.newBoard()"><i class="fa fa-plus"></i> New</a></li>-->
 
     <li ng-init="page.replace('#app-header', '#page-header');page.replace('#app-header-actions', '#page-actions')"></li>
 </ul>
@@ -73,8 +73,12 @@
     <!-- ----------------------------------------------------- -->
 
     <div class="panel panel-default">
-        <div class="panel-body">
-            <div class="pull-right">
+
+        <div class="panel-heading clearfix">
+
+            <h3 class="panel-title pull-left" style="padding-top: 15px;">Charts (${ctrl.sensorsCharts.length})</h3>
+
+            <div class="pull-right" style="padding-top: 10px;">
                 <ul class="list-inline">
                     <li>Period:</li>
                     <li> <input type="number" class="form-control input-sm" size="2"  style="width: 60px" ng-model="ctrl.chartViewOptions.periodValue"/> </li>
@@ -157,9 +161,9 @@
                     <div class="modal-body">
                         <div class="box-body">
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">Interval (sec)</label>
+                                <label class="col-sm-3 control-label">Interval (ms)</label>
                                 <div class="col-sm-9">
-                                    <div ng-init="ctrl.formSimulate = {interval : 1}"></div>
+                                    <div ng-init="ctrl.formSimulate = {interval : 500}"></div>
                                     <input ng-model="ctrl.formSimulate.interval" type="number" />
                                 </div>
                             </div>

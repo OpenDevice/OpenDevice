@@ -19,7 +19,7 @@
                 <!-- Add the bg color to the header using any of the bg-* classes -->
                 <div class="widget-user-header bg-aqua-active">
                     <h3 class="widget-user-username">${::device.name}</h3>
-                    <h5 class="widget-user-desc">ESP8866 #${::device.id}</h5>
+                    <h5 class="widget-user-desc">{TYPE} #${::device.id}</h5>
                 </div>
                 <div class="widget-user-image">
                     <img class="img-circle" src="/images/boards/generic-blue.png" alt="User Avatar">
@@ -73,38 +73,150 @@
                         <h4 class="modal-title" >New Board</h4>
                     </div>
                     <div class="modal-body">
-                        <h4> <mark>1.</mark> Choose a compatible board</h4>
-                        <p> The boads using arduino framework (like ESP8266) are compatible with OpenDevice <br/> See
-                            <a href="https://github.com/OpenDevice/OpenDevice/wiki/Supported-Devices" target="_blank">supported devices</a> for additional information </p>
-
-                        <h4> <mark>2.</mark> Install the Library</h4>
-                        You can install the library using <a href="http://www.arduino.cc/en/guide/libraries" target="_blank">Arduino Library Manager</a> ou download current version from
-                        <a href="https://github.com/OpenDevice/opendevice-lib-arduino"  target="_blank">github</a>.
-
-                        <h4> <mark>3.</mark> Upload Code</h4>
-                        <p>You can use code samples provided in Arduino IDE (Examples > OpenDevice) <br/>
-                            More advanced projects can be found in: <a href="https://github.com/OpenDevice/opendevice-examples" target="_blank">opendevice-examples</a>
-                        </p>
-
-                        <h4> <mark>4.</mark> Change API Key</h4>
-                        <p>Use one of the keys below*:</p>
-
-                        <blockquote>
-                            <ul class="apiKeyList">
-                            </ul>
-                        </blockquote>
-                        *<i>This is not required if you are running a local server</i>
-
+                        <div ng-switch on="ctrl.newBordPage">
+                            <div ng-switch-when="initialHelp"><div ng-include="'boards/initialHelp.htmlx'"></div></div>
+                            <div ng-switch-when="selectDevice"><div ng-include="'boards/selectDevice.htmlx'"></div></div>
+                            <div ng-switch-when="mqtt"><div ng-include="'boards/connection/mqtt.htmlx'"></div></div>
+                            <div ng-switch-when="local"><div ng-include="'boards/connection/local.htmlx'"></div></div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary" >OK</button>
+                        <button type="submit" class="btn btn-primary" ng-if="ctrl.newBordPage == 'initialHelp'" ng-click="ctrl.newBordPage = 'selectDevice'">Next</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 
+
+    <script type="text/ng-template" id="boards/initialHelp.htmlx">
+        <h4> <mark>1.</mark> Choose a compatible board</h4>
+        <p> The boads using arduino framework (like ESP8266) are compatible with OpenDevice <br/> See
+            <a href="https://github.com/OpenDevice/OpenDevice/wiki/Supported-Devices" target="_blank">supported devices</a> for additional information </p>
+
+        <h4> <mark>2.</mark> Install the Library</h4>
+        You can install the library using <a href="http://www.arduino.cc/en/guide/libraries" target="_blank">Arduino Library Manager</a> ou download current version from
+        <a href="https://github.com/OpenDevice/opendevice-lib-arduino"  target="_blank">github</a>.
+
+        <h4> <mark>3.</mark> Upload Code</h4>
+        <p>You can use code samples provided in Arduino IDE (Examples > OpenDevice) <br/>
+            More advanced projects can be found in: <a href="https://github.com/OpenDevice/opendevice-examples" target="_blank">opendevice-examples</a>
+        </p>
+    </script>
+
+
+    <script type="text/ng-template" id="boards/selectDevice.htmlx">
+        <div class="row animate-show noselect" > <!--ng-show="ctrl.editMode"-->
+
+            <div class="col-lg-6 col-xs-12">
+                <div class="dash-add-box small-box bg-aqua" ng-click="ctrl.newBordPage = 'mqtt'">
+                    <div class="inner">
+                        <h3>MQTT</h3>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-connectdevelop"></i>
+                    </div>
+                    <a href="javascript:void(0);" class="small-box-footer">Add New <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-xs-12">
+                <div class="dash-add-box small-box bg-green" ng-click="ctrl.selectBoardConnection('USB')">
+                    <div class="inner">
+                        <h3>Usb</h3>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-usb"></i>
+                    </div>
+                    <a href="javascript:void(0);" class="small-box-footer">Add New <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-xs-12">
+                <div class="dash-add-box small-box bg-yellow" ng-click="ctrl.selectBoardConnection('BLUETOOTH')">
+                    <div class="inner">
+                        <h3>Bluetooth</h3>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-bluetooth"></i>
+                    </div>
+                    <a href="javascript:void(0);" class="small-box-footer">Add New <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-xs-12">
+                <div class="dash-add-box small-box bg-red" ng-click="ctrl.selectBoardConnection('TCP')">
+                    <div class="inner">
+                        <h3>TCP</h3>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-wifi"></i>
+                    </div>
+                    <a href="javascript:void(0);" class="small-box-footer">Add New <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </script>
+
+
+    <script type="text/ng-template" id="boards/connection/mqtt.htmlx">
+
+        <div class="callout callout-info">
+            <h4><i class="icon fa fa-info"></i> Info!</h4>
+            MQTT connections are initiated by the client devices, requires no direct server configuration. <br/>
+            You should just follow the <a ng-click="ctrl.newBordPage = 'initialHelp'">initial instructions</a> , and configure ApiKey on your device
+        </div>
+
+        <h4> <mark>4.</mark> Change API Key</h4>
+        <p>Use one of the keys below (<a href ng-click="ctrl.updateApiKeys()">refresh</a>):</p>
+
+        <blockquote>
+            <ul class="apiKeyList">
+            </ul>
+        </blockquote>
+
+    </script>
+
+    <script type="text/ng-template" id="boards/connection/local.htmlx">
+        <div class="box box-info">
+            <div class="box-header with-border">
+                <h3 class="box-title">Connections</h3>
+                <div class="box-tools pull-right">
+                    <span data-toggle="tooltip" title="" class="badge bg-light-blue">${ctrl.discoveryList.length}</span>
+                    <button type="button" class="btn btn-box-tool" ng-click="ctrl.startDiscovery()" title="Refresh"><i class="fa fa-refresh"></i></button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="table-responsive">
+                    <table class="table no-margin">
+                        <thead>
+                        <tr>
+                            <th>Host / Resource</th>
+                            <th>Type</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        <tr ng-repeat="item in ctrl.discoveryList" >
+                            <td>${::item.host}</td>
+                            <td>${::item.type}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary btn-sm" ng-click="ctrl.boardConnect(item)">Connect</button>
+                            </td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </script>
 
 </section>
 <!-- /.content -->

@@ -136,9 +136,9 @@
                 <!-- Optionally, you can add icons to the links -->
                 <li><a href="#/"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
                 <li><a href="#/boards"><i class="fa fa-sitemap"></i> <span>Boards / Devices</span></a></li>
-                <li><a href="#/new"><i class="fa fa-rss"></i> <span>Connections</span></a></li>
-                <li><a href="#"><i class="fa fa-history"></i> <span>Events</span></a></li>
-                <li><a href="#"><i class="fa fa-code"></i> <span>Programmer</span></a></li>
+                <li><a href="#/connections"><i class="fa fa-rss"></i> <span>Connections</span></a></li>
+                <li><a href="#/new"><i class="fa fa-history"></i> <span>Events</span></a></li>
+                <li><a href="#/new"><i class="fa fa-code"></i> <span>Programmer</span></a></li>
                 <li><a href="#/users"><i class="fa fa-users"></i> <span>Users</span></a></li>
 
                 <li ng-repeat="menu in ext.menu">
@@ -166,7 +166,7 @@
     </aside>
 
     <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper" ng-view>
+    <div class="content-wrapper" ng-animate="false" ng-view>
 
     </div>
     <!-- /.content-wrapper -->
@@ -325,7 +325,7 @@
 <script type="text/javascript" src="js/angular/angular-resource.min.js"></script>
 <script type="text/javascript" src="js/angular/angular-sanitize.min.js"></script> <!-- for ui-select -->
 <script type="text/javascript" src="js/angular/angular-ui-select.min.js"></script>
-<!--<script type="text/javascript" src="js/angular/angular-animate.min.js"></script>-->
+<script type="text/javascript" src="js/angular/angular-animate.min.js"></script>
 
 <link rel="stylesheet" type="text/css" href="js/angular/angular-gridster.min.css" media="screen"/>
 <script type="text/javascript" src="js/angular/angular-gridster-resizedep.js"></script>
@@ -346,6 +346,7 @@
 <script type="text/javascript" src="js/app/DashboardController.js"></script>
 <script type="text/javascript" src="js/app/DeviceController.js"></script>
 <script type="text/javascript" src="js/app/UserController.js"></script>
+<script type="text/javascript" src="js/app/ConnectionController.js"></script>
 
 
 </body>

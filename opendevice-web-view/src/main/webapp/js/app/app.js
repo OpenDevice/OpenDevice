@@ -19,7 +19,7 @@ var urlParams;
 var app = angular.module('opendevice', [
     'ngRoute',
     'ngSanitize', // for: ui.select
-    // 'ngAnimate',
+    'ngAnimate',
     'ui.select',
     'gridster',
     //'opendevice.filters',
@@ -85,6 +85,7 @@ app.config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/boards/:boardID', {templateUrl: 'pages/devices.html', controller: 'DeviceController',  controllerAs: 'ctrl'});
     $routeProvider.when('/new', {templateUrl: 'pages/new.html', controller: 'DeviceController',  controllerAs: 'ctrl'});
     $routeProvider.when('/users', {templateUrl: 'pages/users.html', controller: 'UserController',  controllerAs: 'ctrl'});
+    $routeProvider.when('/connections', {templateUrl: 'pages/connections.html', controller: 'ConnectionController',  controllerAs: 'ctrl'});
     $routeProvider.otherwise({redirectTo: '/'});
 }]);
 
@@ -92,6 +93,10 @@ app.config(['$routeProvider', function($routeProvider) {
 app.config(['$interpolateProvider', function($interpolateProvider) {
     $interpolateProvider.startSymbol('${');
     $interpolateProvider.endSymbol('}');
+}]);
+
+app.config(['$animateProvider', function($animateProvider) {
+    $animateProvider.classNameFilter(/animate/);
 }]);
 
 app.filter('propsFilter', function() {

@@ -19,7 +19,10 @@ var od = od || {};
 od.DeviceType = {
     DIGITAL:1,
     ANALOG:2,
-    NUMERIC:3
+    NUMERIC:3,
+    CHARACTER:4,
+    BOARD:10,
+    MANAGER:11
 };
 
 // Like OpenDevice JAVA-API
@@ -218,13 +221,27 @@ od.Device = function(data){
     /** @deprecated */
     this.toggleValue = this.toggle;
 
-    this.onChange = function(listener){
-        this.listeners.push(listener);
+    /**
+     * Register a listener to monitor changes in this Device.
+     * @param {function} listener
+     * @param {Object} [context] - Context to execute listener
+     * @returns {{context: *, listener: *}} - return registred listener (used in #removeListener)
+     */
+    this.onChange = function(listener, context){
+        var eventDef = {"context":context, "listener" : listener};
+        this.listeners.push(eventDef);
+        return eventDef;
     };
 
-    this.removeListener = function(listener){
-        var index = this.listeners.indexOf(listener);
-        if(index > 0) this.listeners.splice(index, 1);
+    /**
+     *
+     * @param eventDef {{context: *, listener: *}}
+     */
+    this.removeListener = function(eventDef){
+        var index = this.listeners.indexOf(eventDef);
+        if(index >= 0){
+            this.listeners.splice(index, 1);
+        }
     };
 
     // Initialize device data.
@@ -413,20 +430,21 @@ od.DeviceConnection = function(config){
         // KeepAlive
         if(response.responseBody == "X") return;
 
-        // HACK: Atmosphere server, not allow return statuscode > 400. The 'status' is in the message
-        if(response.responseBody == "Authorization Required"){
-            console.warn("Authorization Required");
-            notifyListeners({"type" : od.CommandType.CONNECT_RESPONSE,
-                             "status" : od.CommandStatus.UNAUTHORIZED});
-            return;
-        }
 
         try {
             data = JSON.parse(response.responseBody);
         }catch(err) {
             console.error("Can't parse response: <<" + response.responseBody + ">>");
             console.error(err.stack);
+            return;
+        }
 
+        // HACK: Atmosphere server not allow return statuscode > 400. The 'status' is in the message
+        if(data.status && (data.status == 401 || data.status == 403)){
+            console.warn("Authorization Required");
+            notifyListeners({"type" : od.CommandType.CONNECT_RESPONSE,
+                "status" : od.CommandStatus.UNAUTHORIZED});
+            return;
         }
 
         if(data) {
@@ -468,6 +486,7 @@ od.DeviceManager = function(connection){
     // Alias
     var DEvent = od.Event;
     var CType = od.CommandType;
+    var DeviceType = od.DeviceType;
 
     // Private
     var devices = [];
@@ -514,7 +533,6 @@ od.DeviceManager = function(connection){
         // Isso teria no final que salvar na EPROM/Servidor do arduino.
     };
 
-
     this.getDevices = function(){
 
         if(devices && devices.length > 0) return devices; // return from cache...
@@ -525,11 +543,52 @@ od.DeviceManager = function(connection){
         return devices;
     };
 
-    this.findDevice = function(deviceID){
-        if(devices){
-            for(var i = 0; i < devices.length; i++){
-                if(devices[i].id == deviceID){
-                    return devices[i];
+    this.getDevicesByType = function(type){
+
+        var devices = this.getDevices();
+
+        var found = [];
+
+        if(devices) devices.forEach(function(device){
+            if(device.type == type) found.push(device);
+        });
+
+        return found;
+    };
+
+    this.getDevicesByBoard = function(boardID){
+
+        var devices = this.getDevices();
+
+        var found = [];
+
+        if(devices) devices.forEach(function(device){
+            if(device.parentID == boardID && device.type != DeviceType.BOARD) found.push(device);
+        });
+
+        return found;
+    };
+
+
+    this.getBoards = function(){
+        return this.getDevicesByType(DeviceType.BOARD);
+    };
+
+
+    /**
+     * Find device by ID in List or in currently loaded devices
+     * @param deviceID
+     * @param deviceList (Optional) if not provide, current devices are considered
+     * @returns {*}
+     */
+    this.findDevice = function(deviceID, deviceList){
+
+        if(!deviceList) deviceList = devices;
+
+        if(deviceList){
+            for(var i = 0; i < deviceList.length; i++){
+                if(deviceList[i].id == deviceID){
+                    return deviceList[i];
                 }
             }
         } else{
@@ -558,7 +617,6 @@ od.DeviceManager = function(connection){
 
         // fire sync (GetDeviceRequest) on server
         if(forceSync || (devices && devices.length == 0)) {
-            // OpenDevice.devices.sync();
             _this.send({type : CType.GET_DEVICES, forceSync : forceSync});
         }
 
@@ -573,7 +631,7 @@ od.DeviceManager = function(connection){
      * Shortcut to {@link addListener}
      */
     this.on = function(event, listener){
-        _this.addListener(event, listener);
+        return _this.addListener(event, listener);
     };
 
     // FIXME: rename to onChange
@@ -588,11 +646,45 @@ od.DeviceManager = function(connection){
         });
     };
 
+    /**
+     * Remove listener
+     * @param {( string|Object[]|{event: *, listener: *})} eventDef  -  Event name (String) or Object
+     * @param {function} [listener]
+     */
+    this.removeListener = function(eventDef, listener){
+
+        var event;
+        if(eventDef instanceof Array) {
+            for (var i = 0; i < eventDef.length; i++) {
+                var def = eventDef[i];
+                this.removeListener(def);
+            }
+        } else if(typeof eventDef == "object") {
+            event = eventDef["event"];
+            listener = eventDef["listener"];
+        }else{
+            event =  eventDef;
+        }
+
+        if(listenersMap[event] != null){
+            var listeners = listenersMap[event];
+            var index = listeners.indexOf(listener);
+            if(index >= 0) listeners.splice(index, 1);
+        }
+    };
+
+    /**
+     *
+     * @param event
+     * @param listener
+     * @returns {{event: *, listener: *}} Listener definition (used in removeListener)
+     */
     this.addListener = function(event, listener){
 
         if(listenersMap[event] === undefined) listenersMap[event] = [];
         listenersMap[event].push(listener);
 
+        return { "event" : event, "listener" : listener };
     };
 
     /**
@@ -629,7 +721,14 @@ od.DeviceManager = function(connection){
 
         // Notify Individual Listeners
         for (var i = 0; i < device.listeners.length; i++) {
-            device.listeners[i](device.value, device.id);
+
+            if(typeof device.listeners[i] == "function"){
+                device.listeners[i](device.value, device.id);
+            }else{
+                var listener = device.listeners[i]["listener"];
+                listener.call(device.listeners[i]["context"], device.value, device.id);
+            }
+
         }
 
         // Notify Global Listeners
@@ -792,12 +891,16 @@ return {
 
     // Manager delegate
     on : manager.on,
+    removeListener : manager.removeListener,
     onDeviceChange : manager.onDeviceChange,
     onChange : manager.onDeviceChange,
     onConnect : manager.onConnect,
     findDevice : manager.findDevice,
     get : manager.findDevice,
     getDevices : manager.getDevices,
+    getDevicesByType : manager.getDevicesByType,
+    getDevicesByBoard : manager.getDevicesByBoard,
+    getBoards : manager.getBoards,
     setValue : manager.setValue,
     toggleValue : manager.toggleValue,
     contains : manager.contains,
@@ -838,7 +941,7 @@ return {
     },
 
 
-    history : function(query, callback){
+    history : function(query, callback, errorCallback){
         jQuery.ajax({
             headers: {
                 'Accept': 'application/json',
@@ -846,11 +949,12 @@ return {
                 'Authorization' : "Bearer " + od.appID
             },
             type: 'POST',
-            url: od.serverURL +"/device/" + query.deviceID + "/history",
+            url: od.serverURL + OpenDevice.devices.path + "/" + query.deviceID + "/history",
             data: JSON.stringify(query),
             dataType: 'json',
             async: true,
-            success: callback
+            success: callback,
+            error : errorCallback
         });
     },
 
@@ -918,27 +1022,27 @@ var ODev = OpenDevice;
 
 OpenDevice.devices = {
 
-    path : "/device",
+    path : "/api/devices",
 
     get : function(deviceID){
-        return OpenDevice.rest(OpenDevice.devices.path + "/" + deviceID);
+        return OpenDevice.rest(this.path + "/" + deviceID);
     },
 
     value : function(deviceID, value){
 
         if(value != null){
-            return OpenDevice.rest(OpenDevice.devices.path + "/" + deviceID + "/value/" + value);
+            return OpenDevice.rest(this.path + "/" + deviceID + "/value/" + value);
         }else{
-            return OpenDevice.rest(OpenDevice.devices.path + "/" + deviceID + "/value");
+            return OpenDevice.rest(this.path + "/" + deviceID + "/value");
         }
     },
 
     list : function(){
-        return OpenDevice.rest(OpenDevice.devices.path + "/list");
+        return OpenDevice.rest(this.path + "/");
     },
 
     sync : function(){
-        return OpenDevice.rest(OpenDevice.devices.path + "/sync");
+        return OpenDevice.rest(this.path + "/sync");
     }
 
 };

@@ -1,9 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <entity-mappings
         xmlns="http://java.sun.com/xml/ns/persistence/orm"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_0.xsd"
         version="2.0">
+
+    <package>br.com.criativasoft.opendevice.core.model</package>
 
     <description>OpenDevice Core Mapping</description>
     <entity name="Device" class="br.com.criativasoft.opendevice.core.model.Device" access="FIELD">
@@ -18,13 +21,29 @@
                 <join-column name="categoryID"  />
                 <cascade><cascade-persist/></cascade>
             </one-to-one>
-            <transient name="gpio" />
             <transient name="listeners" />
+        </attributes>
+    </entity>
+
+    <entity name="PhysicalDevice" class="br.com.criativasoft.opendevice.core.model.PhysicalDevice" access="FIELD">
+
+        <attributes>
+            <transient name="gpio" />
+            <many-to-one name="board" fetch="LAZY" optional="true">
+                    <join-column column-definition="LONG" name="boardID" nullable="true" />
+            </many-to-one>
+        </attributes>
+    </entity>
+    <entity name="Board" class="br.com.criativasoft.opendevice.core.model.Board" access="FIELD">
+        <attributes>
+            <one-to-many name="devices" fetch="EAGER" target-entity="br.com.criativasoft.opendevice.core.model.PhysicalDevice" mapped-by="board"/>
         </attributes>
     </entity>
     <entity name="Sensor" class="br.com.criativasoft.opendevice.core.model.Sensor" access="FIELD">
         <discriminator-value>Sensor</discriminator-value>
     </entity>
+
+
     <entity name="DeviceCategory" class="br.com.criativasoft.opendevice.core.model.DeviceCategory" access="FIELD">
         <attributes>
             <id name="code" />

@@ -22,13 +22,9 @@ import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceCategory;
 import br.com.criativasoft.opendevice.core.model.DeviceHistory;
 
-import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * TODO: Add docs.
@@ -58,12 +54,14 @@ public abstract class DeviceDaoJPA extends GenericJpa<Device> implements DeviceD
     @Override
     public List<DeviceHistory> getDeviceHistory(DeviceHistoryQuery params) {
 
+        // FIXME: Use tentantIDs
+
         Device device = getByUID(params.getDeviceID());
 
         AggregationType aggregation = params.getAggregation();
 
         if(aggregation != null && aggregation != AggregationType.NONE){
-            List<DeviceHistory> list = new ArrayList<DeviceHistory>();
+            List<DeviceHistory> list = new LinkedList<DeviceHistory>();
             list.add(getDeviceHistoryAggregate(params));
             return list;
         }else{
@@ -99,6 +97,7 @@ public abstract class DeviceDaoJPA extends GenericJpa<Device> implements DeviceD
 
     @Override
     public List<Device> listAll() {
+
         TypedQuery<Device> query = em().createQuery("select x from Device x where x.applicationID = :TENANT", Device.class);
 
         query.setParameter("TENANT", TenantProvider.getCurrentID());
@@ -114,16 +113,17 @@ public abstract class DeviceDaoJPA extends GenericJpa<Device> implements DeviceD
     @Override
     public void persist(Device entity) {
 
-        // Start transaction if not active, this is necessary because the persist can be called in a unmanaged context
-        EntityTransaction tx = em().getTransaction();
-
-        boolean active = tx.isActive();
-
-        if(!active) tx.begin();
+        if(entity.getId() <= 0) entity.setDateCreated(new Date());
+        else entity.setLastUpdate(System.currentTimeMillis());
 
         super.persist(entity);
 
-        if(!active) tx.commit();
+    }
+
+    @Override
+    public void persistHistory(DeviceHistory history) {
+
+        em().persist(history);
 
     }
 }

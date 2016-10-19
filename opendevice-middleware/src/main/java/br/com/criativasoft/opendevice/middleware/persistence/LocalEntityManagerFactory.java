@@ -14,7 +14,6 @@
 package br.com.criativasoft.opendevice.middleware.persistence;
 
 import br.com.criativasoft.opendevice.core.extension.PersistenceExtension;
-import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
@@ -55,10 +54,15 @@ public class LocalEntityManagerFactory implements Provider<EntityManagerFactory>
 
             log.info("Additional persistence classes: " + persistentClasses);
 
-            properties.put(org.hibernate.jpa.AvailableSettings.LOADED_CLASSES, persistentClasses);
-            properties.put("hibernate.ogm.neo4j.database_path", OpenDeviceConfig.get().getDatabasePath());
+            properties.put("hibernate.ejb.loaded.classes", persistentClasses);
 
-            emf = Persistence.createEntityManagerFactory("neo4j_pu", properties);
+            System.setProperty("objectdb.home", System.getProperty("user.dir"));
+//            properties.put("hibernate.ogm.neo4j.database_path", OpenDeviceConfig.get().getDatabasePath());
+//            properties.put(Neo4jProperties.HOST, "localhost:7474");
+//            properties.put(Neo4jProperties.USERNAME, "admin");
+//            properties.put(Neo4jProperties.PASSWORD, "admin");
+
+            emf = Persistence.createEntityManagerFactory("opendevice_pu", properties);
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
@@ -69,4 +73,4 @@ public class LocalEntityManagerFactory implements Provider<EntityManagerFactory>
         }
         return emf;
     }
-}  
+}

@@ -5,9 +5,18 @@
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
         http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" version="2.0">
 
-    <persistence-unit name="neo4j_pu" transaction-type="RESOURCE_LOCAL">
-        <provider>org.hibernate.ogm.jpa.HibernateOgmPersistence</provider>
-        <mapping-file>META-INF/mappings/opendevice-core-mappings.xml</mapping-file>
+    <persistence-unit name="opendevice_pu" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <!--<provider>org.hibernate.ogm.jpa.HibernateOgmPersistence</provider>-->
+        <!--<provider>com.objectdb.jpa.Provider</provider>-->
+        <!--<mapping-file>META-INF/mappings/opendevice-core-mappings.xml</mapping-file>-->
+        <class>br.com.criativasoft.opendevice.core.model.Device</class>
+        <class>br.com.criativasoft.opendevice.core.model.DeviceCategory</class>
+        <class>br.com.criativasoft.opendevice.core.model.DeviceHistory</class>
+        <class>br.com.criativasoft.opendevice.core.model.Sensor</class>
+        <class>br.com.criativasoft.opendevice.core.model.PhysicalDevice</class>
+        <class>br.com.criativasoft.opendevice.core.model.Board</class>
+
         <class>br.com.criativasoft.opendevice.middleware.model.Dashboard</class>
         <class>br.com.criativasoft.opendevice.middleware.model.DashboardItem</class>
         <class>br.com.criativasoft.opendevice.restapi.model.Account</class>
@@ -15,11 +24,30 @@
         <class>br.com.criativasoft.opendevice.restapi.model.User</class>
         <class>br.com.criativasoft.opendevice.restapi.model.UserAccount</class>
         <exclude-unlisted-classes/>
+
+        <!-- JPA/H2 -->
         <properties>
-            <property name="hibernate.ogm.datastore.provider" value="neo4j_embedded"/>
-            <!--<property name="hibernate.ogm.neo4j.database_path" value="/media/ricardo/Dados/Codidos/Java/Projetos/opendevice-project/databases/graph.db"/>-->
-            <property name="hibernate.jdbc.batch_size" value="1000" />
-            <property name="hibernate.order_inserts" value="true"/>
+            <property name="connection.driver_class" value="org.h2.Driver"/>
+            <property name="hibernate.connection.url" value="jdbc:h2:/media/ricardo/Dados/Codidos/Java/Projetos/opendevice-project/databases/h2jpa"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="validate"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="true"/>
         </properties>
+
+
+        <!-- OBJECT DB -->
+        <!--<properties>-->
+            <!--<property name="javax.persistence.jdbc.url" value="/media/ricardo/Dados/Codidos/Java/Projetos/opendevice-project/databases/my.odb"/>-->
+        <!--</properties>-->
+
+        <!-- NEO4J -->
+        <!--<properties>-->
+            <!--&lt;!&ndash;<property name="hibernate.ogm.datastore.provider" value="neo4j_embedded"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="hibernate.ogm.datastore.provider" value="neo4j_bolt"/> some erros&ndash;&gt;-->
+            <!--&lt;!&ndash;<property name="hibernate.ogm.datastore.provider" value="neo4j_http"/> max error&ndash;&gt;-->
+            <!--<property name="hibernate.jdbc.batch_size" value="1000" />-->
+            <!--<property name="hibernate.order_inserts" value="true"/>-->
+        <!--</properties>-->
     </persistence-unit>
 </persistence>

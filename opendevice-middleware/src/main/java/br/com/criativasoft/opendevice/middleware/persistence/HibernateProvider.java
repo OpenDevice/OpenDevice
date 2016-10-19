@@ -44,6 +44,10 @@ public class HibernateProvider implements Provider<EntityManager> {
         threadLocal.set(instance);
     }
 
+    public static EntityManager getInstance(){
+        return threadLocal.get();
+    }
+
     @Override
     public EntityManager get() {
         return threadLocal.get();

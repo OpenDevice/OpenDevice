@@ -58,8 +58,8 @@ public abstract class GenericJpa<T> implements Dao<T> {
     }
 
     @Override
-    public void update(T entity) {
-        em.persist(entity);
+    public T update(T entity) {
+        return em.merge(entity);
     }
 
     @Override

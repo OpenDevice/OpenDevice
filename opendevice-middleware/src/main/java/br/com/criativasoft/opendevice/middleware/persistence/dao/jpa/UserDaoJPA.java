@@ -14,6 +14,7 @@
 package br.com.criativasoft.opendevice.middleware.persistence.dao.jpa;
 
 import br.com.criativasoft.opendevice.restapi.model.User;
+import br.com.criativasoft.opendevice.restapi.model.UserAccount;
 import br.com.criativasoft.opendevice.restapi.model.dao.UserDao;
 
 import javax.persistence.TypedQuery;
@@ -30,10 +31,9 @@ public class UserDaoJPA extends GenericJpa<User> implements UserDao {
     }
 
     @Override
-    public User getUser(String username, String password) {
-        TypedQuery<User> query = em().createQuery("select x from User x where x.username = :p1 and x.password = :p2", User.class);
+    public User getUser(String username) {
+        TypedQuery<User> query = em().createQuery("select x from User x where x.username = :p1", User.class);
         query.setParameter("p1", username);
-        query.setParameter("p2", password);
         query.setMaxResults(1);
 
         List<User> list = query.getResultList();
@@ -43,5 +43,8 @@ public class UserDaoJPA extends GenericJpa<User> implements UserDao {
         return list.iterator().next();
     }
 
-
+    @Override
+    public void delete(UserAccount userAccount) {
+        em().remove(userAccount);
+    }
 }

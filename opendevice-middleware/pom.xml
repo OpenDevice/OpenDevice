@@ -16,6 +16,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>objectdb</id>
+            <name>ObjectDB Repository</name>
+            <url>http://m2.objectdb.com</url>
+        </repository>
+    </repositories>
 
 	<dependencies>
 
@@ -98,37 +105,75 @@
         <!--</dependency>-->
 
         <dependency>
-            <groupId>org.hibernate.ogm</groupId>
-            <artifactId>hibernate-ogm-neo4j</artifactId>
-            <version>5.1.0.Alpha1</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>resteasy-client</artifactId>
-                    <groupId>org.jboss.resteasy</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>resteasy-jaxrs</artifactId>
-                    <groupId>org.jboss.resteasy</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>resteasy-jackson2-provider</artifactId>
-                    <groupId>org.jboss.resteasy</groupId>
-                </exclusion>
-            </exclusions>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.192</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>5.0.9.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.transaction</groupId>
+            <artifactId>jta</artifactId>
+            <version>1.1</version>
         </dependency>
 
+        <!--<dependency>-->
+            <!--<groupId>com.objectdb</groupId>-->
+            <!--<artifactId>objectdb</artifactId>-->
+            <!--<version>2.6.9_06</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.eclipse.persistence</groupId>-->
+            <!--<artifactId>javax.persistence</artifactId>-->
+            <!--<version>2.1.0</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>javax.transaction</groupId>-->
+            <!--<artifactId>jta</artifactId>-->
+            <!--<version>1.1</version>-->
+        <!--</dependency>-->
+
+
+
+        <!--<dependency>-->
+            <!--<groupId>org.hibernate.ogm</groupId>-->
+            <!--<artifactId>hibernate-ogm-neo4j</artifactId>-->
+            <!--<version>5.1.0.Alpha1</version>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>org.jboss.logging</groupId>-->
+                    <!--<artifactId>jboss-logging</artifactId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>resteasy-client</artifactId>-->
+                    <!--<groupId>org.jboss.resteasy</groupId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>resteasy-jaxrs</artifactId>-->
+                    <!--<groupId>org.jboss.resteasy</groupId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>resteasy-jackson2-provider</artifactId>-->
+                    <!--<groupId>org.jboss.resteasy</groupId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        <!--</dependency>-->
+
+        <!-- For: hibernate-ogm -->
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <version>3.3.0.Final</version>
+        </dependency>
 
         <!--<dependency>-->
             <!--<groupId>org.neo4j</groupId>-->
             <!--<artifactId>neo4j</artifactId>-->
             <!--<version>2.3.5</version>-->
         <!--</dependency>-->
-
-        <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>jta</artifactId>
-            <version>1.1</version>
-        </dependency>
 
         <!--<dependency>-->
             <!--<groupId>org.jboss.spec.javax.transaction</groupId>-->

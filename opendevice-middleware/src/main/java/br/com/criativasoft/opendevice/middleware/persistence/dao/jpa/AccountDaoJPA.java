@@ -13,10 +13,17 @@
 
 package br.com.criativasoft.opendevice.middleware.persistence.dao.jpa;
 
-import br.com.criativasoft.opendevice.restapi.model.*;
+import br.com.criativasoft.opendevice.restapi.model.Account;
+import br.com.criativasoft.opendevice.restapi.model.ApiKey;
+import br.com.criativasoft.opendevice.restapi.model.User;
+import br.com.criativasoft.opendevice.restapi.model.UserAccount;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
 
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Root;
 import java.util.List;
 
 /**
@@ -74,5 +81,44 @@ public class AccountDaoJPA extends GenericJpa<Account> implements AccountDao {
         List<ApiKey> list = query.getResultList();
 
         return list;
+    }
+
+    @Override
+    public List<User> listUsers(Account account) {
+
+        CriteriaBuilder cb = em().getCriteriaBuilder();
+        CriteriaQuery<User> query = cb.createQuery(User.class);
+        Root<User> root = query.from(User.class);
+        Join<User, UserAccount> accounts = root.join("accounts");
+        Join<User, UserAccount> owner = accounts.join("owner");
+        query.where(cb.equal(owner.get("id"), account.getId()));
+        List<User> list = em().createQuery(query).getResultList();
+
+        return list;
+    }
+
+    @Override
+    public Account getAccountByUID(String uid) {
+        TypedQuery<Account> query = em().createQuery("select x from Account x where x.uuid = :p1", Account.class);
+
+        query.setParameter("p1", uid);
+
+        return query.getSingleResult();
+    }
+
+    @Override
+    public boolean existUser(Account account, User user) {
+
+        List<User> users = listUsers(account);
+
+        // Validate
+        for (User user1 : users) {
+            if(user1.getId() == user.getId()){
+                return  true;
+            }
+
+        }
+
+        return false;
     }
 }

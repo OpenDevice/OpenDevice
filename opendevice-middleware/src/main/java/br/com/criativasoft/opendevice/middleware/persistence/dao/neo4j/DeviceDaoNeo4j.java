@@ -30,6 +30,7 @@ import java.util.List;
  */
 public class DeviceDaoNeo4j extends DeviceDaoJPA {
 
+    // FIXME: Use tentantIDs
     protected DeviceHistory getDeviceHistoryAggregate(DeviceHistoryQuery params) {
 
         Device device = getByUID(params.getDeviceID());

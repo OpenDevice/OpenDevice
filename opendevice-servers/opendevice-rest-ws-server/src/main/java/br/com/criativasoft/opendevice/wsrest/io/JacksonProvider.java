@@ -28,16 +28,19 @@ import javax.ws.rs.ext.Provider;
  * @date 09/07/14.
  */
 @Provider
-public class CommandJacksonProvider implements ContextResolver<ObjectMapper> {
+public class JacksonProvider implements ContextResolver<ObjectMapper> {
 
-    private final CommandJacksonMapper mapper;
+    private final ObjectMapper mapper;
 
-    public CommandJacksonProvider() {
-        mapper = new CommandJacksonMapper();
+    public JacksonProvider() {
+        mapper = new CommandJacksonMapper().getMapper();
+//        SimpleModule module = new SimpleModule("ODev-Rest", new Version(0, 1, 0, "alpha"));
+//        module.addSerializer(ErrorResponse.ErrorMessage.class, new HttpResponseSerializer());
+//        mapper.registerModule(module);
     }
 
     @Override
     public ObjectMapper getContext(Class<?> type) {
-        return mapper.getMapper();
+        return mapper;
     }
 }

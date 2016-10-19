@@ -227,7 +227,11 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
 
                 log.debug("Received command: " + message);
 
+                BaseDeviceManager defaultManager = (BaseDeviceManager) manager;
+
+                defaultManager.transactionBegin();
                 connection.notifyListeners(message);
+                defaultManager.transactionEnd();
 
             }
         }

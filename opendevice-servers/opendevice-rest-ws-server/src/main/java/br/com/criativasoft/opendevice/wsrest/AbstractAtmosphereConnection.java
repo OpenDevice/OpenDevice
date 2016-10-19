@@ -31,7 +31,7 @@ import br.com.criativasoft.opendevice.wsrest.filter.CrossOriginInterceptor;
 import br.com.criativasoft.opendevice.wsrest.filter.NewShiroInterceptor;
 import br.com.criativasoft.opendevice.wsrest.guice.config.ConnectionGuiceProvider;
 import br.com.criativasoft.opendevice.wsrest.guice.config.DeviceManagerGuiceProvider;
-import br.com.criativasoft.opendevice.wsrest.io.CommandJacksonProvider;
+import br.com.criativasoft.opendevice.wsrest.io.JacksonProvider;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.Authenticator;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
@@ -115,7 +115,7 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             conf.host("0.0.0.0"); // bind all local IPs
             configure(conf);
 
-            conf.resource(CommandJacksonProvider.class);
+            conf.resource(JacksonProvider.class);
 
             // Custom static resources
             for(String resource : webresources){

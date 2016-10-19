@@ -39,6 +39,7 @@ public class TenantFilter implements ContainerRequestFilter {
             return request;
         }
         Subject subject = SecurityUtils.getSubject();
+        subject.getSession(false);
 
         if(subject.isAuthenticated()){
             AccountPrincipal principal = (AccountPrincipal) subject.getPrincipal(); // return UUID from Account

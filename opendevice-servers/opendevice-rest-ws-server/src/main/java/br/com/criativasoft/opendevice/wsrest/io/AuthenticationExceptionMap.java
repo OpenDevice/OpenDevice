@@ -13,6 +13,7 @@
 
 package br.com.criativasoft.opendevice.wsrest.io;
 
+import br.com.criativasoft.opendevice.restapi.io.ErrorResponse;
 import org.apache.shiro.authc.AuthenticationException;
 
 import javax.ws.rs.core.Response;
@@ -27,6 +28,6 @@ public class AuthenticationExceptionMap implements ExceptionMapper<Authenticatio
 
     @Override
     public Response toResponse(AuthenticationException exception) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity(exception.getMessage()).build();
+        return ErrorResponse.status(Response.Status.UNAUTHORIZED,exception.getMessage());
     }
 }

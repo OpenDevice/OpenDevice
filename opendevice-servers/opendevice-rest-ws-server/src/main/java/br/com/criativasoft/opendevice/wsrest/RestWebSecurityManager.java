@@ -18,12 +18,15 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.subject.SubjectContext;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.subject.support.WebDelegatingSubject;
 import org.apache.shiro.web.util.WebUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
@@ -34,6 +37,8 @@ import java.util.Collection;
  * @date 24/09/16
  */
 public class RestWebSecurityManager extends DefaultWebSecurityManager {
+
+    public static final Logger log = LoggerFactory.getLogger(RestWebSecurityManager.class);
 
     public RestWebSecurityManager(Collection<Realm> realms) {
         super(realms);
@@ -71,7 +76,12 @@ public class RestWebSecurityManager extends DefaultWebSecurityManager {
     protected Session resolveContextSession(SubjectContext context) throws InvalidSessionException {
         SessionKey key = getSessionKey(context);
         if (key != null && key.getSessionId() != null) { // FIXED: check internal sessionID
-            return getSession(key);
+            try {
+                return getSession(key);
+            }catch (UnknownSessionException ex){
+                log.info(ex.getMessage());
+            }
+
         }
         return null;
     }

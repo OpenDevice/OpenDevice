@@ -19,6 +19,7 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 
 import javax.ws.rs.core.HttpHeaders;
@@ -44,12 +45,16 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             return request;
         }
 
+        Subject subject = SecurityUtils.getSubject();
+
+        Session session = subject.getSession(false);
+
+        if(session != null && subject.isAuthenticated()) session.touch();
+
         // Extract the token from the HTTP Authorization header
         String authorizationHeader = request.getHeaderValue(HttpHeaders.AUTHORIZATION);
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring("Bearer".length()).trim(); // API_KEY
-
-            Subject subject = SecurityUtils.getSubject();
 
             if(!subject.isAuthenticated()){
 

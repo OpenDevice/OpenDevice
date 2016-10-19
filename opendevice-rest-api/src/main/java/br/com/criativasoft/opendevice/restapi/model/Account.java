@@ -56,8 +56,8 @@ public class Account {
     }
 
     @PrePersist
-    public void generateUUID(){
-        this.uuid = UUID.randomUUID().toString();
+    protected void generateUUID(){
+        if(this.uuid == null)  this.uuid = UUID.randomUUID().toString();
     }
 
     @Override

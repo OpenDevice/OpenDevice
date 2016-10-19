@@ -166,25 +166,25 @@ public class IPCamGenericProtocol implements MessageSerializer {
                 String value = (command).getValue(String.class);
                 connection.doGet("set_alias.cgi?alias="+value + "&"+getAuthParams(), null);
             }else if(isProperty(property, CategoryIPCam.brightness)){
-                Integer value = (command).getValue(Integer.class); // Values: 0..255
+                Integer value = (command).getValue(Integer.class); // ROLES: 0..255
                 return setBrightnessURL(value).getBytes();
-            }else if(isProperty(property, CategoryIPCam.contrast)){ // Values: 0..255
+            }else if(isProperty(property, CategoryIPCam.contrast)){ // ROLES: 0..255
                 Integer value = (command).getValue(Integer.class);
                 connection.doGet("camera_control.cgi?param=2&value="+value + "&"+getAuthParams(), null);
-            }else if(isProperty(property, CategoryIPCam.resolution)){ // Values: 0..1
+            }else if(isProperty(property, CategoryIPCam.resolution)){ // ROLES: 0..1
                 Integer value = (command).getValue(Integer.class);
                 connection.doGet("camera_control.cgi?param=0&value="+value + "&"+getAuthParams(), null);
-            }else if(isProperty(property, CategoryIPCam.framerate)){ // Values: 0..30
+            }else if(isProperty(property, CategoryIPCam.framerate)){ // ROLES: 0..30
                 Integer value = (command).getValue(Integer.class);
                 connection.doGet("camera_control.cgi?param=6&value="+value + "&"+getAuthParams(), null);
             }else if(isProperty(property, CategoryIPCam.flip)){
-                Integer value = (command).getValue(Integer.class); // Values: 0,1,2,3
+                Integer value = (command).getValue(Integer.class); // ROLES: 0,1,2,3
                 connection.doGet("camera_control.cgi?param=5&value="+value + "&"+getAuthParams(), null);
             }else if(isProperty(property, CategoryIPCam.infrared)){
                 Integer value = (command).getValue(Integer.class);
                 connection.doGet("camera_control.cgi?param=14&value="+value + "&"+getAuthParams(), null);
             }else if(isProperty(property, CategoryIPCam.speed)){
-                Integer value = (command).getValue(Integer.class); // Values: 0..10
+                Integer value = (command).getValue(Integer.class); // ROLES: 0..10
                 connection.doGet("camera_control.cgi?param=100&value="+value + "&"+getAuthParams(), null);
             }
 

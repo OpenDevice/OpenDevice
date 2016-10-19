@@ -13,62 +13,71 @@
 
 package opendevice.io.tests.newconns;
 
-import io.moquette.interception.AbstractInterceptHandler;
-import io.moquette.interception.InterceptHandler;
-import io.moquette.interception.messages.InterceptPublishMessage;
-import io.moquette.proto.messages.AbstractMessage;
-import io.moquette.proto.messages.PublishMessage;
-import io.moquette.server.Server;
-import io.moquette.server.config.ClasspathConfig;
-import io.moquette.server.config.IConfig;
+import br.com.criativasoft.opendevice.connection.ConnectionListener;
+import br.com.criativasoft.opendevice.connection.ConnectionStatus;
+import br.com.criativasoft.opendevice.connection.DeviceConnection;
+import br.com.criativasoft.opendevice.connection.message.Message;
+import br.com.criativasoft.opendevice.core.LocalDeviceManager;
+import br.com.criativasoft.opendevice.core.command.GetDevicesResponse;
+import br.com.criativasoft.opendevice.core.listener.DeviceListener;
+import br.com.criativasoft.opendevice.core.model.Board;
+import br.com.criativasoft.opendevice.core.model.Device;
+import br.com.criativasoft.opendevice.core.model.PhysicalDevice;
+import br.com.criativasoft.opendevice.mqtt.MQTTServerConnection;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.List;
 
-import static java.util.Arrays.asList;
+public class MQTTEmbedded extends LocalDeviceManager {
 
-public class MQTTEmbedded {
-    static class PublisherListener extends AbstractInterceptHandler {
+    public static void main(String[] args) { launch(args); }
 
-        @Override
-        public void onPublish(InterceptPublishMessage msg) {
-            System.out.println("Received on topic: " + msg.getTopicName() + " content: " + new String(msg.getPayload().array()));
-            System.out.println("Client ID" + msg.getClientID());
-        }
+    @Override
+    public void start() throws IOException {
 
+        final Device led = new PhysicalDevice(1);
 
-    }
-
-    public static void main(String[] args) throws InterruptedException, IOException {
-        final IConfig classPathConfig = new ClasspathConfig();
-
-        final Server mqttBroker = new Server();
-        List<? extends InterceptHandler> userHandlers = asList(new PublisherListener());
-        mqttBroker.startServer(classPathConfig, userHandlers);
-
-
-        System.out.println("Broker started press [CTRL+C] to stop");
-        //Bind  a shutdown hook
-        Runtime.getRuntime().addShutdownHook(new Thread() {
+        addConnectionListener(new ConnectionListener() {
             @Override
-            public void run() {
-                System.out.println("Stopping broker");
-                mqttBroker.stopServer();
-                System.out.println("Broker stopped");
+            public void connectionStateChanged(DeviceConnection connection, ConnectionStatus status) {
+                System.err.println(" connectionStateChanged = " + status);
+            }
+
+            @Override
+            public void onMessageReceived(Message message, DeviceConnection connection) {
+                System.err.println("onMessageReceived : " + message);
+
+                if(message instanceof GetDevicesResponse){
+                    while (true){
+                        led.toggle();
+                        delay(1000);
+                    }
+                }
             }
         });
 
-        Thread.sleep(20000);
-        System.out.println("Before self publish");
-        PublishMessage message = new PublishMessage();
-        message.setTopicName("/exit");
-        message.setRetainFlag(true);
-//        message.setQos(AbstractMessage.QOSType.MOST_ONE);
-//        message.setQos(AbstractMessage.QOSType.LEAST_ONE);
-        message.setQos(AbstractMessage.QOSType.EXACTLY_ONCE);
-        message.setPayload(ByteBuffer.wrap("Hello World!!".getBytes()));
-        mqttBroker.internalPublish(message);
-        System.out.println("After self publish");
+
+        addInput(new MQTTServerConnection());
+
+        addListener(new DeviceListener() {
+            @Override
+            public void onDeviceRegistred(Device device) {
+                System.out.println(" >>> " + device);
+
+                if(device instanceof Board){
+                    System.out.println("boarc devices : " + ((Board) device).getDevices());
+                }
+
+            }
+
+            @Override
+            public void onDeviceChanged(Device device) {
+
+            }
+        });
+
+
+        connect();
+
+
     }
 }

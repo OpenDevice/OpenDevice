@@ -45,8 +45,8 @@ public class BlinkTest extends LocalDeviceManager {
 //        connect(out.tcp("192.168.3.100:8182"));
 //        connect(out.tcp("192.168.3.100:8182"));
 //        connect(out.tcp("192.168.43.149:8182"));
-//        connect(out.usb());
-        connect(out.bluetooth("20:13:01:24:01:93"));
+        connect(out.usb());
+//        connect(out.bluetooth("20:13:01:24:01:93"));
 
 //        led.on();
 

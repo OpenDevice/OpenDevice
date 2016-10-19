@@ -75,7 +75,7 @@ public class MainTenantProvider extends ThreadLocalTenantProvider {
 
             map = dbMemory.createHashMap("devices-" + id)
                     .counterEnable()
-                    .expireAfterAccess(1, TimeUnit.MINUTES)
+                    .expireAfterAccess(5, TimeUnit.HOURS)
                     .valueSerializer(Serializer.JAVA)
                     .keySerializer(Serializer.INTEGER)
 

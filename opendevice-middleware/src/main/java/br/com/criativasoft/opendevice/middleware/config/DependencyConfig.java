@@ -22,6 +22,7 @@ import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.AccountDaoJ
 import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.UserDaoJPA;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j.DashboardDaoNeo4j;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j.DeviceDaoNeo4j;
+import br.com.criativasoft.opendevice.middleware.tools.SimulationService;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
 import br.com.criativasoft.opendevice.restapi.model.dao.UserDao;
 import br.com.criativasoft.opendevice.wsrest.guice.config.GuiceModule;
@@ -46,6 +47,7 @@ public class DependencyConfig extends GuiceModule {
         binder.bind(DeviceDao.class).to(DeviceDaoNeo4j.class);
         binder.bind(AccountDao.class).to(AccountDaoJPA.class);
         binder.bind(UserDao.class).to(UserDaoJPA.class);
+        binder.bind(SimulationService.class).toInstance(new SimulationService());
 
 
     }

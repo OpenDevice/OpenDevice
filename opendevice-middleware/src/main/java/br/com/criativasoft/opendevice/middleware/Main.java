@@ -19,22 +19,24 @@ import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.connection.Connections;
 import br.com.criativasoft.opendevice.core.extension.ViewExtension;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
+import br.com.criativasoft.opendevice.core.util.StringUtils;
 import br.com.criativasoft.opendevice.engine.js.OpenDeviceJSEngine;
 import br.com.criativasoft.opendevice.middleware.config.DependencyConfig;
 import br.com.criativasoft.opendevice.middleware.persistence.HibernateProvider;
 import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
 import br.com.criativasoft.opendevice.middleware.resources.DashboardRest;
 import br.com.criativasoft.opendevice.middleware.resources.IndexRest;
+import br.com.criativasoft.opendevice.middleware.test.TestRest;
 import br.com.criativasoft.opendevice.mqtt.MQTTServerConnection;
 import br.com.criativasoft.opendevice.restapi.model.Account;
 import br.com.criativasoft.opendevice.wsrest.guice.GuiceInjectProvider;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.script.SimpleBindings;
 import java.io.*;
@@ -74,7 +76,7 @@ public class Main extends LocalDeviceManager {
 
         // Configuration Scripts (config.js)
         String userConfig = System.getProperty("config");
-        if(!StringUtils.isBlank(userConfig)){
+        if(!StringUtils.isEmpty(userConfig)){
             log.info("Using config file (JS): " + userConfig);
             loadScript(userConfig);
         }
@@ -100,6 +102,8 @@ public class Main extends LocalDeviceManager {
         // Rest Resources
         // ================
         webscoket.addResource(IndexRest.class);
+        webscoket.addResource(TestRest.class);
+
         if(config.isDatabaseEnabled()){
             webscoket.addResource(DashboardRest.class);
         }
@@ -140,7 +144,7 @@ public class Main extends LocalDeviceManager {
         if(config.isTenantsEnabled()){
 
             MainTenantProvider provider = new MainTenantProvider(manager);
-
+            config.setAutoRegisterLocalDevice(false);
             TenantProvider.setProvider(provider);
 
             // FIXME: this can show startup
@@ -160,32 +164,38 @@ public class Main extends LocalDeviceManager {
     }
 
     @Override
-    protected void transactionBegin() {
+    public void transactionBegin() {
 
-        if(entityManager != null){
+        EntityManagerFactory emf = LocalEntityManagerFactory.getInstance();
 
-            EntityTransaction tx = entityManager.getTransaction();
+        EntityManager em = emf.createEntityManager();
 
-            tx.begin();
-        }
+        HibernateProvider.setInstance(em);
+
+        EntityTransaction tx = em.getTransaction();
+
+        tx.begin();
 
     }
 
     @Override
-    protected void transactionEnd() {
-        if(entityManager != null){
+    public void transactionEnd() {
 
-            EntityTransaction tx = entityManager.getTransaction();
+        EntityManager em = HibernateProvider.getInstance();
 
-            try {
+        HibernateProvider.setInstance(null);
 
-                if (tx.isActive()) tx.commit();
+        EntityTransaction local = em.getTransaction();
 
-            }catch (RuntimeException e) {
-                if ( tx != null && tx.isActive() ) tx.rollback();
-                throw e; // or display error message
-            }
+        try {
+            if (local.isActive()) local.commit();
+        }catch (RuntimeException e) {
+            if ( local != null && local.isActive() ) local.rollback();
+            throw e; // or display error message
+        } finally {
+            em.close();
         }
+
     }
 
     private String getWebAppDir(){
@@ -332,7 +342,7 @@ public class Main extends LocalDeviceManager {
     }
 
     public void addWebResource(String staticResourcePath){
-        if(StringUtils.isBlank(staticResourcePath)) return;
+        if(StringUtils.isEmpty(staticResourcePath)) return;
         webscoket.addWebResource(staticResourcePath);
     }
 

@@ -1,0 +1,200 @@
+<span id="page-header"><i class="fa fa fa-sitemap"></i> Boards ${::ctrl.board ? "/ " + ctrl.board.name : "xxx"} </span>
+
+<ul id="page-actions" class="nav navbar-nav">
+    <li><a href ng-click="ctrl.newBoard()"><i class="fa fa-plus"></i> New</a></li>
+
+    <li ng-init="page.replace('#app-header', '#page-header');page.replace('#app-header-actions', '#page-actions')"></li>
+</ul>
+
+<!-- Main content -->
+<section class="content" data-ng-init="ctrl.init()">
+
+
+    <div class="row">
+
+        <div class="col-md-9">
+
+            <div class="box box-solid box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">Digital Devices (${ctrl.devicesCtrls.length})</h3>
+
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" ng-click="ctrl.syncDevices()" title="Refresh Devices"><i class="fa fa-refresh"></i></button>
+                        <button type="button" class="btn btn-box-tool" onclick="new app.VoiceCommand().init()" title="Voice Command"><i class="fa fa-microphone"></i></button>
+                        <button type="button" class="btn btn-box-tool" ng-click="ctrl.sendToAll(1);" title="All On"><i class="fa fa-lightbulb-o"></i></button>
+                        <button type="button" class="btn btn-box-tool" ng-click="ctrl.sendToAll(0);" title="All Off"><i class="fa fa-power-off"></i></button>
+                    </div>
+
+                </div><!-- /.box-header -->
+                <div class="box-body" style="min-height: 90px">
+
+                    <div class="devices-container" class="device-view-container clearfix">
+
+                        <div class="devices-view"
+                             ng-repeat="device in ctrl.devices | filter: ctrl.isControllableDevice"
+                             ng-init="$last && ctrl.onRenderDeviceItems(this)">
+                            <!-- Dynamic Content from DigitalCtrlView-->
+                        </div>
+
+                    </div>
+
+                </div><!-- /.box-body -->
+            </div>
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="box box-solid box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">Simulation & Tools</h3>
+
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" ng-click="ctrl.syncDevices()" title="Refresh Devices"><i class="fa fa-refresh"></i></button>
+                    </div>
+
+                </div>
+                <div class="box-body">
+                    <a class="btn btn-app" ng-click="ctrl.startSimulation()" title="Generate Random Data">
+                        <i class="fa fa-random"></i> Simulation
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+
+    <!-- ----------------------------------------------------- -->
+    <!-- Charts (Controllers)                                  -->
+    <!-- ----------------------------------------------------- -->
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="pull-right">
+                <ul class="list-inline">
+                    <li>Period:</li>
+                    <li> <input type="number" class="form-control input-sm" size="2"  style="width: 60px" ng-model="ctrl.chartViewOptions.periodValue"/> </li>
+                    <li>
+                        <select ng-model="ctrl.chartViewOptions.periodType" class="form-control input-sm" style="width: 120px" >
+                            <option value="MINUTE" selected="selected">Minute(s)</option>
+                            <option value="HOUR">Hour(s)</option>
+                            <option value="DAY">Day(s)</option>
+                            <option value="WEEK">Week(s)</option>
+                            <option value="MONTH">Month(s)</option>
+                            <option value="RECORDS">Last Records</option>
+                        </select>
+                    </li>
+                    <li>Chart Size:</li>
+                    <li>
+                        <div id="char-size-ctrl" class="btn-group btn-group-sm" data-toggle="btn-toggle">
+                            <button type="button" class="btn btn-primary" ng-click="ctrl.setChartSize('S')">S</button>
+                            <button type="button" class="btn btn-primary" ng-click="ctrl.setChartSize('M')">M</button>
+                            <button type="button" class="btn btn-primary" ng-click="ctrl.setChartSize('L')">L</button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ----------------------------------------------------- -->
+    <!-- Charts                                                -->
+    <!-- ----------------------------------------------------- -->
+
+    <div class="row sensors-container">
+
+        <div class="col-xs-12 sensors-view"
+             ng-repeat="chart in ctrl.sensorsCharts"
+             ng-init="$last && ctrl.onRenderChartItems(this)">
+
+        <div class="box box-success ">
+            <div class="box-header" >
+                <i class="fa fa-area-chart"></i>
+
+                <h3 class="box-title">${::chart.title}</h3>
+
+                <div class="box-tools pull-right" data-toggle="tooltip" title="" data-original-title="Operation mode">
+
+                    <div class="btn-group" data-toggle="btn-toggle">
+                        <button type="button" class="btn btn-xs ng-class:(chart.realtime ? 'btn-primary' : 'btn-default')"
+                                ng-click="ctrl.enableRealtime(chart.id, true)">Real-time</i></button>
+                        <button type="button" class="btn btn-xs ng-class:(!chart.realtime ? 'btn-primary' : 'btn-default')"
+                                ng-click="ctrl.enableRealtime(chart.id, false)">Historical</button>
+                    </div>
+
+                    <!--<div class="btn-group" data-toggle="btn-toggle">-->
+                        <!--<button type="button" class="btn btn-default btn-sm"><i class="fa fa-area-chart text-light-blue"></i>-->
+                        <!--</button>-->
+                        <!--<button type="button" class="btn btn-default btn-sm"><i class="fa fa-line-chart text-light-blue"></i></button>-->
+                    <!--</div>-->
+                </div>
+            </div>
+
+            <div class="box-body sensor-chart-body"  style="width: auto; height: 150px;">
+                <!-- Dynamic Content from ChartItemView.js-->
+            </div> <!-- /.chat -->
+
+        </div>
+        </div>
+    </div>
+
+
+    <!----------------------------------------------------------------->
+    <!-- Simulation                                                  -->
+    <!----------------------------------------------------------------->
+    <div id="simulation" class="modal fade"  tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <form class="form-horizontal" >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Simulation - Generate Random Data</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Interval (sec)</label>
+                                <div class="col-sm-9">
+                                    <div ng-init="ctrl.formSimulate = {interval : 1}"></div>
+                                    <input ng-model="ctrl.formSimulate.interval" type="number" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <table id="simulation-list" class="table table-bordered">
+                                    <tbody>
+                                    <tr>
+                                        <th style="width: 30px">#</th>
+                                        <th>Device</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    <tr ng-repeat="x in ctrl.devices">
+                                        <td>${ ::x.id }</td>
+                                        <td>${ ::x.name }</td>
+                                        <td>
+                                            <button type="button" class="btn btn-xs btn-warning" ng-show="ctrl.inSimulation(x.id)"
+                                                ng-click="ctrl.startSimulation(x.id, ctrl.formSimulate.interval, false)">Stop</button>
+                                            <button type="submit" class="btn btn-xs btn-primary" ng-show="!ctrl.inSimulation(x.id)"
+                                                ng-click="ctrl.startSimulation(x.id, ctrl.formSimulate.interval, true)">Start</button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</section>
+<!-- /.content -->

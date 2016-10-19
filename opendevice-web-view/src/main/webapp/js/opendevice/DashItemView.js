@@ -67,7 +67,7 @@ od.view.DashItemView = Class.extend(function() {
     // ==========================================================================
 
 
-    this.init = function (data) {
+    this.constructor = function (data) {
         this.setModel(data);
     }
 
@@ -91,6 +91,8 @@ od.view.DashItemView = Class.extend(function() {
         var reloadDataset = false;  // some changes in Model, need reload chart
 
         if(data.type != this.model.type) reloadDataset = true;
+
+        if(data.realtime != this.model.realtime) reloadDataset = true;
 
         if(data.monitoredDevices.length != this.model.monitoredDevices.length){
             reloadDataset = true;

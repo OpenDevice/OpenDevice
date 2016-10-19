@@ -16,7 +16,7 @@ $.extend(od.view.dashTypes,{
     DIGITAL_CONTROLLER: {
         id: "DIGITAL_CONTROLLER", // Java Enum : DashboardType
         name: "Digital Controller",
-        klass: "od.view.DigitalController",
+        klass: "od.view.DigitalCtrlView",
         multipleDevices: true,
         allowSensor : false,
         allowDevice : true,
@@ -31,7 +31,7 @@ $.extend(od.view.dashTypes,{
     },
 });
 
-od.view.DigitalController = od.view.DashItemView.extend(function() {
+od.view.DigitalCtrlView = od.view.DashItemView.extend(function() {
 
     var _this = this;
     var deviceListeners = [];
@@ -57,11 +57,7 @@ od.view.DigitalController = od.view.DashItemView.extend(function() {
 
             var device = ODev.get(deviceID);
 
-            var listener = function(value, deviceID){
-                onDeviceChange.call(_this, value, deviceID);
-            }
-
-            device.onChange(listener);
+            var listener = device.onChange(onDeviceChange, _this);
             deviceListeners.push(listener);
 
             if(device){
@@ -76,14 +72,13 @@ od.view.DigitalController = od.view.DashItemView.extend(function() {
     };
 
     this.destroy = function () {
-
-        this._super();
-
         // Remove listeners from devices.
         this.model.monitoredDevices.forEach(function(deviceID, index) {
             var device = ODev.get(deviceID);
             device.removeListener(deviceListeners[index]);
         });
+
+        this.super.destroy();
     }
 
     // ==========================================================================
@@ -91,7 +86,6 @@ od.view.DigitalController = od.view.DashItemView.extend(function() {
     // ==========================================================================
 
     function onDeviceChange(value, deviceID){
-        // alert("DeviceChange id : " + deviceID + ", value: " + value);
         var $device = $("[data-deviceid="+deviceID+"]", this.el);
         updateView.call(this, $device, deviceID); // use call(this, ) becouse is a OpenDevice inner event
     }

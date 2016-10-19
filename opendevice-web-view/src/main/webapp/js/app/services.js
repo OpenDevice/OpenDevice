@@ -73,3 +73,47 @@ app.factory('DashboardRest', ['$resource', function($resource){
     });
 
 }]);
+
+
+
+app.factory('AccountRest', ['$resource', function($resource){
+
+    var PATH = "api/accounts";
+
+    return $resource(PATH+'/:id', { id: '@id' }, { // configure defauls
+        listUsers: {method:'GET', url : PATH+"/users", isArray:true},
+        addUser: {method:'POST', url : PATH+"/users"},
+        deleteUser: {method:'DELETE', url : PATH+"/users/:id"}
+    });
+
+}]);
+
+
+
+/**
+ * A generic confirmation for risky actions.
+ * Usage: Add attributes: ng-really-message="Are you sure"? ng-really-click="takeAction()" function
+ */
+app.directive('ngReallyClick', [function() {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs) {
+            element.bind('click', function() {
+
+                var $dialog = $('#confirm-dialog');
+
+                var message = attrs.ngReallyMessage;
+
+                if(message) $dialog.find(".modal-title").text(message);
+
+                $dialog.modal('show');
+
+                $dialog.find("button:last").one('click', function(){
+                    scope.$apply(attrs.ngReallyClick);
+                    $dialog.modal('hide');
+                });
+
+            });
+        }
+    }
+}]);

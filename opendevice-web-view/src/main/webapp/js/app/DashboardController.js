@@ -16,7 +16,10 @@
 var pkg = angular.module('opendevice.controllers');
 
 /**
- * DeviceController for AngularJS
+ * DashboardController for AngularJS
+ *
+ * Note: Access this controller from Chrome Debugger
+ * angular.element(".content-wrapper").controller()
  * @author Ricardo JL Rufino
  * @date 06/07/14
  */
@@ -45,7 +48,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
     this.status = '';
     this.editMode = false;
     this.dashboard = null;
-    this.dashboardItems = [ ]; // view
+    this.dashboardItems = [ ]; // opendevice/DashItemView.js
     this.dashboardList = [];
     this.itemViewSelected = null;
     this.gridConf = {};

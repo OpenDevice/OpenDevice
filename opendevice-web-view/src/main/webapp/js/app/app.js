@@ -19,7 +19,7 @@ var urlParams;
 var app = angular.module('opendevice', [
     'ngRoute',
     'ngSanitize', // for: ui.select
-    'ngAnimate',
+    // 'ngAnimate',
     'ui.select',
     'gridster',
     //'opendevice.filters',
@@ -38,22 +38,53 @@ angular.module('opendevice.controllers', []);
 // Global variables
 app.run(function($rootScope) {
 
-    OpenDevice.setAppID(OpenDevice.findAppID()); // find in cookie/localstore
+    OpenDevice.setAppID(OpenDevice.findAppID()); // find ApiKey in cookie/localstore
+    $rootScope.ext = {}; // Extension support
+    $rootScope.ext.menu = [];
 
     ODev.connect();
 
     ODev.on("loginFail", function(){
-        window.location = "/login.html?message=Not%20Logged%20or%20Expired";
+        window.location = "/?message=Not%20Logged%20or%20Expired";
     });
 
-    $rootScope.ext = {}; // Extension support
-    $rootScope.ext.menu = [];
+    $( document ).ajaxError(function( event, jqXHR, ajaxSettings, thrownError ) {
+        //alert("error");
+        //window.location = "/?message=Not%20Logged%20or%20Expired";
+    });
+
+
+    $.notifyDefaults({
+        type: 'danger',
+        allow_dismiss: true,
+        delay: 3000
+    });
+
+
+    // Radialize the colors
+    Highcharts.getOptions().colors = Highcharts.map(Highcharts.getOptions().colors, function (color) {
+        return {
+            radialGradient: { cx: 0.5, cy: 0.3, r: 0.7 },
+            stops: [
+                [0, color],
+                [1, Highcharts.Color(color).brighten(-0.3).get('rgb')] // darken
+            ]
+        };
+    });
+
+
+    Highcharts.setOptions({
+        global: {useUTC: false, colorSetup : true}
+    });
+
 });
 
 app.config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/', {templateUrl: 'pages/dashboard.html', controller: 'DashboardController',  controllerAs: 'ctrl'});
     $routeProvider.when('/boards', {templateUrl: 'pages/boards.html', controller: 'DeviceController',  controllerAs: 'ctrl'});
+    $routeProvider.when('/boards/:boardID', {templateUrl: 'pages/devices.html', controller: 'DeviceController',  controllerAs: 'ctrl'});
     $routeProvider.when('/new', {templateUrl: 'pages/new.html', controller: 'DeviceController',  controllerAs: 'ctrl'});
+    $routeProvider.when('/users', {templateUrl: 'pages/users.html', controller: 'UserController',  controllerAs: 'ctrl'});
     $routeProvider.otherwise({redirectTo: '/'});
 }]);
 
@@ -92,23 +123,6 @@ app.filter('propsFilter', function() {
 
         return out;
     };
-});
-
-
-// Radialize the colors
-Highcharts.getOptions().colors = Highcharts.map(Highcharts.getOptions().colors, function (color) {
-    return {
-        radialGradient: { cx: 0.5, cy: 0.3, r: 0.7 },
-        stops: [
-            [0, color],
-            [1, Highcharts.Color(color).brighten(-0.3).get('rgb')] // darken
-        ]
-    };
-});
-
-
-Highcharts.setOptions({
-    global: {useUTC: false, colorSetup : true}
 });
 
 

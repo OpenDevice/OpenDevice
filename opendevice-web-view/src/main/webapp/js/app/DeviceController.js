@@ -16,32 +16,41 @@
 var pkg = angular.module('opendevice.controllers');
 
 /**
- * DashboardController for AngularJS
+ * Controller for Boards and Devices
  *
- *  Note: Access this controller from Chrome Debugger
+ * Note: Access this controller from Chrome Debugger
  * angular.element(".content-wrapper").controller()
  * @author Ricardo JL Rufino
- * @date 06/07/14
+ * @date 06/10/19
  */
-pkg.controller('DeviceController', ['$timeout', '$http', '$scope', 'DashboardRest', function ($timeout, $http, $scope, DashboardRest /*Service*/ ) {
+pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $http) {
 
     // Alias / Imports
     var DCategory = od.DeviceCategory;
     var DType = od.DeviceType;
-    var DashItemView = od.view.DashItemView;
 
     // Private
     // ==========================
-    var audioContext;
-    var audioPlay;
-
     var _this = this;
     var _public = this;
+
 
     // Public
     // ==========================
 
     this.devices = [];
+    this.odevListeners = []; // required because of our simple-page-model
+
+    this.sensorsCharts = []; // od.view.ChartItemView
+    this.devicesCtrls = []; // od.view.DigitalCtrlView
+    this.chartViewOptions = {
+        "periodValue": 1,
+        "periodType": "DAY"
+    };
+
+    this.isBoardView = false;
+
+    this.board;
 
     _public.init = function(){
 
@@ -75,34 +84,104 @@ pkg.controller('DeviceController', ['$timeout', '$http', '$scope', 'DashboardRes
 
         });
 
-        _this.devices = ODev.getDevices();
+        if($routeParams.boardID == "standalone"){ // Standalone Devices (DeviceList)
 
-        ODev.onChange(function(device){
-            if(device) {
-                if (device.type == od.DeviceType.DIGITAL) {
-                    // playSound(device);
-                }
+            this.isBoardView = true;
 
-                $timeout(function(){
-                    $scope.$apply(); // sync view
-                });
-            }
-        });
+            this.board = { id : "standalone", name : "Standalone Devices", devices : { length : standalone.length}};
 
+        } else if($routeParams.boardID){ // Board Details (DeviceList)
 
-        ODev.on(od.Event.DEVICE_LIST_UPDATE, function(devices){
-            _this.devices = devices;
-        });
+            this.board = ODev.get($routeParams.boardID);
 
-        // AudioContext detection
-        try {
-            // Fix up for prefixing
-            window.AudioContext = window.AudioContext||window.webkitAudioContext;
-            audioContext = new AudioContext();
-        }catch(e) {
-            alert('Web Audio API is not supported in this browser');
+            this.isBoardView = true;
+
+        } else { // Boards List Page
+
+            this.isBoardView = false;
+
+            this.board = null;
+
         }
 
+        this.devices = filterLocalDevices.call(this);
+
+        // Create Controllers and Charts for devices
+        if(this.isBoardView){
+
+            var charts = [];
+            var ctrls = [];
+
+            this.devices.forEach(function(device){
+
+                var chart = createSensorChart.call(_this, device);
+                if(chart) charts.push(chart);
+
+                var ctrl = createDeviceControler.call(_this, device)
+                if(ctrl) ctrls.push(ctrl);
+
+            });
+
+            _this.sensorsCharts = charts;
+            _this.devicesCtrls = ctrls;
+        }
+
+
+        // Destroy Controller Event
+        $scope.$on("$destroy", function() {
+
+            for (var i = 0; i < _this.sensorsCharts.length; i++) {
+                var view = _this.sensorsCharts[i];
+                view.destroy();
+            }
+            for (var i = 0; i < _this.devicesCtrls.length; i++) {
+                var view = _this.devicesCtrls[i];
+                view.destroy();
+            }
+
+            // Unregister listeners on change page.
+            ODev.removeListener(_this.odevListeners);
+        });
+
+        $scope.$watch('ctrl.chartViewOptions', function() {
+            updateCharts.call(_this);
+        }, true);
+
+        // ODev.onChange(function(device){
+        //     if(device) {
+        //         if (device.type == od.DeviceType.DIGITAL) {
+        //             // playSound(device);
+        //         }
+        //
+        //         $timeout(function(){
+        //             $scope.$apply(); // sync view
+        //         });
+        //     }
+        // });
+
+        // Fired by Sync or by Server
+
+        ODev_addListener(od.Event.DEVICE_LIST_UPDATE, function(devices){
+
+            var devices = filterLocalDevices.call(_this);
+
+            var ctrls = [];
+
+            for (var i = 0; i < _this.devicesCtrls.length; i++) {
+                var view = _this.devicesCtrls[i];
+                view.destroy();
+            }
+
+            devices.forEach(function(device){
+                var ctrl = createDeviceControler.call(_this, device)
+                if(ctrl) ctrls.push(ctrl);
+            });
+
+            _this.devicesCtrls = ctrls;
+
+            _this.devices = devices;
+
+        });
 
     };
 
@@ -116,7 +195,7 @@ pkg.controller('DeviceController', ['$timeout', '$http', '$scope', 'DashboardRes
         $('#new-board').modal('show');
 
         // Show ApiKeys
-        $.get("/api/account/keys", function(data){
+        $.get("/api/accounts/keys", function(data){
             if(data && data instanceof Array){
                 var $ul = $('#new-board .apiKeyList');
                 $ul.empty();
@@ -125,9 +204,67 @@ pkg.controller('DeviceController', ['$timeout', '$http', '$scope', 'DashboardRes
                 });
             }
         });
-
-
     }
+
+    _public.startSimulation = function(deviceID, interval, start){
+
+        if(deviceID == null){
+
+            $('#simulation').modal('show');
+
+            _public.listSimulation();
+
+        }else{
+
+            $http.get("/tests/simulation/"+(start ? "start" : "stop")+"/"+deviceID+"?interval=" + interval).then(function(){
+
+                if(start) _this.enableRealtime(deviceID, true);
+
+                _public.listSimulation(); // update list
+
+            }, function(response){ // error
+
+                if(response.status == 503) {
+                    alert("Maximum simulations reached. Stop simulations or increases in settings");
+                }else{
+                    console.error("Error starting simulation", response);
+                    alert("Error starting simulation");
+                }
+            });
+        }
+
+    };
+
+    _public.restoreSimulation = function(){
+        $http.get("/tests/simulation/list").then(function(response){
+            var devices = response.data;
+            if(devices && devices instanceof Array){
+                for(var i = 0; i < devices.length; i++){
+                    _this.enableRealtime(devices[i].id, true);
+                }
+            }
+        });
+    };
+
+    _public.listSimulation = function(){
+        $http.get("/tests/simulation/list").then(function(response){
+            var data = response.data;
+            if(data && data instanceof Array){
+                $scope["simulaionList"] = data;
+            }
+        });
+    };
+
+    _public.inSimulation = function(deviceID){
+        var devices = $scope["simulaionList"];
+        if(devices){
+            var found = ODev.findDevice(deviceID, devices);
+            return found != null;
+        }else{
+            return false;
+        }
+    };
+
 
     _public.send = function(data){
 
@@ -168,25 +305,25 @@ pkg.controller('DeviceController', ['$timeout', '$http', '$scope', 'DashboardRes
         var cname = "";
 
         if(device.category == DCategory.GENERIC && !(device.sensor)){
-            cname += "ic-lightbulb-";
+            cname += "/images/devices/lightbulb_";
         }
 
         if(device.category == DCategory.LAMP){
-            cname += "ic-lightbulb-";
+            cname += "/images/devices/lightbulb_";
         }
 
         if(device.category == DCategory.POWER_SOURCE){
-            cname += "ic-battery-";
+            cname += "/images/devices/battery_";
         }
 
         if(device.sensor){
-            cname += "ic-sensor-";
+            cname += "/images/devices/sensor_";
         }
 
         if(device.value == 1){
-            cname += "on";
+            cname += "on.png";
         }else{
-            cname += "off";
+            cname += "off.png";
         }
 
         return cname;
@@ -205,11 +342,162 @@ pkg.controller('DeviceController', ['$timeout', '$http', '$scope', 'DashboardRes
         return false;
     };
 
+    _public.enableRealtime = function(deviceID, realtime){
+        var item = findDashboardItem(deviceID);
+        if(item){
+            var model = angular.extend({}, item.model, { realtime : realtime});
+            item.update(model);
+        }
+    };
+
+    _public.setChartSize = function(kclass){
+
+        var sizeClass = {
+            "S" : "col-lg-4",
+            "M" : "col-lg-6",
+            "L" : "col-lg-12"
+        };
+
+        angular.forEach(_this.sensorsCharts, function(item, index) {
+
+            var $container = $(".sensors-container");
+            var $el = $('.sensors-view', $container).eq(index);
+
+            item.onStartResize();
+
+            var old = $el.data("sizeclass");
+            if(old) $el.removeClass(old);
+
+            $el.addClass(sizeClass[kclass]);
+            $el.data("sizeclass", sizeClass[kclass]);
+
+            setTimeout(function(){
+                item.onResize(true);
+            }, 400);
+
+        });
+
+    };
+
+    _public.onRenderChartItems = function(scope){
+
+        var $container = $(".sensors-container");
+
+        // Wait angular render html to initialize charts.
+        $timeout(function(){
+
+            _public.setChartSize("S");
+
+            // $("#char-size-ctrl button").last().button("toggle");
+
+            angular.forEach(_this.sensorsCharts, function(item, index) {
+                console.log('Initializing Chart/View: ' + item.title, item);
+                if(!item.initialized) {
+                    var $el = $('.sensor-chart-body', $container).eq(index);
+                    item.render($el);
+                }
+            });
+        });
+
+        // Verify running simulations
+        $timeout(function(){
+           _this.restoreSimulation();
+        }, 1000);
+
+        return false;
+    };
+
+    _public.onRenderDeviceItems = function(scope){
+
+        var $container = $(".devices-container");
+
+        // Wait angular render html to initialize charts.
+        $timeout(function(){
+
+            angular.forEach(_this.devicesCtrls, function(item, index) {
+                console.log('Initializing Device/View: ' + item.title, item);
+                if(!item.initialized) {
+                    var $el = $('.devices-view', $container).eq(index);
+                    item.render($el);
+                }
+            });
+        });
+
+        return false;
+    };
+
 
     // ============================================================================================
-    // Private Functions
+    // Private Functionsre
     // ============================================================================================
 
+    function ODev_addListener(event, listener){
+        var ldef = ODev.on(event, listener);
+        _this.odevListeners.push(ldef); // required to remove later
+    }
+
+    function updateCharts(){
+        angular.forEach(_this.sensorsCharts, function(item, index) {
+            if(item.initialized && !item.model.realtime) {
+                var model = angular.extend({}, item.model, _this.chartViewOptions);
+                item.update(model);
+            }
+        });
+    }
+
+
+    function createSensorChart(sensor){
+
+        if(this.isAnalogDevice(sensor)){
+            var model = {
+                "id": sensor.id,
+                "title": sensor.name,
+                "type": "LINE_CHART",
+                // "layout": {"row": 0, "col": 2, "sizeX": 4, "sizeY": 2},
+                "monitoredDevices": [sensor.id],
+                "aggregation": "NONE",
+                "itemGroup": 0,
+                "realtime": false,
+                "content": null,
+                "scripts": null,
+                "viewOptions": {}
+            };
+
+            angular.extend(model, this.chartViewOptions); // general options
+
+            return new od.view.ChartItemView(model);
+        }
+
+        return null;
+    }
+
+    function createDeviceControler(device){
+
+        if(this.isControllableDevice(device)){
+            var model = {
+                "type": "DIGITAL_CONTROLLER",
+                "monitoredDevices": [device.id],
+                "periodValue": 1,
+                "realtime": true,
+                "content": null,
+                "scripts": null,
+                "viewOptions": {
+                    "iconON": "lightbulb_on.png",
+                    "iconOFF": "lightbulb_off.png",
+                    "textON": "ON",
+                    "textOFF": "OFF"
+                }
+            };
+
+            return new od.view.DigitalCtrlView(model);
+        }else{
+
+            return null;
+
+        }
+
+
+    }
 
     /**
      * Find device by ID
@@ -231,27 +519,55 @@ pkg.controller('DeviceController', ['$timeout', '$http', '$scope', 'DashboardRes
         return null;
     }
 
-    function playSound(device){
 
-        if(audioContext && device.type == od.DeviceType.DIGITAL){
-            audioPlay = audioContext.createOscillator();
-            audioPlay.type = 3;
-            if(device.value == 0){
-                audioPlay.frequency.value = 700;
-            }else{
-                audioPlay.frequency.value = 800;
+    /**
+     * Filter the devices (ODev) corresponding to selected board
+     * @returns {Array}
+     */
+    function filterLocalDevices(){
+
+        var devices = [];
+
+        if(this.board && this.board.id == "standalone"){ // Standalone Devices
+
+            devices = ODev.getDevicesByBoard(0);
+
+        } else if(this.board && this.board.id){ // Board Details (DeviceList)
+
+            devices = ODev.getDevicesByBoard(this.board.id);
+
+        } else { // Open Boards Page
+
+            devices = ODev.getBoards();
+
+            var standalone = ODev.getDevicesByBoard(0);
+
+            // Add another devices in fake Board
+            if(standalone && standalone.length > 0){
+
+                var Board = { id : "standalone", name : "Standalone Devices", devices : { length : standalone.length}};
+
+                devices.push(Board);
             }
-            audioPlay.connect(audioContext.destination);
 
-            var now = audioContext.currentTime;
-
-            if(audioPlay && audioPlay.noteOn){
-                audioPlay.noteOn( now );
-                audioPlay.noteOff( now + 0.05 ); // "beep" (in seconds)
-            }else{
-                console.error("audioPlay not working !");
-            }
         }
+
+        return devices;
     }
-}]);
+
+    function findDashboardItem(id){
+        var values = _this.sensorsCharts;
+        if(values){
+            for(var i = 0; i < values.length; i++){
+                if(values[i].id == id){
+                    return values[i];
+                }
+            }
+        } else{
+            console.warn("Not loaded or empty !");
+        }
+
+        return null;
+    }
+});
 

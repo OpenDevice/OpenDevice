@@ -76,6 +76,7 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
     // ======================
 
     var chart;
+    var realtimeListeners = [];
 
     // Public
     // ======================
@@ -86,29 +87,42 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
     this.resizing = false;
     this.data = [];
 
+
     // ==========================================================================
     // Public
     // ==========================================================================
 
 
-    this.init = function (data) {
-        this.setModel(data);
-    }
+    // this.init = function (data) {
+    //     this.setModel(data);
+    // }
 
     this.render = function ($el) {
 
         this.el = $el;
 
-        if (od.view.DashItemView.isCompatibleChart(this.model.type)) {
+        if (this.model.realtime) {
+
+            initChart.call(this);
+
+            for (var i = 0; i < this.model.monitoredDevices.length; i++) {
+                var device = ODev.get(this.model.monitoredDevices[i]);
+                if(device){
+                    var listener = device.onChange(updateRealtimeData, this);
+                    realtimeListeners.push(listener);
+                }else{
+                    console.log("Falied on render, not found device: " + this.model.monitoredDevices[i] + ", index: " + i);
+                }
+
+            }
+
+        }else{
+
             try{
 
                 loadData.call(this);
 
             }catch(e){console.error("Error initializing Chart: " +this.model.title + "("+this.model.type+")",e.stack);}
-
-        }else if (this.model.type == 'DYNAMIC_VALUE') {
-
-            this.el.append($('<div class="dash-body-centered"> <span class="text-value center-block-item">0</span> </div>'));
 
         }
 
@@ -120,42 +134,42 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
             this.resizing = false;
             var $el = $(this.el);
             var $chart = $(".highcharts-container", $el);
-            //chart.setSize($(this.el).width(), $(this.el).height(), false);
-            chart.reflow ();
+            $chart.css("width", "100%");
+            chart.reflow();
         }
     };
 
     this.onStartResize = function () {
-        console.log("onStartResize this chart: " + chart);
         if(chart){
             $(this.el).hide(); // hide for performance reasons
         }
-
         this.resizing = true;
     };
 
 
     this.destroy = function () {
-        // TODO: remember to remove DEVICE LISTENERS (real-time)
         if (chart){
+
+            removeRealtimeListeners.call(this);
+
             try{chart.destroy();}catch (e){ console.error(e);} // FIX: avoid error if chart previos fail.
         }
-        $(this.el).remove();
+        $(this.el).empty();
     };
 
     this.update = function (data) {
 
-        var reloadDataset = this._super(data);
+        var reloadDataset = this.super.update(data);
 
         if(chart && data.viewOptions && this.model.viewOptions){
             if(chart && data.viewOptions && data.viewOptions.max != this.model.viewOptions.max) reloadDataset = true;
         }
 
         if(reloadDataset){
-            chart.destroy();
-            if(!data.realtime) loadData();
+            this.destroy();
+            this.render(this.el);
         }else{
-            if(!data.realtime) loadData();
+            if(!data.realtime) loadData.call(this);
         }
 
     };
@@ -182,8 +196,7 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
                 var dserie = {
                     name: device.name,
-                    showInLegend: showLegends,
-                    data : data[i]
+                    showInLegend: showLegends
                 };
 
                 if(this.model.realtime){
@@ -201,6 +214,8 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
                         }
                         return data;
                     }());
+                }else{
+                    dserie.data = data[i]
                 }
 
                 deviceSeries.push(dserie);
@@ -447,27 +462,38 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
             }else{
 
+                // FIXME: THIS IS FOR DYNAMIC VALUE
                 $('.text-value',_this.el).text(value);
 
                 $(_this.el).textfill({maxFontPixels : 65, explicitWidth : $(_this.el).width() - 20});
             }
 
+        },function (jq,status,message) {
+            _this.el.empty();
+            var message = (jq.responseJSON.message || message);
+            _this.el.append("<span class='itemview-error'>"+message+"</span>");
         });
 
     }
 
+    function removeRealtimeListeners() {
+        this.model.monitoredDevices.forEach(function(deviceID, index) {
+            var device = ODev.get(deviceID);
+            var list = realtimeListeners[index];
+            console.log("Removing Listeners : " + deviceID);
+            device.removeListener(list);
+        });
+    }
 
     /**
      * This function is called when the device has changed (OpenDevice.onDeviceChange)
      * @param device
      */
-    function updateRealtimeData(device){
+    function updateRealtimeData(value, deviceID){
 
-        var index = $.inArray(device.id, this.model.monitoredDevices);
+        var index = $.inArray(deviceID, this.model.monitoredDevices);
 
         if(index > -1){
-
-            var value = device.value;
 
             if(chart){
 
@@ -479,6 +505,7 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
                     chart.series[0].data[index].update(value);
                 }
 
+                // FIXME: this is for DYNAMIC TEXT
             }else{
                 $('.text-value',this.el).text(value);
 

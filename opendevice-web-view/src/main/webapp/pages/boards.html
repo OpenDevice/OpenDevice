@@ -1,4 +1,4 @@
-<span id="page-header"><i class="fa fa fa-sitemap"></i> Boards / Devices</span>
+<span id="page-header"><i class="fa fa fa-sitemap"></i> Boards</span>
 
 <ul id="page-actions" class="nav navbar-nav">
     <li><a href ng-click="ctrl.newBoard()"><i class="fa fa-plus"></i> New</a></li>
@@ -10,25 +10,25 @@
 <!-- Main content -->
 <section class="content" data-ng-init="ctrl.init()">
 
-
     <div class="row">
 
-        <div class="col-md-4">
+        <div class="col-md-4" ng-repeat="device in ctrl.devices">
             <!-- Widget: user widget style 1 -->
-            <div class="box box-widget widget-user">
+            <a href="#/boards/${::device.id}">
+            <div class="box box-widget widget-user" >
                 <!-- Add the bg color to the header using any of the bg-* classes -->
                 <div class="widget-user-header bg-aqua-active">
-                    <h3 class="widget-user-username">Board Description</h3>
-                    <h5 class="widget-user-desc">ESP8866</h5>
+                    <h3 class="widget-user-username">${::device.name}</h3>
+                    <h5 class="widget-user-desc">ESP8866 #${::device.id}</h5>
                 </div>
                 <div class="widget-user-image">
-                    <img class="img-circle" src="images/boards/ESP8266.png" alt="User Avatar">
+                    <img class="img-circle" src="/images/boards/generic-blue.png" alt="User Avatar">
                 </div>
                 <div class="box-footer">
                     <div class="row">
                         <div class="col-sm-4 border-right">
                             <div class="description-block">
-                                <h5 class="description-header">5</h5>
+                                <h5 class="description-header">${::device.devices.length}</h5>
                                 <span class="description-text">Devices</span>
                             </div>
                             <!-- /.description-block -->
@@ -36,8 +36,8 @@
                         <!-- /.col -->
                         <div class="col-sm-4 border-right">
                             <div class="description-block">
-                                <h5 class="description-header">3</h5>
-                                <span class="description-text">Sensors</span>
+                                <h5 class="description-header">xxx</h5>
+                                <span class="description-text">xxx</span>
                             </div>
                             <!-- /.description-block -->
                         </div>
@@ -54,39 +54,10 @@
                     <!-- /.row -->
                 </div>
             </div>
+            </a>
             <!-- /.widget-user -->
         </div>
 
-    </div>
-
-    <div class="box box-solid box-primary">
-        <div class="box-header">
-            <h3 class="box-title">Devices (${ctrl.devices.length})</h3>
-
-            <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" ng-click="ctrl.syncDevices()" title="Refresh Devices"><i class="fa fa-refresh"></i></button>
-                <button type="button" class="btn btn-box-tool" onclick="new app.VoiceCommand().init()" title="Voice Command"><i class="fa fa-microphone"></i></button>
-                <button type="button" class="btn btn-box-tool" ng-click="ctrl.sendToAll(1);" title="All On"><i class="fa fa-lightbulb-o"></i></button>
-                <button type="button" class="btn btn-box-tool" ng-click="ctrl.sendToAll(0);" title="All Off"><i class="fa fa-power-off"></i></button>
-            </div>
-
-
-        </div><!-- /.box-header -->
-        <div class="box-body">
-
-            <div id="main-device-list" class="device-view-container clearfix">
-
-                <a class="device-view"  data-deviceid="${device.id}" ng-click="ctrl.toggleValue(device.id);" ng-repeat="device in ctrl.devices | filter: ctrl.isControllableDevice">
-                    <span class="device-view-icon mws-ic ${ctrl.getIcon(device.id)}">&nbsp;</span>
-                    <div class="device-view-content">
-                        <span class="device-view-title">${device.name}</span>
-                        <span class="device-view-value" ng-class="device.value == 1 ? 'on' : 'off'">${device.value == 1 ? "ON" : "OFF"}</span>
-                    </div>
-                </a>
-
-            </div>
-
-        </div><!-- /.box-body -->
     </div>
 
 

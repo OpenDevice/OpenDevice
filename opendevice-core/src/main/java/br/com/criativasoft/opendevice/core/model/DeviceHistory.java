@@ -26,7 +26,7 @@ import javax.persistence.Id;
 public class DeviceHistory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
 
     private long timestamp;

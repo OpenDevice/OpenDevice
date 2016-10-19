@@ -13,6 +13,8 @@
 
 package br.com.criativasoft.opendevice.restapi.auth;
 
+import br.com.criativasoft.opendevice.restapi.model.AccountType;
+
 import java.security.Principal;
 
 /**
@@ -29,10 +31,13 @@ public class AccountPrincipal implements Principal {
 
     private String accountUUID;
 
-    public AccountPrincipal(long userID, long userAccountID, String accountUUID) {
+    private AccountType type;
+
+    public AccountPrincipal(long userID, long userAccountID, String accountUUID, AccountType type) {
         this.userID = userID;
         this.userAccountID = userAccountID;
         this.accountUUID = accountUUID;
+        this.type = type;
     }
 
     public String getAccountUUID() {
@@ -50,5 +55,9 @@ public class AccountPrincipal implements Principal {
     @Override
     public String getName() {
         return "User#"+userID;
+    }
+
+    public AccountType getType() {
+        return type;
     }
 }

@@ -17,6 +17,7 @@ import br.com.criativasoft.opendevice.core.DataManager;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.restapi.ApiDataManager;
 import br.com.criativasoft.opendevice.restapi.model.Account;
+import br.com.criativasoft.opendevice.restapi.model.AccountType;
 import br.com.criativasoft.opendevice.restapi.model.UserAccount;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
 import org.apache.shiro.SecurityUtils;
@@ -26,11 +27,10 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.mgt.DefaultSecurityManager;
-import org.apache.shiro.realm.AuthenticatingRealm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BearerTokenRealm extends AuthenticatingRealm  {
+public class BearerTokenRealm extends AbstractAuthorizingRealm {
 
     public static final String TOKEN_CACHE = "AuthTokenCache";
 
@@ -68,7 +68,9 @@ public class BearerTokenRealm extends AuthenticatingRealm  {
             if(userAccount != null){
                 Account account = userAccount.getOwner();
 
-                AccountPrincipal principal = new AccountPrincipal(userAccount.getUser().getId(), userAccount.getId(), account.getUuid());
+                AccountType type = userAccount.getType();
+
+                AccountPrincipal principal = new AccountPrincipal(userAccount.getUser().getId(), userAccount.getId(), account.getUuid(), type);
 
                 // todo: load permission tags into AuthenticationInfo
                 return new SimpleAuthenticationInfo(principal, authToken.getCredentials(), "BearerTokenRealm");
@@ -77,4 +79,5 @@ public class BearerTokenRealm extends AuthenticatingRealm  {
 
         return null;
     }
+
 }

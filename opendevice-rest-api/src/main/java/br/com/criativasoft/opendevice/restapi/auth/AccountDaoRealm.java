@@ -17,10 +17,13 @@ import br.com.criativasoft.opendevice.core.DataManager;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.restapi.ApiDataManager;
 import br.com.criativasoft.opendevice.restapi.model.Account;
+import br.com.criativasoft.opendevice.restapi.model.AccountType;
 import br.com.criativasoft.opendevice.restapi.model.UserAccount;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
-import org.apache.shiro.authc.*;
-import org.apache.shiro.realm.AuthenticatingRealm;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
 
 /**
  * TODO: Add docs.
@@ -28,8 +31,7 @@ import org.apache.shiro.realm.AuthenticatingRealm;
  * @author Ricardo JL Rufino
  * @date 22/09/16
  */
-public class AccountDaoRealm extends AuthenticatingRealm {
-
+public class AccountDaoRealm extends AbstractAuthorizingRealm {
 
     private DeviceManager manager;
 
@@ -54,15 +56,16 @@ public class AccountDaoRealm extends AuthenticatingRealm {
             if(userAccount != null){
                 Account account = userAccount.getOwner();
 
-                AccountPrincipal principal = new AccountPrincipal(userAccount.getUser().getId(), userAccount.getId(), account.getUuid());
+                AccountType type = userAccount.getType();
+
+                AccountPrincipal principal = new AccountPrincipal(userAccount.getUser().getId(), userAccount.getId(), account.getUuid(), type);
 
                 // todo: load permission tags into AuthenticationInfo
                 return new SimpleAuthenticationInfo(principal, userAccount.getId(), "AccountDaoRealm");
             }
         }
 
-
-
         return null;
     }
+
 }

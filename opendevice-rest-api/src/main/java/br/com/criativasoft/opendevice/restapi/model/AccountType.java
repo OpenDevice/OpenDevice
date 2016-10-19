@@ -19,5 +19,11 @@ package br.com.criativasoft.opendevice.restapi.model;
  */
 public enum AccountType {
     ACCOUNT_MANAGER,
-    USER
+    USER;
+
+    // For Rest
+    public static class Values {
+        public static final String ACCOUNT_MANAGER = "ACCOUNT_MANAGER";
+        public static final String USER = "USER";
+    }
 }

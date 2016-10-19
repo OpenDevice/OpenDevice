@@ -28,8 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -45,7 +43,7 @@ import java.util.List;
  * @author Ricardo JL Rufino
  * @date 04/07/14.
  */
-@Path("device")
+@Path("/api/devices")
 @RequiresAuthentication
 public class DeviceRest {
 
@@ -85,7 +83,7 @@ public class DeviceRest {
 
     @GET
     @Path("/{uid}/value")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     public String getValue(@PathParam("uid") int uid) {
 
         Device device = manager.findDeviceByUID(uid);
@@ -128,10 +126,8 @@ public class DeviceRest {
     }
 
     @GET
-    @Path("/list")
     @Produces(MediaType.APPLICATION_JSON)
     public List<DeviceVO> list() throws IOException {
-
 
         List<DeviceVO> devices = new LinkedList<DeviceVO>();
 

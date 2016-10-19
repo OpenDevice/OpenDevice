@@ -25,6 +25,8 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.authc.credential.DefaultPasswordService;
+import org.apache.shiro.authc.credential.HashingPasswordService;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.Session;
@@ -40,6 +42,7 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
+import java.util.Date;
 import java.util.Set;
 
 import static br.com.criativasoft.opendevice.restapi.auth.BearerTokenRealm.TOKEN_CACHE;
@@ -114,6 +117,7 @@ public class AuthRest {
             javax.servlet.http.Cookie cookie = new javax.servlet.http.Cookie(AuthRest.SESSION_ID,  (String) session.getId());
             cookie.setPath("/");
             res.getResponse().addCookie(cookie);
+            session.setTimeout((1000 * 60) * 30); // min
 
 //            // Generate Cookie to indentify ApiKey/AuthToken
 //            cookie = new javax.servlet.http.Cookie(TenantProvider.HTTP_HEADER_KEY, principal.getAccountUUID()); // (String) session.getId()
@@ -160,9 +164,14 @@ public class AuthRest {
 
             try {
 
-                User user = userDao.getUser(username, password);
+                User user = userDao.getUser(username);
 
-                if(user == null) throw new AuthenticationException("Incorrect username/password");
+                if(user == null) throw new AuthenticationException("Incorrect username");
+
+                HashingPasswordService service = new DefaultPasswordService();
+                boolean passwordsMatch = service.passwordsMatch(password, user.getPassword());
+
+                if (!passwordsMatch)  throw new AuthenticationException("Incorrect password");
 
                 Set<UserAccount> uaccounts = user.getAccounts();
 
@@ -184,6 +193,7 @@ public class AuthRest {
                     AccountPrincipal principal = (AccountPrincipal) currentUser.getPrincipal();
                     logged = true;
                     authtoken = principal.getAccountUUID();
+                    user.setLastLogin(new Date());
                 }
 
             } catch (UnknownAccountException e) {

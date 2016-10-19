@@ -13,12 +13,9 @@
 
 package br.com.criativasoft.opendevice.core.metamodel;
 
-import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.DeviceCategory;
-import br.com.criativasoft.opendevice.core.model.DeviceType;
-import br.com.criativasoft.opendevice.core.model.Sensor;
-import br.com.criativasoft.opendevice.core.model.test.GenericCategory;
+import br.com.criativasoft.opendevice.core.model.*;
 import br.com.criativasoft.opendevice.core.model.test.ActionDef;
+import br.com.criativasoft.opendevice.core.model.test.GenericCategory;
 import br.com.criativasoft.opendevice.core.model.test.GenericDevice;
 import br.com.criativasoft.opendevice.core.model.test.Property;
 
@@ -31,12 +28,15 @@ public class DeviceVO {
 	private int type;
 	private int category;
 	private long value;
+	private int parentID;
     private boolean sensor=false;
 	
 	private long lastUpdate;
 	private Date dateCreated;
 
 	private List<String> actions = new LinkedList<String>();
+    private List<Integer> devices = new LinkedList<Integer>();
+
 	private Map<String, Object> properties = new HashMap<String, Object>();
 
 	public DeviceVO() {
@@ -50,6 +50,18 @@ public class DeviceVO {
 
         if(device instanceof Sensor){
             setSensor(true);
+        }
+
+		if(device instanceof PhysicalDevice){
+            Board board = ((PhysicalDevice) device).getBoard();
+            if(board != null) setParentID(board.getUid());
+		}
+
+		if(device instanceof Board){
+			Set<PhysicalDevice> devices = ((Board) device).getDevices();
+            for (Device current : devices) {
+                this.devices.add(current.getUid());
+            }
         }
 
 		// FIXME: remove later
@@ -131,6 +143,22 @@ public class DeviceVO {
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
 	}
+
+	public void setParentID(int parentID) {
+		this.parentID = parentID;
+	}
+
+	public int getParentID() {
+		return parentID;
+	}
+
+    public void setDevices(List<Integer> devices) {
+        this.devices = devices;
+    }
+
+    public List<Integer> getDevices() {
+        return devices;
+    }
 
     public void setSensor(boolean sensor) {
         this.sensor = sensor;

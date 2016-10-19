@@ -2,15 +2,17 @@ package br.com.criativasoft.opendevice.core.model;
 
 import br.com.criativasoft.opendevice.core.command.GPIO;
 
+import javax.persistence.Entity;
+
 /**
  * Sensors are basically the same as devices.
  * @author Ricardo JL Rufino
  * @date 06/09/14.
  * @see br.com.criativasoft.opendevice.core.model.Device
- */
-public class Sensor extends Device {
+ */@Entity
+public class Sensor extends PhysicalDevice {
 
-    private Sensor() {} // NONE: used only for persistence/load
+    public Sensor() {} // NONE: used only for persistence/load
 
     /**
      * Create new Sensor with type  {@link DeviceType#DIGITAL}

@@ -13,14 +13,12 @@
 
 package br.com.criativasoft.opendevice.core.command;
 
-import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.DeviceCategory;
-import br.com.criativasoft.opendevice.core.model.DeviceType;
-import br.com.criativasoft.opendevice.core.model.Sensor;
+import br.com.criativasoft.opendevice.core.model.*;
 import br.com.criativasoft.opendevice.core.util.StringUtils;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 public class GetDevicesResponse extends ResponseCommand implements ExtendedCommand {
 
@@ -48,6 +46,9 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
 
         String[] split = extradata.split(Command.DELIMITER);
 
+        Board board = null;
+        List<Device> deviceList = new LinkedList<Device>();
+
         for (int i = 1; i < split.length; i++) {
             String deviceStr = split[i].substring(1, split[i].length()-1);
             String[] deviceSplit = deviceStr.split(",");
@@ -58,16 +59,32 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
 
             DeviceType deviceType =  DeviceType.getByCode(Integer.parseInt(deviceSplit[6]));
 
-            if(isSensor){
+            if(deviceType == DeviceType.BOARD) {
+                if (StringUtils.isEmpty(name)) name = "Board " + uid;
+                board = new Board(uid, name, deviceType, DeviceCategory.GENERIC, value);
+            } else if(isSensor){
                 if(StringUtils.isEmpty(name)) name = "Sensor " + uid;
                 Sensor sensor = new Sensor(uid, name, deviceType, DeviceCategory.GENERIC);
                 sensor.setValue(value);
-                devices.add(sensor);
+                deviceList.add(sensor);
             }else{
                 if(StringUtils.isEmpty(name)) name = "Device " + uid;
-                devices.add(new Device(uid, name, deviceType, DeviceCategory.GENERIC, value));
+                deviceList.add(new PhysicalDevice(uid, name, deviceType, DeviceCategory.GENERIC, value));
             }
         }
+
+        if(board != null){
+            board.setDevices(deviceList);
+            for (Device device : deviceList) {
+                if(device instanceof PhysicalDevice){
+                    ((PhysicalDevice) device).setBoard(board);
+                }
+            }
+            devices.add(board);
+        }
+
+        devices.addAll(deviceList);
+
 	}
 
 	@Override
@@ -82,11 +99,18 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
             sb.append("[");
             sb.append(device.getName()).append(",");
             sb.append(device.getUid()).append(",");
-            if(device.getGpio() != null){
-                sb.append(device.getGpio().getPin()).append(",");
+
+            if(device instanceof PhysicalDevice){
+                GpioInfo gpio = ((PhysicalDevice) device).getGpio();
+                if(gpio != null){
+                    sb.append(gpio.getPin()).append(",");
+                }else {
+                    sb.append(0).append(",");
+                }
             }else {
                 sb.append(0).append(",");
             }
+
             sb.append(device.getValue()).append(",");
             sb.append(-1).append(",");
             sb.append((device instanceof Sensor ? 1 : 0)).append(",");

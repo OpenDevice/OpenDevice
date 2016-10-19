@@ -110,8 +110,9 @@ public class DeviceDaoMemory implements DeviceDao {
     }
 
     @Override
-    public void update(Device entity) {
+    public Device update(Device entity) {
         // nothing
+        return null;
     }
 
     @Override
@@ -148,5 +149,10 @@ public class DeviceDaoMemory implements DeviceDao {
     @Override
     public List<DeviceHistory> getDeviceHistory(DeviceHistoryQuery query) {
         throw new NotImplementedException();
+    }
+
+    @Override
+    public void persistHistory(DeviceHistory history) {
+        //
     }
 }

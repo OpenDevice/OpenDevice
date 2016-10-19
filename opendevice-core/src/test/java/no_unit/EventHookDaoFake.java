@@ -44,8 +44,8 @@ public class EventHookDaoFake implements EventHookDao {
     }
 
     @Override
-    public void update(EventHook entity) {
-
+    public EventHook update(EventHook entity) {
+        return null;
     }
 
     @Override

@@ -31,4 +31,6 @@ public interface DeviceDao extends Dao<Device> {
     DeviceCategory getCategoryByCode(int code);
 
     List<DeviceHistory> getDeviceHistory(DeviceHistoryQuery query);
+
+    void persistHistory(DeviceHistory history);
 }

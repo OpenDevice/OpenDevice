@@ -13,6 +13,8 @@
 
 package br.com.criativasoft.opendevice.core.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.io.Serializable;
 
 /**
@@ -20,11 +22,14 @@ import java.io.Serializable;
  * @author Ricardo JL Rufino
  * @date 04/09/2011 12:44:44
  */
+@Entity
 public class DeviceCategory implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
-	
+
+	@Id
 	private int code;
+
 	private String description;
 
 	public static DeviceCategory LAMP = new DeviceCategory(1, "Lâmpada");
@@ -32,8 +37,8 @@ public class DeviceCategory implements Serializable {
 	public static DeviceCategory GENERIC = new DeviceCategory(3, "Genérico");
 	public static DeviceCategory POWER_SOURCE = new DeviceCategory(4, "Tomada");
 	
-	public static DeviceCategory GENERIC_SENSOR = new DeviceCategory(50, "Sensor Genérico");
-
+	public static DeviceCategory GENERIC_SENSOR = new DeviceCategory(100, "Generic Sensor");
+	public static DeviceCategory GENERIC_BOARD = new DeviceCategory(101, "Generic Board");
 
     public DeviceCategory(){
 

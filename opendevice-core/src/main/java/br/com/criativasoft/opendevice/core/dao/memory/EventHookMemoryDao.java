@@ -87,8 +87,9 @@ public class EventHookMemoryDao implements EventHookDao {
     }
 
     @Override
-    public void update(EventHook entity) {
+    public EventHook update(EventHook entity) {
         // nothing
+        return null;
     }
 
     @Override

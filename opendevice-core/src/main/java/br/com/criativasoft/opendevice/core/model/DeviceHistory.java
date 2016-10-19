@@ -13,15 +13,26 @@
 
 package br.com.criativasoft.opendevice.core.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 /**
  * DeviceHistory represents the device status at any given time
  * @author Ricardo JL Rufino on 05/05/15.
  */
+@Entity
 public class DeviceHistory {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
     private long timestamp;
+
     private double value;
+
     private long deviceID;
 
     public DeviceHistory(){
@@ -59,7 +70,7 @@ public class DeviceHistory {
         this.value = value;
     }
 
-    public double getDeviceID() {
+    public long getDeviceID() {
         return deviceID;
     }
 

@@ -80,6 +80,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
     public BaseDeviceManager(){
         instance = this;
         eventManager = new EventHookManager();
+
         addListener(eventManager);
 
         // Load Extensions
@@ -136,6 +137,10 @@ public abstract class BaseDeviceManager implements DeviceManager {
         return deviceCategoryRegistry.getCategory(klass);
     }
 
+    public DeviceCategory getCategory(int code) {
+        return deviceCategoryRegistry.getCategory(code);
+    }
+
     public void addCategory(Class<? extends DeviceCategory> klass) {
         deviceCategoryRegistry.add(klass);
     }
@@ -173,7 +178,11 @@ public abstract class BaseDeviceManager implements DeviceManager {
         return getDataManager().getDeviceDao();
     }
 
-    public void transactionBegin(){}
+    /**
+     *
+     * @return true if transaction already active by another thread/component
+     */
+    public boolean transactionBegin(){ return false; }
 
     public void transactionEnd(){}
 
@@ -235,6 +244,10 @@ public abstract class BaseDeviceManager implements DeviceManager {
      */
     public void notifyListeners(Device device, boolean sync) {
 
+        boolean alreadyExist =transactionBegin();
+        saveDeviceHistory(device);
+        if(!alreadyExist) transactionEnd();
+
         if(sync){
 
             try {
@@ -252,9 +265,9 @@ public abstract class BaseDeviceManager implements DeviceManager {
             listener.onDeviceChanged(device);
         }
 
-        // Global Listeners
         if(listeners.isEmpty()) return;
 
+        // Global Listeners
         for (final DeviceListener listener : listeners) {
             listener.onDeviceChanged(device);
         }
@@ -534,6 +547,15 @@ public abstract class BaseDeviceManager implements DeviceManager {
         return OpenDeviceConfig.get();
     }
 
+    protected void saveDeviceHistory(Device device){
+//        transactionBegin();
+        DeviceHistory history = new DeviceHistory();
+        history.setDeviceID(device.getId());
+        history.setValue(device.getValue());
+        history.setTimestamp(System.currentTimeMillis());
+        getDeviceDao().persistHistory(history);
+//        transactionEnd();
+    }
 
     private void onMessageReceivedImpl(Message message, DeviceConnection connection){
 
@@ -750,6 +772,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
                 }
 
             }
+
         }
     }
 
@@ -779,12 +802,12 @@ public abstract class BaseDeviceManager implements DeviceManager {
                 return;
             }
 
-            //transactionBegin();
+            transactionBegin();
 
             try{
                 onMessageReceivedImpl(message, connection);
             } finally {
-              //  transactionEnd();
+                transactionEnd();
             }
 
         }

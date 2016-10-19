@@ -53,6 +53,15 @@ public class LocalDeviceManager extends BaseDeviceManager {
     protected OutputConnections out = Connections.out;
     protected InputContections in = Connections.in;
 
+
+    public LocalDeviceManager(){
+        super();
+        setDataManager(new LocalDataManager());
+        TenantProvider.setProvider(new LocalTenantProvider());
+    }
+
+
+
     public void setApiKey(String key) {
         TenantProvider.setCurrentID(key);
     }
@@ -69,10 +78,6 @@ public class LocalDeviceManager extends BaseDeviceManager {
         return TenantProvider.getCurrentID();
     }
 
-    public LocalDeviceManager(){
-        super();
-        setDataManager(new LocalDataManager());
-    }
 
     @Override
     public void addInput(DeviceConnection connection) {
@@ -108,6 +113,46 @@ public class LocalDeviceManager extends BaseDeviceManager {
         devices.addAll(dblist); // TODO: this must be enabled (comentado devido a duplicidade nos testes)
 
         return devices;
+    }
+
+
+    /**
+     * This method is called from {@link Device} constructor, to auto-register devices if enabled
+     * @see OpenDeviceConfig#setAutoRegisterLocalDevice(boolean)
+     * @param device
+     */
+    public void autoRegisterDevice(Device device) {
+
+        if(getConfig().isAutoRegisterLocalDevice()){
+
+            StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+            int maxint = 10;
+
+            boolean register = false;
+            // Check if this method has called by a "New Device" in Constructor of a LocalDeviceManager
+            // This avoids auto-register devices loaded from a Connections/Serializers
+
+            for (int i = 0; i < maxint; i++) {
+                StackTraceElement stackTraceElement = stack[i];
+                String className = stackTraceElement.getClassName();
+                String methodName = stackTraceElement.getMethodName();
+                try {
+                    Class<?> aClass = Class.forName(className);
+
+                    if(LocalDeviceManager.class.isAssignableFrom(aClass) && ( methodName.equals("<init>") || methodName.equals("start"))){
+                        register = true;
+                        break;
+                    }
+                } catch (ClassNotFoundException e) {
+                    //
+                }
+            }
+
+            if(register){
+                log.info("Registring the device in context : " + device + " ! (may slow down device initialization )");
+                addDevice(device);
+            }
+        }
     }
 
 

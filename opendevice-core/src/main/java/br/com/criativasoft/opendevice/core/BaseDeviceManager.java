@@ -173,9 +173,9 @@ public abstract class BaseDeviceManager implements DeviceManager {
         return getDataManager().getDeviceDao();
     }
 
-    protected void transactionBegin(){}
+    public void transactionBegin(){}
 
-    protected void transactionEnd(){}
+    public void transactionEnd(){}
 
 
     public TenantContext getCurrentContext(){
@@ -779,14 +779,16 @@ public abstract class BaseDeviceManager implements DeviceManager {
                 return;
             }
 
-            transactionBegin();
+            //transactionBegin();
 
             try{
                 onMessageReceivedImpl(message, connection);
             } finally {
-                transactionEnd();
+              //  transactionEnd();
             }
 
         }
     };
+
+
 }

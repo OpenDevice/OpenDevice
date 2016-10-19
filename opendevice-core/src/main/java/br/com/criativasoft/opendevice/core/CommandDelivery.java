@@ -20,6 +20,7 @@ import br.com.criativasoft.opendevice.core.command.CommandStatus;
 import br.com.criativasoft.opendevice.core.command.ResponseCommand;
 import br.com.criativasoft.opendevice.core.connection.MultipleConnection;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
+import br.com.criativasoft.opendevice.core.util.ODevThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,7 @@ public class CommandDelivery implements ConnectionListener {
 	
 	private static final Logger log = LoggerFactory.getLogger(CommandDelivery.class);
 	
-	private ExecutorService executor = Executors.newCachedThreadPool();
+	private ExecutorService executor;
 	
 	private DeviceManager manager;
 	
@@ -54,6 +55,7 @@ public class CommandDelivery implements ConnectionListener {
 	public CommandDelivery(DeviceManager manager) {
 		super();
 		this.manager = manager;
+        this.executor = Executors.newCachedThreadPool(new ODevThreadFactory("CommandDelivery"));
 	}
 
 

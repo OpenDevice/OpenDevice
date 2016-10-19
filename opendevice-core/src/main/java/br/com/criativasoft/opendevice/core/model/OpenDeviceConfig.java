@@ -42,6 +42,13 @@ public class OpenDeviceConfig {
 
     private boolean authRequired = false;
 
+    /**
+     * This allow local application registar devices without call addDevice
+     * Note: This is a experimental feature and may slow down device initialization
+     * @see br.com.criativasoft.opendevice.core.LocalDeviceManager#autoRegisterDevice(Device)
+     */
+    private boolean autoRegisterLocalDevice = true;
+
     private String certificateFile;
 
     private String certificateKey;
@@ -148,5 +155,14 @@ public class OpenDeviceConfig {
 
     public String getDatabasePath() {
         return databasePath;
+    }
+
+
+    public void setAutoRegisterLocalDevice(boolean autoRegisterLocalDevice) {
+        this.autoRegisterLocalDevice = autoRegisterLocalDevice;
+    }
+
+    public boolean isAutoRegisterLocalDevice() {
+        return autoRegisterLocalDevice;
     }
 }

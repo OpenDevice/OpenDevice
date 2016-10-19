@@ -33,12 +33,16 @@ return {
 
     // Manager delegate
     on : manager.on,
+    removeListener : manager.removeListener,
     onDeviceChange : manager.onDeviceChange,
     onChange : manager.onDeviceChange,
     onConnect : manager.onConnect,
     findDevice : manager.findDevice,
     get : manager.findDevice,
     getDevices : manager.getDevices,
+    getDevicesByType : manager.getDevicesByType,
+    getDevicesByBoard : manager.getDevicesByBoard,
+    getBoards : manager.getBoards,
     setValue : manager.setValue,
     toggleValue : manager.toggleValue,
     contains : manager.contains,
@@ -79,7 +83,7 @@ return {
     },
 
 
-    history : function(query, callback){
+    history : function(query, callback, errorCallback){
         jQuery.ajax({
             headers: {
                 'Accept': 'application/json',
@@ -87,11 +91,12 @@ return {
                 'Authorization' : "Bearer " + od.appID
             },
             type: 'POST',
-            url: od.serverURL +"/device/" + query.deviceID + "/history",
+            url: od.serverURL + OpenDevice.devices.path + "/" + query.deviceID + "/history",
             data: JSON.stringify(query),
             dataType: 'json',
             async: true,
-            success: callback
+            success: callback,
+            error : errorCallback
         });
     },
 
@@ -159,27 +164,27 @@ var ODev = OpenDevice;
 
 OpenDevice.devices = {
 
-    path : "/device",
+    path : "/api/devices",
 
     get : function(deviceID){
-        return OpenDevice.rest(OpenDevice.devices.path + "/" + deviceID);
+        return OpenDevice.rest(this.path + "/" + deviceID);
     },
 
     value : function(deviceID, value){
 
         if(value != null){
-            return OpenDevice.rest(OpenDevice.devices.path + "/" + deviceID + "/value/" + value);
+            return OpenDevice.rest(this.path + "/" + deviceID + "/value/" + value);
         }else{
-            return OpenDevice.rest(OpenDevice.devices.path + "/" + deviceID + "/value");
+            return OpenDevice.rest(this.path + "/" + deviceID + "/value");
         }
     },
 
     list : function(){
-        return OpenDevice.rest(OpenDevice.devices.path + "/list");
+        return OpenDevice.rest(this.path + "/");
     },
 
     sync : function(){
-        return OpenDevice.rest(OpenDevice.devices.path + "/sync");
+        return OpenDevice.rest(this.path + "/sync");
     }
 
 };

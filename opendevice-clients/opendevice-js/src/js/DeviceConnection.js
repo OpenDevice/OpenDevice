@@ -182,20 +182,21 @@ od.DeviceConnection = function(config){
         // KeepAlive
         if(response.responseBody == "X") return;
 
-        // HACK: Atmosphere server, not allow return statuscode > 400. The 'status' is in the message
-        if(response.responseBody == "Authorization Required"){
-            console.warn("Authorization Required");
-            notifyListeners({"type" : od.CommandType.CONNECT_RESPONSE,
-                             "status" : od.CommandStatus.UNAUTHORIZED});
-            return;
-        }
 
         try {
             data = JSON.parse(response.responseBody);
         }catch(err) {
             console.error("Can't parse response: <<" + response.responseBody + ">>");
             console.error(err.stack);
+            return;
+        }
 
+        // HACK: Atmosphere server not allow return statuscode > 400. The 'status' is in the message
+        if(data.status && (data.status == 401 || data.status == 403)){
+            console.warn("Authorization Required");
+            notifyListeners({"type" : od.CommandType.CONNECT_RESPONSE,
+                "status" : od.CommandStatus.UNAUTHORIZED});
+            return;
         }
 
         if(data) {

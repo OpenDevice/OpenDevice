@@ -102,13 +102,27 @@ od.Device = function(data){
     /** @deprecated */
     this.toggleValue = this.toggle;
 
-    this.onChange = function(listener){
-        this.listeners.push(listener);
+    /**
+     * Register a listener to monitor changes in this Device.
+     * @param {function} listener
+     * @param {Object} [context] - Context to execute listener
+     * @returns {{context: *, listener: *}} - return registred listener (used in #removeListener)
+     */
+    this.onChange = function(listener, context){
+        var eventDef = {"context":context, "listener" : listener};
+        this.listeners.push(eventDef);
+        return eventDef;
     };
 
-    this.removeListener = function(listener){
-        var index = this.listeners.indexOf(listener);
-        if(index > 0) this.listeners.splice(index, 1);
+    /**
+     *
+     * @param eventDef {{context: *, listener: *}}
+     */
+    this.removeListener = function(eventDef){
+        var index = this.listeners.indexOf(eventDef);
+        if(index >= 0){
+            this.listeners.splice(index, 1);
+        }
     };
 
     // Initialize device data.

@@ -58,11 +58,8 @@ public class CommandEncoderDecoder implements Encoder<Command, String>, Decoder<
             if("X".equalsIgnoreCase(s)) return null; // ping send from WebSocketServer
 
             // Note: If change this logic if future, also change in DeviceConnection.js:186
-            if(s.contains("Authorization Required")) {
-                ResponseCommand response = new ResponseCommand(CommandType.CONNECT_RESPONSE,  CommandStatus.UNAUTHORIZED);
-                return response;
-            }
-            if(s.contains("Invalid AuthToken")) {
+            if(s.contains("Authorization Required") || s.contains("Unauthorized") || s.contains("Invalid AuthToken")) {
+                log.info("Fail on authentication, response: " + s);
                 ResponseCommand response = new ResponseCommand(CommandType.CONNECT_RESPONSE,  CommandStatus.UNAUTHORIZED);
                 return response;
             }

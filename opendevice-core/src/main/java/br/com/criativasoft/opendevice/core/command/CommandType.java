@@ -46,6 +46,7 @@ public enum CommandType implements EnumCode {
     MEMORY_REPORT           (24, SimpleCommand.class), // Report the amount of memory (displays the current and maximum).
     CPU_TEMPERATURE_REPORT  (25, SimpleCommand.class),
     CPU_USAGE_REPORT        (26, SimpleCommand.class),
+    RESET                   (26, SimpleCommand.class),
 
     GET_DEVICES             (30, GetDevicesRequest.class),
     GET_DEVICES_RESPONSE    (31, GetDevicesResponse.class),
@@ -53,15 +54,18 @@ public enum CommandType implements EnumCode {
     DEVICE_ADD_RESPONSE		(33, null), // NOT.IMPLEMENTED
     DEVICE_DEL 				(34, null), // NOT.IMPLEMENTED
     CLEAR_DEVICES 			(35, null), // NOT.IMPLEMENTED
-    GET_CONNECTIONS 		(36, null), // NOT.IMPLEMENTED
-    GET_CONNECTIONS_RESPONSE   (37, null), // NOT.IMPLEMENTED
-    CONNECTION_ADD 			(38, AddConnection.class),
-    CONNECTION_ADD_RESPONSE (39, AddConnectionResponse.class),
-    CONNECTION_DEL 			(40, null), // NOT.IMPLEMENTED
-    CLEAR_CONNECTIONS 		(41, null), // NOT.IMPLEMENTED
-    CONNECT 		        (42, null), // NOT.IMPLEMENTED
-    CONNECT_RESPONSE 		(43, ResponseCommand.class), // NOT.IMPLEMENTED
+    SYNC_DEVICES_ID 		(36, null), // NOT.IMPLEMENTED
 
+    GET_CONNECTIONS 		(40, null), // NOT.IMPLEMENTED
+    GET_CONNECTIONS_RESPONSE (41, null), // NOT.IMPLEMENTED
+    CONNECTION_ADD 			(42, AddConnection.class),
+    CONNECTION_ADD_RESPONSE (43, AddConnectionResponse.class),
+    CONNECTION_DEL 			(44, null), // NOT.IMPLEMENTED
+    CLEAR_CONNECTIONS 		(45, null), // NOT.IMPLEMENTED
+    CONNECT 		        (46, null), // NOT.IMPLEMENTED
+    CONNECT_RESPONSE 		(47, ResponseCommand.class), // NOT.IMPLEMENTED
+
+    USER_EVENT(98, UserEventCommand.class),
     USER_COMMAND(99, UserCommand.class);
 
     private int code;
@@ -78,6 +82,8 @@ public enum CommandType implements EnumCode {
     public int getCode() {
         return code;
     }
+
+    public String getDescription() {return name();}
 
     public static CommandType getByCode( int code ) {
         CommandType[] values = CommandType.values();

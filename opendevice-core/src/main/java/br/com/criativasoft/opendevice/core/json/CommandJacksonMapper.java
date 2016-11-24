@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
  * @author Ricardo JL Rufino
  * @date 11/07/14.
  */
+
 public class CommandJacksonMapper  {
 
     private ObjectMapper mapper;
@@ -36,11 +37,9 @@ public class CommandJacksonMapper  {
         if(mapper == null){
             mapper = new ObjectMapper();
 
-            // Uses Enum.toString() for serialization of an Enum
-            mapper.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
-            // Uses Enum.toString() for deserialization of an Enum
-            mapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
 
+            mapper.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING); // Uses Enum.toString() for serialization of an Enum
+            mapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING); // Uses Enum.toString() for deserialization of an Enum
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
             SimpleModule module = new SimpleModule("OpenDeviceModule", new Version(0, 1, 0, "alpha"));

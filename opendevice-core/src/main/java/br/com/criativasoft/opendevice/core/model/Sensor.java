@@ -69,6 +69,18 @@ public class Sensor extends PhysicalDevice {
     }
 
     /**
+     * Create new Sensor
+     * @param uid Must match with 'id' configured in the physical module
+     * @param name Logical name of device
+     * @param type Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}
+     * @param category Does not influence the communication logic, only the GUIs
+     */
+    public Sensor(int uid, String name, DeviceType type, DeviceCategory category, long value) {
+        super(uid, name, type, category, value);
+    }
+
+
+    /**
      * Configure GPIO for this device. <br/>
      * This type of configuration is ideal for devices like the Raspberry.<br/>
      * Or when it is used to save the settings in the EPROM of low processing power devices

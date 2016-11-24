@@ -54,6 +54,7 @@ public class Device implements Serializable {
     public static final int ON = 1;
     public static final int OFF = 0;
 
+    // ALIAS
     public static final DeviceType ANALOG = DeviceType.ANALOG;
     public static final DeviceType DIGITAL = DeviceType.DIGITAL;
     public static final DeviceType NUMERIC = DeviceType.NUMERIC;
@@ -101,6 +102,15 @@ public class Device implements Serializable {
      */
     public Device(int uid,DeviceType type) {
         this(uid, null, type, DeviceCategory.GENERIC);
+    }
+
+    /**
+     * Create new Device
+     * @param name Must match with 'name' configured in the physical module
+     * @param type Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}
+     */
+    public Device(String name, DeviceType type) {
+        this(0, name, type, DeviceCategory.GENERIC);
     }
 
     /**

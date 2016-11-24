@@ -42,6 +42,8 @@ public enum CommandStatus implements EnumCode {
         return code;
     }
 
+    public String getDescription() {return name();}
+
     public static CommandStatus getByCode(int code){
         EnumCode[] values = CommandStatus.values();
         for (EnumCode enumCode : values) {

@@ -14,12 +14,12 @@
 package br.com.criativasoft.opendevice.core.metamodel;
 
 /**
- * TODO: PENDING DOC
- *
  * @author Ricardo JL Rufino
  * @date 08/07/14.
  */
 public interface EnumCode {
 
     int getCode();
+
+    String getDescription();
 }

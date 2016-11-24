@@ -46,4 +46,8 @@ public enum ConnectionType implements EnumCode {
         return null;
     }
 
+    @Override
+    public String getDescription() {
+        return name();
+    }
 }

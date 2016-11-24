@@ -132,6 +132,8 @@ public class LocalDeviceManager extends BaseDeviceManager {
             // Check if this method has called by a "New Device" in Constructor of a LocalDeviceManager
             // This avoids auto-register devices loaded from a Connections/Serializers
 
+            maxint = Math.min(maxint, stack.length);
+
             for (int i = 0; i < maxint; i++) {
                 StackTraceElement stackTraceElement = stack[i];
                 String className = stackTraceElement.getClassName();
@@ -150,6 +152,7 @@ public class LocalDeviceManager extends BaseDeviceManager {
 
             if(register){
                 log.info("Registring the device in context : " + device + " ! (may slow down device initialization )");
+                if(device.getUid() <= 0) device.setUID(getDeviceDao().getNextUID());
                 addDevice(device);
             }
         }
@@ -248,6 +251,9 @@ public class LocalDeviceManager extends BaseDeviceManager {
 
     public static void launchApplication(Class<? extends LocalDeviceManager> appClass, String... args) {
         try {
+
+            long start = System.currentTimeMillis();
+
             final LocalDeviceManager main = appClass.newInstance();
             main.start();
 
@@ -260,8 +266,9 @@ public class LocalDeviceManager extends BaseDeviceManager {
             });
 
             // Manual shutdown
+            long end = System.currentTimeMillis() - start;
             log.info("========================================================");
-            log.info("Application - started on port: " + OpenDeviceConfig.get().getPort());
+            log.info("Application - started on port: " + OpenDeviceConfig.get().getPort() + " in " + end + "ms");
             log.info("Type [CTRL+C] to stop the server");
             log.info("========================================================");
 

@@ -17,16 +17,13 @@ package br.com.criativasoft.opendevice.raspberry;
 
 import br.com.criativasoft.opendevice.connection.AbstractConnection;
 import br.com.criativasoft.opendevice.connection.ConnectionStatus;
-import br.com.criativasoft.opendevice.core.command.CommandStatus;
-import br.com.criativasoft.opendevice.core.connection.EmbeddedGPIO;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
+import br.com.criativasoft.opendevice.core.command.CommandStatus;
 import br.com.criativasoft.opendevice.core.command.CommandType;
 import br.com.criativasoft.opendevice.core.command.DeviceCommand;
-import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.DeviceType;
-import br.com.criativasoft.opendevice.core.model.GpioInfo;
-import br.com.criativasoft.opendevice.core.model.Sensor;
+import br.com.criativasoft.opendevice.core.connection.EmbeddedGPIO;
+import br.com.criativasoft.opendevice.core.model.*;
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.gpio.event.GpioPinAnalogValueChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
@@ -118,7 +115,7 @@ public class RaspberryGPIO extends AbstractConnection implements EmbeddedGPIO {
 
 
     @Override
-    public void attach(Device device){
+    public void attach(PhysicalDevice device){
 
         if(findPinForDevice(device.getUid()) != null) return; // exist !
 

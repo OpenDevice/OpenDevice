@@ -1,10 +1,15 @@
-<span id="page-header"><i class="fa fa fa-sitemap"></i> Boards ${::ctrl.board ? "/ " + ctrl.board.name : "xxx"} </span>
+<span id="page-header" ng-init="page.replace('#app-header', '#page-header')"><i class="fa fa fa-sitemap"></i> Devices</span>
 
-<ul id="page-actions" class="nav navbar-nav">
-    <!--<li><a href ng-click="ctrl.newBoard()"><i class="fa fa-plus"></i> New</a></li>-->
+<section class="content-header">
+    <h1>
+        <i class="fa fa-sitemap"></i> <a href="#/boards">Boards</a>  <i class="fa fa-arrow-right"></i> ${::ctrl.board.name}
+        <small> Your things </small>
+    </h1>
 
-    <li ng-init="page.replace('#app-header', '#page-header');page.replace('#app-header-actions', '#page-actions')"></li>
-</ul>
+    <ol class="breadcrumb">
+        <!--<li><a ng-click="ctrl.newBoard()" class="btn btn-info pull-right" role="button"><i class="fa fa-plus"></i> New Board</a></li>-->
+    </ol>
+</section>
 
 <!-- Main content -->
 <section class="content" data-ng-init="ctrl.init()">
@@ -172,13 +177,15 @@
                                 <table id="simulation-list" class="table table-bordered">
                                     <tbody>
                                     <tr>
-                                        <th style="width: 30px">#</th>
+                                        <th style="width: 30px">#ID</th>
                                         <th>Device</th>
+                                        <th>Type</th>
                                         <th>Actions</th>
                                     </tr>
                                     <tr ng-repeat="x in ctrl.devices">
                                         <td>${ ::x.id }</td>
                                         <td>${ ::x.name }</td>
+                                        <td><span class="badge device-type-${::x.type}">${ ::x.type | deviceType}</span></td>
                                         <td>
                                             <button type="button" class="btn btn-xs btn-warning" ng-show="ctrl.inSimulation(x.id)"
                                                 ng-click="ctrl.startSimulation(x.id, ctrl.formSimulate.interval, false)">Stop</button>

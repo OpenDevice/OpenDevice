@@ -1,61 +1,78 @@
-<span id="page-header"><i class="fa fa fa-sitemap"></i> Boards</span>
+<span id="page-header" ng-init="page.replace('#app-header', '#page-header')"><i class="fa fa fa-sitemap"></i> Boards</span>
 
-<ul id="page-actions" class="nav navbar-nav">
-    <li><a href ng-click="ctrl.newBoard()"><i class="fa fa-plus"></i> New</a></li>
+<section class="content-header">
+    <h1>
+        <i class="fa fa-sitemap"></i> Boards
+        <small> Your have ${ctrl.devices.length} boards</small>
+    </h1>
 
-    <li ng-init="page.replace('#app-header', '#page-header');page.replace('#app-header-actions', '#page-actions')"></li>
-</ul>
+    <ol class="breadcrumb">
+        <li>
+            <div class="input-group input-group-sm" style="width: 150px;">
 
+                <input ng-model="searchFilter" class="form-control pull-right" placeholder="Search">
+
+                <div class="input-group-btn">
+                    <button type="submit" class="btn btn-info"><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+        </li>
+        <li><a ng-click="ctrl.newBoard()" class="btn btn-info pull-right" role="button"><i class="fa fa-plus"></i> New Board</a></li>
+    </ol>
+</section>
 
 <!-- Main content -->
 <section class="content" data-ng-init="ctrl.init()">
 
     <div class="row">
 
-        <div class="col-md-4" ng-repeat="device in ctrl.devices">
-            <!-- Widget: user widget style 1 -->
-            <a href="#/boards/${::device.id}">
-            <div class="box box-widget widget-user" >
-                <!-- Add the bg color to the header using any of the bg-* classes -->
-                <div class="widget-user-header bg-aqua-active">
-                    <h3 class="widget-user-username">${::device.name}</h3>
-                    <h5 class="widget-user-desc">{TYPE} #${::device.id}</h5>
-                </div>
-                <div class="widget-user-image">
-                    <img class="img-circle" src="/images/boards/generic-blue.png" alt="User Avatar">
-                </div>
-                <div class="box-footer">
-                    <div class="row">
-                        <div class="col-sm-4 border-right">
-                            <div class="description-block">
-                                <h5 class="description-header">${::device.devices.length}</h5>
-                                <span class="description-text">Devices</span>
-                            </div>
-                            <!-- /.description-block -->
+        <div class="col-md-4" ng-repeat="device in ctrl.devices | filter:searchFilter">
+
+                <div class="box box-widget widget-user" >
+
+                    <ul class="widget-user-actions">
+                        <li class="dropdown">
+                            <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cog"></i></a>
+
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href ng-really-click="ctrl.delete(device, $index)"><i class="fa fa-remove"></i>Delete</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <a href="#/boards/${::device.id}">
+                        <div class="widget-user-header bg-aqua-active">
+                            <h3 class="widget-user-username">${::device.name}</h3>
+                            <h5 class="widget-user-desc">{TYPE} #${::device.id}</h5>
                         </div>
-                        <!-- /.col -->
-                        <div class="col-sm-4 border-right">
-                            <div class="description-block">
-                                <h5 class="description-header">xxx</h5>
-                                <span class="description-text">xxx</span>
-                            </div>
-                            <!-- /.description-block -->
+                        <div class="widget-user-image">
+                            <img class="img-circle" src="/images/boards/generic-blue.png" alt="User Avatar">
                         </div>
-                        <!-- /.col -->
-                        <div class="col-sm-4">
-                            <div class="description-block">
-                                <h5 class="description-header">Last Update</h5>
-                                <span class="description-text">1/1/1 11:11</span>
+                    </a>
+
+                    <div class="box-footer">
+                        <div class="row">
+                            <div class="col-sm-4 border-right">
+                                <div class="description-block">
+                                    <h5 class="description-header">${::device.devices.length}</h5>
+                                    <span class="description-text">Devices</span>
+                                </div>
                             </div>
-                            <!-- /.description-block -->
+                            <div class="col-sm-4 border-right">
+                                <div class="description-block">
+                                    <h5 class="description-header">xxx</h5>
+                                    <span class="description-text">xxx</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="description-block">
+                                    <h5 class="description-header">Last Update</h5>
+                                    <span class="description-text">1/1/1 11:11</span>
+                                </div>
+                            </div>
                         </div>
-                        <!-- /.col -->
                     </div>
-                    <!-- /.row -->
                 </div>
-            </div>
-            </a>
-            <!-- /.widget-user -->
         </div>
 
     </div>

@@ -23,6 +23,7 @@ import br.com.criativasoft.opendevice.connection.message.Request;
 import br.com.criativasoft.opendevice.connection.serialize.MessageSerializer;
 import br.com.criativasoft.opendevice.core.BaseDeviceManager;
 import br.com.criativasoft.opendevice.core.DeviceManager;
+import br.com.criativasoft.opendevice.core.ODev;
 import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.GetDevicesRequest;
@@ -31,8 +32,6 @@ import br.com.criativasoft.opendevice.core.util.StringUtils;
 import io.moquette.BrokerConstants;
 import io.moquette.interception.InterceptHandler;
 import io.moquette.interception.messages.*;
-import io.moquette.server.config.IConfig;
-import io.moquette.server.config.MemoryConfig;
 import io.moquette.spi.security.IAuthenticator;
 import io.moquette.spi.security.ISslContextCreator;
 import io.netty.handler.ssl.JdkSslServerContext;
@@ -112,18 +111,20 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
     private void initConnection() throws IOException {
 
         if (server == null) {
+
+            final OpenDeviceConfig oconfig = ODev.getConfig();
+
             Properties params = new Properties();
 //            params.put(BrokerConstants.PORT_PROPERTY_NAME, Integer.toString(port));
-            params.put(BrokerConstants.SSL_PORT_PROPERTY_NAME, Integer.toString(8883));
+            if(oconfig.getCertificateFile() != null) params.put(BrokerConstants.SSL_PORT_PROPERTY_NAME, Integer.toString(8883));
+            params.setProperty(BrokerConstants.PERSISTENT_STORE_PROPERTY_NAME, OpenDeviceConfig.getDataDirectory() + File.separator + "moquette_data.mapdb");
+            params.setProperty(BrokerConstants.ALLOW_ANONYMOUS_PROPERTY_NAME, "false");
 
-            IConfig config = new MemoryConfig(params);
-            server = new MoquetteServer(config);
+            server = new MoquetteServer(params);
             server.setHandlers(asList(serverListener));
 
 
-            // SSL Support
-            final OpenDeviceConfig oconfig = OpenDeviceConfig.get();
-
+            // IAuthenticator based on ApplicationID
             if(oconfig.isAuthRequired() || oconfig.isTenantsEnabled()){
                 server.setAuthenticator(new IAuthenticator() {
                     @Override
@@ -218,7 +219,6 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
 
             TenantProvider.setCurrentID(appID);
 
-
             // Received from Devices : /appID/out
             if(msg.getTopicName().contains(appID + "/out")){
 
@@ -231,7 +231,7 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
 
                 MessageSerializer serializer = getSerializer();
 
-                Message message = serializer.parse(msg.getPayload().array()); // TODO May be delay to send to clients (send direct json ?).
+                Message message = serializer.parse(msg.getPayload().array());
                 if(message instanceof Command) {
                     message.setConnectionUUID(connection.getUID());
                     ((Command) message).setApplicationID(appID);
@@ -239,11 +239,10 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
 
                 log.debug("Received command: " + message);
 
-                BaseDeviceManager defaultManager = (BaseDeviceManager) manager;
-
-                defaultManager.transactionBegin();
+//              BaseDeviceManager defaultManager = (BaseDeviceManager) manager;
+//              defaultManager.transactionBegin();
                 connection.notifyListeners(message);
-                defaultManager.transactionEnd();
+//              defaultManager.transactionEnd();
 
             }
         }
@@ -255,7 +254,7 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
             String moduleName = msg.getClientID().split("/")[1];
             TenantProvider.setCurrentID(appID);
 
-            // Received from Devices ( Subscribe in ApplicationID/in/ModuleName)
+            // Received from Devices ( Subscribe in ApplicationID/in/ModuleName
             if(msg.getTopicFilter().startsWith(appID + "/in/")){
 
                 MQTTResource resource = (MQTTResource) manager.findConnection(msg.getTopicFilter());

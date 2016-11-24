@@ -13,7 +13,6 @@
 
 package br.com.criativasoft.opendevice.core.util;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -25,9 +24,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ODevThreadFactory implements ThreadFactory {
 
-    private static final ConcurrentHashMap<String, ThreadGroup> threads = new ConcurrentHashMap<String, ThreadGroup>();
-
-    private ThreadGroup group;
     private final AtomicInteger count = new AtomicInteger();
     private final String name;
 

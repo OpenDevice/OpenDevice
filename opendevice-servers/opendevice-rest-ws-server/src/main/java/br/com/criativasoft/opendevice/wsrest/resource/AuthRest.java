@@ -59,6 +59,7 @@ import static br.com.criativasoft.opendevice.restapi.auth.BearerTokenRealm.TOKEN
  * @date 08/09/16
  */
 @Path("/api/auth")
+@Produces(MediaType.APPLICATION_JSON)
 public class AuthRest {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthRest.class);
@@ -71,7 +72,6 @@ public class AuthRest {
     private UserDao userDao;
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     public Response login(@Context AtmosphereResource res,
                           @Context HttpHeaders headers,
                           @QueryParam("username") String username, @QueryParam("password") String password) {
@@ -228,7 +228,6 @@ public class AuthRest {
 
     @GET
     @Path("logout")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response logout(@Context AtmosphereResource res, @Auth Subject currentUser) {
 
         if (currentUser.isAuthenticated()) {
@@ -240,5 +239,10 @@ public class AuthRest {
 
     }
 
+    @GET
+    @Path("ping")
+    public Response ping(@Auth Subject currentUser) {
+           return noCache(Response.status(Status.OK));
+    }
 
 }

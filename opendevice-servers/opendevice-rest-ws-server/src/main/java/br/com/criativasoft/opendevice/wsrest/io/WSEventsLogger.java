@@ -32,21 +32,21 @@ public class WSEventsLogger implements WebSocketEventListener {
 
     public void onSuspend(final AtmosphereResourceEvent event) {
         logger.info("Connected: {} - {}", event.getResource().getRequest().getRemoteAddr()
-               + ":" +  event.getResource().getRequest().getRemotePort(), event.getResource().uuid());
+                + ":" + event.getResource().getRequest().getRemotePort(), event.getResource().uuid());
     }
 
     public void onResume(AtmosphereResourceEvent event) {
         logger.info("{} - {}", event.getResource().getRequest().getRemoteAddr()
-                + ":" +  event.getResource().getRequest().getRemotePort(), event.getResource().uuid());
+                + ":" + event.getResource().getRequest().getRemotePort(), event.getResource().uuid());
     }
 
     public void onDisconnect(AtmosphereResourceEvent event) {
         logger.info("{} - {}", event.getResource().getRequest().getRemoteAddr()
-                + ":" +  event.getResource().getRequest().getRemotePort(), event.getResource().uuid());
+                + ":" + event.getResource().getRequest().getRemotePort(), event.getResource().uuid());
     }
 
     public void onBroadcast(AtmosphereResourceEvent event) {
-        logger.info("onBroadcast(): {}", event.getMessage());
+        if (logger.isTraceEnabled()) logger.trace("onBroadcast(): {}", event.getMessage());
     }
 
     public void onHeartbeat(AtmosphereResourceEvent event) {
@@ -68,7 +68,7 @@ public class WSEventsLogger implements WebSocketEventListener {
     }
 
     public void onMessage(WebSocketEvent event) {
-        logger.debug("onMessage(): {}", event.message());
+        if (logger.isDebugEnabled()) logger.debug("onMessage(): {}", event.message());
     }
 
     public void onClose(WebSocketEvent event) {

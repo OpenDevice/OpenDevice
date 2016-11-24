@@ -18,6 +18,7 @@ import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.connection.message.Request;
 import br.com.criativasoft.opendevice.core.DeviceManager;
+import br.com.criativasoft.opendevice.core.ODev;
 import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.CommandType;
@@ -129,6 +130,8 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             }
 
             conf.initParam("com.sun.jersey.api.json.POJOMappingFeature", "true");
+            conf.initParam(ApplicationConfig.BROADCASTER_MESSAGE_PROCESSING_THREADPOOL_MAXSIZE, "10");
+            conf.initParam(ApplicationConfig.BROADCASTER_ASYNC_WRITE_THREADPOOL_MAXSIZE, "10");
             conf.initParam(ApplicationConfig.SCAN_CLASSPATH, "false");
             conf.initParam(ApplicationConfig.ANALYTICS, "false");
             // conf.initParam(ApplicationConfig.DROP_ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "false");
@@ -141,7 +144,7 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             conf.interceptor(this); // add this as interceptor
 
             // SSL Support
-            OpenDeviceConfig config = OpenDeviceConfig.get();
+            OpenDeviceConfig config = ODev.getConfig();
             String certificate = config.getCertificateFile();
             if(!StringUtils.isEmpty(certificate)){
                 File cert = new File(certificate);
@@ -324,8 +327,7 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
             if(broadcaster != null){
 
-                log.debug("To: " +cmd.getApplicationID()+ " ( clients: "+broadcaster.getAtmosphereResources().size()+" ) ");
-
+                if(log.isDebugEnabled()) log.debug("To: " +cmd.getApplicationID()+ " ( clients: "+broadcaster.getAtmosphereResources().size()+" ) ");
 
                 Collection<AtmosphereResource> atmosphereResources = broadcaster.getAtmosphereResources();
 //                System.out.println("WSServer.clients = "+ atmosphereResources.size());

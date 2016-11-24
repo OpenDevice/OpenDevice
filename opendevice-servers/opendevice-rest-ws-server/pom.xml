@@ -16,8 +16,8 @@
         <jersey-version>1.19</jersey-version>
         <jaxb-version>2.1</jaxb-version>
         <nettosphere-version>2.4.11-SNAPSHOT</nettosphere-version>
-        <atmosphere-version>2.4.6</atmosphere-version>
-        <atmosphere-extensions>2.4.2</atmosphere-extensions>
+        <atmosphere-version>2.4.7</atmosphere-version>
+        <atmosphere-extensions>2.4.3</atmosphere-extensions>
         <shiro-version>1.2.4</shiro-version>
     </properties>
 

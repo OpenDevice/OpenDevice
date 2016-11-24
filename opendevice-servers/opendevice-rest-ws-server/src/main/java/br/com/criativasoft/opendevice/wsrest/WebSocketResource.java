@@ -14,6 +14,7 @@
 package br.com.criativasoft.opendevice.wsrest;
 
 import br.com.criativasoft.opendevice.connection.ServerConnection;
+import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.ResponseCommand;
 import br.com.criativasoft.opendevice.wsrest.io.WSEventsLogger;
@@ -71,8 +72,7 @@ public class WebSocketResource {
 //        ResponseCommand response = null;
 
         // Find caller ID.
-        if(command.getConnectionUUID() == null)   command.setConnectionUUID(resource.uuid());
-        command.setApplicationID(topic.getID()); // This is APPLICATION ID TOKEN !
+        command.setApplicationID(TenantProvider.getCurrentID()); // This is APPLICATION ID TOKEN !
         command.setConnectionUUID(this.resource.uuid());
 
          connection.notifyListeners(command); // broadcast to all clients (browser/android/desktop)

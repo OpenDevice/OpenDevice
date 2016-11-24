@@ -38,7 +38,7 @@ import java.util.Collection;
  */
 public class RestWebSecurityManager extends DefaultWebSecurityManager {
 
-    public static final Logger log = LoggerFactory.getLogger(RestWebSecurityManager.class);
+    private static final Logger log = LoggerFactory.getLogger(RestWebSecurityManager.class);
 
     public RestWebSecurityManager(Collection<Realm> realms) {
         super(realms);

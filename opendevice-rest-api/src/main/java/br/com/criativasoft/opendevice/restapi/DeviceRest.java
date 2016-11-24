@@ -21,8 +21,10 @@ import br.com.criativasoft.opendevice.core.command.*;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceVO;
+import br.com.criativasoft.opendevice.core.metamodel.EnumVO;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceHistory;
+import br.com.criativasoft.opendevice.core.model.DeviceType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +47,7 @@ import java.util.List;
  */
 @Path("/api/devices")
 @RequiresAuthentication
+@Produces(MediaType.APPLICATION_JSON)
 public class DeviceRest {
 
     private static final Logger log = LoggerFactory.getLogger(DeviceRest.class);
@@ -60,7 +63,6 @@ public class DeviceRest {
 
     @GET
     @Path("/{uid}/value/{value}")
-    @Produces(MediaType.APPLICATION_JSON)
     public ResponseCommand setValue(@PathParam("uid") int uid, @PathParam("value") String value){
 
         String connectionUUID = connection.getUID();
@@ -83,7 +85,6 @@ public class DeviceRest {
 
     @GET
     @Path("/{uid}/value")
-    @Produces(MediaType.TEXT_PLAIN)
     public String getValue(@PathParam("uid") int uid) {
 
         Device device = manager.findDeviceByUID(uid);
@@ -98,7 +99,6 @@ public class DeviceRest {
 
     @GET
     @Path("/{uid}")
-    @Produces(MediaType.APPLICATION_JSON)
     public DeviceVO getDevice(@PathParam("uid") int uid) {
 
         Device device = manager.findDeviceByUID(uid);
@@ -112,21 +112,18 @@ public class DeviceRest {
 
     @DELETE
     @Path("/{uid}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response delete(@PathParam("uid") int uid){
 
         Device device = manager.findDeviceByUID(uid);
-
         if(device != null){
-            manager.getDeviceDao().delete(device);
-            return Response.status(Response.Status.OK).build();
+            manager.removeDevice(device);
+            return Response.status(Response.Status.OK).entity("null").build();
         }
 
         return Response.status(Response.Status.NOT_FOUND).build();
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     public List<DeviceVO> list() throws IOException {
 
         List<DeviceVO> devices = new LinkedList<DeviceVO>();
@@ -144,7 +141,6 @@ public class DeviceRest {
 
     @POST
     @Path("/{uid}/history")
-    @Produces(MediaType.APPLICATION_JSON)
     public List<DeviceHistory> getDeviceHistory(@PathParam("uid") int uid, DeviceHistoryQuery query) {
         query.setDeviceID(uid);
         return manager.getDeviceHistory(query);
@@ -152,7 +148,6 @@ public class DeviceRest {
 
     @GET
     @Path("/sync")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response sync() throws  IOException{
         manager.send(new GetDevicesRequest());
         return Response.status(Response.Status.OK).build();
@@ -172,6 +167,20 @@ public class DeviceRest {
 
         return applicationID;
 
+    }
+
+    @GET @Path("/types")
+    public List<EnumVO> listTypes() {
+
+        List<EnumVO> list = new LinkedList<EnumVO>();
+
+        for (DeviceType value : DeviceType.values()) {
+            if(value != DeviceType.MANAGER){
+                list.add(new EnumVO(value));
+            }
+        }
+
+        return list;
     }
 
 }

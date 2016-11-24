@@ -19,6 +19,14 @@
 
         <class>br.com.criativasoft.opendevice.middleware.model.Dashboard</class>
         <class>br.com.criativasoft.opendevice.middleware.model.DashboardItem</class>
+        <class>br.com.criativasoft.opendevice.middleware.model.rules.ScriptRuleSpec</class>
+        <class>br.com.criativasoft.opendevice.middleware.model.rules.StateRuleSpec</class>
+        <class>br.com.criativasoft.opendevice.middleware.model.rules.ThresholdRuleSpec</class>
+        <class>br.com.criativasoft.opendevice.middleware.model.rules.ActiveTimeConditionSpec</class>
+        <class>br.com.criativasoft.opendevice.middleware.model.actions.ControlActionSpec</class>
+        <class>br.com.criativasoft.opendevice.middleware.model.jobs.CronJobSpec</class>
+
+
         <class>br.com.criativasoft.opendevice.restapi.model.Account</class>
         <class>br.com.criativasoft.opendevice.restapi.model.ApiKey</class>
         <class>br.com.criativasoft.opendevice.restapi.model.User</class>
@@ -28,11 +36,16 @@
         <!-- JPA/H2 -->
         <properties>
             <property name="connection.driver_class" value="org.h2.Driver"/>
-            <property name="hibernate.connection.url" value="jdbc:h2:/media/ricardo/Dados/Codidos/Java/Projetos/opendevice-project/databases/h2jpa"/>
+            <!--<property name="hibernate.connection.url" value="jdbc:h2:/media/ricardo/Dados/Codidos/Java/Projetos/opendevice-project/databases/h2jpa"/>-->
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
-            <property name="hibernate.hbm2ddl.auto" value="validate"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/> <!-- validate, update -->
             <property name="hibernate.show_sql" value="false"/>
             <property name="hibernate.format_sql" value="true"/>
+            <property name="org.hibernate.flushMode" value="COMMIT"/>
+
+            <property name="hibernate.jdbc.batch_size" value="100"/>
+            <property name="hibernate.order_inserts" value="true"/>
+            <property name="hibernate.order_updates" value="true"/>
         </properties>
 
 

@@ -17,7 +17,7 @@ import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.model.*;
 import br.com.criativasoft.opendevice.middleware.model.Dashboard;
 import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
-import br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j.DeviceDaoNeo4j;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j.DeviceNeo4J;
 import br.com.criativasoft.opendevice.restapi.model.*;
 import org.apache.shiro.authc.credential.DefaultPasswordService;
 import org.apache.shiro.authc.credential.HashingPasswordService;
@@ -34,7 +34,7 @@ import java.util.*;
 public class PopulateDatabase {
 
     static EntityManager em;
-    static DeviceDaoNeo4j dao;
+    static DeviceNeo4J dao;
 
     public static void main(String[] args) {
 
@@ -44,7 +44,7 @@ public class PopulateDatabase {
         OpenDeviceConfig.get().setDatabaseEnabled(true);
 
         em = LocalEntityManagerFactory.getInstance().createEntityManager();
-        dao = new DeviceDaoNeo4j();
+        dao = new DeviceNeo4J();
         dao.setEntityManager(em);
         EntityTransaction tx = em.getTransaction();
         tx.begin();

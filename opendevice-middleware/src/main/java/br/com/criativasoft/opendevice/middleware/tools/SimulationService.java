@@ -17,6 +17,7 @@ import br.com.criativasoft.opendevice.core.TenantContext;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.util.ODevThreadFactory;
 
+import javax.inject.Singleton;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -26,9 +27,10 @@ import java.util.concurrent.*;
  * @author Ricardo JL Rufino
  * @date 16/10/16
  */
+@Singleton
 public class SimulationService {
 
-    /* TODO: Enchacement - Improve the simulation allowing you to add multiple devices on the same task,
+    /* TODO: Enchacement - Improve the simulation allowing you to add multiple devices on the same jobs,
      * and agrupas the Tasks for Tenant to allow use fewer threads in a multithred environment.
      * https://github.com/OpenDevice/OpenDevice/issues/71
      */

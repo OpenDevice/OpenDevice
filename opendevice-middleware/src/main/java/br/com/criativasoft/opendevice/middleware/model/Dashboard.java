@@ -35,7 +35,7 @@ public class Dashboard {
     private long id;
 
     @JsonIgnore
-    private String applicationID;
+    private String applicationID; // FIXME: Change to account
 
     private String title;
 

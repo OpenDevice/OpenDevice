@@ -16,14 +16,15 @@ package br.com.criativasoft.opendevice.middleware.test;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.TenantContext;
 import br.com.criativasoft.opendevice.core.TenantProvider;
+import br.com.criativasoft.opendevice.core.command.FirmwareUpdateCommand;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceVO;
 import br.com.criativasoft.opendevice.core.model.Board;
 import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.DeviceHistory;
 import br.com.criativasoft.opendevice.core.model.PhysicalDevice;
 import br.com.criativasoft.opendevice.middleware.tools.SimulationService;
 import br.com.criativasoft.opendevice.restapi.DeviceRest;
+import org.atmosphere.cpr.AtmosphereResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +33,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -111,17 +114,6 @@ public class TestRest {
     @Produces(MediaType.APPLICATION_JSON)
     public String teste1() {
 
-        // Apenas com relacionamento
-        // MATCH (s:Device)-[r:board]->(t:Device) RETURN s,r
-
-//        Devices sem relacionamento...
-//        MATCH (s:Device)
-//        OPTIONAL MATCH (s)-[r:board]->(t:Device)
-//        WITH s,r
-//        WHERE r IS NULL and s.classType <> "Board" and s.applicationID = "7262e4d6-7e3e-4fef-9267-92b12d7800af"
-//        RETURN s
-
-
         Set<Device> devices = new HashSet();
 
 //        TypedQuery<PhysicalDevice> query = em.createQuery("select x from PhysicalDevice x JOIN x.board where  x.applicationID = :TENANT", PhysicalDevice.class);
@@ -195,48 +187,63 @@ public class TestRest {
 
 
     @GET
-    @Path("/generateHistory/{uid}")
+    @Path("/updateFiemware")
     @Produces(MediaType.APPLICATION_JSON)
-    public String generateHistory(@PathParam("uid") int uid) {
+    public Response updateFiemware() {
 
-        Device device = manager.findDeviceByUID(uid);
-
-        int batchSize = 100;
-        int interval = 30;
-        int months = 2;
-        int numberOfValues = ((months*30) * 24 * 60) / interval;
-
-        int valueMax = 1000;
-
-        Random random = new Random();
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.add(Calendar.MONTH, -months);
-
-        System.out.println("Generating " + numberOfValues + " records");
-
-
-        for (int i = 0; i < numberOfValues; i++){
-
-            DeviceHistory history = new DeviceHistory();
-            history.setValue(random.nextInt(valueMax));
-            history.setTimestamp(calendar.getTime().getTime());
-            history.setDeviceID(device.getId());
-
-            System.out.println(i + ": " + calendar.getTime());
-            dao.persistHistory(history);
-            if(i % batchSize == 0) {
-                //em.flush();
-                //em.clear();
-            }
-            calendar.add(Calendar.MINUTE,interval);
+        // Files path: {root}/data/files/uploads/firmwares
+        try {
+            manager.send(new FirmwareUpdateCommand("firmware.bin"), true, false);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-
-        if(device != null){
-            return Long.toString(device.getValue());
-        }
-
-        return "";// TODO: return error ?
+        return Response.ok().build();
     }
+
+    @GET
+    @Path("/firmwares/download/{id}")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public ByteArrayOutputStream downloadFiemware(@Context AtmosphereResource request, @PathParam("id") int id) {
+
+        request.getRequest().header("Transfer-Encoding", "xxxxxxxx");
+        System.out.println("Downloading....");
+
+        File file = new File("/media/ricardo/Dados/TEMP/ArduinoTestes/OpenDeviceEEPROM/.pioenvs/esp/firmware.bin");
+
+        try{
+
+            ByteArrayOutputStream ous = null;
+            InputStream ios = null;
+            try {
+                byte[] buffer = new byte[4096];
+                ous = new ByteArrayOutputStream();
+                ios = new FileInputStream(file);
+                int read = 0;
+                while ((read = ios.read(buffer)) != -1) {
+                    ous.write(buffer, 0, read);
+                }
+            }finally {
+                try {
+                    if (ous != null)
+                        ous.close();
+                } catch (IOException e) {
+                }
+
+                try {
+                    if (ios != null)
+                        ios.close();
+                } catch (IOException e) {
+                }
+            }
+
+            return ous;
+
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return null;
+        }
+
+    }
+
 }

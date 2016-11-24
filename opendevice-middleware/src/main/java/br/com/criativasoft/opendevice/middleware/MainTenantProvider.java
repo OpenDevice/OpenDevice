@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Create TenantContext using MapDB, that has cache system with expiration time. <br/>
+ * Create TenantContext using MapDB, with a expiration cache system. <br/>
  * Calls to getDeviceByUID/getDevices use this cache to improve performance.
  *
  * @author Ricardo JL Rufino
@@ -120,6 +120,11 @@ public class MainTenantProvider extends ThreadLocalTenantProvider {
         }
 
         @Override
+        public void removeDevice(Device device) {
+            if(initialized) map.remove(device.getUid());
+        }
+
+        @Override
         public Device getDeviceByUID(int uid) {
             if(!initialized) syncronizeData(); // force load
 
@@ -129,6 +134,24 @@ public class MainTenantProvider extends ThreadLocalTenantProvider {
                 return null;
             }
 
+        }
+        @Override
+        public Device getDeviceByName(String name) {
+            if(!initialized) syncronizeData(); // force load
+
+            try {
+
+                Collection<Device> devices = getDevices();
+
+                for (Device device : devices) {
+                    if(device.getName().equals(name)) return device;
+                }
+
+            }catch (Exception ex){
+                log.error(ex.getMessage(), ex);
+            }
+
+            return null;
         }
 
         @Override

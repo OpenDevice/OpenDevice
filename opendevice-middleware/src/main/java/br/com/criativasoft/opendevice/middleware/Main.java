@@ -15,6 +15,7 @@ package br.com.criativasoft.opendevice.middleware;
 
 import br.com.criativasoft.opendevice.connection.IWSServerConnection;
 import br.com.criativasoft.opendevice.core.LocalDeviceManager;
+import br.com.criativasoft.opendevice.core.ODev;
 import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.connection.Connections;
 import br.com.criativasoft.opendevice.core.extension.ViewExtension;
@@ -22,15 +23,21 @@ import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.core.util.StringUtils;
 import br.com.criativasoft.opendevice.engine.js.OpenDeviceJSEngine;
 import br.com.criativasoft.opendevice.middleware.config.DependencyConfig;
+import br.com.criativasoft.opendevice.middleware.jobs.JobManager;
 import br.com.criativasoft.opendevice.middleware.persistence.HibernateProvider;
 import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
 import br.com.criativasoft.opendevice.middleware.resources.ConnectionsRest;
 import br.com.criativasoft.opendevice.middleware.resources.DashboardRest;
 import br.com.criativasoft.opendevice.middleware.resources.IndexRest;
+import br.com.criativasoft.opendevice.middleware.rules.RuleManager;
 import br.com.criativasoft.opendevice.middleware.test.TestRest;
 import br.com.criativasoft.opendevice.mqtt.MQTTServerConnection;
 import br.com.criativasoft.opendevice.restapi.model.Account;
 import br.com.criativasoft.opendevice.wsrest.guice.GuiceInjectProvider;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.util.StatusPrinter;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.slf4j.Logger;
@@ -53,20 +60,20 @@ public class Main extends LocalDeviceManager {
 
     private SimpleBindings jscontext;
     private IWSServerConnection webscoket;
-    private EntityManager entityManager;
 
 	public void start() throws IOException  {
 
-        setApplicationID(OpenDeviceConfig.LOCAL_APP_ID); // Only for Startup
+        setApiKey(OpenDeviceConfig.LOCAL_APP_ID); // Only for Startup
 
-        // Server with suport for HTTP,Rest,WebSocket
+        OpenDeviceConfig config = ODev.getConfig();
 
-        OpenDeviceConfig config = OpenDeviceConfig.get();
+        configLogging(config);
 
         MainDataManager manager = new MainDataManager();
 
         setDataManager(manager);
 
+        // Server with suport for HTTP,Rest,WebSocket
         webscoket = Connections.in.websocket(config.getPort());
 
         jscontext = new SimpleBindings();
@@ -75,29 +82,11 @@ public class Main extends LocalDeviceManager {
 
 
         // Configuration Scripts (config.js)
-        String userConfig = System.getProperty("config");
+        String userConfig = config.getStartupScript();
         if(!StringUtils.isEmpty(userConfig)){
             log.info("Using config file (JS): " + userConfig);
             loadScript(userConfig);
         }
-
-        webscoket.setPort(config.getPort()); // script can change port.
-
-        // TODO: use EntityManager by injection
-        if(config.isDatabaseEnabled()){
-            log.info("Using database: " + config.getDatabasePath());
-            entityManager = LocalEntityManagerFactory.getInstance().createEntityManager();
-            HibernateProvider.setInstance(entityManager);
-        }
-
-		// Enable UDP discovery service.
-        getDiscoveryService().listen();
-
-        // Set IoC/DI Config
-        Injector injector = Guice.createInjector(new DependencyConfig());
-        GuiceInjectProvider.setInjector(injector);
-        injector.injectMembers(manager);
-
 
         // Rest Resources
         // ================
@@ -109,11 +98,20 @@ public class Main extends LocalDeviceManager {
             webscoket.addResource(DashboardRest.class);
         }
 
+        // Extract resources from JARS
+        extractResources();
 
         // Static WebResources
         String rootWebApp = getWebAppDir();
         addWebResource(rootWebApp);
         log.debug("Current root-resource: " + rootWebApp);
+
+        // External Resources
+        List<String> externalResources = config.getExternalResources();
+        for (String externalResource : externalResources) {
+            log.info("Add external resource : " + externalResource + " exist: " + new File(externalResource).exists());
+            addWebResource(externalResource);
+        }
 
         this.addInput(webscoket);
 
@@ -142,36 +140,68 @@ public class Main extends LocalDeviceManager {
 
         this.connect();
 
+        EntityManager entityManager = null;
+
+        if(config.isDatabaseEnabled()){
+            log.info("Using database: " + config.getDatabasePath());
+            entityManager = LocalEntityManagerFactory.getInstance().createEntityManager();
+            HibernateProvider.setInstance(entityManager);
+        }
+
+        // Enable UDP discovery service.
+        getDiscoveryService().listen();
+
+        // Set IoC/DI Config
+        Injector injector = Guice.createInjector(new DependencyConfig());
+        GuiceInjectProvider.setInjector(injector);
+        injector.injectMembers(manager);
+
         if(config.isTenantsEnabled()){
 
             MainTenantProvider provider = new MainTenantProvider(manager);
             config.setAutoRegisterLocalDevice(false);
             TenantProvider.setProvider(provider);
 
-            // FIXME: this can show startup
-
             // Init accounts
-            EntityTransaction tx = entityManager.getTransaction();
-            tx.begin();
-            List<Account> accounts = manager.getAccountDao().listAll();
-            for (Account account : accounts) {
-                provider.addNewContext(account.getUuid());
+            if(entityManager != null){
+                // FIXME: this can show startup
+                EntityTransaction tx = entityManager.getTransaction();
+                tx.begin();
+                List<Account> accounts = manager.getAccountDao().listAll();
+                for (Account account : accounts) {
+                    provider.addNewContext(account.getUuid());
+                }
+                tx.commit();
             }
-            tx.commit();
-
         }
 
+        // TODO: Instead of looking for the entities manually it would be interesting to implement a
+        // system of self-registration (features)
+        RuleManager ruleManager = injector.getInstance(RuleManager.class);
+        ruleManager.start();
+
+
+        JobManager jobManager = injector.getInstance(JobManager.class);
+        jobManager.start();
+
+//        // Create a JmDNS instance
+//        JmDNS jmdns = JmDNS.create(InetAddress.getLocalHost());
+//
+//        // Register a service
+//        ServiceInfo serviceInfo = ServiceInfo.create("_http._tcp.local.", "opendevice", config.getPort(), "path=index.html");
+//        jmdns.registerService(serviceInfo);
 
     }
 
     @Override
     public boolean transactionBegin() {
 
-        if(!entityManager.isOpen()){
-            entityManager = LocalEntityManagerFactory.getInstance().createEntityManager();
-        }
+        EntityManager entityManager = HibernateProvider.getInstance();
 
-        HibernateProvider.setInstance(entityManager);
+        if(entityManager == null || !entityManager.isOpen()){
+            entityManager = LocalEntityManagerFactory.getInstance().createEntityManager();
+            HibernateProvider.setInstance(entityManager);
+        }
 
         EntityTransaction tx = entityManager.getTransaction();
 
@@ -203,8 +233,6 @@ public class Main extends LocalDeviceManager {
     }
 
     private String getWebAppDir(){
-
-        extractResources();
 
         String current = getClass().getResource("").getPath();
 
@@ -335,6 +363,21 @@ public class Main extends LocalDeviceManager {
         launchApplication(Main.class, args);
     }
 
+    private void configLogging(OpenDeviceConfig config){
+        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+        try {
+            JoranConfigurator configurator = new JoranConfigurator();
+            configurator.setContext(context);
+            context.reset(); // Call context.reset() to clear any previous configuration, e.g. default
+            String directory = OpenDeviceConfig.getConfigDirectory();
+            configurator.doConfigure(directory + File.separator + config.getLogConfig());
+
+        } catch (JoranException je) {
+            // StatusPrinter will handle this
+        }
+        StatusPrinter.printInCaseOfErrorsOrWarnings(context);
+    }
 
     private void loadScript(String file){
 

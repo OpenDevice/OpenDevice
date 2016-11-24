@@ -13,12 +13,14 @@
 
 package br.com.criativasoft.opendevice.wsrest.config;
 
+import br.com.criativasoft.opendevice.core.ODev;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.wsrest.filter.AuthenticationFilter;
 import br.com.criativasoft.opendevice.wsrest.filter.TenantFilter;
 import br.com.criativasoft.opendevice.wsrest.guice.GuiceInjectProvider;
 import br.com.criativasoft.opendevice.wsrest.io.AuthenticationExceptionMap;
 import br.com.criativasoft.opendevice.wsrest.io.AuthorizationExceptionMap;
+import br.com.criativasoft.opendevice.wsrest.io.EntityJacksonReader;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.ResourceConfigurator;
 import org.secnod.shiro.jersey.ShiroResourceFilterFactory;
@@ -38,8 +40,10 @@ public class AppResourceConfigurator implements ResourceConfigurator {
         classes.add(GuiceInjectProvider.class);
         classes.add(AuthenticationExceptionMap.class);
         classes.add(AuthorizationExceptionMap.class);
+        classes.add(EntityJacksonReader.class);
+//        classes.add(ByteArrayWriter.class);
 
-        OpenDeviceConfig odevConfig = OpenDeviceConfig.get();
+        OpenDeviceConfig odevConfig = ODev.getConfig();
 
         if (odevConfig.isAuthRequired()) {
             // Shiro (Auth)

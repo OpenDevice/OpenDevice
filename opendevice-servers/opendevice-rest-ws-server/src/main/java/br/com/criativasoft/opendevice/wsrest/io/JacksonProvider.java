@@ -13,7 +13,7 @@
 
 package br.com.criativasoft.opendevice.wsrest.io;
 
-import br.com.criativasoft.opendevice.core.json.CommandJacksonMapper;
+import br.com.criativasoft.opendevice.wsrest.guice.GuiceInjectProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.ws.rs.ext.ContextResolver;
@@ -26,21 +26,13 @@ import javax.ws.rs.ext.Provider;
  *
  * @author Ricardo JL Rufino
  * @date 09/07/14.
+ * @see  JacksonProviderGuice
  */
 @Provider
 public class JacksonProvider implements ContextResolver<ObjectMapper> {
 
-    private final ObjectMapper mapper;
-
-    public JacksonProvider() {
-        mapper = new CommandJacksonMapper().getMapper();
-//        SimpleModule module = new SimpleModule("ODev-Rest", new Version(0, 1, 0, "alpha"));
-//        module.addSerializer(ErrorResponse.ErrorMessage.class, new HttpResponseSerializer());
-//        mapper.registerModule(module);
-    }
-
     @Override
     public ObjectMapper getContext(Class<?> type) {
-        return mapper;
+        return GuiceInjectProvider.getInjector().getInstance(ObjectMapper.class);
     }
 }

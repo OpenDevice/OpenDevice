@@ -44,6 +44,8 @@ od.Device = function(data){
 
         for (var property in this.properties) this[property] = this.properties[property];
 
+        if(!this.description) this.description = this.name;
+
         this.actions.forEach(function(method) {
             _this[method] = function(){
                 console.log('Calling remote action: ' + method + ", params: ", arguments);

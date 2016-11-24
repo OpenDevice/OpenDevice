@@ -26,6 +26,8 @@ od.deviceManager = {};
  */
 od.DeviceManager = function(connection){
     var _this = this;
+    var initialized = false;
+
     od.deviceManager = this; // set global reference
     // Alias
     var DEvent = od.Event;
@@ -34,7 +36,10 @@ od.DeviceManager = function(connection){
 
     // Private
     var devices = [];
+    var types = [];
+
     var listenersMap = {};
+    var listenerReceiver = []; // current listerners (for single page model)
 
     // public
     this.connection = connection || od.connection;
@@ -54,8 +59,6 @@ od.DeviceManager = function(connection){
         if(device){
             device.setValue(value);
         }
-
-        // TODO :Alterar dados locais (localstorage)
 
     };
 
@@ -77,19 +80,27 @@ od.DeviceManager = function(connection){
         // Isso teria no final que salvar na EPROM/Servidor do arduino.
     };
 
+
+    this.removeDevice = function(device){
+
+        var index = devices.indexOf(device);
+        if(index >= 0) devices.splice(index, 1);
+        notifyListeners(DEvent.DEVICE_LIST_UPDATE, devices);
+
+    };
+
     this.getDevices = function(){
 
-        if(devices && devices.length > 0) return devices; // return from cache...
+        if(devices.length > 0) return devices; // return from cache...
 
-        // load remote.
-        devices = this.sync(false);
+        devices = this.sync(/*notify=*/false); // load remote
 
         return devices;
     };
 
-    this.getDevicesByType = function(type){
+    this.getDevicesByType = function(type, devices){
 
-        var devices = this.getDevices();
+        if(!devices) devices = this.getDevices();
 
         var found = [];
 
@@ -118,6 +129,18 @@ od.DeviceManager = function(connection){
         return this.getDevicesByType(DeviceType.BOARD);
     };
 
+    this.getTypes = function(){
+
+        if(types.length == 0){
+            ODev.devices.listTypes(function(response){
+                if(response.length > 0){
+                    response.forEach(function(item){ types.push(item)})
+                }
+            });
+        }
+
+        return types;
+    };
 
     /**
      * Find device by ID in List or in currently loaded devices
@@ -145,28 +168,29 @@ od.DeviceManager = function(connection){
     /**
      * Sync Devices with server
      * @param {Boolean} notify - if true notify listeners
-     * @param {Boolean} forceSync - force sync with physical module
+     * @param {Boolean} forceSync - force sync with physical modules ( async )
      * @returns {Array}
      */
     this.sync = function(notify, forceSync){
 
-
-        // try local storage
-        devices =  _getDevicesLocalStorege();
-
-        if(devices && devices.length > 0) return devices;
-
         // load remote.
         devices = _getDevicesRemote();
 
-        // fire sync (GetDeviceRequest) on server
+        // force sync (send GetDeviceRequest for all devices)
         if(forceSync || (devices && devices.length == 0)) {
             _this.send({type : CType.GET_DEVICES, forceSync : forceSync});
         }
 
-        if(notify === true) notifyListeners(DEvent.DEVICE_LIST_UPDATE, devices);
+        // Map devices and Parents
+        if(devices){
+            devices.forEach(function(item){
+                if(item.parentID){
+                    item.parent = _this.findDevice(item.parentID, devices);
+                }
+            });
+        }
 
-        // TODO: salvar no localstore..
+        if(notify === true) notifyListeners(DEvent.DEVICE_LIST_UPDATE, devices);
 
         return devices;
     }
@@ -184,10 +208,16 @@ od.DeviceManager = function(connection){
     };
 
     this.onConnect = function (listener){
-        this.on(od.Event.CONNECTED, function(){
+        if(_this.isConnected()){
             var devices = OpenDevice.getDevices();
             if(listener) listener(devices);
-        });
+            return {event : od.Event.CONNECTED}; // fake listener
+        }else{
+            return this.on(od.Event.CONNECTED, function(){
+                var devices = OpenDevice.getDevices();
+                if(listener) listener(devices);
+            });
+        }
     };
 
     /**
@@ -199,6 +229,9 @@ od.DeviceManager = function(connection){
 
         var event;
         if(eventDef instanceof Array) {
+
+            if(listener == listenerReceiver) listenerReceiver = null; // clear temporary listeners
+
             for (var i = 0; i < eventDef.length; i++) {
                 var def = eventDef[i];
                 this.removeListener(def);
@@ -228,7 +261,22 @@ od.DeviceManager = function(connection){
         if(listenersMap[event] === undefined) listenersMap[event] = [];
         listenersMap[event].push(listener);
 
-        return { "event" : event, "listener" : listener };
+        var eventlistener = { "event" : event, "listener" : listener };
+
+        // See: setListenerReceiver
+        if(listenerReceiver) listenerReceiver.push(eventlistener);
+
+        return eventlistener;
+    };
+
+    /**
+     * Defines a list where temporary listeners will be registered. Useful when you are working on a single page application
+     * @param listeners
+     * @returns {{event: Event, listener: *}}
+     */
+    this.setListenerReceiver = function(listeners){
+
+        listenerReceiver = listeners;
     };
 
     /**
@@ -255,6 +303,13 @@ od.DeviceManager = function(connection){
 
         return false;
     };
+
+
+
+    this.isConnected = function(){
+        return _this.connection.isConnected() && initialized;
+    }
+
 
     this.notifyDeviceListeners = function(device, sync){
 
@@ -300,10 +355,6 @@ od.DeviceManager = function(connection){
         }
     }
 
-    function _getDevicesLocalStorege(){
-        return null;
-    }
-
     /**
      *
      * @returns Array[]
@@ -322,6 +373,8 @@ od.DeviceManager = function(connection){
             }else console.warn("Object.observe not supported in this browser.");
             devices.push(device);
         }
+
+        initialized = true;
 
         return devices;
     }
@@ -358,6 +411,12 @@ od.DeviceManager = function(connection){
             return;
         }
 
+        //  Custom User Event
+        if (message.type == CType.USER_EVENT){
+            notifyListeners(message.name, message);
+            return;
+        }
+
         //od.CommandType.CONNECT_RESPONSE
 
         // Device changed in another client..
@@ -369,7 +428,6 @@ od.DeviceManager = function(connection){
             if(device){
                 device.setValue(message.value, false);
             }
-            // TODO: store changes localstore..
         }
 
         // Force load new list from server
@@ -386,13 +444,14 @@ od.DeviceManager = function(connection){
 
     function _connectionStateChanged(conn, newStatus, oldStatus){
         console.log("DeviceManager._connectionStateChanged :" + newStatus);
+
         notifyListeners(DEvent.CONNECTION_CHANGE, newStatus);
 
         if(od.ConnectionStatus.CONNECTED == newStatus){
             notifyListeners(DEvent.CONNECTED, _this.getDevices());
         }
 
-        if(od.ConnectionStatus.CONNECTED == newStatus){
+        if(od.ConnectionStatus.DISCONNECTED == newStatus){
             notifyListeners(DEvent.DISCONNECTED);
         }
 

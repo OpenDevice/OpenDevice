@@ -75,6 +75,7 @@ od.CommandType = {
     CONNECT 		        :42,
     CONNECT_RESPONSE 		:43,
 
+    USER_EVENT              :98,
     USER_COMMAND            :99,
 
     isDeviceCommand : function(type){

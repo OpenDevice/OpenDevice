@@ -34,15 +34,19 @@ return {
     // Manager delegate
     on : manager.on,
     removeListener : manager.removeListener,
+    setListenerReceiver : manager.setListenerReceiver,
     onDeviceChange : manager.onDeviceChange,
     onChange : manager.onDeviceChange,
     onConnect : manager.onConnect,
+    isConnected : manager.isConnected,
     findDevice : manager.findDevice,
     get : manager.findDevice,
+    removeDevice : manager.removeDevice,
     getDevices : manager.getDevices,
     getDevicesByType : manager.getDevicesByType,
     getDevicesByBoard : manager.getDevicesByBoard,
     getBoards : manager.getBoards,
+    getTypes : manager.getTypes,
     setValue : manager.setValue,
     toggleValue : manager.toggleValue,
     contains : manager.contains,
@@ -63,23 +67,36 @@ return {
     },
 
     // TODO: try do Rest over WS
-    rest : function(path){
-        var response = $.ajax({
-                type: "GET",
-                url: od.serverURL + path,
-                headers : {
-                    'Authorization' : "Bearer " + od.appID
-                },
-                async: false // FIXME: isso não é recomendado...
+    rest : function(path, options){
+
+        var request = {
+            type: "GET",
+            url: od.serverURL + path,
+            headers : {
+                'Authorization' : "Bearer " + od.appID
+            },
+            async: false // FIXME: isso não é recomendado...
+        };
+
+        $.extend(request, options || {});
+
+        var response = $.ajax(request);
+
+        response.fail(function(){
+            console.error("Rest fail, status ("+response.status+"): " + response.responseText );
         });
 
         // TODO: fazer tratamento dos possíveis erros (como exceptions e servidor offline ou 404)
-        if(response.status == 200 && response.responseText.length > 0){
-            return JSON.parse(response.responseText)
-        }else{
-            console.error("Rest fail, status ("+response.status+"): " + response.responseText );
-            return null;
+
+        // For async = false
+        if(request.async == null || request.async == false){
+            if(response.status == 200 && response.responseText.length > 0){
+                return JSON.parse(response.responseText)
+            }else{
+                return null;
+            }
         }
+
     },
 
 
@@ -183,8 +200,16 @@ OpenDevice.devices = {
         return OpenDevice.rest(this.path + "/");
     },
 
+    listTypes : function(callback, errorCallback){
+        return OpenDevice.rest(this.path + "/types", { async : true, success : callback, error : errorCallback});
+    },
+
     sync : function(){
         return OpenDevice.rest(this.path + "/sync");
+    },
+
+    delete : function(uid, callback, errorCallback){
+        return OpenDevice.rest(this.path + "/" + uid, { async : true, type : "DELETE", success : callback, error : errorCallback});
     }
 
 };

@@ -76,6 +76,21 @@ public class DeviceDaoMemory implements DeviceDao {
         return null;
     }
 
+    @Override
+    public int getNextUID() {
+        if(deviceMap.isEmpty()) return 1;
+
+        int max = 0;
+
+        List<Device> devices = getCurrentDevices();
+
+        for (Device device : devices) {
+            if(device.getUid() > max) max = device.getUid();
+        }
+
+        return max + 1;
+    }
+
     private boolean exist(Device device){
         if(device.getId() > 0){
             Device find = getById(device.getId());
@@ -107,6 +122,11 @@ public class DeviceDaoMemory implements DeviceDao {
 
             devices.add(entity);
         }
+
+    }
+
+    @Override
+    public void deleteHistory(Device device) {
 
     }
 

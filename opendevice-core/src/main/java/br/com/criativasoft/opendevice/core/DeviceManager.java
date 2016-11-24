@@ -43,11 +43,17 @@ public interface DeviceManager extends ConnectionManager{
 	
 	public Device findDeviceByUID(int deviceUID);
 
+    public Device findDeviceByName(String name);
+
     public void addDevice(Device device);
+
+    public void removeDevice(Device device);
 
     public void addDevices(Collection<Device> devices);
 	
 	public void send(Command command) throws IOException;
+
+    public void send(Command command, boolean output, boolean input) throws IOException;
 	
 	/**
 	 * This will call a user-defined command, allowing you to perform custom method calls directly on device. <br/>

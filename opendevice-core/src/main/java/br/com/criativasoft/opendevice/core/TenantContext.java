@@ -28,7 +28,11 @@ public interface TenantContext {
 
     public void addDevice(Device device);
 
+    public void removeDevice(Device device);
+
     public Device getDeviceByUID(int uid);
 
     public String getId();
+
+    Device getDeviceByName(String name);
 }

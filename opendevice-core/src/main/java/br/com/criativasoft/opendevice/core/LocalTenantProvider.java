@@ -22,13 +22,13 @@ import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
  */
 public class LocalTenantProvider extends TenantProvider {
 
-    private static String tenantID = OpenDeviceConfig.LOCAL_APP_ID;;
+    private static String tenantID = OpenDeviceConfig.LOCAL_APP_ID;
 
     private static LocalTenantContext context = new LocalTenantContext(OpenDeviceConfig.LOCAL_APP_ID);
 
     @Override
     public synchronized void setTenantID(String appID) {
-        this.tenantID = appID;
+        // Ignore
     }
 
     @Override

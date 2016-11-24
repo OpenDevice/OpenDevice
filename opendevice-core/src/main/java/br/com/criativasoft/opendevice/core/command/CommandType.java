@@ -55,6 +55,7 @@ public enum CommandType implements EnumCode {
     DEVICE_DEL 				(34, null), // NOT.IMPLEMENTED
     CLEAR_DEVICES 			(35, null), // NOT.IMPLEMENTED
     SYNC_DEVICES_ID 		(36, null), // NOT.IMPLEMENTED
+    FIRMWARE_UPDATE         (37, FirmwareUpdateCommand.class),
 
     GET_CONNECTIONS 		(40, null), // NOT.IMPLEMENTED
     GET_CONNECTIONS_RESPONSE (41, null), // NOT.IMPLEMENTED
@@ -65,7 +66,7 @@ public enum CommandType implements EnumCode {
     CONNECT 		        (46, null), // NOT.IMPLEMENTED
     CONNECT_RESPONSE 		(47, ResponseCommand.class), // NOT.IMPLEMENTED
 
-    USER_EVENT(98, UserEventCommand.class),
+    USER_EVENT(98, UserEventCommand.class), // Command used to send user-defined events / notifications
     USER_COMMAND(99, UserCommand.class);
 
     private int code;

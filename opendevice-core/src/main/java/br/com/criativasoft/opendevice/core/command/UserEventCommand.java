@@ -22,6 +22,14 @@ import java.util.Set;
  * Command used to send user-defined events / notifications.<br/>
  * The initial intent is to notify client applications of state changes in user-defined extensions.
  *
+ * Using JS API, you can use:
+ *
+ * <pre>{@code
+ * ODev.on("cutom_event_name", function(message){
+ *      // logic
+ * });
+ * }</pre>
+ *
  * @author Ricardo JL Rufino (ricardo@criativasoft.com.br)
  * @date 05/11/2016
  */

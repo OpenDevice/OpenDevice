@@ -33,4 +33,8 @@ public interface DeviceDao extends Dao<Device> {
     List<DeviceHistory> getDeviceHistory(DeviceHistoryQuery query);
 
     void persistHistory(DeviceHistory history);
+
+    void deleteHistory(Device device);
+
+    int getNextUID();
 }

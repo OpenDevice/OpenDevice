@@ -60,7 +60,8 @@ public abstract class TenantProvider {
     }
 
     /**
-     * Create a new {@link TenantContext} with provied ID if not exist
+     * Create a new {@link TenantContext} with provied ID
+     * @throws IllegalArgumentException if ID already exists
      */
     public TenantContext addNewContext(String id){
         if(!exist(id)){

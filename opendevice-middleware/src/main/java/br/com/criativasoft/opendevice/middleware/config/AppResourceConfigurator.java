@@ -15,6 +15,7 @@
 
 package br.com.criativasoft.opendevice.middleware.config;
 
+import br.com.criativasoft.opendevice.core.ODev;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
 import br.com.criativasoft.opendevice.middleware.persistence.PersistenceContextInjectableProvider;
@@ -38,7 +39,7 @@ public class AppResourceConfigurator implements ResourceConfigurator {
 
         // AUTO: config.getProviderClasses().add(DependencyConfig.class);
 
-        OpenDeviceConfig odev = OpenDeviceConfig.get();
+        OpenDeviceConfig odev = ODev.getConfig();
 
         if(odev.isDatabaseEnabled()){
             TransactionFilter transactionFilter = new TransactionFilter(LocalEntityManagerFactory.getInstance());
@@ -50,10 +51,12 @@ public class AppResourceConfigurator implements ResourceConfigurator {
         classes.add(PersistenceContextInjectableProvider.class);
         classes.add(EntityNotFoundMapper.class);
 
-        log.info("AppResourceConfigurator : classes");
+
+        StringBuffer sb = new StringBuffer();
         for (Class<?> aClass : classes) {
-            System.out.println(" - " + aClass);
+            sb.append(" - " + aClass).append("\n");
         }
+        log.debug("Configured Resources and Filters : \n {}", sb);
 
         //config.add(new MainApplication());
 

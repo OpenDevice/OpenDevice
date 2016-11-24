@@ -42,8 +42,23 @@ public class LocalTenantContext implements TenantContext {
     }
 
     @Override
+    public void removeDevice(Device device) {
+        devices.remove(device.getUid());
+    }
+
+    @Override
     public Device getDeviceByUID(int uid) {
         return devices.get(uid);
+    }
+
+    @Override
+    public Device getDeviceByName(String name) {
+
+        for (Device device : devices.values()) {
+            if(device.getName().equals(name)) return device;
+        }
+
+        return null;
     }
 
     public Collection<Device> getDevices(){

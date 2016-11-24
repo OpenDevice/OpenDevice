@@ -78,6 +78,13 @@ public class Board extends Device {
         }
     }
 
+    public void addDevice(Device device) {
+        if(device instanceof PhysicalDevice) {
+            ((PhysicalDevice) device).setBoard(this);
+            this.devices.add((PhysicalDevice) device);
+        }
+    }
+
     @Override
     public void setValue(long value) {
         // ignore.

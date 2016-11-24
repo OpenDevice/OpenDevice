@@ -28,10 +28,7 @@ import br.com.criativasoft.opendevice.core.filter.CommandFilter;
 import br.com.criativasoft.opendevice.core.listener.DeviceListener;
 import br.com.criativasoft.opendevice.core.listener.OnDeviceChangeListener;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
-import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.DeviceCategory;
-import br.com.criativasoft.opendevice.core.model.DeviceHistory;
-import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
+import br.com.criativasoft.opendevice.core.model.*;
 import br.com.criativasoft.opendevice.core.model.test.DeviceCategoryRegistry;
 import br.com.criativasoft.opendevice.core.model.test.GenericDevice;
 import org.slf4j.Logger;
@@ -71,11 +68,14 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     private DeviceCategoryRegistry deviceCategoryRegistry = new DeviceCategoryRegistry();
 
+    // FIXME: remove from here
     private EventHookManager eventManager;
 
     private DataManager dataManager;
 
     private Message lastMessage;
+
+    private List<Device> partialDevices = new LinkedList<Device>(); // Devices from partial GetDevicesResponse
 
     public BaseDeviceManager(){
         instance = this;
@@ -148,7 +148,19 @@ public abstract class BaseDeviceManager implements DeviceManager {
     @Override
     public Device findDeviceByUID(int deviceUID) {
 
+        if(deviceUID <= 0) return null;
+
         Device device = getCurrentContext().getDeviceByUID(deviceUID);
+
+        return device;
+    }
+
+    @Override
+    public Device findDeviceByName(String name) {
+
+        if(name == null || name.length() == 0) return null;
+
+        Device device = getCurrentContext().getDeviceByName(name);
 
         return device;
     }
@@ -209,6 +221,22 @@ public abstract class BaseDeviceManager implements DeviceManager {
     }
 
     @Override
+    public void removeDevice(Device device) {
+        if(device == null) throw new IllegalArgumentException("Device is null");
+
+        if(device instanceof Board){
+            Set<PhysicalDevice> devices = ((Board) device).getDevices();
+            for (PhysicalDevice physicalDevice : devices) {
+                removeDevice(physicalDevice);
+            }
+        }
+
+        device = getValidDeviceDao().getById(device.getId());
+        getValidDeviceDao().delete(device);
+        getCurrentContext().removeDevice(device); // remove from cache
+    }
+
+    @Override
     public void addDevices(Collection<Device> devices) {
         for (Device device : devices){
             addDevice(device);
@@ -242,7 +270,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
      * Notify All Listeners about device change
      * @param sync - sync state with server
      */
-    public void notifyListeners(Device device, boolean sync) {
+    public synchronized void notifyListeners(Device device, boolean sync) {
 
         boolean alreadyExist =transactionBegin();
         saveDeviceHistory(device);
@@ -322,14 +350,17 @@ public abstract class BaseDeviceManager implements DeviceManager {
      * Synchronize devices with connections that require additional information such as GPIO.
      * (An example is the raspberry that already has support built GPIO)
      * @param connection
+     * @param request
      */
-    protected void syncDevices(DeviceConnection connection){
+    protected void syncDevices(DeviceConnection connection, GetDevicesRequest request){
 
         if(connection instanceof EmbeddedGPIO){
             EmbeddedGPIO gpioConn = (EmbeddedGPIO) connection;
             Collection<Device> devices = getDevices();
             if(devices != null){
-                for (Device device : devices) gpioConn.attach(device);
+                for (Device device : devices){
+                    if(device instanceof PhysicalDevice) gpioConn.attach((PhysicalDevice) device);
+                }
             }else{
                 log.warn("None device registered !");
             }
@@ -338,14 +369,14 @@ public abstract class BaseDeviceManager implements DeviceManager {
         if((connection instanceof StreamConnection || connection instanceof IWSConnection )
                 && outputConnections.exist(connection)){
             try {
-                sendTo(new GetDevicesRequest(), connection);
+                sendTo(request, connection);
             } catch (IOException e) {}
         }
 
         if(connection instanceof MultipleConnection){
             Set<DeviceConnection> connections = outputConnections.getConnections();
             for (DeviceConnection current : connections) {
-                syncDevices(current);
+                syncDevices(current, request);
             }
         }
 
@@ -421,6 +452,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
 	protected void sendTo(Command command, DeviceConnection connection) throws  IOException {
 		if(connection != null && connection.isConnected()){
+            if(command.getApplicationID() == null) command.setApplicationID(connection.getApplicationID());
 			delivery.sendTo(command, connection);
 		}
 	}
@@ -431,16 +463,18 @@ public abstract class BaseDeviceManager implements DeviceManager {
 	 */
 	@Override
 	public void send(Command command) throws IOException {
-        send(command, false);
+        send(command, true, true);
 	}
 
     /*
      * (non-Javadoc)
      * @see br.com.criativasoft.opendevice.core.DeviceManager#send(br.com.criativasoft.opendevice.core.command.Command)
      */
-    public void send(Command command, boolean onlyToOutput) throws IOException {
+    public void send(Command command, boolean output, boolean input) throws IOException {
 
-        if(outputConnections.hasConnections()){
+        if(command.getApplicationID() == null) command.setApplicationID(TenantProvider.getCurrentID());
+
+        if(output && outputConnections.hasConnections()){
 
             Set<DeviceConnection> connections = outputConnections.getConnections();
             for (DeviceConnection connection : connections) {
@@ -449,7 +483,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
         }
 
-        if(!onlyToOutput && inputConnections.hasConnections()){
+        if(input && inputConnections.hasConnections()){
 
             Set<DeviceConnection> connections = inputConnections.getConnections();
             for (DeviceConnection connection : connections) {
@@ -702,7 +736,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
                 if(outputConnections.hasConnections()){
                     log.debug("Sending to output connections...");
-                    syncDevices(outputConnections);
+                    syncDevices(outputConnections, request);
                 }
 
             }else{
@@ -753,26 +787,77 @@ public abstract class BaseDeviceManager implements DeviceManager {
         } else if (type == CommandType.GET_DEVICES_RESPONSE) {
 
             GetDevicesResponse response = (GetDevicesResponse) command;
-            Collection<Device> loadDevices = response.getDevices();
+
+            partialDevices.addAll(response.getDevices());
+
+            if(!response.isLast()){
+                return;
+            }
+
+            Collection<Device> loadDevices = partialDevices;
+
+            // Resolver Parent (Boards)
+            GetDevicesResponse.resolveParents(loadDevices);
 
             log.info("Loaded Devices: " + loadDevices.size() + " , from: " + connection.getClass().getSimpleName());
             DeviceDao dao = getValidDeviceDao();
+            boolean syncIds = false; // firmware use dynamic ids
+            int nextID = -1;
 
             for (Device device : loadDevices) {
                 log.debug(" - " + device.toString());
+
                 Device found = findDeviceByUID(device.getUid());
+
+                // Fallback, recovery previous device cleared/replaced
+                // If the name/id does not match, the name has priority
+                if(found == null || !found.getName().equals(device.getName())){
+                    found = findDeviceByName(device.getName());
+                    device.setUID(0); // clear, need resyc
+                }
+
                 if(found == null){
+
+                    // Device not have ID, Get next ID from database
+                    if(device.getUid() <= 0){
+                        if(nextID == -1) nextID = dao.getNextUID();
+                        syncIds = true;
+                        device.setUID(nextID++);
+                        // TODO: Notify Client Applications ??
+                    }
+
                     device.setApplicationID(response.getApplicationID());
                     if(device.getCategory() != null) {
                         device.setCategory(dao.getCategoryByCode(device.getCategory().getCode())); // update reference
                     }
                     addDevice(device);
                 }else{
+
+                    // Firmware has ben cleared/replaced
+                    // This will help recover IDs.
+                    if(device.getUid() <= 0 || device.getUid() != found.getUid()){
+                        device.setUID(found.getUid());
+                        syncIds = true;
+                    }
+
                     found.setValue(device.getValue());
+
                 }
 
             }
 
+            if(syncIds){
+
+                try {
+                    sendTo(new SyncDevicesIdCommand(loadDevices), connection);
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                }
+
+            }
+
+
+            partialDevices.clear();
         }
     }
 
@@ -782,10 +867,11 @@ public abstract class BaseDeviceManager implements DeviceManager {
         public void connectionStateChanged(DeviceConnection connection, ConnectionStatus status) {
             log.debug("connectionStateChanged :: "+ connection.getClass().getSimpleName() + ", status = " + status);
 
+            // Force sync devices with physical modules on connect.
             if(status == ConnectionStatus.CONNECTED && outputConnections.exist(connection)){
-
-                syncDevices(connection);
-
+                GetDevicesRequest request = new GetDevicesRequest();
+                request.setApplicationID(OpenDeviceConfig.LOCAL_APP_ID);
+                syncDevices(connection, request);
             }
         }
 

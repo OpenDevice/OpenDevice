@@ -24,6 +24,10 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
 
 	public static final CommandType TYPE = CommandType.GET_DEVICES_RESPONSE;
 
+    private int index;
+
+    private int length;
+
 	private Collection<Device> devices = new LinkedList<Device>();
 
 	private static final long serialVersionUID = -1023397181880070237L;
@@ -49,7 +53,10 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
         Board board = null;
         List<Device> deviceList = new LinkedList<Device>();
 
-        for (int i = 1; i < split.length; i++) {
+        index = Integer.parseInt(split[0]);
+        length = Integer.parseInt(split[1]);
+
+        for (int i = 2; i < split.length; i++) {
             String deviceStr = split[i].substring(1, split[i].length()-1);
             String[] deviceSplit = deviceStr.split(",");
             String name = deviceSplit[0];
@@ -64,8 +71,7 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
                 board = new Board(uid, name, deviceType, DeviceCategory.GENERIC, value);
             } else if(isSensor){
                 if(StringUtils.isEmpty(name)) name = "Sensor " + uid;
-                Sensor sensor = new Sensor(uid, name, deviceType, DeviceCategory.GENERIC);
-                sensor.setValue(value);
+                Sensor sensor = new Sensor(uid, name, deviceType, DeviceCategory.GENERIC, value);
                 deviceList.add(sensor);
             }else{
                 if(StringUtils.isEmpty(name)) name = "Device " + uid;
@@ -80,9 +86,9 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
                     ((PhysicalDevice) device).setBoard(board);
                 }
             }
-            devices.add(board);
         }
 
+        if(board != null) devices.add(board);
         devices.addAll(deviceList);
 
 	}
@@ -125,4 +131,36 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
 
 		return sb.toString();
 	}
+
+    public int getLength() {
+        return length;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public boolean isLast(){
+        return index == length;
+    }
+
+    public static void resolveParents(Collection<Device> devices){
+
+        Board board = null;
+
+        for (Device device : devices) {
+            if(device instanceof Board){
+                board = (Board) device;
+            }
+        }
+
+        if(board != null){
+            for (Device device : devices) {
+                if(device != board){
+                    board.addDevice(device);
+                }
+            }
+        }
+
+    }
 }

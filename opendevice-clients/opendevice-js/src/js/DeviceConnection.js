@@ -61,6 +61,7 @@ od.DeviceConnection = function(config){
         if(_config["reconnectInterval"] == undefined) _config["reconnectInterval"] = 5000;
         if(_config["maxReconnectOnClose"] == undefined) _config["maxReconnectOnClose"] = 5;
 
+        _config.enableProtocol = false;
 
         _config.onError = function (response) {
             console.log("Connection.onError");

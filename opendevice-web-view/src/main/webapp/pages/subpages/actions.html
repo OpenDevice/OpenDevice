@@ -1,0 +1,38 @@
+<fieldset ng-controller="ActionController as ac" ng-init="ac.init()">
+    <legend><i class="fa fa-tasks"></i> Actions</legend>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">Action Type</label>
+        <div class="col-sm-10 form-inline">
+
+            <ui-select ng-model="model.action.type"  theme="select2" style="width: 160px;">
+                <ui-select-match placeholder="Type">${$select.selected.description}</ui-select-match>
+                <ui-select-choices repeat="value.code as value in options.actionTypes | filter: $select.search">
+                    <div ng-bind="value.description"></div>
+                </ui-select-choices>
+            </ui-select>
+        </div>
+    </div>
+
+    <div class="form-group" ng-if="model.action.type == 'control'">
+        <label class="col-sm-2 control-label">Target</label>
+        <div class="col-sm-10 form-inline">
+
+            <ui-select ng-model="model.action.resourceID" theme="select2" style="width: 300px;">
+                <ui-select-match placeholder="Device">
+                    <ol class="breadcrumb breadcrumb-device">
+                        <li><i class="fa fa-sitemap"></i> ${$select.selected.parent.name}</span></li>
+                        <li><i class="fa fa-cog"></i> ${$select.selected.name}</li>
+                    </ol>
+                </ui-select-match>
+                <ui-select-choices repeat="obj.id as obj in ac.targetDevices | filter: $select.search"
+                                   group-by="ac.groupDevices">
+                    <i class="fa fa-cog"></i> <span ng-bind="obj.name"></span>
+                </ui-select-choices>
+            </ui-select>
+
+            <input type="number" class="form-control" ng-model="model.action.value" placeholder="Value" style="width: 80px;" />
+
+        </div>
+    </div>
+</fieldset>

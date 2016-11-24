@@ -20,9 +20,9 @@
 
                 <div class="col-sm-10">
                     <div class="input-group">
-                                    <span class="input-group-addon">
-                                      <input type="checkbox"  ng-model="controller.current.titleVisible" ng-change="(!controller.current.titleVisible ? controller.current.title = null : void(0))" /> Visible
-                                    </span>
+                            <span class="input-group-addon">
+                              <input type="checkbox"  ng-model="controller.current.titleVisible" ng-change="(!controller.current.titleVisible ? controller.current.title = null : void(0))" /> Visible
+                            </span>
                         <input type="text" class="form-control" ng-model="controller.current.title" ng-disabled="!controller.current.titleVisible" />
                     </div>
                 </div>
@@ -125,6 +125,25 @@
                 </div>
             </div>
 
+
+            <!-- Feilds : ImageCtrlView -->
+
+            <div class="form-group" data-fname="subtype">
+                <label class="col-sm-2 control-label">Image Type</label>
+                <div class="col-sm-10">
+                    <select ng-model="controller.current.viewOptions.subtype" class="form-control" style="max-width: 200px">
+                        <option value="IMAGE">Image</option>
+                        <option value="VIDEO">Video</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group" data-fname="path">
+                <label class="col-sm-2 control-label">Image Path</label>
+                <div class="col-sm-10">
+                    <input name="path" class="form-control"  ng-model="controller.current.viewOptions.path" />
+                </div>
+            </div>
 
             <!---------------- advancedOptionsBar ------------------------->
 

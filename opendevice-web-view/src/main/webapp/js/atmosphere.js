@@ -591,11 +591,11 @@
                 var parts = /^([\w\+\.\-]+:)(?:\/\/([^\/?#:]*)(?::(\d+))?)?/.exec(url);
                 var crossOrigin = !!(parts && (
                     // protocol
-                parts[1] != window.location.protocol ||
+                    parts[1] != window.location.protocol ||
                     // hostname
-                parts[2] != window.location.hostname ||
+                    parts[2] != window.location.hostname ||
                     // port
-                (parts[3] || (parts[1] === "http:" ? 80 : 443)) != (window.location.port || (window.location.protocol === "http:" ? 80 : 443))
+                    (parts[3] || (parts[1] === "http:" ? 80 : 443)) != (window.location.port || (window.location.protocol === "http:" ? 80 : 443))
                 ));
                 return window.EventSource && (!crossOrigin || !atmosphere.util.browser.safari || atmosphere.util.browser.vmajor >= 7);
             }
@@ -645,14 +645,14 @@
                 } else if (_request.transport === 'websocket') {
                     if (!_supportWebsocket()) {
                         _reconnectWithFallbackTransport("Websocket is not supported, using request.fallbackTransport (" + _request.fallbackTransport
-                        + ")");
+                            + ")");
                     } else {
                         _executeWebSocket(false);
                     }
                 } else if (_request.transport === 'sse') {
                     if (!_supportSSE()) {
                         _reconnectWithFallbackTransport("Server Side Events(SSE) is not supported, using request.fallbackTransport ("
-                        + _request.fallbackTransport + ")");
+                            + _request.fallbackTransport + ")");
                     } else {
                         _executeSSE(false);
                     }
@@ -981,10 +981,10 @@
                     document.cookie = _sharingKey + "=" +
                         // Opera's JSON implementation ignores a number whose a last digit of 0 strangely
                         // but has no problem with a number whose a last digit of 9 + 1
-                    encodeURIComponent(atmosphere.util.stringifyJSON({
-                        ts: atmosphere.util.now() + 1,
-                        heir: (storageService.get("children") || [])[0]
-                    })) + "; path=/";
+                        encodeURIComponent(atmosphere.util.stringifyJSON({
+                            ts: atmosphere.util.now() + 1,
+                            heir: (storageService.get("children") || [])[0]
+                        })) + "; path=/";
                 }
 
                 // Chooses a storageService
@@ -1490,14 +1490,14 @@
                                 break;
                             case 1001:
                                 reason = "The endpoint is going away, either because of a server failure or because the "
-                                + "browser is navigating away from the page that opened the connection.";
+                                    + "browser is navigating away from the page that opened the connection.";
                                 break;
                             case 1002:
                                 reason = "The endpoint is terminating the connection due to a protocol error.";
                                 break;
                             case 1003:
                                 reason = "The connection is being terminated because the endpoint received data of a type it "
-                                + "cannot accept (for example, a text-only endpoint received binary data).";
+                                    + "cannot accept (for example, a text-only endpoint received binary data).";
                                 break;
                             case 1004:
                                 reason = "The endpoint is terminating the connection because a data frame was received that is too large.";
@@ -2421,6 +2421,9 @@
                                 }
 
                                 var res = cdoc.body ? cdoc.body.lastChild : cdoc;
+                                if (res.omgThisIsBroken) {
+                                    // Cause an exception when res is null, to trigger a reconnect...
+                                }
                                 var readResponse = function () {
                                     // Clones the element not to disturb the original one
                                     var clone = res.cloneNode(true);

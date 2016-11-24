@@ -44,6 +44,11 @@ app.run(function($rootScope) {
 
     ODev.connect();
 
+    // Avoid Expire session
+    setInterval(function(){
+        $.get("/api/auth/ping");
+    }, 1000 * 60 * 15); //15min
+
     ODev.on("loginFail", function(){
         window.location = "/?message=Not%20Logged%20or%20Expired";
     });
@@ -54,6 +59,7 @@ app.run(function($rootScope) {
     });
 
 
+    // Bootstrap Notify Config
     $.notifyDefaults({
         type: 'danger',
         allow_dismiss: true,
@@ -61,7 +67,7 @@ app.run(function($rootScope) {
     });
 
 
-    // Radialize the colors
+    // Highcharts - Radialize the colors
     Highcharts.getOptions().colors = Highcharts.map(Highcharts.getOptions().colors, function (color) {
         return {
             radialGradient: { cx: 0.5, cy: 0.3, r: 0.7 },
@@ -80,12 +86,32 @@ app.run(function($rootScope) {
 });
 
 app.config(['$routeProvider', function($routeProvider) {
-    $routeProvider.when('/', {templateUrl: 'pages/dashboard.html', controller: 'DashboardController',  controllerAs: 'ctrl'});
-    $routeProvider.when('/boards', {templateUrl: 'pages/boards.html', controller: 'DeviceController',  controllerAs: 'ctrl'});
-    $routeProvider.when('/boards/:boardID', {templateUrl: 'pages/devices.html', controller: 'DeviceController',  controllerAs: 'ctrl'});
+
+    var odev_wait = {
+        "check":function($q){
+            var defer = $q.defer();
+            if(ODev.isConnected()){
+                defer.resolve(true);
+            }else{
+                ODev.onConnect(function(){
+                    defer.resolve(true);
+                });
+            }
+            return defer.promise; // route will wait the promise
+        }
+    };
+
+    $routeProvider.when('/', {templateUrl: 'pages/dashboard.html', controller: 'DashboardController',  controllerAs: 'ctrl', resolve : odev_wait});
+    $routeProvider.when('/boards', {templateUrl: 'pages/boards.html', controller: 'DeviceController',  controllerAs: 'ctrl', resolve : odev_wait});
+    $routeProvider.when('/boards/:boardID', {templateUrl: 'pages/devices.html', controller: 'DeviceController',  controllerAs: 'ctrl', resolve : odev_wait});
     $routeProvider.when('/new', {templateUrl: 'pages/new.html', controller: 'DeviceController',  controllerAs: 'ctrl'});
     $routeProvider.when('/users', {templateUrl: 'pages/users.html', controller: 'UserController',  controllerAs: 'ctrl'});
     $routeProvider.when('/connections', {templateUrl: 'pages/connections.html', controller: 'ConnectionController',  controllerAs: 'ctrl'});
+    $routeProvider.when('/rules', {templateUrl: 'pages/rules.html', controller: 'RuleController',  controllerAs: 'ctrl'});
+    $routeProvider.when('/rules/:id', {templateUrl: 'pages/subpages/new-rule.html', controller: 'RuleController',  controllerAs: 'ctrl', resolve : odev_wait});
+    $routeProvider.when('/jobs', {templateUrl: 'pages/jobs.html', controller: 'JobController',  controllerAs: 'ctrl'});
+    $routeProvider.when('/jobs/:id', {templateUrl: 'pages/subpages/new-job.html', controller: 'JobController',  controllerAs: 'ctrl', resolve : odev_wait});
+
     $routeProvider.otherwise({redirectTo: '/'});
 }]);
 
@@ -131,3 +157,47 @@ app.filter('propsFilter', function() {
 });
 
 
+app.filter('deviceType', function() {
+    return function(type) {
+        for (var p in od.DeviceType) {
+            if( od.DeviceType.hasOwnProperty(p) ) {
+                if(type == od.DeviceType[p]){
+                    return p;
+                }
+            }
+        }
+        return "Undefined";
+    }
+});
+
+app.filter('deviceIcon', function() {
+    return function(device) {
+
+        if(device.type == od.DeviceType.DIGITAL){
+            return device.sensor ? "fa-plug" : "fa-lightbulb-o";
+        }else if(device.type == od.DeviceType.ANALOG){
+            return "fa-thermometer-half";
+        }else if(device.type == od.DeviceType.BOARD){
+            return "fa-sitemap";
+        }else{
+            return "fa-cog";
+        }
+
+    }
+});
+
+app.filter('deviceRef', function() {
+    return function(resourceID) {
+        var device = ODev.findDevice(resourceID) || { description : "[Not Found]"};
+        return device.description;
+
+    }
+});
+
+app.filter('deviceNameRef', function() {
+    return function(resourceID) {
+        var device = ODev.findDevice(resourceID) || { name : "[Not Found]"};
+        return device.name;
+
+    }
+});

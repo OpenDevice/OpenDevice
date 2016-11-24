@@ -1,0 +1,140 @@
+<span id="page-header"><i class="fa fa fa-magic"></i> Rules </span>
+
+<ul id="page-actions" class="nav navbar-nav">
+
+    <li ng-init="page.replace('#app-header', '#page-header');page.replace('#app-header-actions', '#page-actions')"></li>
+</ul>
+
+<section class="content-header">
+    <h1>
+        <i class="fa fa-plus"></i> New Rule
+        <small>new <i>things</i> are being created</small>
+    </h1>
+
+    <ol class="breadcrumb">
+        <li><button type="button" class="btn btn-xs btn-info pull-right"><i class="fa fa-help"></i> Help</button></li>
+    </ol>
+</section>
+
+
+<!-- Main content -->
+<section class="content" data-ng-init="ctrl.init()">
+
+    <div class="col-md-9">
+        <div class="box box-success">
+            <form class="form-horizontal">
+                <div class="box-body">
+
+                    <fieldset>
+                        <legend><span>Name:</span> <input name="description" ng-model="model.description" placeholder="Rule description" class="no-border" style="outline: none;width: 90%;" autofocus required/></legend>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Rule Type</label>
+                            <div class="col-sm-10">
+                                <div class="radio radio-success radio-inline">
+                                    <input type="radio" id="type1" value="state" ng-model="model.type">
+                                    <label for="type1"> State Change</label>
+                                </div>
+                                <div class="radio radio-success radio-inline">
+                                    <input type="radio" id="type2" value="threshold" ng-model="model.type">
+                                    <label for="type2"> Threshold </label>
+                                </div>
+                                <div class="radio radio-success radio-inline">
+                                    <input type="radio" id="type3" value="script" ng-model="model.type">
+                                    <label for="type3"> Script </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">When Device</label>
+                            <div class="col-sm-10 form-inline">
+
+                                <ui-select ng-model="model.deviceType" ng-change="ctrl.filterDevices()" theme="select2" style="width: 100px;">
+                                    <ui-select-match placeholder="Type">${$select.selected.description}</ui-select-match>
+                                    <ui-select-choices repeat="value.code as value in ctrl.deviceTypes | filter: $select.search">
+                                        <div ng-bind="value.description"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+
+                                <ui-select ng-model="model.resourceID" theme="select2" style="width: 250px;">
+                                    <ui-select-match placeholder="Device">
+                                        <ol class="breadcrumb breadcrumb-device">
+                                            <li><i class="fa fa-sitemap"></i> ${$select.selected.parent.name}</span></li>
+                                            <li><i class="fa fa-cog"></i> ${$select.selected.name}</li>
+                                        </ol>
+                                    </ui-select-match>
+                                    <ui-select-choices repeat="obj.id as obj in ctrl.devices | filter: $select.search"
+                                                       group-by="ctrl.groupDevices">
+                                        <i class="fa ${obj | deviceIcon}"></i> <span ng-bind="obj.name"></span>
+                                    </ui-select-choices>
+                                </ui-select>
+
+                                Change to:
+
+                                <ui-select ng-model="model.value" theme="select2" style="width: 80px;">
+                                    <ui-select-match placeholder="State">${$select.selected.description}</ui-select-match>
+                                    <ui-select-choices repeat="obj.code as obj in ctrl.deviceStates">
+                                        <div ng-bind-html="obj.description | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend><i class="fa fa-wrench"></i> Conditions</legend>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Condition Type</label>
+                            <div class="col-sm-10 form-inline">
+
+                                <ui-select ng-model="model.condition.type"  theme="select2" style="width: 120px;">
+                                    <ui-select-match placeholder="Type">${$select.selected.description}</ui-select-match>
+                                    <ui-select-choices repeat="value.code as value in options.conditionTypes | filter: $select.search">
+                                        <div ng-bind="value.description"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+
+                                <div ng-if="model.conditionType == 'time'" style="display: inline-block">
+
+                                    <ui-select ng-model="model.condition.eval" theme="select2" style="width: 100px;">
+                                        <ui-select-match placeholder="Condiction">${$select.selected.description}</ui-select-match>
+                                        <ui-select-choices repeat="value.code as value in options.evalConditionTypes | filter: $select.search">
+                                            <div ng-bind="value.description"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+
+                                    <input type="number" class="form-control" ng-model="model.time"  style="width: 80px;" />
+
+                                </div>
+
+                                <div ng-if="model.condition.type == 'activeTime'" style="display: inline-block">
+
+                                    <input type="number" class="form-control" ng-model="model.condition.time"  style="width: 80px;" />
+
+                                    <ui-select ng-model="model.condition.intervalType" theme="select2" style="width: 80px;" placeholder="Time">
+                                        <ui-select-match placeholder="Scale">${$select.selected.description}</ui-select-match>
+                                        <ui-select-choices repeat="value.code as value in options.timeTypes | filter: $select.search">
+                                            <div ng-bind="value.description"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <div ng-include="'/pages/subpages/actions.html'"></div>
+
+                </div>
+                <div class="box-footer">
+                    <a rule="submit" class="btn btn-default" ng-href="#/rules"><i class="fa fa-backward"></i> Cancel</a>
+                    <a rule="submit" class="btn btn-success pull-right" ng-click="ctrl.save()"><i class="fa fa-save"></i> Save</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</section>

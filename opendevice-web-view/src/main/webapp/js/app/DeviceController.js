@@ -33,20 +33,19 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
     // ==========================
     var _this = this;
     var _public = this;
-
+    var odevListeners = []; // required because of our simple-page-model
 
     // Public
     // ==========================
 
     this.devices = [];
     this.discoveryList = [];
-    this.odevListeners = []; // required because of our simple-page-model
 
     this.sensorsCharts = []; // od.view.ChartItemView
     this.devicesCtrls = []; // od.view.DigitalCtrlView
     this.chartViewOptions = {
         "periodValue": 1,
-        "periodType": "DAY"
+        "periodType": "HOUR"
     };
 
     this.isBoardView = false;
@@ -55,6 +54,14 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
     this.board;
 
     _public.init = function(){
+
+        // Wait for devices full loaded
+        if(!ODev.isConnected()){
+            _this.odevListeners.push(ODev.onConnect(function(){
+                _this.init();
+            }));
+            return;
+        }
 
         $(function(){
 
@@ -142,28 +149,19 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
             }
 
             // Unregister listeners on change page.
-            ODev.removeListener(_this.odevListeners);
+            ODev.removeListener(odevListeners);
         });
 
         $scope.$watch('ctrl.chartViewOptions', function() {
             updateCharts.call(_this);
         }, true);
 
-        // ODev.onChange(function(device){
-        //     if(device) {
-        //         if (device.type == od.DeviceType.DIGITAL) {
-        //             // playSound(device);
-        //         }
-        //
-        //         $timeout(function(){
-        //             $scope.$apply(); // sync view
-        //         });
-        //     }
-        // });
+
+        // Defines a list where temporary listeners will be registered
+        ODev.setListenerReceiver(odevListeners);
 
         // Fired by Sync or by Server
-
-        ODev_addListener(od.Event.DEVICE_LIST_UPDATE, function(devices){
+        ODev.on(od.Event.DEVICE_LIST_UPDATE, function(devices){
             updateDevices();
         });
 
@@ -183,7 +181,16 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
         _this.newBordPage = 'initialHelp';
 
 
-    }
+    };
+
+
+    _public.delete = function(item, index){
+
+        ODev.removeDevice(_this.devices[index]);
+
+    };
+
+
 
     _public.updateApiKeys = function(){
         // Show ApiKeys
@@ -457,11 +464,6 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
     // ============================================================================================
     // Private Functionsre
     // ============================================================================================
-
-    function ODev_addListener(event, listener){
-        var ldef = ODev.on(event, listener);
-        _this.odevListeners.push(ldef); // required to remove later
-    }
 
     function updateDevices(){
 

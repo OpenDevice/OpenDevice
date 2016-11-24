@@ -35,6 +35,8 @@
     <!-- angular ui-select-->
     <link rel="stylesheet" type="text/css" href="js/angular/angular-ui-select.min.css" media="screen" />
     <link rel="stylesheet" href="css/plugins/select2.css"/>
+    <!--<link rel="stylesheet" href="css/plugins/selectize.default.min.css"/>-->
+    <link rel="stylesheet" href="css/plugins/awesome-bootstrap-checkbox.css"/>
 
     <link rel="stylesheet" href="css/app.css">
     <link rel="stylesheet" href="css/icons/icons.css">
@@ -137,7 +139,8 @@
                 <li><a href="#/"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
                 <li><a href="#/boards"><i class="fa fa-sitemap"></i> <span>Boards / Devices</span></a></li>
                 <li><a href="#/connections"><i class="fa fa-rss"></i> <span>Connections</span></a></li>
-                <li><a href="#/new"><i class="fa fa-history"></i> <span>Events</span></a></li>
+                <li><a href="#/jobs"><i class="fa fa-history"></i> <span>Jobs/Timers</span></a></li>
+                <li><a href="#/rules"><i class="fa fa-magic"></i> <span>Rules</span></a></li>
                 <li><a href="#/new"><i class="fa fa-code"></i> <span>Programmer</span></a></li>
                 <li><a href="#/users"><i class="fa fa-users"></i> <span>Users</span></a></li>
 
@@ -281,7 +284,8 @@
 
 <script type="text/javascript" src="js/atmosphere.js"></script>
 
-<!--<script type="text/javascript" src="js/opendevice.js"></script>-->
+<script type="text/javascript" src="js/opendevice.js"></script>
+<!-- Development Files Coment in Production -->
 <script type="text/javascript" src="js/Constants.js"></script>
 <script type="text/javascript" src="js/Device.js"></script>
 <script type="text/javascript" src="js/DeviceConnection.js"></script>
@@ -294,6 +298,7 @@
 <script type="text/javascript" src="js/opendevice/DashItemView.js"></script>
 <script type="text/javascript" src="js/opendevice/ChartItemView.js"></script>
 <script type="text/javascript" src="js/opendevice/DigitalCtrlView.js"></script>
+<script type="text/javascript" src="js/opendevice/ImageCtrlView.js"></script>
 
 <!-- ----------------------------------------------------- -->
 <!-- Jquery -->
@@ -347,6 +352,11 @@
 <script type="text/javascript" src="js/app/DeviceController.js"></script>
 <script type="text/javascript" src="js/app/UserController.js"></script>
 <script type="text/javascript" src="js/app/ConnectionController.js"></script>
+<script type="text/javascript" src="js/app/ActionController.js"></script>
+<script type="text/javascript" src="js/app/RuleController.js"></script>
+<script type="text/javascript" src="js/app/JobController.js"></script>
+
+
 
 
 </body>

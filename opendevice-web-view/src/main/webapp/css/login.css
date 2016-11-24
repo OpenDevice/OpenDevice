@@ -195,3 +195,24 @@ textarea {
   color: #dc9797;
   font-variant: small-caps;
 }
+
+@media only screen and (max-width:800px) {
+
+  body{
+    background: rgb(19, 35, 47);
+  }
+
+  .form{
+    padding: 22px;
+    margin:  0;
+    box-shadow: none;
+  }
+  .tab-group li a{
+    padding: 9px;
+  }
+
+  .button{
+    padding: 5px 0;
+  }
+
+}

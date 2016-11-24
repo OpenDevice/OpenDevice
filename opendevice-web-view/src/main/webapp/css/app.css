@@ -264,6 +264,32 @@
     line-height: 35px;
 }
 
+.content-header {
+    background-color: white !important;
+    padding-bottom: 12px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+}
+
+.content-header>.breadcrumb>li+li:before {
+    content: normal !important;
+}
+
+.content-header>.breadcrumb {
+    top: 4px !important;
+}
+
+.content-header .fa-arrow-right{
+    font-size: 12px;
+    vertical-align: middle;
+    color: #777;
+}
+
+.breadcrumb .btn {
+    line-height: 0.428571;
+    height: 30px;
+    color: white !important;
+}
+
 .noselect {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none;   /* Chrome/Safari/Opera */
@@ -464,6 +490,34 @@
     color: #f53809;
 }
 
+.breadcrumb-device{
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    display:block
+}
+.breadcrumb-device li{
+    display:inline-block;
+}
+
+.breadcrumb-device>li+li:before {
+    /*content: '>\00a0';*/
+}
+
+
+/* Image/Video view
+----------------------------------------------------------------------------------------------------*/
+
+.image-view {
+    width: 100%;
+    height: 100%;
+}
+
+.image-view img {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
 
 
 /* Dashboards
@@ -631,6 +685,25 @@
 }
 
 
+.device-type-1{ /*DIGITAL*/
+    background-color: #0073b7 !important;
+}
+.device-type-2{ /*ANALOG*/
+    background-color: #00a65a !important;
+}
+.device-type-3{ /*NUMERIC*/
+    background-color: #dd4b39 !important;
+}
+.device-type-4{ /*CHARACTER*/
+    background-color: #f39c12 !important;
+}
+.device-type-10{ /*BOARD*/
+    background-color: #00c0ef !important;
+}
+.device-type-11{ /*MANAGER*/
+    background-color: #605ca8 !important;
+}
+
 .dash-move{
     cursor: move;
 }
@@ -674,3 +747,36 @@
     background-color: #ffffff !important;
 }
 
+
+.checkbox-circle{  /* Override: awesome-bootstrap-checkbox */
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+    outline: none;
+}
+
+.checkbox input[type="checkbox"]:focus + label::before { /* Override Bootstrap: remove focus effect */
+    outline: 0px !important;
+    -webkit-appearance:none !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    box-shadow: none !important;
+}
+
+.radio input[type="radio"]:focus + label::before {  /* Override Bootstrap: remove focus effect */
+    outline: 0px !important;
+    -webkit-appearance:none !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    box-shadow: none !important;
+}
+
+.widget-user-actions{
+    float: right;
+    list-style-type: none;
+    margin-right: 9px;
+    margin-top: 5px;
+}
+
+.widget-user-actions a{
+    color: white;
+}

@@ -2520,7 +2520,7 @@ function toDebugString(obj) {
  */
 var version = {
   full: '1.5.8',    // all of these placeholder strings will be replaced by grunt's
-  major: 1,    // package task
+  major: 1,    // package jobs
   minor: 5,
   dot: 8,
   codeName: 'arbitrary-fallbacks'
@@ -6225,7 +6225,7 @@ function Browser(window, document, $log, $sniffer) {
    * @name $browser#defer
    * @param {function()} fn A function, who's execution should be deferred.
    * @param {number=} [delay=0] of milliseconds to defer the function execution.
-   * @returns {*} DeferId that can be used to cancel the task via `$browser.defer.cancel()`.
+   * @returns {*} DeferId that can be used to cancel the jobs via `$browser.defer.cancel()`.
    *
    * @description
    * Executes a fn asynchronously via `setTimeout(fn, delay)`.
@@ -6251,10 +6251,10 @@ function Browser(window, document, $log, $sniffer) {
    * @name $browser#defer.cancel
    *
    * @description
-   * Cancels a deferred task identified with `deferId`.
+   * Cancels a deferred jobs identified with `deferId`.
    *
    * @param {*} deferId Token returned by the `$browser.defer` function.
-   * @returns {boolean} Returns `true` if the task hasn't executed yet and was successfully
+   * @returns {boolean} Returns `true` if the jobs hasn't executed yet and was successfully
    *                    canceled.
    */
   self.defer.cancel = function(deferId) {
@@ -12657,10 +12657,10 @@ function $IntervalProvider() {
       * @name $interval#cancel
       *
       * @description
-      * Cancels a task associated with the `promise`.
+      * Cancels a jobs associated with the `promise`.
       *
       * @param {Promise=} promise returned by the `$interval` function.
-      * @returns {boolean} Returns `true` if the task was successfully canceled.
+      * @returns {boolean} Returns `true` if the jobs was successfully canceled.
       */
     interval.cancel = function(promise) {
       if (promise && promise.$$intervalId in intervals) {
@@ -16318,7 +16318,7 @@ function qFactory(nextTick, exceptionHandler) {
    * @kind function
    *
    * @description
-   * Creates a `Deferred` object which represents a task which will finish in the future.
+   * Creates a `Deferred` object which represents a jobs which will finish in the future.
    *
    * @returns {Deferred} Returns a new instance of deferred.
    */
@@ -17714,7 +17714,7 @@ function $RootScopeProvider() {
        */
       $evalAsync: function(expr, locals) {
         // if we are outside of an $digest loop and this is the first time we are scheduling async
-        // task also schedule async auto-flush
+        // jobs also schedule async auto-flush
         if (!$rootScope.$$phase && !asyncQueue.length) {
           $browser.defer(function() {
             if (asyncQueue.length) {
@@ -19633,11 +19633,11 @@ function $TimeoutProvider() {
       * @name $timeout#cancel
       *
       * @description
-      * Cancels a task associated with the `promise`. As a result of this, the promise will be
+      * Cancels a jobs associated with the `promise`. As a result of this, the promise will be
       * resolved with a rejection.
       *
       * @param {Promise=} promise Promise returned by the `$timeout` function.
-      * @returns {boolean} Returns `true` if the task hasn't executed yet and was successfully
+      * @returns {boolean} Returns `true` if the jobs hasn't executed yet and was successfully
       *   canceled.
       */
     timeout.cancel = function(promise) {

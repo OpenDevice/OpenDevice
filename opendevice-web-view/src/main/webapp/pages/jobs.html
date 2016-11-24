@@ -1,0 +1,78 @@
+<script src="/js/plugins/jqCron.js"></script>
+<script src="/js/plugins/jqCron.en.js"></script>
+<link rel="stylesheet" href="/js/plugins/jqCron.css">
+
+<span id="page-header"><i class="fa fa fa-magic"></i> Jobs </span>
+
+<ul id="page-actions" class="nav navbar-nav">
+
+    <li ng-init="page.replace('#app-header', '#page-header');page.replace('#app-header-actions', '#page-actions')"></li>
+</ul>
+
+<section class="content-header">
+    <h1>
+        <i class="fa fa-magic"></i> Jobs
+        <small> Do periodic stuff here</small>
+    </h1>
+
+    <ol class="breadcrumb">
+        <li>
+            <div class="input-group input-group-sm" style="width: 150px;">
+
+                <input ng-model="searchFilter" class="form-control pull-right" placeholder="Search">
+
+                <div class="input-group-btn">
+                    <button type="submit" class="btn btn-info"><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+        </li>
+        <li><a href="#/jobs/new" class="btn btn-info pull-right" role="button"><i class="fa fa-plus"></i> New Job</a></li>
+    </ol>
+</section>
+
+
+<!-- Main content -->
+<section class="content" data-ng-init="ctrl.init()">
+
+    <div class="box box-info">
+        <div class="box-body">
+            <table class="table table-responsive">
+                <tbody>
+                <tr>
+                    <th width="30">Enabled</th>
+                    <th>Description</th>
+                    <th>Schedule</th>
+                    <th>Actions</th>
+                    <th>Last Execution</th>
+                    <th>--</th>
+                </tr>
+                <tr ng-repeat="x in ctrl.list | filter:searchFilter"
+                    ng-init="$last && ctrl.onRenderItems()">
+                    <td class="text-center">
+                        <div class="checkbox checkbox-success checkbox-circle" data-toggle="tooltip" title="Click to Enable/Disable">
+                            <input id="checkbox${::x.id}" class="styled" type="checkbox" ng-model="x.enabled" ng-change="ctrl.activate(x)">
+                            <label for="checkbox${::x.id}"></label>
+                        </div>
+                    </td>
+                    <td>${ ::x.description }</td>
+                    <td><input class="cronspec hidden" value="${ ::x.cronExpression }" /></td>
+                    <td>${ ::x.action | actionType }</td>
+
+                    <td ng-if="x.status == 'ACTIVE'">
+                        <small class="label bg-green">Active</small>
+                    </td>
+                    <td ng-if="x.status != 'ACTIVE'">
+                        ${ ::x.lastExecution | date:'hh:mm:ss - dd/MM' }
+                    </td>
+                    <td>
+                        <a role="button" class="btn btn-xs btn-warning" ng-href="#/jobs/${::x.id}"><i class="fa fa-edit"></i></a>
+                        <a role="submit" class="btn btn-xs btn-danger" ng-really-click="ctrl.delete(x, $index)"><i class="fa fa-remove"></i></a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+</section>

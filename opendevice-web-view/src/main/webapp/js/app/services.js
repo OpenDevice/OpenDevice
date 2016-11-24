@@ -98,6 +98,48 @@ app.factory('ConnectionRest', ['$resource', function($resource){
 
 }]);
 
+app.factory('RuleRest', ['$resource', function($resource){
+
+    var PATH = "/middleware/rules/:id";
+
+    var resource = $resource(PATH, { id: '@id' }, {
+        activate: {method:'PUT', url : PATH+"/activate"},
+        update: {method:'PUT'},
+    })
+
+    resource.prototype.$saveOrUpdate = function(callback) {
+        if (this.id) {
+            return this.$update(callback);
+        } else {
+            return this.$save(callback);
+        }
+    };
+
+    return resource;
+
+}]);
+
+app.factory('JobRest', ['$resource', function($resource){
+
+    var PATH = "/middleware/jobs/:id";
+
+    var resource = $resource(PATH, { id: '@id' }, {
+        activate: {method:'PUT', url : PATH+"/activate"},
+        update: {method:'PUT'},
+    })
+
+    resource.prototype.$saveOrUpdate = function(callback) {
+        if (this.id) {
+            return this.$update(callback);
+        } else {
+            return this.$save(callback);
+        }
+    };
+
+    return resource;
+
+}]);
+
 
 
 /**

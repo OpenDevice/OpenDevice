@@ -33,9 +33,6 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
     // Private
     // ==========================
 
-    var audioContext;
-    var audioPlay;
-
     var $dashboards; // @HtmlElement - $('.dashboards');
     var $layoutManager; // @Object - gridster instance
 
@@ -52,6 +49,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
     this.dashboardList = [];
     this.itemViewSelected = null;
     this.gridConf = {};
+    this.odevListeners = []; // required because of our simple-page-model
 
     _public.init = function(){
 
@@ -123,11 +121,21 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
                 var itemView = _this.dashboardItems[i];
                 itemView.destroy();
             }
+
+
+            // Unregister listeners on change page.
+            ODev.removeListener(_this.odevListeners);
+
         });
 
         configureLayoutManager();
 
-        // Load Dashboard's
+        // // Load Dashboard's
+        // // Wait for devices full loaded
+        // _this.odevListeners.push(ODev.onConnect(function(){
+        //     if(!_this.dashboardList.length) _this.syncDashboards();
+        // }));
+
         _this.syncDashboards();
 
     };

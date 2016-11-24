@@ -23,7 +23,7 @@ $.extend(od.view.dashTypes,{
         deviceTypes: [od.DeviceType.DIGITAL],
         fields: [
             // [Name, Required, Default]
-            ["iconON", true, "lightbulb.png"],
+            ["iconON", true, "lightbulb_on.png"],
             ["iconOFF", true, "lightbulb_off.png"],
             ["textON", true, "ON"],
             ["textOFF", true, "OFF"],
@@ -57,10 +57,13 @@ od.view.DigitalCtrlView = od.view.DashItemView.extend(function() {
 
             var device = ODev.get(deviceID);
 
-            var listener = device.onChange(onDeviceChange, _this);
-            deviceListeners.push(listener);
+            if(!device) console.error("Device with id: " + deviceID + " not found, chart: " + _this.model.title);
 
             if(device){
+
+                var listener = device.onChange(onDeviceChange, _this);
+                deviceListeners.push(listener);
+
                 var $device = $(HTML);
                 _this.el.append($device);
                 $device.attr("data-deviceid", deviceID);
@@ -75,7 +78,7 @@ od.view.DigitalCtrlView = od.view.DashItemView.extend(function() {
         // Remove listeners from devices.
         this.model.monitoredDevices.forEach(function(deviceID, index) {
             var device = ODev.get(deviceID);
-            device.removeListener(deviceListeners[index]);
+            if(device) device.removeListener(deviceListeners[index]);
         });
 
         this.super.destroy();

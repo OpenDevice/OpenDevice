@@ -17,7 +17,6 @@ import br.com.criativasoft.opendevice.connection.*;
 import br.com.criativasoft.opendevice.core.BaseDeviceManager;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.TenantProvider;
-import br.com.criativasoft.opendevice.core.command.GetDevicesRequest;
 import br.com.criativasoft.opendevice.core.connection.ConnectionInfo;
 import br.com.criativasoft.opendevice.core.connection.ConnectionType;
 import br.com.criativasoft.opendevice.core.connection.Connections;
@@ -50,6 +49,7 @@ import java.util.Set;
 @Path("/middleware/connections")
 @RequiresAuthentication
 @RequiresRoles(AccountType.ROLES.ACCOUNT_MANAGER)
+@Produces(MediaType.APPLICATION_JSON)
 public class ConnectionsRest {
 
     private static final Logger log = LoggerFactory.getLogger(WebSocketResource.class);
@@ -61,7 +61,6 @@ public class ConnectionsRest {
     private DeviceManager manager;
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     public List<ConnectionInfo> list() throws IOException {
 
         List<ConnectionInfo> list = new LinkedList<ConnectionInfo>();
@@ -117,7 +116,6 @@ public class ConnectionsRest {
     }
 
     @GET @Path("/discovery")
-    @Produces(MediaType.APPLICATION_JSON)
     public List<ConnectionInfo> discovery(@QueryParam("type") ConnectionType type) throws IOException {
 
         List<ConnectionInfo> list = new LinkedList<ConnectionInfo>();
@@ -137,7 +135,6 @@ public class ConnectionsRest {
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
     public Response save(ConnectionInfo info) throws IOException {
 
         ConnectionType type = ConnectionType.valueOf(info.getType());
@@ -156,7 +153,7 @@ public class ConnectionsRest {
             connection.connect();
 
             if(connection.isConnected()){
-                connection.send(new GetDevicesRequest());
+//                connection.send(new GetDevicesRequest());
             }
         }
 
@@ -164,7 +161,6 @@ public class ConnectionsRest {
     }
 
     @DELETE @Path("/{uuid}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response delete(@PathParam("uuid") String uuid) throws IOException {
 
         MultipleConnection outputConnections = ((BaseDeviceManager)manager).getOutputConnections();

@@ -43,6 +43,7 @@ import java.util.Set;
  */
 @Path("/middleware/dashboards")
 @RequiresAuthentication
+@Produces(MediaType.APPLICATION_JSON)
 public class DashboardRest {
 
     private static final Logger log = LoggerFactory.getLogger(DashboardRest.class);
@@ -55,14 +56,12 @@ public class DashboardRest {
 
     @GET
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Dashboard get(@PathParam("id") long id) throws IOException {
         return dao.getById(id);
     }
 
     @GET
     @Path("/{id}/activate")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response activate(@PathParam("id") long id) throws IOException {
 
         dao.activate(dao.getById(id));
@@ -71,7 +70,6 @@ public class DashboardRest {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     public List<Dashboard> list() throws IOException {
 //
 //        for (Dashboard dashboard : dao.listAll()) {
@@ -84,7 +82,6 @@ public class DashboardRest {
     }
 
     @GET @Path("{id}/items")
-    @Produces(MediaType.APPLICATION_JSON)
     public List<DashboardItem> listItems(@PathParam("id") long id) throws IOException {
 
         Dashboard dashboard = dao.getById(id);
@@ -95,7 +92,6 @@ public class DashboardRest {
 
 
     @DELETE @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response remove(@PathParam("id") long id) throws IOException {
 
         Dashboard dashboard = dao.getById(id);
@@ -112,7 +108,6 @@ public class DashboardRest {
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
     public Dashboard save(Dashboard dashboard) throws IOException {
 
         if(dashboard.getId() > 0) dashboard = em.merge(dashboard);
@@ -124,7 +119,6 @@ public class DashboardRest {
     }
 
     @GET @Path("/{id}/edit")
-    @Produces(MediaType.APPLICATION_JSON)
     public Dashboard edit(@PathParam("id") long id) throws IOException {
         System.out.println("DashboardRest.get - createEntityManager instance : " + em.hashCode());
 
@@ -139,7 +133,6 @@ public class DashboardRest {
 
 
     @PUT @Path("/{id}/updateLayout")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response updateLayout(@PathParam("id") long id, DashboardItem item) throws IOException {
         System.err.println("DashboardRest.updateLayout: dash:" + id + "->" + item.getLayout());
 
@@ -153,7 +146,6 @@ public class DashboardRest {
     }
 
     @POST @Path("/{id}/item")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response saveItem(@PathParam("id") long id, DashboardItem item) throws IOException {
 
         System.err.println("DashboardRest.saveItem: dash:" + id + "->" + item.getLayout());
@@ -188,7 +180,6 @@ public class DashboardRest {
     }
 
     @DELETE @Path("/{id}/item")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response removeItem(@PathParam("id") long id, @QueryParam("id") long itemID) throws IOException {
 
         DashboardItem item = em.find(DashboardItem.class, itemID);
@@ -205,7 +196,6 @@ public class DashboardRest {
     }
 
     @GET @Path("/deviceIcons")
-    @Produces(MediaType.APPLICATION_JSON)
     public List<String> deviceIcons() throws IOException {
         // FIXME: get current path.
         File path = new File("/media/ricardo/Dados/Codidos/Java/Projetos/OpenDevice/opendevice-web-view/src/main/webapp/images/devices");

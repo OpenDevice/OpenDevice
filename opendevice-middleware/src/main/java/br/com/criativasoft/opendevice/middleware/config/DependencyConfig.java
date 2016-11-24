@@ -16,12 +16,18 @@
 package br.com.criativasoft.opendevice.middleware.config;
 
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
+import br.com.criativasoft.opendevice.middleware.jobs.JobManager;
 import br.com.criativasoft.opendevice.middleware.persistence.HibernateProvider;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.DashboardDao;
-import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.AccountDaoJPA;
-import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.UserDaoJPA;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.JobSpecDao;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.RuleSpecDao;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.AccountJPA;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.JobSpecJPA;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.RuleSpecJPA;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.UserJPA;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j.DashboardDaoNeo4j;
-import br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j.DeviceDaoNeo4j;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j.DeviceNeo4J;
+import br.com.criativasoft.opendevice.middleware.rules.RuleManager;
 import br.com.criativasoft.opendevice.middleware.tools.SimulationService;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
 import br.com.criativasoft.opendevice.restapi.model.dao.UserDao;
@@ -31,7 +37,6 @@ import com.google.inject.Binder;
 import javax.persistence.EntityManager;
 
 /**
- * TODO: Add Docs
  *
  * @author Ricardo JL Rufino on 02/05/15.
  */
@@ -42,12 +47,17 @@ public class DependencyConfig extends GuiceModule {
         super.configure(binder);
 
         binder.bind(EntityManager.class).toProvider(HibernateProvider.class);
+        binder.bind(SimulationService.class);
+        binder.bind(RuleManager.class);
+        binder.bind(JobManager.class);
 
+        // Daos
         binder.bind(DashboardDao.class).to(DashboardDaoNeo4j.class);
-        binder.bind(DeviceDao.class).to(DeviceDaoNeo4j.class);
-        binder.bind(AccountDao.class).to(AccountDaoJPA.class);
-        binder.bind(UserDao.class).to(UserDaoJPA.class);
-        binder.bind(SimulationService.class).toInstance(new SimulationService());
+        binder.bind(DeviceDao.class).to(DeviceNeo4J.class);
+        binder.bind(AccountDao.class).to(AccountJPA.class);
+        binder.bind(UserDao.class).to(UserJPA.class);
+        binder.bind(RuleSpecDao.class).to(RuleSpecJPA.class);
+        binder.bind(JobSpecDao.class).to(JobSpecJPA.class);
 
 
     }

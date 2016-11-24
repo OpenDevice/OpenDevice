@@ -17,7 +17,7 @@ import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.metamodel.PeriodType;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceHistory;
-import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.DeviceDaoJPA;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.DeviceJPA;
 
 import javax.persistence.Query;
 import java.util.Calendar;
@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author Ricardo JL Rufino on 06/05/15.
  */
-public class DeviceDaoNeo4j extends DeviceDaoJPA {
+public class DeviceNeo4J extends DeviceJPA {
 
     // FIXME: Use tentantIDs
     protected DeviceHistory getDeviceHistoryAggregate(DeviceHistoryQuery params) {

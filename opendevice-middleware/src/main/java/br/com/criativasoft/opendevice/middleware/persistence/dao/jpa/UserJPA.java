@@ -24,9 +24,9 @@ import java.util.List;
  * @author Ricardo JL Rufino
  * @date 24/09/16
  */
-public class UserDaoJPA extends GenericJpa<User> implements UserDao {
+public class UserJPA extends GenericJpa<User> implements UserDao {
 
-    public UserDaoJPA() {
+    public UserJPA() {
         super(User.class);
     }
 

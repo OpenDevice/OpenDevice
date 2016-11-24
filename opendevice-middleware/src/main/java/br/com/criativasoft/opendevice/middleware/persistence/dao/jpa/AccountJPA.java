@@ -31,10 +31,10 @@ import java.util.List;
  * @author Ricardo JL Rufino
  * @date 22/09/16
  */
-public class AccountDaoJPA extends GenericJpa<Account> implements AccountDao {
+public class AccountJPA extends GenericJpa<Account> implements AccountDao {
 
 
-    public AccountDaoJPA() {
+    public AccountJPA() {
         super(Account.class);
     }
 

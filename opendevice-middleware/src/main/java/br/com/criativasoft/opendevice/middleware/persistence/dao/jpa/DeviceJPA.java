@@ -32,14 +32,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * TODO: Add docs.
- *
  * @author Ricardo JL Rufino
  * @date 12/10/16
  */
-public abstract class DeviceDaoJPA extends GenericJpa<Device> implements DeviceDao{
+public abstract class DeviceJPA extends GenericJpa<Device> implements DeviceDao{
 
-    public DeviceDaoJPA() {
+    public DeviceJPA() {
         super(Device.class);
     }
 
@@ -57,6 +55,33 @@ public abstract class DeviceDaoJPA extends GenericJpa<Device> implements DeviceD
     }
 
     @Override
+    public int getNextUID() {
+
+        TypedQuery<Integer> query = em().createQuery("select MAX(x.uid) from Device x where x.applicationID = :TENANT", Integer.class);
+        query.setParameter("TENANT", TenantProvider.getCurrentID());
+        Integer val = query.getSingleResult();
+        if(val == null) val = 0;
+
+        try {
+            return val + 1;
+        }catch (NoResultException ex){
+            return 1;
+        }
+
+    }
+
+    @Override
+    public void delete(Device entity) {
+        deleteHistory(entity);
+        super.delete(entity);
+    }
+
+    @Override
+    public void deleteHistory(Device device) {
+        int deletedCount = em().createQuery("DELETE FROM DeviceHistory where deviceID = :uid").setParameter("uid", device.getId()).executeUpdate();
+    }
+
+    @Override
     public List<DeviceHistory> getDeviceHistory(DeviceHistoryQuery params) {
 
         // FIXME: Use tentantIDs
@@ -71,16 +96,16 @@ public abstract class DeviceDaoJPA extends GenericJpa<Device> implements DeviceD
             return list;
         }else{
 
-            StringBuilder sbquery = new StringBuilder("from DeviceHistory where deviceID = :deviceID");
+            StringBuilder jpql = new StringBuilder("from DeviceHistory where deviceID = :deviceID");
 
             if(params.getPeriodType() != PeriodType.RECORDS){
-                sbquery.append(" and timestamp between :start and :end");
-                sbquery.append(" ORDER BY timestamp ASC");
+                jpql.append(" and timestamp between :start and :end");
+                jpql.append(" ORDER BY timestamp ASC");
             }else{
-                sbquery.append(" ORDER BY timestamp DESC");
+                jpql.append(" ORDER BY timestamp DESC");
             }
 
-            TypedQuery<DeviceHistory> query = em().createQuery(sbquery.toString(), DeviceHistory.class);
+            TypedQuery<DeviceHistory> query = em().createQuery(jpql.toString(), DeviceHistory.class);
             query.setParameter("deviceID",  new Long(device.getId()));
 
             if(params.getPeriodType() == PeriodType.RECORDS){
@@ -91,6 +116,8 @@ public abstract class DeviceDaoJPA extends GenericJpa<Device> implements DeviceD
                 query.setParameter("start", calendar.getTimeInMillis());
                 query.setParameter("end", new Date().getTime());
             }
+
+            query.setMaxResults(1000);
 
             List<DeviceHistory> list = query.getResultList();
             return list;

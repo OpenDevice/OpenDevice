@@ -20,15 +20,17 @@ package br.com.criativasoft.opendevice.middleware.persistence.dao.jpa;
  * @date 24/09/16
  */
 
+import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.dao.Dao;
+import br.com.criativasoft.opendevice.middleware.persistence.HibernateProvider;
+import br.com.criativasoft.opendevice.restapi.model.Account;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 public abstract class GenericJpa<T> implements Dao<T> {
-
-    private EntityManager em;
 
     private Class<T> persistentClass;
 
@@ -38,43 +40,47 @@ public abstract class GenericJpa<T> implements Dao<T> {
 
     @Inject
     public void setEntityManager(EntityManager em) {
-
-        this.em = em;
+        HibernateProvider.setInstance(em);
     }
 
     public EntityManager em() {
-        return em;
+        return HibernateProvider.getInstance();
     }
-
 
     @Override
     public T getById(long id) {
-        return em.find(persistentClass, id);
+        return em().find(persistentClass, id);
     }
 
     @Override
     public void persist(T entity) {
-        em.persist(entity);
+        em().persist(entity);
     }
 
     @Override
     public T update(T entity) {
-        return em.merge(entity);
+        return em().merge(entity);
     }
 
     @Override
     public void delete(T entity) {
-        em.remove(entity);
+        em().remove(entity);
     }
 
     @Override
     public void refresh(T entity) {
-        em.refresh(entity);
+        em().refresh(entity);
     }
 
     @Override
     public List<T> listAll() {
-        return em.createQuery("from " + persistentClass.getSimpleName(), persistentClass).getResultList();
+        return em().createQuery("from " + persistentClass.getSimpleName(), persistentClass).getResultList();
+    }
+
+    public Account getCurrentAccount() {
+        TypedQuery<Account> query = em().createQuery("select x from Account x where x.uuid = :uuid", Account.class);
+        query.setParameter("uuid", TenantProvider.getCurrentID());
+        return query.getSingleResult();
     }
 
 }

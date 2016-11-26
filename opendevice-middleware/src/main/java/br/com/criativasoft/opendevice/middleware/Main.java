@@ -30,6 +30,7 @@ import br.com.criativasoft.opendevice.middleware.resources.ConnectionsRest;
 import br.com.criativasoft.opendevice.middleware.resources.DashboardRest;
 import br.com.criativasoft.opendevice.middleware.resources.IndexRest;
 import br.com.criativasoft.opendevice.middleware.rules.RuleManager;
+import br.com.criativasoft.opendevice.middleware.test.PopulateInitialData;
 import br.com.criativasoft.opendevice.middleware.test.TestRest;
 import br.com.criativasoft.opendevice.mqtt.MQTTServerConnection;
 import br.com.criativasoft.opendevice.restapi.model.Account;
@@ -168,6 +169,9 @@ public class Main extends LocalDeviceManager {
                 EntityTransaction tx = entityManager.getTransaction();
                 tx.begin();
                 List<Account> accounts = manager.getAccountDao().listAll();
+
+                if(accounts.isEmpty()) accounts = initDatabase(entityManager);
+
                 for (Account account : accounts) {
                     provider.addNewContext(account.getUuid());
                 }
@@ -191,6 +195,12 @@ public class Main extends LocalDeviceManager {
 //        ServiceInfo serviceInfo = ServiceInfo.create("_http._tcp.local.", "opendevice", config.getPort(), "path=index.html");
 //        jmdns.registerService(serviceInfo);
 
+    }
+
+    private List<Account> initDatabase(EntityManager em) {
+        PopulateInitialData populate = new PopulateInitialData(em);
+        populate.initDatabase();
+        return populate.getAccounts();
     }
 
     @Override

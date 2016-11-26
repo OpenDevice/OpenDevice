@@ -36,11 +36,15 @@ pkg.controller('UserController', function ($scope, AccountRest) {
 
     this.users = [];
 
+    this.accounts = [];
+
     $scope.model = {}; // curren editing
 
     _public.init = function(){
 
         _this.users = AccountRest.listUsers();
+
+        _this.accounts = AccountRest.query();
 
         $(function(){
 
@@ -69,14 +73,14 @@ pkg.controller('UserController', function ($scope, AccountRest) {
 
     };
 
-    _public.edit = function(user, index){
+    _public.editUser = function(user, index){
 
         $scope.model = angular.copy(user);
         $scope.model.index = index;
 
     };
 
-    _public.delete = function(user, index){
+    _public.deleteUser = function(user, index){
         AccountRest.deleteUser({id : user.id}, function() {
             _this.users.splice(index, 1);
             $.notify({message: "Removed"}, {type:"warning"});
@@ -87,7 +91,31 @@ pkg.controller('UserController', function ($scope, AccountRest) {
         });
     };
 
+    _public.delete = function(account, index){
+        AccountRest.delete({id : account.id}, function() {
+            _this.accounts.splice(index, 1);
+            $.notify({message: "Removed"}, {type:"warning"});
+        }, function(error) {
+            if(error.data && error.data.message){
+                $.notify({message: error.data.message});
+            }
+        });
+    };
 
+    _public.invitationLink = function(){
+
+        $.get("/api/accounts/invitationLink", function(resp){
+
+            var link = window.location.origin + "?invitation=" + resp.invitation;
+            var html = "<textarea style='width: 100%'>"+link+"</textarea>";
+
+            $.notify({message: html}, {type:"success", allow_dismiss : true, delay: 10000, placement: {
+                from: "bottom",
+                align: "right"
+            }});
+        });
+
+    };
 
 
 

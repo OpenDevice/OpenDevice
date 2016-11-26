@@ -63,7 +63,7 @@ pkg.controller('PageController', function ( $http, $scope) {
 
     _public.logout = function(){
         ODev.logout(function(){
-            window.location = "/?message=Logged%20out";
+            window.location = "/?logout=true";
         });
     };
 

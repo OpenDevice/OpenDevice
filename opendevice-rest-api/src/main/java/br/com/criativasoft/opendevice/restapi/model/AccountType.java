@@ -18,11 +18,13 @@ package br.com.criativasoft.opendevice.restapi.model;
  * @date 24/09/16
  */
 public enum AccountType {
+    CLOUD_MANAGER,
     ACCOUNT_MANAGER,
     USER;
 
     // For Rest
     public static class ROLES {
+        public static final String CLOUD_MANAGER = "CLOUD_MANAGER";
         public static final String ACCOUNT_MANAGER = "ACCOUNT_MANAGER";
         public static final String USER = "USER";
     }

@@ -141,6 +141,12 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.2</version>
+        </dependency>
+        <!-- On future we can use: http://unirest.io/java.html -->
 
         <!--<dependency>-->
             <!--<groupId>javax.servlet</groupId>-->

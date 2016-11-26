@@ -127,7 +127,7 @@ public class PopulateDatabase {
 
     private static List<Account> saveUsers() {
         List<Account> list = new ArrayList<Account>();
-        list.add(saveUser("admin", "admin", AccountType.ACCOUNT_MANAGER, "7262e4d6-7e3e-4fef-9267-92b12d7800af"));
+        list.add(saveUser("admin", "admin", AccountType.CLOUD_MANAGER, "7262e4d6-7e3e-4fef-9267-92b12d7800af"));
         list.add(saveUser("user", "user", AccountType.USER, "6bde80c3-ad56-4e93-8fcb-275a125f9669"));
 
         return list;

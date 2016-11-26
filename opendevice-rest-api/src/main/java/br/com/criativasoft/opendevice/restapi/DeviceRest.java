@@ -25,6 +25,7 @@ import br.com.criativasoft.opendevice.core.metamodel.EnumVO;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceHistory;
 import br.com.criativasoft.opendevice.core.model.DeviceType;
+import br.com.criativasoft.opendevice.restapi.io.ErrorResponse;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,14 +114,13 @@ public class DeviceRest {
     @DELETE
     @Path("/{uid}")
     public Response delete(@PathParam("uid") int uid){
-
         Device device = manager.findDeviceByUID(uid);
         if(device != null){
             manager.removeDevice(device);
-            return Response.status(Response.Status.OK).entity("null").build();
+            return Response.status(Response.Status.OK).entity("{}").build();
         }
 
-        return Response.status(Response.Status.NOT_FOUND).build();
+        return ErrorResponse.status(Response.Status.NOT_FOUND, "Device not found !");
     }
 
     @GET

@@ -13,6 +13,7 @@
 
 package br.com.criativasoft.opendevice.restapi.io;
 
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -49,7 +50,20 @@ public class ErrorResponse {
     protected ErrorResponse() {}
 
     public static Response status(Response.Status status, String message){
-        return Response.status(status).entity(new ErrorMessage(status.getStatusCode(), message)).type(MediaType.APPLICATION_JSON_TYPE).build();
+        return noCache(Response.status(status).entity(new ErrorMessage(status.getStatusCode(), message)).type(MediaType.APPLICATION_JSON_TYPE));
+    }
+
+    public static Response noCache(Response.ResponseBuilder resp) {
+        CacheControl cc = new CacheControl();
+        cc.setNoCache(true);
+        cc.setMaxAge(-1);
+        cc.setMustRevalidate(true);
+        return resp.cacheControl(cc).build();
+    }
+
+    public static Response UNAUTHORIZED(String message){
+        int status = Response.Status.UNAUTHORIZED.getStatusCode();
+        return Response.status(status).entity(new ErrorMessage(status, message)).type(MediaType.APPLICATION_JSON_TYPE).build();
     }
 
     public static Response BAD_REQUEST(String message){

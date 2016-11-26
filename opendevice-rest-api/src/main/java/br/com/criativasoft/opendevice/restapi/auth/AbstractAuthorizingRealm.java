@@ -13,6 +13,7 @@
 
 package br.com.criativasoft.opendevice.restapi.auth;
 
+import br.com.criativasoft.opendevice.restapi.model.AccountType;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
@@ -37,6 +38,9 @@ public abstract class AbstractAuthorizingRealm extends AuthorizingRealm {
         AccountPrincipal principal = (AccountPrincipal) principals.getPrimaryPrincipal();
 
         Set<String> roles = new HashSet(Arrays.asList(principal.getType().name()));
+
+        if(principal.getType() == AccountType.CLOUD_MANAGER) roles.add(AccountType.ROLES.ACCOUNT_MANAGER);
+
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(roles);
         return info;
     }

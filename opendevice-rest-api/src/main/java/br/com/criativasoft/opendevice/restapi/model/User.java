@@ -114,4 +114,13 @@ public class User {
             this.updateDate = new Date();
         }
     }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
 }

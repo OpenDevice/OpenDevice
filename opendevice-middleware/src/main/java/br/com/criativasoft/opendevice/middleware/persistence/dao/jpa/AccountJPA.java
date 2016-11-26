@@ -13,6 +13,7 @@
 
 package br.com.criativasoft.opendevice.middleware.persistence.dao.jpa;
 
+import br.com.criativasoft.opendevice.core.util.DefaultPasswordGenerator;
 import br.com.criativasoft.opendevice.restapi.model.Account;
 import br.com.criativasoft.opendevice.restapi.model.ApiKey;
 import br.com.criativasoft.opendevice.restapi.model.User;
@@ -120,5 +121,15 @@ public class AccountJPA extends GenericJpa<Account> implements AccountDao {
         }
 
         return false;
+    }
+
+    @Override
+    public void persist(Account entity) {
+
+        if(entity.getUuid() == null){
+            entity.setUuid(new DefaultPasswordGenerator().generatePassword());
+        }
+
+        super.persist(entity);
     }
 }

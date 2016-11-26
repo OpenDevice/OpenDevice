@@ -24,9 +24,11 @@ import org.atmosphere.cpr.FrameworkConfig;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -89,6 +91,16 @@ public class IndexRest {
     @Produces({MediaType.TEXT_HTML})
     public InputStream admin( @Context AtmosphereResource res) throws Exception {
         return index(res);
+    }
+
+    @GET
+    @Path("admin/invitation/{key}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response invitation(@Context AtmosphereResource res, @PathParam("key") String key) throws Exception {
+
+        // admin/invitation/asdasdasdasd
+
+        return Response.ok().build();
     }
 
 

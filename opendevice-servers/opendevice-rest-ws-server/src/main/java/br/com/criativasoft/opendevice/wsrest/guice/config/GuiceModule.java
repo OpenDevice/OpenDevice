@@ -68,6 +68,7 @@ package br.com.criativasoft.opendevice.wsrest.guice.config;
 import br.com.criativasoft.opendevice.connection.ServerConnection;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
+import br.com.criativasoft.opendevice.restapi.auth.AesRuntimeCipher;
 import br.com.criativasoft.opendevice.wsrest.io.JacksonProviderGuice;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Binder;
@@ -84,6 +85,7 @@ public class GuiceModule implements Module {
         binder.bind(DeviceManager.class).toProvider(DeviceManagerGuiceProvider.class);
         binder.bind(OpenDeviceConfig.class).toProvider(OpenDeviceConfigProvider.class);
         binder.bind(ObjectMapper.class).toProvider(JacksonProviderGuice.class).in(Singleton.class);
+        binder.bind(AesRuntimeCipher.class).in(Singleton.class);
     }
 
 }

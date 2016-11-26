@@ -50,8 +50,8 @@ public class Board extends Device {
         super(uid, type);
     }
 
-    public Board(int uid, String name, DeviceType type) {
-        super(uid, name, type);
+    public Board(int uid, String name) {
+        super(uid, name, DeviceType.BOARD);
     }
 
     public Board(int uid, String name, DeviceType type, DeviceCategory category) {

@@ -14,6 +14,7 @@
 package br.com.criativasoft.opendevice.restapi.model.dao;
 
 import br.com.criativasoft.opendevice.core.dao.Dao;
+import br.com.criativasoft.opendevice.restapi.model.Account;
 import br.com.criativasoft.opendevice.restapi.model.User;
 import br.com.criativasoft.opendevice.restapi.model.UserAccount;
 
@@ -26,4 +27,6 @@ public interface UserDao extends Dao<User> {
     User getUser(String username);
 
     void delete(UserAccount userAccount);
+
+    User createUser(Account account, String username, String password);
 }

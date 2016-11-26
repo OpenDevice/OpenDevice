@@ -46,7 +46,7 @@ public class OpenDeviceConfig {
     private Boolean autoRegisterLocalDevice; // as attribute for fast access.
 
 
-    enum ConfigKey{
+    public enum ConfigKey{
         web_port("web.port", null, DEFAULT_PORT),
         log_config("log.config", null, "logback-dev.xml"),
         web_external_resources("web.external_resources", null, new ArrayList<String>()),
@@ -62,6 +62,7 @@ public class OpenDeviceConfig {
         ssl_certificateFile("ssl.certificateFile", null, null),
         ssl_certificateKey("ssl.certificateKey", null, null),
         ssl_certificatePass("ssl.certificatePass", null, null),
+        google_appid("google.appid", null, null),
         ;
 
         private String key, description;
@@ -255,9 +256,13 @@ public class OpenDeviceConfig {
     //
 
     private String get(ConfigKey config) {
+        return get(config.getKey());
+    }
 
-        if (properties.containsKey(config.getKey())) {
-            return properties.getProperty(config.getKey());
+    private String get(String key) {
+
+        if (properties.containsKey(key)) {
+            return properties.getProperty(key);
         }
 
         return null;
@@ -268,6 +273,11 @@ public class OpenDeviceConfig {
         properties.setProperty(config.getKey(), value.toString());
     }
 
+
+    public String getString(String key) {
+
+        return get(key);
+    }
 
     public String getString(ConfigKey key) {
 

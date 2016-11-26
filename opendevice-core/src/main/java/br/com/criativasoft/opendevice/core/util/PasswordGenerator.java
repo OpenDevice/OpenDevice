@@ -59,7 +59,7 @@ public class PasswordGenerator {
     }
 
 
-    public char[] generatePassword() {
+    public String generatePassword() {
         SecureRandom rand = new SecureRandom();
 
         // Set pw length to minLength <= pwLength <= maxLength
@@ -79,7 +79,7 @@ public class PasswordGenerator {
             addRandomCharacters(pw, pwSet.getCharacters(), pwSet.getMinCharacters(), remainingIndexes, rand);
         }
         addRandomCharacters(pw, allCharacters, randomCharacterCount, remainingIndexes, rand);
-        return pw;
+        return new String(pw);
     }
 
     private static void addRandomCharacters(char[] pw, char[] characterSet,

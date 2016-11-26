@@ -13,10 +13,11 @@
 
 package br.com.criativasoft.opendevice.restapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  *
@@ -33,7 +34,8 @@ public class Account {
     @Column(unique = true)
     private String uuid;
 
-    @OneToMany(mappedBy= "owner")
+    @OneToMany(mappedBy= "owner",cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<UserAccount> userAccounts = new HashSet<UserAccount>();
 
     public Account() {
@@ -55,11 +57,6 @@ public class Account {
         this.uuid = uuid;
     }
 
-    @PrePersist
-    protected void generateUUID(){
-        if(this.uuid == null)  this.uuid = UUID.randomUUID().toString();
-    }
-
     @Override
     public String toString() {
         return "Account["+uuid+"]";
@@ -72,5 +69,6 @@ public class Account {
     public void setUserAccounts(Set<UserAccount> userAccounts) {
         this.userAccounts = userAccounts;
     }
+
 }
 

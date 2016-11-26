@@ -15,10 +15,12 @@ package br.com.criativasoft.opendevice.restapi.resources;
 
 import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.restapi.auth.AccountPrincipal;
+import br.com.criativasoft.opendevice.restapi.auth.AesRuntimeCipher;
 import br.com.criativasoft.opendevice.restapi.io.ErrorResponse;
 import br.com.criativasoft.opendevice.restapi.model.*;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
 import br.com.criativasoft.opendevice.restapi.model.dao.UserDao;
+import br.com.criativasoft.opendevice.restapi.model.vo.AccountVO;
 import org.apache.shiro.authc.credential.DefaultPasswordService;
 import org.apache.shiro.authc.credential.HashingPasswordService;
 import org.apache.shiro.authz.AuthorizationException;
@@ -33,6 +35,7 @@ import javax.persistence.PersistenceContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -45,6 +48,7 @@ import java.util.Set;
  * @date 09/10/16
  */
 @Path("/api/accounts")
+@Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class AccountRest {
 
@@ -57,6 +61,9 @@ public class AccountRest {
     @PersistenceContext
     private EntityManager em;
 
+    @Inject
+    private AesRuntimeCipher cipher;
+
 //    @POST
 //    @Produces(MediaType.APPLICATION_JSON)
 //    public Response createKey(String appName) {
@@ -64,8 +71,6 @@ public class AccountRest {
 //    }
 
     @GET @Path("keys")
-    @Produces(MediaType.APPLICATION_JSON)
-    @RequiresRoles(AccountType.ROLES.ACCOUNT_MANAGER)
     public List<ApiKey> listKeys(@Auth Subject subject) {
 
         AccountPrincipal principal = (AccountPrincipal) subject.getPrincipal();
@@ -75,8 +80,77 @@ public class AccountRest {
         return keys;
     }
 
+
+    @GET
+    @RequiresRoles(AccountType.ROLES.CLOUD_MANAGER)
+    public List<AccountVO> list() {
+
+        List<Account> list = dao.listAll();
+
+        List<AccountVO> accounts = new LinkedList<AccountVO>();
+
+        String id = TenantProvider.getCurrentID();
+
+        for (Account account : list) {
+
+            if(!account.getUuid().equals(id)){
+                accounts.add(new AccountVO(account));
+            }
+
+        }
+
+        return accounts;
+    }
+
+
+    @GET @Path("invitationLink")
+    @RequiresRoles(AccountType.ROLES.ACCOUNT_MANAGER)
+    public Response invitationLink() {
+
+        String secret = TenantProvider.getCurrentID()+":"+System.currentTimeMillis();
+
+        String link = cipher.encript(secret);
+
+        String decript = cipher.decript(link);
+
+        System.out.println(decript);
+
+        return Response.ok().entity("{\"invitation\" : \""+link+"\"}").build();
+    }
+
+    @DELETE @Path("{id}")
+    @RequiresRoles(AccountType.ROLES.CLOUD_MANAGER)
+    public Response delete(@PathParam("id") long id) {
+
+        String uid = TenantProvider.getCurrentID();
+
+        Account account = dao.getById(id);
+
+        if(account == null) ErrorResponse.status(Response.Status.NOT_FOUND, "Account not found !");
+
+        if(account != null && account.getUuid().equals(uid)) {
+            return ErrorResponse.BAD_REQUEST("You can not remove current account !");
+        }
+
+        // Delete Users
+        Set<UserAccount> userAccounts = account.getUserAccounts();
+        for (UserAccount userAccount : userAccounts) {
+            userDao.delete(userAccount.getUser());
+        }
+
+        dao.delete(account);
+
+
+        System.out.println("delete....!!");
+        // FIXME: delete all data from account!!
+        // Dash, Rules, Jobs, Context, Caches, etc...
+
+
+        return Response.ok().build();
+    }
+
+
     @GET @Path("users")
-    @Produces(MediaType.APPLICATION_JSON)
     @RequiresRoles(AccountType.ROLES.ACCOUNT_MANAGER)
     public List<User> listUsers() {
 
@@ -88,7 +162,6 @@ public class AccountRest {
     }
 
     @POST @Path("users")
-    @Produces(MediaType.APPLICATION_JSON)
     @RequiresRoles(AccountType.ROLES.ACCOUNT_MANAGER)
     public User addUser(User user, @Auth Subject subject) {
 
@@ -118,12 +191,10 @@ public class AccountRest {
         }
 
         return user;
-
-    };
+    }
 
 
     @DELETE @Path("users/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
     @RequiresRoles(AccountType.ROLES.ACCOUNT_MANAGER)
     public Response deleteUser(@PathParam("id") long id, @Auth Subject subject) {
 
@@ -154,11 +225,12 @@ public class AccountRest {
             }
         }
 
+        boolean deleteUser = (user.getAccounts().size() == 1);
+        account.getUserAccounts().remove(userAccount);
         userDao.delete(userAccount);
-        userDao.delete(user);
+        if(deleteUser)  userDao.delete(user);
 
         return Response.ok().build();
-
 
     }
 }

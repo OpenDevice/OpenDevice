@@ -186,7 +186,13 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
 
     _public.delete = function(item, index){
 
-        ODev.removeDevice(_this.devices[index]);
+        ODev.removeDevice(_this.devices[index]).then(function( data, textStatus, jqXHR ) {
+            $.notify({message: "Removed"}, {type:"warning"});
+        }).fail(function(req){
+            if(req.responseJSON && req.responseJSON.message){
+                $.notify({message: req.responseJSON.message});
+            }
+        });
 
     };
 
@@ -467,23 +473,26 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
 
     function updateDevices(){
 
-        var devices = filterLocalDevices.call(_this);
+        var devices = filterLocalDevices.call(_this); // get devices for current view.
 
         var ctrls = [];
 
+        // Destroy all
         for (var i = 0; i < _this.devicesCtrls.length; i++) {
             var view = _this.devicesCtrls[i];
             view.destroy();
         }
 
+        // Recreate All
         devices.forEach(function(device){
             var ctrl = createDeviceControler.call(_this, device)
             if(ctrl) ctrls.push(ctrl);
         });
 
-        _this.devicesCtrls = ctrls;
-
-        _this.devices = devices;
+        $scope.$apply(function () {
+            _this.devices = devices;
+            _this.devicesCtrls = ctrls;
+        });
 
     }
 

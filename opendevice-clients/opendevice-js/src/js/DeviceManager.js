@@ -83,9 +83,13 @@ od.DeviceManager = function(connection){
 
     this.removeDevice = function(device){
 
-        var index = devices.indexOf(device);
-        if(index >= 0) devices.splice(index, 1);
-        notifyListeners(DEvent.DEVICE_LIST_UPDATE, devices);
+        return ODev.devices.delete(device.id, function(){
+            var index = devices.indexOf(device);
+            if(index >= 0) devices.splice(index, 1);
+
+            // TODO: if is a board need remove chids.
+            notifyListeners(DEvent.DEVICE_LIST_UPDATE, devices);
+        });
 
     };
 
@@ -436,7 +440,7 @@ od.DeviceManager = function(connection){
             // load remote.
             var devices = _getDevicesRemote();
 
-            notifyListeners(DEvent.DEVICE_LIST_UPDATE, devices);
+            if(devices && devices.length > 0) notifyListeners(DEvent.DEVICE_LIST_UPDATE, devices);
         }
 
     }

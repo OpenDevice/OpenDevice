@@ -46,7 +46,7 @@ a:hover {
 .tab-group {
   list-style: none;
   padding: 0;
-  margin: 0 0 40px 0;
+  margin: 0 0 15px 0;
 }
 .tab-group:after {
   content: "";
@@ -84,13 +84,13 @@ h1 {
   text-align: center;
   color: #ffffff;
   font-weight: 300;
-  margin: 0 0 40px;
+  margin: 0 0 15px 0;
 }
 
 label {
   position: absolute;
   -webkit-transform: translateY(6px);
-          transform: translateY(6px);
+  transform: translateY(6px);
   left: 13px;
   color: rgba(255, 255, 255, 0.5);
   -webkit-transition: all 0.25s ease;
@@ -106,7 +106,7 @@ label .req {
 
 label.active {
   -webkit-transform: translateY(50px);
-          transform: translateY(50px);
+  transform: translateY(50px);
   left: 2px;
   font-size: 14px;
 }
@@ -145,6 +145,10 @@ textarea {
 .field-wrap {
   position: relative;
   margin-bottom: 40px;
+}
+
+input:disabled, button:disabled{
+  cursor: not-allowed;
 }
 
 .top-row:after {

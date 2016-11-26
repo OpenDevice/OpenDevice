@@ -5,6 +5,8 @@
     <title>OpenDevice Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='http://fonts.googleapis.com/css?family=Titillium+Web:400,300,600' rel='stylesheet' type='text/css'>
+    <meta name="google-signin-client_id" content="284609070670-s53kk24afh6ejutsr4o98boftpeeqpfr.apps.googleusercontent.com">
+
     <link rel="icon" type="image/png" href="/images/favicon.png" />
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/login.css">
@@ -17,7 +19,7 @@
 
     <ul class="tab-group">
         <li class="tab active"><a href="#login">Log In</a></li>
-        <li class="tab"><a href="#signup">Sign Up</a></li>
+        <li class="tab"><a href="#signup" id="btn-signup">Sign Up</a></li>
     </ul>
 
     <div class="tab-content">
@@ -62,14 +64,14 @@
                         <label>
                             First Name<span class="req">*</span>
                         </label>
-                        <input type="text" required autocomplete="off" />
+                        <input type="text" required autocomplete="off" disabled/>
                     </div>
 
                     <div class="field-wrap">
                         <label>
                             Last Name<span class="req">*</span>
                         </label>
-                        <input type="text"required autocomplete="off"/>
+                        <input type="text"required autocomplete="off" disabled/>
                     </div>
                 </div>
 
@@ -77,17 +79,17 @@
                     <label>
                         Email Address<span class="req">*</span>
                     </label>
-                    <input type="email"required autocomplete="off"/>
+                    <input type="email"required autocomplete="off" disabled/>
                 </div>
 
                 <div class="field-wrap">
                     <label>
                         Set A Password<span class="req">*</span>
                     </label>
-                    <input type="password"required autocomplete="off"/>
+                    <input type="password"required autocomplete="off" disabled/>
                 </div>
 
-                <button type="submit" class="button button-block"/>Get Started</button>
+                <button type="submit" class="button button-block" disabled/>Get Started</button>
 
             </form>
 
@@ -95,18 +97,98 @@
 
     </div><!-- tab-content -->
 
+
+    <div style="margin-top: 10px">
+        <div id="btnGoogle" ></div>
+    </div>
+
 </div> <!-- /form -->
 
 
 <script src='js/jquery-2.2.3.min.js'></script>
+<script src="https://apis.google.com/js/platform.js?onload=googleButton" async defer></script>
 
 <script>
+
+    var isLogout = false;
+    var inivitationKey;
 
     // Check message from redirects
     if(location.search.split('message=')[1]){
         $(".message").html(decodeURI(location.search.split('message=')[1]));
     }
 
+    if(location.search.split('logout=')[1]){
+        isLogout = true;
+        $(".message").html("Logged Out !");
+    }
+
+    $(function(){
+
+        if(location.search.split('invitation=')[1]){
+            inivitationKey = decodeURI(location.search.split('invitation=')[1]);
+            $("#btn-signup").click();
+        }
+
+    });
+
+
+    function onGoogleSignIn(googleUser) {
+
+        if(isLogout){
+            googleSignOut();
+            isLogout = false; // reset
+            return;
+        }
+
+        var profile = googleUser.getBasicProfile();
+        var id_token = googleUser.getAuthResponse().id_token;
+
+        var data = {
+            "idtoken" : id_token,
+            "invitation" : inivitationKey
+        }
+
+        $(".message").html("Logging...");
+        $.post('/api/auth/loginGoogle', data,function(resp) {
+            afterLogin(resp);
+        })
+        .fail(function(err) {
+            console.log("fail:", err);
+            $(".message").html(err.responseText);
+        });
+
+    }
+
+
+
+    function googleButton() {
+        gapi.signin2.render('btnGoogle', {
+            'scope': 'profile email',
+            'width': $("#btnGoogle").parent().width(),
+            'height': 50,
+            'longtitle': true,
+            'theme': 'dark',
+            'onsuccess': onGoogleSignIn,
+            'onfailure': function(){
+                alert("google login fail");
+            }
+        });
+    }
+
+    function googleSignOut() {
+        var auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(function () {
+            console.log('User signed out.');
+        });
+    }
+
+    function afterLogin(data){
+        $(".message").html("");
+        localStorage.setItem("AuthToken", data.token);
+        sessionStorage.setItem("LastPath", window.location.hash);
+        window.location = "/admin";
+    }
 
     $("#login").find("form").submit(function(event){
         event.preventDefault();
@@ -114,10 +196,7 @@
         $(".message").html("Logging...");
 
         $.post('/api/auth', $(this).serialize(),function(data) {
-            $(".message").html("");
-            localStorage.setItem("AuthToken", data);
-            sessionStorage.setItem("LastPath", window.location.hash);
-            window.location = "/admin";
+            afterLogin(data);
         })
         .fail(function(err) {
             console.log("fail:", err);

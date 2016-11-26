@@ -780,3 +780,8 @@
 .widget-user-actions a{
     color: white;
 }
+
+/* Bootstrap notify, with textarea inside */
+.alert span textarea{
+    color: #2a2a2a;
+}

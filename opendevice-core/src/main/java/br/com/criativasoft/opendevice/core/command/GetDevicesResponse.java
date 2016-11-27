@@ -36,6 +36,13 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
         super(TYPE, CommandStatus.CREATED);
     }
 
+    public GetDevicesResponse(Collection<Device> devices, int index, int length) {
+        super(TYPE, CommandStatus.CREATED, null);
+        this.devices = devices;
+        this.index = index;
+        this.length = length;
+    }
+
 	public GetDevicesResponse(Collection<Device> devices, String connectionUUID) {
 		super(TYPE, CommandStatus.CREATED, connectionUUID);
 		this.devices = devices;
@@ -98,7 +105,9 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
 		StringBuffer sb = new StringBuffer();
         // [ID, PIN, VALUE, TARGET, SENSOR?, TYPE]
 
-        sb.append(devices.size());
+        sb.append(index);
+        sb.append(Command.DELIMITER);
+        sb.append(length);
         sb.append(Command.DELIMITER);
 
         for (Device device : devices) {

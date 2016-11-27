@@ -53,6 +53,11 @@ public class CommandStreamSerializer implements MessageSerializer{
 			cmd = cmd.replaceFirst("/", "");
 		}
 
+		// Remove ACK_FLAG if exist
+		if(cmd.endsWith(String.valueOf(Command.ACK_FLAG))){
+			cmd = cmd.replaceFirst(String.valueOf(Command.ACK_FLAG), "");
+		}
+
 		String[] split = cmd.split(Command.DELIMITER);
 
         int ctype = Integer.parseInt(split[0]);
@@ -95,7 +100,7 @@ public class CommandStreamSerializer implements MessageSerializer{
 
                 Constructor<? extends Command> constructor = type.getCommandClass().getConstructor(long.class);
 
-                long value = Long.parseLong(split[3]);
+                long value = Long.parseLong((split.length == 4 ? split[3] : "0"));
 
                 command = constructor.newInstance(value);
 

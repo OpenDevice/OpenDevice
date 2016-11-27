@@ -30,6 +30,14 @@ public class GetDevicesRequest extends SimpleCommand implements Request {
     private Object filterValue;
     private boolean forceSync = false;
 
+    public GetDevicesRequest(long filterByValue) {
+        super(CommandType.GET_DEVICES, filterByValue);
+    }
+
+    /**
+     * @param filter Filter type, like {@link #FILTER_BY_ID}
+     * @param filterValue
+     */
     public GetDevicesRequest(int filter, Object filterValue) {
         this(filter, filterValue, false);
     }

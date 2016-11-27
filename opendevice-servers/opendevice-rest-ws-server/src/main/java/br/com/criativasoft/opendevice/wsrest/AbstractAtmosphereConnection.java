@@ -22,6 +22,7 @@ import br.com.criativasoft.opendevice.core.ODev;
 import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.CommandType;
+import br.com.criativasoft.opendevice.core.command.DeviceCommand;
 import br.com.criativasoft.opendevice.core.command.ResponseCommand;
 import br.com.criativasoft.opendevice.core.connection.ConnectionInfo;
 import br.com.criativasoft.opendevice.core.connection.ConnectionType;
@@ -297,7 +298,8 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
             Command cmd = (Command) message;
 
-            if(CommandType.allowBroadcast(cmd.getType())){
+            // Avoid broadcast DeviceCommand twice..
+            if(CommandType.allowBroadcast(cmd.getType()) && !DeviceCommand.isCompatible(cmd)){
                 broadcast(message);
             }
 

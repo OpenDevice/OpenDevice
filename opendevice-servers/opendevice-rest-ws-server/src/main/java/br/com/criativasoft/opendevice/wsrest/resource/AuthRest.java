@@ -127,7 +127,7 @@ public class AuthRest {
     }
 
     @POST
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response loginForm(@Context AtmosphereResource res,
                               @Auth Subject currentUser,
                               @FormParam("username") String username,

@@ -281,6 +281,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
             try {
                 CommandType type = DeviceCommand.getCommandType(device.getType());
                 DeviceCommand cmd = new DeviceCommand(type, device.getUid(), device.getValue());
+                if(device.getApplicationID() != null) cmd.setApplicationID(device.getApplicationID());
                 send(cmd);
             }catch (IOException ex){
                 log.error(ex.getMessage(), ex);
@@ -731,7 +732,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
             GetDevicesRequest request = (GetDevicesRequest) message;
 
-            // Received GET_DEVICES with ForceSync
+            // Received GET_DEVICES with ForceSync ( broadcast to output devices )
             if(request.isForceSync() && inputConnections.exist(connection)){
 
                 if(outputConnections.hasConnections()){

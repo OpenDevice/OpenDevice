@@ -72,10 +72,11 @@ public class WebSocketResource {
 //        ResponseCommand response = null;
 
         // Find caller ID.
-        command.setApplicationID(TenantProvider.getCurrentID()); // This is APPLICATION ID TOKEN !
+        TenantProvider.setCurrentID(topic.getID());
+        command.setApplicationID(topic.getID()); // This is APPLICATION ID TOKEN !
         command.setConnectionUUID(this.resource.uuid());
 
-         connection.notifyListeners(command); // broadcast to all clients (browser/android/desktop)
+        connection.notifyListeners(command); // broadcast to all clients (browser/android/desktop)
 
         // return new Broadcastable(params, response, topic);
         return null;

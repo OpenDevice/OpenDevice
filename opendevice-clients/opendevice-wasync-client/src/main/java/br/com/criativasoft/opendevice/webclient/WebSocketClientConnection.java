@@ -23,6 +23,8 @@ import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.webclient.io.CommandEncoderDecoder;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Response;
@@ -34,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -161,6 +164,7 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
                 String apiKey = TenantProvider.getCurrentID();
                 String authToken;
 
+                // Login and get AuthToken
                 if(apiKey != null & ! OpenDeviceConfig.LOCAL_APP_ID.equals(apiKey)){
 
                     String connectionURI = getConnectionURI();
@@ -175,7 +179,10 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
 
                     if(r.getStatusCode() != 200)  throw new ConnectionException(r.getResponseBody());
 
-                    authToken = r.getResponseBody();
+                    ObjectMapper mapper = new ObjectMapper();
+                    Map<String, String> resp = mapper.readValue(r.getResponseBody(),new TypeReference<Map<String, String>>() {});
+
+                    authToken = resp.get("token");
 
                     log.info("Login Success, AuthToken: " + authToken);
                 }else{

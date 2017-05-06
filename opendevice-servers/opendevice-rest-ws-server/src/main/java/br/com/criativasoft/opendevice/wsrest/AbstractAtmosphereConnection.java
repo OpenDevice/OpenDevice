@@ -112,6 +112,8 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
     private void initConnection() throws IOException{
         if(server == null){
+            OpenDeviceConfig odevc = ODev.getConfig();
+
             Config.Builder conf = new Config.Builder();
             conf.port(port);
 
@@ -141,25 +143,24 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             // conf.initParam("com.sun.jersey.spi.container.ResourceMethodDispatchProvider", "true");
             //.initParam(ApplicationConfig.OBJECT_FACTORY, GuiceConfigFactory.class.getName())
             conf.interceptor(new CrossOriginInterceptor());
-            conf.interceptor(new NewShiroInterceptor());
+            if(odevc.isAuthRequired())  conf.interceptor(new NewShiroInterceptor());
 //            conf.interceptor(new JacksonFilterInterceptor());
             conf.interceptor(this); // add this as interceptor
 
             // SSL Support
-            OpenDeviceConfig config = ODev.getConfig();
-            String certificate = config.getCertificateFile();
+            String certificate = odevc.getCertificateFile();
             if(!StringUtils.isEmpty(certificate)){
                 File cert = new File(certificate);
                 if(!cert.exists()) throw new IllegalArgumentException("Certificate not found !");
-                File key = new File(config.getCertificateKey());
+                File key = new File(odevc.getCertificateKey());
                 if(!key.exists()) throw new IllegalArgumentException("Certificate key must be provided !");
 
-                SslContext sslContext = SslContext.newServerContext(SslProvider.JDK, cert, key, config.getCertificatePass());
+                SslContext sslContext = SslContext.newServerContext(SslProvider.JDK, cert, key, odevc.getCertificatePass());
                 conf.sslContext(sslContext);
             }
 
             // Authentication
-            if(config.isAuthRequired()){
+            if(odevc.isAuthRequired()){
                 List<Realm> realms = new LinkedList<Realm>();
                 realms.add(new BearerTokenRealm((DeviceManager) getConnectionManager()));
                 realms.add(new AccountDaoRealm((DeviceManager) getConnectionManager()));

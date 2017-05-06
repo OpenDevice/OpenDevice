@@ -21,13 +21,13 @@ import br.com.criativasoft.opendevice.restapi.model.*;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
 import br.com.criativasoft.opendevice.restapi.model.dao.UserDao;
 import br.com.criativasoft.opendevice.restapi.model.vo.AccountVO;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.credential.DefaultPasswordService;
 import org.apache.shiro.authc.credential.HashingPasswordService;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.subject.Subject;
-import org.secnod.shiro.jaxrs.Auth;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -71,9 +71,9 @@ public class AccountRest {
 //    }
 
     @GET @Path("keys")
-    public List<ApiKey> listKeys(@Auth Subject subject) {
+    public List<ApiKey> listKeys() {
 
-        AccountPrincipal principal = (AccountPrincipal) subject.getPrincipal();
+        AccountPrincipal principal = (AccountPrincipal) getSubject().getPrincipal();
 
         List<ApiKey> keys = dao.listKeys(principal.getUserAccountID());
 
@@ -163,9 +163,9 @@ public class AccountRest {
 
     @POST @Path("users")
     @RequiresRoles(AccountType.ROLES.ACCOUNT_MANAGER)
-    public User addUser(User user, @Auth Subject subject) {
+    public User addUser(User user) {
 
-        AccountPrincipal principal = (AccountPrincipal) subject.getPrincipal();
+        AccountPrincipal principal = (AccountPrincipal) getSubject().getPrincipal();
 
         Account account = dao.getAccountByUID(principal.getAccountUUID());
 
@@ -196,9 +196,9 @@ public class AccountRest {
 
     @DELETE @Path("users/{id}")
     @RequiresRoles(AccountType.ROLES.ACCOUNT_MANAGER)
-    public Response deleteUser(@PathParam("id") long id, @Auth Subject subject) {
+    public Response deleteUser(@PathParam("id") long id) {
 
-        AccountPrincipal principal = (AccountPrincipal) subject.getPrincipal();
+        AccountPrincipal principal = (AccountPrincipal) getSubject().getPrincipal();
 
         Account account = dao.getAccountByUID(principal.getAccountUUID());
 
@@ -232,5 +232,10 @@ public class AccountRest {
 
         return Response.ok().build();
 
+    }
+
+
+    private Subject getSubject(){
+        return SecurityUtils.getSubject();
     }
 }

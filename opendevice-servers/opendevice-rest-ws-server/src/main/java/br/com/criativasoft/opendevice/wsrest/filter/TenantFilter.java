@@ -14,6 +14,7 @@
 package br.com.criativasoft.opendevice.wsrest.filter;
 
 import br.com.criativasoft.opendevice.core.TenantProvider;
+import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.restapi.auth.AccountPrincipal;
 import br.com.criativasoft.opendevice.wsrest.io.WebUtils;
 import com.sun.jersey.spi.container.ContainerRequest;
@@ -30,6 +31,13 @@ import javax.ws.rs.ext.Provider;
  */
 @Provider
 public class TenantFilter implements ContainerRequestFilter {
+
+    private OpenDeviceConfig config;
+
+    public TenantFilter(OpenDeviceConfig odevConfig) {
+        this.config = odevConfig;
+    }
+
     @Override
     public ContainerRequest filter(ContainerRequest request) {
 
@@ -38,14 +46,17 @@ public class TenantFilter implements ContainerRequestFilter {
         if(WebUtils.isWebResource(path)){
             return request;
         }
-        Subject subject = SecurityUtils.getSubject();
-        subject.getSession(false);
 
-        if(subject.isAuthenticated()){
-            AccountPrincipal principal = (AccountPrincipal) subject.getPrincipal(); // return UUID from Account
-            TenantProvider.setCurrentID(principal.getAccountUUID());
-        }else{
-            TenantProvider.setCurrentID(null);
+        if(config.isAuthRequired()){
+            Subject subject = SecurityUtils.getSubject();
+            subject.getSession(false);
+
+            if(subject.isAuthenticated()){
+                AccountPrincipal principal = (AccountPrincipal) subject.getPrincipal(); // return UUID from Account
+                TenantProvider.setCurrentID(principal.getAccountUUID());
+            }else{
+                TenantProvider.setCurrentID(null);
+            }
         }
 
         return request;

@@ -52,7 +52,7 @@ public class AppResourceConfigurator implements ResourceConfigurator {
             config.getResourceFilterFactories().add(new ShiroResourceFilterFactory());
         }
 
-        config.getContainerRequestFilters().add(new TenantFilter());
+        config.getContainerRequestFilters().add(new TenantFilter(odevConfig));
 
 
     }

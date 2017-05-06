@@ -144,7 +144,7 @@ public class MainTenantProvider extends ThreadLocalTenantProvider {
                 Collection<Device> devices = getDevices();
 
                 for (Device device : devices) {
-                    if(device.getName().equals(name)) return device;
+                    if(device.getName() != null && device.getName().equals(name)) return device;
                 }
 
             }catch (Exception ex){

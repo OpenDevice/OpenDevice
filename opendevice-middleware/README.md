@@ -1,2 +1,2 @@
-opendevice-server
+opendevice-middleware (server)
 =================

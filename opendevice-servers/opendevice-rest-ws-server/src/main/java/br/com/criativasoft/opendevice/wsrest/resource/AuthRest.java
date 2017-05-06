@@ -182,6 +182,7 @@ public class AuthRest {
                 // authtoken = UUID.randomUUID().toString();
                 authtoken = account.getUuid();
 
+                // Add token to cache (thid will be used in BearerTokenRealm)
                 DefaultSecurityManager securityManager = (DefaultSecurityManager) SecurityUtils.getSecurityManager();
                 Cache<Object, Object> cache = securityManager.getCacheManager().getCache(TOKEN_CACHE);
                 cache.put(authtoken, username); // username (is Api_Key in this case)
@@ -200,7 +201,7 @@ public class AuthRest {
                 // ckeck plain version (loaded from database)
                 boolean passwordsMatch = password.equals(user.getPassword());
 
-                // Check encryption version
+                // Check encryption version (provided by user)
                 if(!passwordsMatch){
                     HashingPasswordService service = new DefaultPasswordService();
                     passwordsMatch = service.passwordsMatch(password, user.getPassword());

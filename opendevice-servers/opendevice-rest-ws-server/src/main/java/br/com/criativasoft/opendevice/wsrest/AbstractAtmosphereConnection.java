@@ -126,6 +126,7 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
                 conf.resource(resource);
             }
 
+            // Jersey
             for(Class<?> resource : resources){
                 conf.resource(resource);
             }

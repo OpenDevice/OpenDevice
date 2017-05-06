@@ -56,7 +56,7 @@ public class WebSocketResource {
     @Suspend(contentType = "application/json", listeners = WSEventsLogger.class)
     public Response onConnect() {
         resource.getRequest().setAttribute("lastConnectionDate", new Date());
-        return Response.status(Response.Status.OK).build();
+        return Response.ok("X").build();
     }
 
 

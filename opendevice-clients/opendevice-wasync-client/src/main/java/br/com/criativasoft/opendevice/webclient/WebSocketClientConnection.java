@@ -150,7 +150,7 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
 
     private void initConnection() throws IOException{
         if(connection == null){
-            // AtmosphereClient client = ClientFactory.getDefault().newClient(AtmosphereClient.class);
+
             AtmosphereClient client = ClientFactory.getDefault().newClient(AtmosphereClient.class);
 
             // FIXME: Workaround for BUG: https://github.com/Atmosphere/wasync/issues/120

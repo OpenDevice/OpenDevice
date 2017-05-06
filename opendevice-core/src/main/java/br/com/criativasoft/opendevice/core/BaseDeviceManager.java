@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This is the base class for device management and input and output connections. <br/>
@@ -76,6 +77,8 @@ public abstract class BaseDeviceManager implements DeviceManager {
     private Message lastMessage;
 
     private List<Device> partialDevices = new LinkedList<Device>(); // Devices from partial GetDevicesResponse
+
+    private AtomicBoolean processingNewDevices = new AtomicBoolean(false);
 
     public BaseDeviceManager(){
         instance = this;
@@ -214,6 +217,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
         if(findDeviceByUID(device.getUid()) == null) {
             getValidDeviceDao().persist(device);
             getCurrentContext().addDevice(device); // add to cache.
+            device.setManaged(true);
             for(DeviceListener listener: listeners){
                 listener.onDeviceRegistred(device);
             }
@@ -272,21 +276,23 @@ public abstract class BaseDeviceManager implements DeviceManager {
      */
     public synchronized void notifyListeners(Device device, boolean sync) {
 
-        boolean alreadyExist =transactionBegin();
-        saveDeviceHistory(device);
-        if(!alreadyExist) transactionEnd();
+        if(!processingNewDevices.get()) { // ignore events from device syncronization/initialization  (GET_DEVICES_RESPONSE)...
 
-        if(sync){
+            boolean alreadyExist = transactionBegin();
+            saveDeviceHistory(device);
+            if (!alreadyExist) transactionEnd();
 
-            try {
-                CommandType type = DeviceCommand.getCommandType(device.getType());
-                DeviceCommand cmd = new DeviceCommand(type, device.getUid(), device.getValue());
-                if(device.getApplicationID() != null) cmd.setApplicationID(device.getApplicationID());
-                send(cmd);
-            }catch (IOException ex){
-                log.error(ex.getMessage(), ex);
+            if (sync) {
+                try {
+                    CommandType type = DeviceCommand.getCommandType(device.getType());
+                    DeviceCommand cmd = new DeviceCommand(type, device.getUid(), device.getValue());
+                    if (device.getApplicationID() != null) cmd.setApplicationID(device.getApplicationID());
+                    send(cmd);
+                } catch (IOException ex) {
+                    log.error(ex.getMessage(), ex);
+                }
+
             }
-
         }
 
         // Individual Listeners
@@ -743,6 +749,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
             }else{
                 List<Device> devices = new LinkedList<Device>();
 
+                // No filter
                 if(request.getFilter() <= 0) devices.addAll(getDevices());
 
                 if(request.getFilter() == GetDevicesRequest.FILTER_BY_ID){
@@ -787,7 +794,11 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
         } else if (type == CommandType.GET_DEVICES_RESPONSE) {
 
+            boolean fromDevice = !(connection instanceof IWSConnection);
+
             GetDevicesResponse response = (GetDevicesResponse) command;
+
+            processingNewDevices.set(true);
 
             partialDevices.addAll(response.getDevices());
 
@@ -814,7 +825,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
                 // If the name/id does not match, the name has priority
                 if(found == null || !found.getName().equals(device.getName())){
                     found = findDeviceByName(device.getName());
-                    device.setUID(0); // clear, need resyc
+                    if(fromDevice) device.setUID(0); // clear, need resyc
                 }
 
                 if(found == null){
@@ -834,11 +845,22 @@ public abstract class BaseDeviceManager implements DeviceManager {
                     addDevice(device);
                 }else{
 
-                    // Firmware has ben cleared/replaced
-                    // This will help recover IDs.
-                    if(device.getUid() <= 0 || device.getUid() != found.getUid()){
-                        device.setUID(found.getUid());
-                        syncIds = true;
+                    // For devices (check if need send/sync IDs to devices)
+                    if(fromDevice){
+
+                        // Firmware has ben cleared/replaced
+                        // This will help recover IDs.
+                        if(device.getUid() <= 0 || device.getUid() != found.getUid()){
+                            device.setUID(found.getUid());
+                            syncIds = true;
+                        }
+
+                    // For Clientes (update DeviceID on Local)
+                    }else{
+
+                        //  NOTE: probably found a device with the same name on the server, so we should update the client
+                        found.setUID(device.getUid());
+
                     }
 
                     found.setValue(device.getValue());
@@ -857,7 +879,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
             }
 
-
+            processingNewDevices.set(false);
             partialDevices.clear();
         }
     }
@@ -871,7 +893,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
             // Force sync devices with physical modules on connect.
             if(status == ConnectionStatus.CONNECTED && outputConnections.exist(connection)){
                 GetDevicesRequest request = new GetDevicesRequest();
-                request.setApplicationID(OpenDeviceConfig.LOCAL_APP_ID);
+                request.setApplicationID(TenantProvider.getCurrentID());
                 syncDevices(connection, request);
             }
         }

@@ -24,7 +24,7 @@ public class LocalTenantProvider extends TenantProvider {
 
     private static String tenantID = OpenDeviceConfig.LOCAL_APP_ID;
 
-    private static LocalTenantContext context = new LocalTenantContext(OpenDeviceConfig.LOCAL_APP_ID);
+    private static LocalTenantContext context = null;
 
     @Override
     public synchronized void setTenantID(String appID) {
@@ -38,11 +38,16 @@ public class LocalTenantProvider extends TenantProvider {
 
     @Override
     public TenantContext getTenantContext() {
-        return context;
+        return getStaticContext();
     }
 
     @Override
     protected TenantContext createContext(String id) {
+        return getStaticContext();
+    }
+
+    private TenantContext getStaticContext(){
+        if(context == null) context = new LocalTenantContext(getTenantID());
         return context;
     }
 }

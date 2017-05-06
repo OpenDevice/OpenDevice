@@ -237,7 +237,7 @@ public class OpenDeviceConfig {
 
     /**
      * This allow local application registar devices without call addDevice
-     * Note: This is a experimental feature and may slow down device initialization
+     * Note: This is a experimental feature and may slow down app initialization
      * @see br.com.criativasoft.opendevice.core.LocalDeviceManager#autoRegisterDevice(Device)
      */
     public boolean isAutoRegisterLocalDevice() {

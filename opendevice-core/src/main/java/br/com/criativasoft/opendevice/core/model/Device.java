@@ -72,6 +72,8 @@ public class Device implements Serializable {
     private Date dateCreated;
     private long value = VALUE_LOW;
 
+    private transient boolean managed; // Already been linked to the Manager
+
     @OneToOne
     @JsonIdentityReference(alwaysAsId = true)
 	private DeviceCategory category = DeviceCategory.GENERIC;
@@ -189,7 +191,7 @@ public class Device implements Serializable {
 
 
     public void setValue(long value) {
-        this.setValue(value, true);
+        this.setValue(value, (isManaged())); // sync only if managed
     }
 
     /**
@@ -320,6 +322,14 @@ public class Device implements Serializable {
     public Device setApplicationID(String applicationID) {
         this.applicationID = applicationID;
         return this;
+    }
+
+    public void setManaged(boolean managed) {
+        this.managed = managed;
+    }
+
+    public boolean isManaged() {
+        return managed;
     }
 
     @Override

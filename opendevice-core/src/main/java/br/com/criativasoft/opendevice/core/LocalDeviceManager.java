@@ -117,7 +117,8 @@ public class LocalDeviceManager extends BaseDeviceManager {
 
 
     /**
-     * This method is called from {@link Device} constructor, to auto-register devices if enabled
+     * This method is called from {@link Device} constructor, to auto-register devices if enabled. <br/>
+     * This allow local application registar devices without call addDevice
      * @see OpenDeviceConfig#setAutoRegisterLocalDevice(boolean)
      * @param device
      */
@@ -151,7 +152,7 @@ public class LocalDeviceManager extends BaseDeviceManager {
             }
 
             if(register){
-                log.info("Registring the device in context : " + device + " ! (may slow down device initialization )");
+                log.info("Registring the device in context : " + device + " ! (may slow down app initialization )");
                 if(device.getUid() <= 0) device.setUID(getDeviceDao().getNextUID());
                 addDevice(device);
             }

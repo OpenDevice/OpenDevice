@@ -55,7 +55,7 @@ public class LocalTenantContext implements TenantContext {
     public Device getDeviceByName(String name) {
 
         for (Device device : devices.values()) {
-            if(device.getName().equals(name)) return device;
+            if(device.getName() != null && device.getName().equals(name)) return device;
         }
 
         return null;

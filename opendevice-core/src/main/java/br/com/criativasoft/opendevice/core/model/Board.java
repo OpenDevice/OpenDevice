@@ -35,7 +35,7 @@ import java.util.Set;
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="uid")
 public class Board extends Device {
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch= FetchType.LAZY)
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch= FetchType.EAGER)
     @JsonIdentityReference(alwaysAsId = true)
     private Set<PhysicalDevice> devices = new LinkedHashSet<PhysicalDevice>();
 

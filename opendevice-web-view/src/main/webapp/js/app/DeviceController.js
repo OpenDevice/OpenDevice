@@ -28,6 +28,7 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
     // Alias / Imports
     var DCategory = od.DeviceCategory;
     var DType = od.DeviceType;
+    var CType = od.CommandType;
 
     // Private
     // ==========================
@@ -180,9 +181,47 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
 
         _this.newBordPage = 'initialHelp';
 
+    };
+
+    /** Dialog to list devices */
+    _public.manageDevices = function(){
+
+        $('#manageDevices').modal('show');
+
+        _this.popupDevicesPage = 'list-devices';
 
     };
 
+    _public.editDevice = function(device){
+
+        _this.formDevice = angular.copy(device);
+
+        // Remove invalid attributes.
+        delete _this.formDevice.listeners;
+        delete _this.formDevice.manager;
+        delete _this.formDevice.devices;
+        delete _this.formDevice.parent;
+
+        _this.popupDevicesPage = 'edit-device';
+
+    };
+
+    _public.saveDevice = function(event){
+
+        var $btn = $(event.target).find("button:submit");
+        $btn.data("loading-text", "Saving...");
+        $btn.button('loading');
+
+        _this.formDevice.uid = _this.formDevice.id; // change to UID (the server property)
+
+        ODev.save(_this.formDevice, function(state){
+            if(state){
+                if($btn) $btn.button('reset');
+                _this.popupDevicesPage = 'list-devices';
+            }
+        });
+
+    };
 
     _public.delete = function(item, index){
 
@@ -245,7 +284,9 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
 
     };
 
-
+    /**
+     * Start a tool to generate random data
+     */
     _public.startSimulation = function(deviceID, interval, start){
 
         if(deviceID == null){

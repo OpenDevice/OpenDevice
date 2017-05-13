@@ -15,6 +15,7 @@ package br.com.criativasoft.opendevice.middleware;
 
 import br.com.criativasoft.opendevice.connection.IWSServerConnection;
 import br.com.criativasoft.opendevice.core.LocalDeviceManager;
+import br.com.criativasoft.opendevice.core.LocalTenantProvider;
 import br.com.criativasoft.opendevice.core.ODev;
 import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.connection.Connections;
@@ -64,6 +65,7 @@ public class Main extends LocalDeviceManager {
 
 	public void start() throws IOException  {
 
+        LocalTenantProvider.setAvoidChanges(true);
         setApiKey(OpenDeviceConfig.LOCAL_APP_ID); // Only for Startup
 
         OpenDeviceConfig config = ODev.getConfig();
@@ -197,6 +199,9 @@ public class Main extends LocalDeviceManager {
 
     }
 
+    /**
+     * Init database for fist usage
+     */
     private List<Account> initDatabase(EntityManager em) {
         PopulateInitialData populate = new PopulateInitialData(em);
         populate.initDatabase();

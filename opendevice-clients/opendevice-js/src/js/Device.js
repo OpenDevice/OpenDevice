@@ -37,7 +37,6 @@ od.Device = function(data){
         this.id = data.id;
         this.manager = od.deviceManager;
 
-
         // Dynamic Properties and Funtions
 
         for (var attrname in data) this[attrname] = data[attrname];
@@ -124,6 +123,13 @@ od.Device = function(data){
         var index = this.listeners.indexOf(eventDef);
         if(index >= 0){
             this.listeners.splice(index, 1);
+        }
+    };
+
+    this.applyChanges = function(device){
+        for (var attr in device) {
+            if (device.hasOwnProperty(attr) &&  typeof device[attr] != "function" )
+                this[attr] = device[attr];
         }
     };
 

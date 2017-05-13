@@ -50,6 +50,12 @@ public interface DeviceManager extends ConnectionManager{
     public void removeDevice(Device device);
 
     public void addDevices(Collection<Device> devices);
+
+    /**
+     * Update device properties </br>
+     * NOTE: You don't need call this for changes in VALUE
+     */
+    public void updateDevice(Device device);
 	
 	public void send(Command command) throws IOException;
 

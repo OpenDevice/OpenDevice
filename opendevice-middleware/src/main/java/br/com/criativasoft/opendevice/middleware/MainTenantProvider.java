@@ -116,6 +116,13 @@ public class MainTenantProvider extends ThreadLocalTenantProvider {
         @Override
         public void addDevice(Device device) {
             if(!initialized) syncronizeData(); // force load
+            device.setManaged(true);
+            map.put(device.getUid(), device);
+        }
+
+        @Override
+        public void updateDevice(Device device) {
+            device.setManaged(true);
             map.put(device.getUid(), device);
         }
 
@@ -169,6 +176,7 @@ public class MainTenantProvider extends ThreadLocalTenantProvider {
             // Load from database
             List<Device> devices = dataManager.getDeviceDao().listAll();
             for (Device device : devices) {
+                device.setManaged(true);
                 map.put(device.getUid(), device);
             }
 

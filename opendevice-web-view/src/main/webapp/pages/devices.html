@@ -62,6 +62,10 @@
                     <a class="btn btn-app" ng-click="ctrl.startSimulation()" title="Generate Random Data">
                         <i class="fa fa-random"></i> Simulation
                     </a>
+                    <a class="btn btn-app" ng-click="ctrl.manageDevices()" title="Edit Devices">
+                        <i class="fa fa-edit"></i> Manage
+                    </a>
+                </div>
                 </div>
             </div>
 
@@ -206,6 +210,91 @@
             </form>
         </div>
     </div>
+
+    <!----------------------------------------------------------------->
+    <!-- Manage Devices                                                  -->
+    <!----------------------------------------------------------------->
+    <div id="manageDevices" class="modal fade"  tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+
+            <!-- ******************* LIST ***************** -->
+
+            <div ng-if="ctrl.popupDevicesPage == 'list-devices'">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Device List</h4>
+                    </div>
+                    <div class="modal-body">
+                        <table id="devices-list" class="table table-bordered">
+                            <tbody>
+                            <tr>
+                                <th style="width: 30px">#ID</th>
+                                <th>Device</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Actions</th>
+                            </tr>
+                            <tr ng-repeat="x in ctrl.devices">
+                                <td>${ ::x.id }</td>
+                                <td>${ ::x.title }</td>
+                                <td>${ ::x.name }</td>
+                                <td>
+                                    <span class="badge device-type-${::x.type}"> <i class="fa ${ ::x | deviceIcon}" aria-hidden="true"></i> ${ ::x.type | deviceType}</span>
+                                </td>
+                                <td>
+                                    <button type="submit" class="btn btn-xs btn-primary"  ng-click="ctrl.editDevice(x)">Edit</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ******************* EDIT ***************** -->
+
+            <div ng-if="ctrl.popupDevicesPage == 'edit-device'">
+                <form class="form-horizontal" ng-submit="ctrl.saveDevice($event)">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Edit Device - #${ctrl.formDevice.id}  ${ctrl.formDevice.name} </h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Title</label>
+                                <div class="col-sm-10">
+                                    <input class="form-control" ng-model="ctrl.formDevice.title" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Type</label>
+                                <div class="col-sm-10 form-control-static">
+                                    <span class="badge device-type-${::ctrl.formDevice.type}"> <i class="fa ${ ::ctrl.formDevice | deviceIcon}" aria-hidden="true"></i> ${ ::ctrl.formDevice.type | deviceType}</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Sensor</label>
+                                <div class="col-sm-10 form-control-static">
+                                    <span class="">${ ::ctrl.formDevice.sensor}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default pull-left" ng-click="ctrl.popupDevicesPage = 'list-devices'">Back</button>
+                            <button class="btn btn-info" type="submit" ><i class="fa fa-save"></i> Salvar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 
 </section>
 <!-- /.content -->

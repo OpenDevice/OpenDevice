@@ -38,11 +38,18 @@ public class LocalTenantContext implements TenantContext {
 
     @Override
     public void addDevice(Device device) {
+        device.setManaged(true);
         devices.put(device.getUid(), device);
     }
 
     @Override
+    public void updateDevice(Device device) {
+        addDevice(device);
+    }
+
+    @Override
     public void removeDevice(Device device) {
+        device.setManaged(false);
         devices.remove(device.getUid());
     }
 

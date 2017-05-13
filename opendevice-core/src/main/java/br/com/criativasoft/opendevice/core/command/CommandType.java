@@ -50,8 +50,8 @@ public enum CommandType implements EnumCode {
 
     GET_DEVICES             (30, GetDevicesRequest.class),
     GET_DEVICES_RESPONSE    (31, GetDevicesResponse.class),
-    DEVICE_ADD 				(32, null), // NOT.IMPLEMENTED
-    DEVICE_ADD_RESPONSE		(33, null), // NOT.IMPLEMENTED
+    DEVICE_SAVE 			(32, SaveDeviceCommand.class), 
+    DEVICE_SAVE_RESPONSE	(33, null), // NOT.IMPLEMENTED
     DEVICE_DEL 				(34, null), // NOT.IMPLEMENTED
     CLEAR_DEVICES 			(35, null), // NOT.IMPLEMENTED
     SYNC_DEVICES_ID 		(36, null), // NOT.IMPLEMENTED

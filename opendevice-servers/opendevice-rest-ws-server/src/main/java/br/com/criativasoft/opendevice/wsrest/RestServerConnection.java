@@ -14,6 +14,7 @@
 package br.com.criativasoft.opendevice.wsrest;
 
 import br.com.criativasoft.opendevice.connection.IRestServerConnection;
+import br.com.criativasoft.opendevice.restapi.CommandRest;
 import br.com.criativasoft.opendevice.restapi.DeviceRest;
 import br.com.criativasoft.opendevice.restapi.resources.AccountRest;
 import br.com.criativasoft.opendevice.wsrest.resource.ApiInfoRest;
@@ -41,6 +42,7 @@ public class RestServerConnection extends AbstractAtmosphereConnection implement
         conf.resource(ApiInfoRest.class);
         conf.resource(AuthRest.class);
         conf.resource(DeviceRest.class);
+        conf.resource(CommandRest.class);
         conf.resource(AccountRest.class);
     }
 

@@ -51,6 +51,7 @@ return {
     toggleValue : manager.toggleValue,
     contains : manager.contains,
     sync : manager.sync,
+    save : manager.save,
     send : manager.send,
 
     setAppID : function(appID){

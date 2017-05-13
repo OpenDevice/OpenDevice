@@ -54,22 +54,41 @@ public abstract class GenericJpa<T> implements Dao<T> {
 
     @Override
     public void persist(T entity) {
-        em().persist(entity);
+        try{
+            em().persist(entity);
+        }catch (RuntimeException ex){
+            ex.printStackTrace();
+        }
     }
 
     @Override
     public T update(T entity) {
-        return em().merge(entity);
+        try{
+            return em().merge(entity);
+        }catch (RuntimeException ex){
+            ex.printStackTrace();
+            throw ex;
+        }
     }
 
     @Override
     public void delete(T entity) {
-        em().remove(entity);
+        try{
+            em().remove(entity);
+        }catch (RuntimeException ex){
+            ex.printStackTrace();
+            throw ex;
+        }
     }
 
     @Override
     public void refresh(T entity) {
-        em().refresh(entity);
+        try{
+            em().refresh(entity);
+        }catch (RuntimeException ex){
+            ex.printStackTrace();
+            throw ex;
+        }
     }
 
     @Override

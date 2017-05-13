@@ -24,11 +24,16 @@ public class LocalTenantProvider extends TenantProvider {
 
     private static String tenantID = OpenDeviceConfig.LOCAL_APP_ID;
 
+    private static boolean avoidChanges = false;
+
     private static LocalTenantContext context = null;
 
     @Override
     public synchronized void setTenantID(String appID) {
-        // Ignore
+
+        if(avoidChanges) return;  // Ignore
+
+        LocalTenantProvider.tenantID  = appID;
     }
 
     @Override
@@ -49,5 +54,9 @@ public class LocalTenantProvider extends TenantProvider {
     private TenantContext getStaticContext(){
         if(context == null) context = new LocalTenantContext(getTenantID());
         return context;
+    }
+
+    public static void setAvoidChanges(boolean avoidChanges) {
+        LocalTenantProvider.avoidChanges = avoidChanges;
     }
 }

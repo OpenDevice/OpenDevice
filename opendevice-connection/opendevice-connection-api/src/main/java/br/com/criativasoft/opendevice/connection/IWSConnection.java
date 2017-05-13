@@ -20,5 +20,5 @@ package br.com.criativasoft.opendevice.connection;
  * @author Ricardo JL Rufino
  * @date 06/03/15.
  */
-public interface IWSConnection extends DeviceConnection, URIBasedConnection{
+public interface IWSConnection extends DeviceConnection, IRemoteClientConnection{
 }

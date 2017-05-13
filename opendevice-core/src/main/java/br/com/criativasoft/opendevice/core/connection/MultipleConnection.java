@@ -67,8 +67,11 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
 	@Override
 	public synchronized boolean removeListener(ConnectionListener e) {
 		boolean value = false;
-		listeners.remove(e);
-		
+
+		synchronized (listeners) {
+			listeners.remove(e);
+		}
+
 		for (DeviceConnection connection : connections) {
 			if(connection.removeListener(e)){
 				value = true;

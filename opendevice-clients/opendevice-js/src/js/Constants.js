@@ -62,8 +62,8 @@ od.CommandType = {
 
     GET_DEVICES             :30,
     GET_DEVICES_RESPONSE    :31,
-    DEVICE_ADD              :32,
-    DEVICE_ADD_RESPONSE	    :33,
+    DEVICE_SAVE             :32,
+    DEVICE_SAVE_RESPONSE	:33,
     DEVICE_DEL              :34,
     CLEAR_DEVICES           :35,
     GET_CONNECTIONS         :36,

@@ -95,7 +95,7 @@ od.view.DigitalCtrlView = od.view.DashItemView.extend(function() {
 
     function updateView($device, deviceID){
         var device = ODev.get(deviceID);
-        $(".device-view-title", $device).text(device.name);
+        $(".device-view-title", $device).text(device.title);
 
         var $value = $(".device-view-value", $device);
         $value.text(device.isON() ? this.model.viewOptions.textON : this.model.viewOptions.textOFF);

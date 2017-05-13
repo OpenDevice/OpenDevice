@@ -13,7 +13,6 @@
 
 package br.com.criativasoft.opendevice.middleware.test;
 
-import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.model.*;
 import br.com.criativasoft.opendevice.middleware.model.Dashboard;
 import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
@@ -44,7 +43,7 @@ public class PopulateDatabase {
         OpenDeviceConfig.get().setDatabaseEnabled(true);
 
         em = LocalEntityManagerFactory.getInstance().createEntityManager();
-        dao = new DeviceNeo4J();
+        dao = new DeviceNeo4J(); // Work with H2
         dao.setEntityManager(em);
         EntityTransaction tx = em.getTransaction();
         tx.begin();
@@ -66,20 +65,21 @@ public class PopulateDatabase {
         }
 
 
-        for (Account account : accounts) {
-
-            TenantProvider.setCurrentID(account.getUuid());
-
-            System.out.println("Tenant : " + TenantProvider.getCurrentID());
-            List<Device> devices = dao.listAll();
-            System.out.println("Device : " + devices.size());
-            for (Device device : devices) {
-                if(device instanceof Sensor) {
-                    saveHistory(device.getId());
-                }
-            }
-
-        }
+        // saveHistory
+//        for (Account account : accounts) {
+//
+//            TenantProvider.setCurrentID(account.getUuid());
+//
+//            System.out.println("Tenant : " + TenantProvider.getCurrentID());
+//            List<Device> devices = dao.listAll();
+//            System.out.println("Device : " + devices.size());
+//            for (Device device : devices) {
+//                if(device instanceof Sensor) {
+//                    saveHistory(device.getId());
+//                }
+//            }
+//
+//        }
 
 
         System.out.println("============== FINISH ==============");

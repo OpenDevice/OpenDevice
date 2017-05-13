@@ -35,4 +35,6 @@ public interface TenantContext {
     public String getId();
 
     Device getDeviceByName(String name);
+
+    void updateDevice(Device device);
 }

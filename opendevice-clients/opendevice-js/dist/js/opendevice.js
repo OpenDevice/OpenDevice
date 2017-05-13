@@ -62,8 +62,8 @@ od.CommandType = {
 
     GET_DEVICES             :30,
     GET_DEVICES_RESPONSE    :31,
-    DEVICE_ADD              :32,
-    DEVICE_ADD_RESPONSE	    :33,
+    DEVICE_SAVE             :32,
+    DEVICE_SAVE_RESPONSE	:33,
     DEVICE_DEL              :34,
     CLEAR_DEVICES           :35,
     GET_CONNECTIONS         :36,
@@ -543,12 +543,12 @@ od.DeviceManager = function(connection){
 
     this.removeDevice = function(device){
 
-        var index = devices.indexOf(device);
-        if(index >= 0) devices.splice(index, 1);
-        notifyListeners(DEvent.DEVICE_LIST_UPDATE, devices);
+        return ODev.devices.delete(device.id, function(){
+            var index = devices.indexOf(device);
+            if(index >= 0) devices.splice(index, 1);
 
-        ODev.devices.delete(device.id, function () {
-            alert("ok");
+            // TODO: if is a board need remove chids.
+            notifyListeners(DEvent.DEVICE_LIST_UPDATE, devices);
         });
 
     };
@@ -900,7 +900,7 @@ od.DeviceManager = function(connection){
             // load remote.
             var devices = _getDevicesRemote();
 
-            notifyListeners(DEvent.DEVICE_LIST_UPDATE, devices);
+            if(devices && devices.length > 0) notifyListeners(DEvent.DEVICE_LIST_UPDATE, devices);
         }
 
     }
@@ -1020,6 +1020,8 @@ return {
             }else{
                 return null;
             }
+        }else{
+            return response;
         }
 
     },

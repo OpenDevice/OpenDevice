@@ -1,7 +1,13 @@
 package br.com.criativasoft.opendevice.core.util;
 
+import java.util.List;
+
 public class StringUtils {
-    
+
+    public static String join(List<String> array , String sep ) {
+        return join(array.toArray(new String[0]), sep.charAt(0));
+    }
+
     public static String join( String[] array , String sep ) {
         return join(array, sep.charAt(0));
     }

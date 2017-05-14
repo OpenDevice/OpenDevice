@@ -45,6 +45,15 @@ pkg.controller('PageController', function ( $http, $scope) {
                 a.parent().removeClass('active');
             };
         });
+
+
+    });
+
+    $scope.$on('$viewContentLoaded', function(){
+        // Update title
+        var $title = $("#page-title");
+        $title.html("");
+        $title.append($("span.page-title"));
     });
 
     $(function () {

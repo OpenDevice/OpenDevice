@@ -37,13 +37,13 @@ od.view.DigitalCtrlView = od.view.DashItemView.extend(function() {
     var deviceListeners = [];
 
     var HTML="";
-    HTML += "<a class=\"device-view\">";
+    HTML += "<div class=\"device-view\">";
     HTML += "    <div class=\"device-view-icon\"><img src=\"/images/devices/lightbulb.png\"/><\/div>";
     HTML += "    <div class=\"device-view-content\">";
     HTML += "        <span class=\"device-view-title\">Device<\/span>";
     HTML += "        <span class=\"device-view-value\">OFF<\/span>";
     HTML += "    <\/div>";
-    HTML += "<\/a>";
+    HTML += "<\/div>";
 
     this.render = function ($el) {
 

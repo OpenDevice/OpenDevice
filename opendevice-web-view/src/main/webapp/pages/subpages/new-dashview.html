@@ -30,11 +30,21 @@
             <div class="form-group" ng-show="controller.current.type != 'TEXT'">
                 <label class="col-sm-2 control-label">Device(s)</label>
                 <div class="col-sm-10">
-                    <ui-select multiple ng-model="controller.current.monitoredDevices" theme="select2"  sortable="true" close-on-select="true" style="width: 400px;">
-                        <ui-select-match placeholder="Select device...">${$item.name}</ui-select-match>
-                        <ui-select-choices repeat="device.id as device in controller.devices | propsFilter: {name: $select.search}">
-                            <div ng-bind-html="device.name | highlight: $select.search"></div></ui-select-choices>
+
+                    <ui-select multiple ng-model="controller.current.monitoredDevices" theme="select2" style="width: 250px;">
+                        <ui-select-match placeholder="Select device...">
+                            <ol class="breadcrumb breadcrumb-device">
+                                <li><i class="fa fa-sitemap"></i> ${$item.parent.title}</span></li>
+                                <li><i class="fa ${$item | deviceIcon}"></i> ${$item.title}</li>
+                            </ol>
+                        </ui-select-match>
+                        <ui-select-choices repeat="obj.id as obj in controller.devices | propsFilter: {title: $select.search}"
+                                           group-by="controller.selectGroupDevices">
+                            <i class="fa ${obj | deviceIcon}"></i> <span ng-bind="obj.title"></span>
+                        </ui-select-choices>
                     </ui-select>
+
+
                 </div>
             </div>
             <div class="form-group">

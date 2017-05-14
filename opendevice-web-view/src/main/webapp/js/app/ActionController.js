@@ -58,10 +58,9 @@ pkg.controller('ActionController', function ($scope) {
 
     _public.groupDevices = function (item){
         if (item.parent)
-            return item.parent.name;
+            return item.parent.title;
         else
             return "Standalone"
-
     };
 
     // ============================================================================================

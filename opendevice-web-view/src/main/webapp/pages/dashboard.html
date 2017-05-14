@@ -1,43 +1,40 @@
 
-<ul id="page-header" class="nav navbar-nav">
-    <li>
-        <i class="fa fa-dashboard"></i> Dashboard :
-    </li>
-    <li class="dropdown" ng-if="!ctrl.editMode">
-        <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">${ctrl.dashboard.title}<span class="caret"></span></a>
-        <ul class="dropdown-menu" role="menu">
-            <li ng-repeat="current in ctrl.dashboardList"><a href="javascript:void(0)" target="_self" ng-click="ctrl.activateDash(current);">${current.title}</a></li>
-        </ul>
-    </li>
+<span class="page-title"><i class="fa fa-dashboard"></i> Dashboards</span>
 
-    <li ng-if="ctrl.editMode">
-        <form ng-submit="ctrl.save($event)" class="navbar-form" role="form">
+<section class="content-header">
+    <h1>
+        <i class="fa fa-dashboard"></i> Current -
 
-            <div class="input-group">
-                <input type="text" name="title" class="form-control" ng-value="ctrl.dashboard.title" />
-                <input type="hidden" name="id" class="form-control" ng-value="ctrl.dashboard.id" />
-                <div class="input-group-btn">
-                    <button class="btn btn-default" type="submit" title="Save (CTRL + S)"><i class="fa fa-save"></i></button>
-                    <button class="btn btn-default" ng-click="ctrl.delete()" title="Delete Dashboard #${ctrl.dashboard.id}"><i class="fa fa-remove"></i></button>
+        <div ng-if="ctrl.editMode" style="display:inline-block">
+            <form ng-submit="ctrl.save($event)" class="navbar-form no-padding no-margin" role="form">
+                <div class="input-group">
+                    <input type="text" name="title" class="form-control" ng-value="ctrl.dashboard.title" />
+                    <input type="hidden" name="id" class="form-control" ng-value="ctrl.dashboard.id" />
+                    <div class="input-group-btn">
+                        <button class="btn btn-info" type="submit" title="Save (CTRL + S)"><i class="fa fa-save"></i></button>
+                        <button class="btn btn-danger" ng-click="ctrl.delete()" title="Delete Dashboard #${ctrl.dashboard.id}"><i class="fa fa-remove"> Delete</i></button>
+                    </div>
                 </div>
-            </div>
-        </form>
-    </li>
+            </form>
+        </div>
 
-    <li><a href="javascript:void(0);" ng-if="!ctrl.editMode" ng-click="ctrl.toggleEdit(true)" title="Edit (F2)"><i class="fa fa-edit"></i></a></li>
+        <div ng-if="!ctrl.editMode" style="display:inline-block">
+            <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">${ctrl.dashboard.title} &nbsp;<span class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+                <li ng-repeat="current in ctrl.dashboardList"><a href="javascript:void(0)" target="_self" ng-click="ctrl.activateDash(current);">${current.title}</a></li>
+            </ul>
+        </div>
 
-    <li><a href="javascript:void(0);" ng-if="ctrl.editMode" ng-click="ctrl.toggleEdit(false)" title="Cancel Edition (F2)"><i class="fa fa-reply"></i></a></li>
-</ul>
+    </h1>
 
+    <ol class="breadcrumb">
+        <li><a href="javascript:void(0);" ng-if="!ctrl.editMode" ng-click="ctrl.toggleEdit(true)" class="btn btn-info pull-right" title="Edit (F2)"><i class="fa fa-edit"></i></a></li>
+        <li><a href="javascript:void(0);" ng-if="ctrl.editMode" ng-click="ctrl.toggleEdit(false)" class="btn btn-warning pull-right" title="Cancel Edition (F2)"><i class="fa fa-reply"></i></a></li>
 
-
-<ul id="page-actions" class="nav navbar-nav">
-
-    <li><a href="javascript:void(0);" target="_self" ng-click="ctrl.addNewDash()"><i class="fa fa-plus"></i> Dashboard</a></li>
-
-    <li ng-init="page.replace('#app-header', '#page-header');page.replace('#app-header-actions', '#page-actions')"></li>
-</ul>
-
+        <li><a ng-click="ctrl.addNewView()" class="btn btn-info pull-right" role="button"><i class="fa fa-plus"></i> New Item/Chart</a></li>
+        <li><a ng-click="ctrl.addNewDash()" class="btn btn-info pull-right" role="button"><i class="fa fa-plus"></i> New Dashboard</a></li>
+    </ol>
+</section>
 
 <!-- Main content -->
 <section class="content dashboard-page" data-ng-init="ctrl.init()">
@@ -46,8 +43,7 @@
     <!-- Add Dashboards Actions                                      -->
     <!----------------------------------------------------------------->
 
-    <div class="row animate-show noselect ng-cloak ng-hide" ng-show="ctrl.editMode">
-        <div class="col-lg-2 col-xs-6">
+    <div class="sidebar-content animate-show noselect ng-cloak" ng-init="ctrl.updateSidebar()">
             <div class="dash-add-box small-box bg-aqua" ng-click="ctrl.addNewView('LINE_CHART')" >
                 <div class="inner">
                     <h3>Line Chart</h3>
@@ -58,8 +54,6 @@
                 <a href="javascript:void(0);"  class="small-box-footer">Add New <i class="fa fa-arrow-circle-right"></i>
                 </a>
             </div>
-        </div>
-        <div class="col-lg-2 col-xs-6">
             <div class="dash-add-box small-box bg-green" ng-click="ctrl.addNewView('PIE_CHART')">
                 <div class="inner">
                     <h3>Pie Chart</h3>
@@ -70,8 +64,6 @@
                 <a href="javascript:void(0);"  class="small-box-footer">Add New <i class="fa fa-arrow-circle-right"></i>
                 </a>
             </div>
-        </div>
-        <div class="col-lg-2 col-xs-6">
             <div class="dash-add-box small-box bg-yellow" ng-click="ctrl.addNewView('GAUGE_CHART')">
                 <div class="inner">
                     <h3>Gauge</h3>
@@ -82,8 +74,6 @@
                 <a href="javascript:void(0);"  class="small-box-footer">Add New <i class="fa fa-arrow-circle-right"></i>
                 </a>
             </div>
-        </div>
-        <div class="col-lg-2 col-xs-6">
             <div class="dash-add-box small-box bg-red" ng-click="ctrl.addNewView('DYNAMIC_VALUE')">
                 <div class="inner">
                     <h3>Dyn. Value</h3>
@@ -94,8 +84,6 @@
                 <a href="javascript:void(0);"  class="small-box-footer">Add New <i class="fa fa-arrow-circle-right"></i>
                 </a>
             </div>
-        </div>
-        <div class="col-lg-2 col-xs-6">
             <div class="dash-add-box small-box bg-red" ng-click="ctrl.addNewView('DIGITAL_CONTROLLER')">
                 <div class="inner">
                     <h3>Digital Ctrl</h3>
@@ -106,8 +94,6 @@
                 <a href="javascript:void(0);"  class="small-box-footer">Add New <i class="fa fa-arrow-circle-right"></i>
                 </a>
             </div>
-        </div>
-        <div class="col-lg-2 col-xs-6">
             <div class="dash-add-box small-box bg-red" ng-click="ctrl.addNewView('DIGITAL_CONTROLLER')">
                 <div class="inner">
                     <h3>Analog Ctrl</h3>
@@ -118,8 +104,6 @@
                 <a href="javascript:void(0);"  class="small-box-footer">Add New <i class="fa fa-arrow-circle-right"></i>
                 </a>
             </div>
-        </div>
-        <div class="col-lg-2 col-xs-6">
             <div class="dash-add-box small-box bg-red" ng-click="ctrl.addNewView('IMAGE_CONTROLLER')">
                 <div class="inner">
                     <h3>Image/Video</h3>
@@ -130,8 +114,8 @@
                 <a href="javascript:void(0);"  class="small-box-footer">Add New <i class="fa fa-arrow-circle-right"></i>
                 </a>
             </div>
-        </div>
     </div>
+
 
     <!----------------------------------------------------------------->
     <!-- Dashboards List                                             -->

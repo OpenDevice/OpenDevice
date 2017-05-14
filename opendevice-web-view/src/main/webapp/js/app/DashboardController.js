@@ -122,9 +122,11 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
                 itemView.destroy();
             }
 
-
             // Unregister listeners on change page.
             ODev.removeListener(_this.odevListeners);
+
+            var $side = $("aside.control-sidebar");
+            $.AdminLTE.controlSidebar.close($side, true);
 
         });
 
@@ -144,6 +146,13 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
     // Public Functions
     // ============================================================================================
 
+
+    _public.updateSidebar = function(){
+        // Configure sidebar
+        var $side = $("aside.control-sidebar");
+        var actions = $(".sidebar-content");
+        $side.html(actions);
+    }
 
     _public.activateDash = function(dashboard){
 
@@ -224,7 +233,19 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
         //_this.dashboardItems.push( new DashItemView({ configMode : true, title : 'Grafico 3 ', type : 'LINE_CHART', layout : [1,3,1,1], metrics : [{ deviceID : 2 , type : 'realtime'  }]}));
         // NOTE: this will fire: renderCompleteDashItem, to setup appropriate configs
 
-        $scope.$broadcast('newItem', type);
+        if(!type){
+
+            var $side = $("aside.control-sidebar");
+
+            $.AdminLTE.controlSidebar.open($side, true);
+
+            $(".dashboards").one('click', function(){
+                $.AdminLTE.controlSidebar.close($side, true);
+            });
+
+        }else{
+            $scope.$broadcast('newItem', type);
+        }
 
     };
 
@@ -760,6 +781,13 @@ pkg.controller('NewItemController', ['$scope','$timeout', 'DashboardRest', funct
             _this.current = defaults;
         });
 
+    };
+
+    _public.selectGroupDevices = function (item){
+        if (item.parent)
+            return item.parent.title;
+        else
+            return "Standalone"
     };
 
     // ====================================

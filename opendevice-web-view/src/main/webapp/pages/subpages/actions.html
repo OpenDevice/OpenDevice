@@ -22,12 +22,12 @@
                 <ui-select-match placeholder="Device">
                     <ol class="breadcrumb breadcrumb-device">
                         <li><i class="fa fa-sitemap"></i> ${$select.selected.parent.name}</span></li>
-                        <li><i class="fa fa-cog"></i> ${$select.selected.name}</li>
+                        <li><i class="fa ${$select.selected | deviceIcon}"></i> ${$select.selected.name}</li>
                     </ol>
                 </ui-select-match>
                 <ui-select-choices repeat="obj.id as obj in ac.targetDevices | filter: $select.search"
                                    group-by="ac.groupDevices">
-                    <i class="fa fa-cog"></i> <span ng-bind="obj.name"></span>
+                    <i class="fa ${obj | deviceIcon}"></i> <span ng-bind="obj.name"></span>
                 </ui-select-choices>
             </ui-select>
 

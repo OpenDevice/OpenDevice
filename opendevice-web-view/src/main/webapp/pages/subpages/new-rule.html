@@ -1,9 +1,4 @@
-<span id="page-header"><i class="fa fa fa-magic"></i> Rules </span>
-
-<ul id="page-actions" class="nav navbar-nav">
-
-    <li ng-init="page.replace('#app-header', '#page-header');page.replace('#app-header-actions', '#page-actions')"></li>
-</ul>
+<span class="page-title"><i class="fa fa fa-magic"></i> Rules </span>
 
 <section class="content-header">
     <h1>
@@ -60,13 +55,13 @@
                                 <ui-select ng-model="model.resourceID" theme="select2" style="width: 250px;">
                                     <ui-select-match placeholder="Device">
                                         <ol class="breadcrumb breadcrumb-device">
-                                            <li><i class="fa fa-sitemap"></i> ${$select.selected.parent.name}</span></li>
-                                            <li><i class="fa fa-cog"></i> ${$select.selected.name}</li>
+                                            <li><i class="fa fa-sitemap"></i> ${$select.selected.parent.title}</span></li>
+                                            <li><i class="fa ${$select.selected | deviceIcon}"></i> ${$select.selected.title}</li>
                                         </ol>
                                     </ui-select-match>
                                     <ui-select-choices repeat="obj.id as obj in ctrl.devices | filter: $select.search"
                                                        group-by="ctrl.groupDevices">
-                                        <i class="fa ${obj | deviceIcon}"></i> <span ng-bind="obj.name"></span>
+                                        <i class="fa ${obj | deviceIcon}"></i> <span ng-bind="obj.title"></span>
                                     </ui-select-choices>
                                 </ui-select>
 

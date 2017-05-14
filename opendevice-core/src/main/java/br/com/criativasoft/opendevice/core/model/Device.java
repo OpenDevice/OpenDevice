@@ -67,6 +67,7 @@ public class Device implements Serializable {
 
 	private int uid; // Logic level user ID.
 	private String name;
+    private String title;
 	private DeviceType type;
     private long lastUpdate;
     private Date dateCreated;
@@ -74,7 +75,7 @@ public class Device implements Serializable {
 
     private transient boolean managed; // Already been linked to the Manager
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.MERGE)
     @JsonIdentityReference(alwaysAsId = true)
 	private DeviceCategory category = DeviceCategory.GENERIC;
 
@@ -182,7 +183,17 @@ public class Device implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public DeviceType getType() {
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTitle() {
+        if(title == null) return getName();
+        return title;
+    }
+
+    public DeviceType getType() {
 		return type;
 	}
 	public void setType(DeviceType type) {
@@ -191,7 +202,7 @@ public class Device implements Serializable {
 
 
     public void setValue(long value) {
-        this.setValue(value, (isManaged())); // sync only if managed
+        this.setValue(value, true);
     }
 
     /**
@@ -308,7 +319,10 @@ public class Device implements Serializable {
     public void notifyListeners(boolean sync) {
 
         DeviceManager manager = BaseDeviceManager.getInstance();
-        if(manager != null) manager.notifyListeners(this, sync);
+
+        // On device change notify listeners
+        // isManaged() used to avoid fire listeners on deserialization...
+        if(manager != null && isManaged()) manager.notifyListeners(this, sync);
         else{
             if(log.isDebugEnabled()) log.debug("None DeviceManager registered for this device: " + this.toString());
         }
@@ -324,6 +338,10 @@ public class Device implements Serializable {
         return this;
     }
 
+    /**
+     * Identifies the device as manageable. <br/>
+     * NOTE: The main function is to enable and disable the listeners
+     */
     public void setManaged(boolean managed) {
         this.managed = managed;
     }

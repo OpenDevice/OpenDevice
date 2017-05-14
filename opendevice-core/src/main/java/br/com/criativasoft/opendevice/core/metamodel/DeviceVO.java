@@ -25,6 +25,7 @@ public class DeviceVO {
 	
 	private int id; // Mapped to UID on Device.class
 	private String name;
+	private String title;
 	private int type;
 	private int category;
 	private long value;
@@ -47,6 +48,8 @@ public class DeviceVO {
 		this(device.getUid(), device.getName(), device.getType().getCode(),
 				(device.getCategory() == null ? DeviceCategory.GENERIC.getCode() : device.getCategory().getCode()),
 		     device.getValue(), device.getLastUpdate(), device.getDateCreated());
+
+        this.title = device.getTitle();
 
         if(device instanceof Sensor){
             setSensor(true);
@@ -142,6 +145,14 @@ public class DeviceVO {
 	}
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getTitle() {
+		return title;
 	}
 
 	public void setParentID(int parentID) {

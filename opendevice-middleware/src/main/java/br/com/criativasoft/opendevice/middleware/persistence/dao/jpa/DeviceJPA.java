@@ -86,8 +86,6 @@ public abstract class DeviceJPA extends GenericJpa<Device> implements DeviceDao{
 
         // FIXME: Use tentantIDs
 
-        Device device = getByUID(params.getDeviceID());
-
         AggregationType aggregation = params.getAggregation();
 
         if(aggregation != null && aggregation != AggregationType.NONE){
@@ -106,7 +104,7 @@ public abstract class DeviceJPA extends GenericJpa<Device> implements DeviceDao{
             }
 
             TypedQuery<DeviceHistory> query = em().createQuery(jpql.toString(), DeviceHistory.class);
-            query.setParameter("deviceID",  new Long(device.getId()));
+            query.setParameter("deviceID",  params.getDeviceID());
 
             if(params.getPeriodType() == PeriodType.RECORDS){
                 query.setMaxResults(params.getPeriodValue());
@@ -120,6 +118,7 @@ public abstract class DeviceJPA extends GenericJpa<Device> implements DeviceDao{
             query.setMaxResults(1000);
 
             List<DeviceHistory> list = query.getResultList();
+
             return list;
         }
 

@@ -35,6 +35,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -142,8 +143,14 @@ public class DeviceRest {
     @POST
     @Path("/{uid}/history")
     public List<DeviceHistory> getDeviceHistory(@PathParam("uid") int uid, DeviceHistoryQuery query) {
-        query.setDeviceID(uid);
-        return manager.getDeviceHistory(query);
+        Device device = manager.findDeviceByUID(uid); // find user device
+        if (device != null) {
+            query.setDeviceID(device.getId());
+            query.setDeviceUID(uid);
+            return manager.getDeviceHistory(query);
+        } else {
+            return new ArrayList<DeviceHistory>();
+        }
     }
 
     @GET

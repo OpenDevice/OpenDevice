@@ -15,7 +15,6 @@ package br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j;
 
 import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.metamodel.PeriodType;
-import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceHistory;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.DeviceJPA;
 
@@ -33,8 +32,6 @@ public class DeviceNeo4J extends DeviceJPA {
     // FIXME: Use tentantIDs
     protected DeviceHistory getDeviceHistoryAggregate(DeviceHistoryQuery params) {
 
-        Device device = getByUID(params.getDeviceID());
-
         String function = params.getAggregation().getFunction();
 
         StringBuilder sbquery = new StringBuilder("MATCH (h:DeviceHistory) where h.deviceID = {deviceID}");
@@ -48,7 +45,7 @@ public class DeviceNeo4J extends DeviceJPA {
         }
 
         Query query = em().createNativeQuery(sbquery.toString());
-        query.setParameter("deviceID", new Long(device.getId()));
+        query.setParameter("deviceID", params.getDeviceID());
 
         if (params.getPeriodType() != PeriodType.RECORDS) {
             Calendar calendar = Calendar.getInstance();

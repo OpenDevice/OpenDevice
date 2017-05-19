@@ -135,7 +135,7 @@ od.view.DashItemView = Class.extend(function() {
 // Static Functions
 // =====================================================================================================================
 od.view.DashItemView.isCompatibleChart = function(type){
-    if(type == 'LINE_CHART' || type == 'GAUGE_CHART' || type == 'PIE_CHART'){
+    if(type == 'LINE_CHART' || type == 'GAUGE_CHART' || type == 'PIE_CHART' || type == 'AREA_CHART'){
         return true;
     }
     return false;

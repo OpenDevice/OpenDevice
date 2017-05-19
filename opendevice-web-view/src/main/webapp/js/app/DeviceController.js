@@ -42,7 +42,7 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
     this.devices = [];
     this.discoveryList = [];
 
-    this.sensorsCharts = []; // od.view.ChartItemView
+    this.historyCharts = []; // od.view.ChartItemView
     this.devicesCtrls = []; // od.view.DigitalCtrlView
     this.chartViewOptions = {
         "periodValue": 1,
@@ -132,7 +132,7 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
 
             });
 
-            _this.sensorsCharts = charts;
+            _this.historyCharts = charts;
             _this.devicesCtrls = ctrls;
         }
 
@@ -140,8 +140,8 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
         // Destroy Controller Event
         $scope.$on("$destroy", function() {
 
-            for (var i = 0; i < _this.sensorsCharts.length; i++) {
-                var view = _this.sensorsCharts[i];
+            for (var i = 0; i < _this.historyCharts.length; i++) {
+                var view = _this.historyCharts[i];
                 view.destroy();
             }
             for (var i = 0; i < _this.devicesCtrls.length; i++) {
@@ -439,7 +439,7 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
             "L" : "col-lg-12"
         };
 
-        angular.forEach(_this.sensorsCharts, function(item, index) {
+        angular.forEach(_this.historyCharts, function(item, index) {
 
             var $container = $(".sensors-container");
             var $el = $('.sensors-view', $container).eq(index);
@@ -471,7 +471,7 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
 
             // $("#char-size-ctrl button").last().button("toggle");
 
-            angular.forEach(_this.sensorsCharts, function(item, index) {
+            angular.forEach(_this.historyCharts, function(item, index) {
                 console.log('Initializing Chart/View: ' + item.title, item);
                 if(!item.initialized) {
                     var $el = $('.sensor-chart-body', $container).eq(index);
@@ -537,7 +537,7 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
     }
 
     function updateCharts(){
-        angular.forEach(_this.sensorsCharts, function(item, index) {
+        angular.forEach(_this.historyCharts, function(item, index) {
             if(item.initialized && !item.model.realtime) {
                 var model = angular.extend({}, item.model, _this.chartViewOptions);
                 item.update(model);
@@ -546,15 +546,15 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
     }
 
 
-    function createSensorChart(sensor){
+    function createSensorChart(device){
 
-        if(this.isAnalogDevice(sensor)){
+        if(device.type == od.DeviceType.ANALOG || device.type == od.DeviceType.DIGITAL){
             var model = {
-                "id": sensor.id,
-                "title": sensor.name,
+                "id": device.id,
+                "title": device.title,
                 "type": "LINE_CHART",
                 // "layout": {"row": 0, "col": 2, "sizeX": 4, "sizeY": 2},
-                "monitoredDevices": [sensor.id],
+                "monitoredDevices": [device.id],
                 "aggregation": "NONE",
                 "itemGroup": 0,
                 "realtime": false,
@@ -656,7 +656,7 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
     }
 
     function findDashboardItem(id){
-        var values = _this.sensorsCharts;
+        var values = _this.historyCharts;
         if(values){
             for(var i = 0; i < values.length; i++){
                 if(values[i].id == id){

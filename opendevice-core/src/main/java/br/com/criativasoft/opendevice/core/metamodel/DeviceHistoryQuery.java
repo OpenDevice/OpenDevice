@@ -13,6 +13,8 @@
 
 package br.com.criativasoft.opendevice.core.metamodel;
 
+import java.util.Date;
+
 /**
  * TODO: Add Docs
  *
@@ -20,18 +22,18 @@ package br.com.criativasoft.opendevice.core.metamodel;
  */
 public class DeviceHistoryQuery {
 
-
-    private int deviceID;
+    private long deviceID;
+    private int deviceUID;
     private int periodValue;
     private PeriodType periodType;
     private AggregationType aggregation;
+    private Date periodEnd;
 
     public DeviceHistoryQuery(){
 
     }
 
-
-    public DeviceHistoryQuery(int deviceID, PeriodType periodType, int periodValue) {
+    public DeviceHistoryQuery(long deviceID, PeriodType periodType, int periodValue) {
         this.periodType = periodType;
         this.deviceID = deviceID;
         this.periodValue = periodValue;
@@ -53,11 +55,11 @@ public class DeviceHistoryQuery {
         this.periodType = periodType;
     }
 
-    public void setDeviceID(int deviceID) {
+    public void setDeviceID(long deviceID) {
         this.deviceID = deviceID;
     }
 
-    public int getDeviceID() {
+    public long getDeviceID() {
         return deviceID;
     }
 
@@ -67,5 +69,22 @@ public class DeviceHistoryQuery {
 
     public AggregationType getAggregation() {
         return aggregation;
+    }
+
+    public void setDeviceUID(int deviceUID) {
+        this.deviceUID = deviceUID;
+    }
+
+    public int getDeviceUID() {
+        return deviceUID;
+    }
+
+    public void setPeriodEnd(Date periodEnd) {
+        this.periodEnd = periodEnd;
+    }
+
+    public Date getPeriodEnd() {
+        if(periodEnd == null) return new Date();
+        return periodEnd;
     }
 }

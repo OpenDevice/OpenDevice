@@ -282,7 +282,7 @@
     min-width: 167px;
     margin: 8px 1% !important;
     min-height: 55px;
-    /*float: left;*/
+    float: left;
     cursor: pointer;
     display: block;
     text-decoration: none;

@@ -85,7 +85,7 @@
 
         <div class="panel-heading clearfix">
 
-            <h3 class="panel-title pull-left" style="padding-top: 15px;">Charts (${ctrl.sensorsCharts.length})</h3>
+            <h3 class="panel-title pull-left" style="padding-top: 15px;">Charts (${ctrl.historyCharts.length})</h3>
 
             <div class="pull-right" style="padding-top: 10px;">
                 <ul class="list-inline">
@@ -121,7 +121,7 @@
     <div class="row sensors-container">
 
         <div class="col-xs-12 sensors-view"
-             ng-repeat="chart in ctrl.sensorsCharts"
+             ng-repeat="chart in ctrl.historyCharts"
              ng-init="$last && ctrl.onRenderChartItems(this)">
 
         <div class="box box-success ">

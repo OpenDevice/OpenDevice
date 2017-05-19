@@ -166,7 +166,18 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     @Override
     public List<DeviceHistory> getDeviceHistory(DeviceHistoryQuery query) {
-        return getValidDeviceDao().getDeviceHistory(query);
+        List<DeviceHistory> list = getValidDeviceDao().getDeviceHistory(query);
+
+        Device device = findDeviceByUID(query.getDeviceUID());
+        if(device != null){
+            DeviceHistory last = new DeviceHistory();
+            last.setDeviceID(query.getDeviceID());
+            last.setTimestamp(query.getPeriodEnd().getTime());
+            last.setValue(device.getValue());
+            list.add(last);
+        }
+
+        return list;
     }
 
     @Override

@@ -148,8 +148,6 @@ public class DashboardRest {
     @POST @Path("/{id}/item")
     public Response saveItem(@PathParam("id") long id, DashboardItem item) throws IOException {
 
-        System.err.println("DashboardRest.saveItem: dash:" + id + "->" + item.getLayout());
-
         boolean create = true;
 
         // do update !

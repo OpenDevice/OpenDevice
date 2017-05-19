@@ -14,7 +14,7 @@
 
 
 // Register new Type
-$.extend(od.view.dashTypes,{
+$.extend(od.view.dashTypes, {
     LINE_CHART: {
         id: "LINE_CHART",
         name: "Line Chart",
@@ -28,7 +28,20 @@ $.extend(od.view.dashTypes,{
             ["realtime", false],
             ["period", true],
         ]
-
+    },
+    AREA_CHART: { // Use same chart/code of LINE
+        id: "AREA_CHART",
+        name: "Area Chart",
+        klass: "od.view.ChartItemView",
+        multipleDevices: false,
+        allowSensor : true,
+        allowDevice : true,
+        deviceTypes: [od.DeviceType.DIGITAL],
+        fields: [
+            // Name, required
+            ["realtime", false],
+            ["period", true],
+        ]
     },
     PIE_CHART: {
         id: "PIE_CHART",
@@ -189,7 +202,10 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
         var viewOptions = this.model.viewOptions;
         this.initialized = true;
 
-        if (this.model.type == 'LINE_CHART') {
+
+        // =============================================================================================
+
+        if (this.model.type == 'LINE_CHART' || this.model.type == 'AREA_CHART') {
 
             for (var i = 0; i < devices.length; i++) {
                 var device = OpenDevice.findDevice(devices[i]);
@@ -198,6 +214,10 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
                     name: device.name,
                     showInLegend: showLegends
                 };
+
+                if(od.DeviceType.DIGITAL){
+                    dserie.step = 'left'; // make chart ON/OFF style
+                }
 
                 if(this.model.realtime){
                     dserie.data = (function () {
@@ -221,56 +241,122 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
                 deviceSeries.push(dserie);
             }
 
-            chart = $(this.el).highcharts({
-                chart: {
-                    type: 'spline',
-                    zoomType: 'x',
-                    margin: [ 10, 10, 25, 43]
-                },
-                title: {
-                    text: '', style: {display: 'none'}
-                },
-                xAxis: {
-                    type: 'datetime',
-                    dateTimeLabelFormats: { // don't display the dummy year
-                        second: '%H:%M:%S',
-                        month: '%e. %b',
-                        year: '%b'
+            // =========================
+            // LINE_CHART for ANALOG
+            // =========================
+
+            var device = OpenDevice.findDevice(devices[0]);
+
+            if(device.type == od.DeviceType.ANALOG){
+
+                chart = $(this.el).highcharts({
+                    chart: {
+                        type: (this.model.type == 'LINE_CHART' ? 'spline' : 'area'),
+                        zoomType: 'x',
+                        panning : true,
+                        panKey : 'shift',
+                        margin: [ 10, 10, 25, 43]
                     },
                     title: {
                         text: '', style: {display: 'none'}
-                    }
-                },
-                yAxis: {
+                    },
+                    xAxis: {
+                        type: 'datetime',
+                        dateTimeLabelFormats: { // don't display the dummy year
+                            second: '%H:%M:%S',
+                            month: '%e. %b',
+                            year: '%b'
+                        },
+                        title: {
+                            text: '', style: {display: 'none'}
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: null // Value title
+                        },
+                        min: (viewOptions && viewOptions.min ? viewOptions.min : 0),
+                        max: (viewOptions && viewOptions.max ? viewOptions.max : null)
+                    },
+
+                    tooltip: {
+                        headerFormat: '<b>{series.name}</b><br>',
+                        pointFormat: '{point.x:%e. %b (%H:%M:%S)}: <b>{point.y}</b>'
+                    },
+                    credits: {
+                        enabled: false
+                    },
+
+                    plotOptions: {
+                        series: {
+                            animation: false,
+                            states: { hover: false }
+                        },
+                        spline: {
+                            marker: { enabled: false }
+                        }
+                    },
+
+                    series: deviceSeries
+                }).highcharts();
+
+            }
+
+            // =========================
+            // LINE_CHART for DIGITAL
+            // =========================
+
+            if(device.type == od.DeviceType.DIGITAL){
+
+                chart = $(this.el).highcharts({
+                    chart: {
+                        type: (this.model.type == 'LINE_CHART' ? 'line' : 'area'),
+                        zoomType: 'x',
+                        panning : true,
+                        panKey : 'shift',
+                        margin: [ 10, 10, 25, 43]
+                    },
                     title: {
-                        text: null // Value title
+                        text: '', style: {display: 'none'}
                     },
-                    min: (viewOptions && viewOptions.min ? viewOptions.min : 0),
-                    max: (viewOptions && viewOptions.max ? viewOptions.max : null)
-                },
-
-                tooltip: {
-                    headerFormat: '<b>{series.name}</b><br>',
-                    pointFormat: '{point.x:%e. %b (%H:%M:%S)}: <b>{point.y}</b>'
-                },
-                credits: {
-                    enabled: false
-                },
-
-                plotOptions: {
-                    series: {
-                        animation: false,
-                        states: { hover: false }
+                    xAxis: {
+                        type: 'datetime',
+                        dateTimeLabelFormats: { // don't display the dummy year
+                            second: '%H:%M:%S',
+                            month: '%e. %b',
+                            year: '%b'
+                        },
+                        title: {
+                            text: '', style: {display: 'none'}
+                        }
                     },
-                    spline: {
-                        marker: { enabled: false }
-                    }
-                },
+                    yAxis: {
+                        title: { text: null  }, // Value title
+                        min : 0,
+                        max : 1
+                    },
+                    tooltip: {
+                        // valueSuffix: '°C'
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    plotOptions: {
+                        line: {
+                            marker: {enabled: false}
+                        },
+                        area: {
+                            marker: {enabled: false}
+                        }
+                    },
+                    series: deviceSeries
+                }).highcharts();
 
-                series: deviceSeries
-            }).highcharts();
+            }
 
         }
+
+        // =============================================================================================
 
         if (this.model.type == 'GAUGE_CHART') {
 
@@ -344,6 +430,8 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
 
         }
+
+        // =============================================================================================
 
         if (this.model.type == 'PIE_CHART') {
 
@@ -462,7 +550,7 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
             }else{
 
-                // FIXME: THIS IS FOR DYNAMIC VALUE
+                // FIXME: THIS IS FOR DYNAMIC VALUE (MOVED TO ANOTHER CLASS)
                 $('.text-value',_this.el).text(value);
 
                 $(_this.el).textfill({maxFontPixels : 65, explicitWidth : $(_this.el).width() - 20});
@@ -511,7 +599,6 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
                 $(this.el).textfill({maxFontPixels : 65, explicitWidth : $(this.el).width() - 20});
             }
-
 
         }
 

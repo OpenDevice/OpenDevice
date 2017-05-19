@@ -244,7 +244,10 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
                 var $ul = $('#new-board .apiKeyList');
                 $ul.empty();
                 data.forEach(function(item){
-                    $ul.append("<li>" + item.key + " ( " + item.appName + " ) </li>")
+                    var data = encodeURIComponent(location.host + "," + item.key);
+                    $ul.append("<li>" + item.key + " ( " + location.host + " ) <br/>" +
+                            "<img src='https://chart.googleapis.com/chart?cht=qr&chl="+data+"&chs=250x250' />" +
+                            " </li>");
                 });
             }
         });

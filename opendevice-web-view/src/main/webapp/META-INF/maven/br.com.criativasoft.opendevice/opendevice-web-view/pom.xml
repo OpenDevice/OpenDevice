@@ -1,0 +1,68 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>br.com.criativasoft.opendevice</groupId>
+        <artifactId>opendevice-pom</artifactId>
+        <version>0.1.4-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>opendevice-web-view</artifactId>
+    <packaging>war</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>br.com.criativasoft.opendevice</groupId>
+            <artifactId>opendevice-js</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+
+            <!--<plugin>-->
+                <!--<groupId>com.samaxes.maven</groupId>-->
+                <!--<artifactId>minify-maven-plugin</artifactId>-->
+                <!--<version>1.7.4</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>default-minify</id>-->
+                        <!--<phase>generate-resources</phase>-->
+                        <!--<configuration>-->
+                            <!--<charset>UTF-8</charset>-->
+                            <!--<cssSourceFiles>-->
+                                <!--<cssSourceFile>core.css</cssSourceFile>-->
+                                <!--<cssSourceFile>table.css</cssSourceFile>-->
+                                <!--<cssSourceFile>gallery.css</cssSourceFile>-->
+                                <!--<cssSourceFile>panels.css</cssSourceFile>-->
+                                <!--<cssSourceFile>misc.css</cssSourceFile>-->
+                                <!--<cssSourceFile>form.css</cssSourceFile>-->
+                                <!--<cssSourceFile>report.css</cssSourceFile>-->
+                                <!--<cssSourceFile>button.css</cssSourceFile>-->
+                                <!--<cssSourceFile>error.css</cssSourceFile>-->
+                            <!--</cssSourceFiles>-->
+                            <!--<cssSourceDir>css/core</cssSourceDir>-->
+                            <!--<cssFinalFile>mws.styles-all.css</cssFinalFile>-->
+                            <!--&lt;!&ndash;<webappTargetDir>${basedir}/src/main/webapp</webappTargetDir>&ndash;&gt;-->
+                        <!--</configuration>-->
+                        <!--<goals>-->
+                            <!--<goal>minify</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+
+                <!--</executions>-->
+            <!--</plugin>-->
+        </plugins>
+    </build>
+</project>

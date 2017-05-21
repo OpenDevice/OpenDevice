@@ -42,8 +42,8 @@
 
                     <a href="#/boards/${::device.id}">
                         <div class="widget-user-header bg-aqua-active">
-                            <h3 class="widget-user-username">${::device.name}</h3>
-                            <h5 class="widget-user-desc">{TYPE} #${::device.id}</h5>
+                            <h3 class="widget-user-username">${::device.title}</h3>
+                            <!--<h5 class="widget-user-desc">{TYPE} #${::device.id}</h5>-->
                         </div>
                         <div class="widget-user-image">
                             <img class="img-circle" src="/images/boards/generic-blue.png" alt="User Avatar">
@@ -60,8 +60,8 @@
                             </div>
                             <div class="col-sm-4 border-right">
                                 <div class="description-block">
-                                    <h5 class="description-header">xxx</h5>
-                                    <span class="description-text">xxx</span>
+                                    <!--<h5 class="description-header">{TYPE} #${::device.id}</h5>-->
+                                    <span class="description-text">#${::device.id}</span>
                                 </div>
                             </div>
                             <div class="col-sm-4">
@@ -193,7 +193,7 @@
         <p>Use one of the keys below (<a href ng-click="ctrl.updateApiKeys()">refresh</a>):</p>
 
         <blockquote>
-            <ul class="apiKeyList">
+            <ul class="apiKeyList" ng-init="ctrl.updateApiKeys()">
             </ul>
         </blockquote>
 

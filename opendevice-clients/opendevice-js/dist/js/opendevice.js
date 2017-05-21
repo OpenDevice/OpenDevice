@@ -157,7 +157,6 @@ od.Device = function(data){
         this.id = data.id;
         this.manager = od.deviceManager;
 
-
         // Dynamic Properties and Funtions
 
         for (var attrname in data) this[attrname] = data[attrname];
@@ -244,6 +243,13 @@ od.Device = function(data){
         var index = this.listeners.indexOf(eventDef);
         if(index >= 0){
             this.listeners.splice(index, 1);
+        }
+    };
+
+    this.applyChanges = function(device){
+        for (var attr in device) {
+            if (device.hasOwnProperty(attr) &&  typeof device[attr] != "function" )
+                this[attr] = device[attr];
         }
     };
 
@@ -657,7 +663,28 @@ od.DeviceManager = function(connection){
         if(notify === true) notifyListeners(DEvent.DEVICE_LIST_UPDATE, devices);
 
         return devices;
-    }
+    };
+
+    /**
+     * Save or update device
+     * @device
+     * @param {function(status)} callback executed when device is saved.
+     */
+    this.save = function(device, callback){
+        ODev.send({
+            type : CType.DEVICE_SAVE, device : device
+        });
+
+        var found = _this.findDevice(device.id);
+
+        // TODO: may be best wait the response before fire listeners
+        if(found != null){
+            found.applyChanges(device);
+            _this.notifyDeviceListeners(found, /*sync=*/false);
+            if(callback) callback.call(found, true);
+        }
+
+    };
 
     /**
      * Shortcut to {@link addListener}
@@ -772,7 +799,7 @@ od.DeviceManager = function(connection){
 
     this.isConnected = function(){
         return _this.connection.isConnected() && initialized;
-    }
+    };
 
 
     this.notifyDeviceListeners = function(device, sync){
@@ -976,6 +1003,7 @@ return {
     toggleValue : manager.toggleValue,
     contains : manager.contains,
     sync : manager.sync,
+    save : manager.save,
     send : manager.send,
 
     setAppID : function(appID){

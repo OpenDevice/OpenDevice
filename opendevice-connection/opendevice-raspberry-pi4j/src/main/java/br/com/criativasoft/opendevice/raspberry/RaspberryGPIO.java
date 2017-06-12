@@ -34,10 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Wrapper to Raspberry GPIO (pi4j)
@@ -53,6 +50,8 @@ public class RaspberryGPIO extends AbstractConnection implements EmbeddedGPIO {
     private GpioListenerIml listener = new GpioListenerIml();
 
     private Map<GpioPin, Integer> bindings = new HashMap<GpioPin, Integer>();
+
+    private final Set<Device> devices = Collections.synchronizedSet(new LinkedHashSet<Device>());
 
     @Override
     public void connect() throws ConnectionException {
@@ -115,13 +114,15 @@ public class RaspberryGPIO extends AbstractConnection implements EmbeddedGPIO {
 
 
     @Override
-    public void attach(PhysicalDevice device){
+    public void attach(Device device){
+
+        PhysicalDevice physicalDevice = (PhysicalDevice) device;
 
         if(findPinForDevice(device.getUid()) != null) return; // exist !
 
-        if(device.getGpio() ==  null) throw new IllegalStateException("Device doesn't have gpio config");
+        if(physicalDevice.getGpio() ==  null) throw new IllegalStateException("Device doesn't have gpio config");
 
-        GpioInfo info = device.getGpio();
+        GpioInfo info = physicalDevice.getGpio();
 
         Pin pin = new PinImpl(RaspiGpioProvider.NAME, info.getPin(), "GPIO " + info.getPin(),
                 EnumSet.of(PinMode.DIGITAL_INPUT, PinMode.DIGITAL_OUTPUT),
@@ -132,6 +133,8 @@ public class RaspberryGPIO extends AbstractConnection implements EmbeddedGPIO {
     }
 
     public void attach(Device device, Pin pin){
+
+        devices.add(device);
 
         if(device instanceof Sensor){
 
@@ -160,6 +163,11 @@ public class RaspberryGPIO extends AbstractConnection implements EmbeddedGPIO {
             input.addListener(listener);
         }
 
+    }
+
+    @Override
+    public Collection<Device> getDevices() {
+        return devices;
     }
 
     /**

@@ -35,6 +35,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
     var $dashboards; // @HtmlElement - $('.dashboards');
     var $layoutManager; // @Object - gridster instance
+    var keydownListener;
 
     var _this = this;
     var _public = this;
@@ -58,13 +59,38 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
             $dashboards = $('.dashboards');
 
             var Key = {
-                LEFT: 37,  UP: 38,  RIGHT: 39, DOWN: 40, F2 : 113
+                LEFT: 37,  UP: 38,  RIGHT: 39, DOWN: 40, F2 : 113, ESC : 27
             };
 
-            $(window).bind('keydown', function(event) {
+            $(document).on("keydown", keydownListener = function(event){
+
+                if($(event.target).is(":input")){ // avoif affect fields,selects
+                    return;
+                }
 
                 if(event.keyCode == Key.F2){
                     _this.toggleEdit();
+                    $scope.$apply();
+                }
+
+                // F3
+                if(event.keyCode == 114){
+                    _this.addNewView();
+                    $scope.$apply();
+                    event.preventDefault();
+                    event.stopPropagation(); // ignore browser search
+                }
+
+                // ESC
+                if(event.keyCode == Key.ESC){
+                    var $side = $("aside.control-sidebar");
+                    $.AdminLTE.controlSidebar.close($side, true);
+
+                    if(_this.editMode){
+                        _this.toggleEdit(false);
+                        $scope.$apply();
+                    }
+
                 }
 
                 if (event.ctrlKey || event.metaKey) {
@@ -83,14 +109,6 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
                         //    break;
                     }
                 }
-            });
-
-
-            $(document.body).on("keydown", function(event){
-
-                if($(event.target).is(":input")){ // avoif affect fields,selects
-                    return;
-                }
 
                 // Change chart using Keys
                 if(event.keyCode > 48 && event.keyCode < 58){
@@ -98,10 +116,13 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
                     _this.activateDash(_this.dashboardList[index]);
                 }
 
-                if (event.keyCode == Key.UP && _this.itemViewSelected != null) {
+                // Plus (+)
+                if (event.keyCode == 187 && _this.itemViewSelected != null) {
                     _this.updatePeriod(_this.itemViewSelected, true);
                 }
-                if (event.keyCode == Key.DOWN && _this.itemViewSelected != null) {
+
+                // Minus (-)
+                if (event.keyCode == 189 && _this.itemViewSelected != null) {
                     _this.updatePeriod(_this.itemViewSelected, false);
                 }
 
@@ -128,6 +149,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
             var $side = $("aside.control-sidebar");
             $.AdminLTE.controlSidebar.close($side, true);
 
+            $(document).off("keydown", keydownListener);
         });
 
         configureLayoutManager();
@@ -201,6 +223,8 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
             }
         });
 
+        var $side = $("aside.control-sidebar");
+        $.AdminLTE.controlSidebar.close($side, true);
 
     };
 
@@ -337,7 +361,6 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
             $scope.$apply();
         }
 
-
     };
 
 
@@ -347,6 +370,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
         DashboardRest.delete({id : dasboard.id}, function(){
             _this.syncDashboards();
+            _this.toggleEdit(false);
         });
 
     };
@@ -425,7 +449,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
                     item.render($el);
                 }
             });
-        });
+        },100);
 
     };
 
@@ -649,7 +673,7 @@ pkg.controller('NewDashController', ['$scope','$timeout', 'DashboardRest', funct
 }]);
 
 // =========================================================================================================
-// NewItemController (Dialog in file dashboard.html)
+// NewItemController / New Chart (Dialog in file dashboard.html)
 // =========================================================================================================
 
 pkg.controller('NewItemController', ['$scope','$timeout', 'DashboardRest', function ($scope, $timeout, DashboardRest) {
@@ -750,6 +774,43 @@ pkg.controller('NewItemController', ['$scope','$timeout', 'DashboardRest', funct
 
         _this.onSelectType(); // show/hide fields
 
+        var periodEnd = $el.find("input[name=periodEnd]");
+
+        if(!periodEnd.data("range-enabled")){
+
+            periodEnd.data("range-enabled", true);
+
+            periodEnd.daterangepicker({
+                "singleDatePicker": true,
+                "timePicker": true,
+                "timePicker24Hour": true,
+                "linkedCalendars": false,
+                "showCustomRangeLabel": false,
+                "autoApply": true,
+                "autoUpdateInput": false,
+                locale: {
+                    format: 'DD/MM/YY HH:mm'
+                },
+                "startDate": _this.current.periodEnd
+            }, function(start, end, label) {
+                console.log("New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')");
+            });
+
+            periodEnd.on('apply.daterangepicker', function(ev, picker) {
+                $(this).val(picker.startDate.format('DD/MM/YY HH:mm'));
+                _this.current.periodEnd = picker.startDate.format('DD/MM/YY HH:mm');
+            });
+
+            periodEnd.on('cancel.daterangepicker', function(ev, picker) {
+                if(_this.current.periodEnd){
+                    $(this).val(_this.current.periodEnd);
+                }
+            });
+        }else{
+            if(_this.current.periodEnd) periodEnd.data('daterangepicker').setStartDate(_this.current.periodEnd);
+        }
+
+
         $('#new-item-dialog').modal('show');
 
     };
@@ -763,7 +824,7 @@ pkg.controller('NewItemController', ['$scope','$timeout', 'DashboardRest', funct
 
         var isEdit = _this.current.id;
 
-        _this.current.layout = null; // not update layout !
+        // _this.current.layout = null; // not update layout !
 
         var $btn = $el.find("button:submit");
         $btn.data("loading-text", "Saving...");

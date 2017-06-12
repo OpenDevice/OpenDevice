@@ -106,12 +106,8 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
     // Public
     // ==========================================================================
 
-
-    // this.init = function (data) {
-    //     this.setModel(data);
-    // }
-
     this.render = function ($el) {
+
 
         this.el = $el;
 
@@ -216,7 +212,7 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
                     showInLegend: showLegends
                 };
 
-                if(od.DeviceType.DIGITAL){
+                if(device.type == od.DeviceType.DIGITAL){
                     dserie.step = 'left'; // make chart ON/OFF style
                 }
 
@@ -252,7 +248,7 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
                 chart = $(this.el).highcharts({
                     chart: {
-                        type: (this.model.type == 'LINE_CHART' ? 'spline' : 'area'),
+                        type: (this.model.type == 'LINE_CHART' ? 'spline' : 'areaspline'),
                         zoomType: 'xy',
                         panning : true,
                         panKey : 'shift',
@@ -295,6 +291,9 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
                         },
                         spline: {
                             marker: { enabled: false }
+                        },
+                        areaspline: {
+                            marker: {enabled: false}
                         }
                     },
 

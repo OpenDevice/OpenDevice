@@ -83,8 +83,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
                 // ESC
                 if(event.keyCode == Key.ESC){
-                    var $side = $("aside.control-sidebar");
-                    $.AdminLTE.controlSidebar.close($side, true);
+                    closeSidebar();
 
                     if(_this.editMode){
                         _this.toggleEdit(false);
@@ -146,8 +145,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
             // Unregister listeners on change page.
             ODev.removeListener(_this.odevListeners);
 
-            var $side = $("aside.control-sidebar");
-            $.AdminLTE.controlSidebar.close($side, true);
+            closeSidebar();
 
             $(document).off("keydown", keydownListener);
         });
@@ -223,8 +221,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
             }
         });
 
-        var $side = $("aside.control-sidebar");
-        $.AdminLTE.controlSidebar.close($side, true);
+        closeSidebar();
 
     };
 
@@ -275,9 +272,9 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
     _public.insertNewItem = function(data){
 
-        var item = new DashItemView(data);
-
-        _this.dashboardItems.push(item); // will trigger 'ng-repeat' and 'onRenderDashboardItems'
+        var dashType = od.view.dashTypes[data.type];
+        var klass = eval(dashType.klass); // get reference to implementation class
+        _this.dashboardItems.push(new klass(data)); // will trigger 'ng-repeat' and 'onRenderDashboardItems'
 
     };
 
@@ -443,10 +440,10 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
         // Wait angular render html to initialize charts.
         $timeout(function(){
             angular.forEach(_this.dashboardItems, function(item, index) {
-                console.log('Initializing Chart/View: ' + item.title, item);
                 if(!item.initialized) {
+                    console.log('Initializing Chart/View: ' + item.title, item);
                     var $el = $('.dash-body', $dashboards).eq(index);
-                    item.render($el);
+                    item.render($el); // init
                 }
             });
         },100);
@@ -599,11 +596,17 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
 
     }
 
+
+    function closeSidebar(){
+        var $side = $("aside.control-sidebar");
+        $.AdminLTE.controlSidebar.close($side, true);
+    }
+
 }]);
 
 
 // =========================================================================================================
-// NewDashController (Dialog in file dashboard.html)
+// New Dashboard (Dialog in file dashboard.html)
 // =========================================================================================================
 
 pkg.controller('NewDashController', ['$scope','$timeout', 'DashboardRest', function ($scope, $timeout, DashboardRest) {
@@ -791,7 +794,7 @@ pkg.controller('NewItemController', ['$scope','$timeout', 'DashboardRest', funct
                 locale: {
                     format: 'DD/MM/YY HH:mm'
                 },
-                "startDate": _this.current.periodEnd
+                "startDate": (_this.current.periodEnd || new Date())
             }, function(start, end, label) {
                 console.log("New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')");
             });

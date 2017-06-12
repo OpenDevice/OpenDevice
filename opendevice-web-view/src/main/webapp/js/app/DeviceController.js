@@ -64,41 +64,11 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
             return;
         }
 
-        $(function(){
-
-            var Key = {
-                LEFT: 37,  UP: 38,  RIGHT: 39, DOWN: 40, F2 : 113
-            };
-
-            //
-            // $(document.body).on("keydown", function(event){
-            //
-            //     if($(event.target).is(":input")){ // avoif affect fields,selects
-            //         return;
-            //     }
-            //
-            //     // Change chart using Keys
-            //     if(event.keyCode > 48 && event.keyCode < 58){
-            //         var index = (event.keyCode - 48) - 1;
-            //         _this.activateDash(_this.dashboardList[index]);
-            //     }
-            //
-            //     if (event.keyCode == Key.UP && _this.itemViewSelected != null) {
-            //         _this.updatePeriod(_this.itemViewSelected, true);
-            //     }
-            //     if (event.keyCode == Key.DOWN && _this.itemViewSelected != null) {
-            //         _this.updatePeriod(_this.itemViewSelected, false);
-            //     }
-            //
-            // });
-
-        });
-
         if($routeParams.boardID == "standalone"){ // Standalone Devices (DeviceList)
 
             this.isBoardView = true;
 
-            this.board = { id : "standalone", name : "Standalone Devices", devices : { length : standalone.length}};
+            this.board = { id : "standalone", name : "Standalone Devices", devices : { length : 0}};
 
         } else if($routeParams.boardID){ // Board Details (DeviceList)
 
@@ -153,6 +123,7 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
             ODev.removeListener(odevListeners);
         });
 
+        // Watch for changes in Chart view options
         $scope.$watch('ctrl.chartViewOptions', function() {
             updateCharts.call(_this);
         }, true);
@@ -419,9 +390,13 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
 
         return false;
     };
+
     _public.isAnalogDevice = function(device){
 
-        if(device.type == od.DeviceType.ANALOG) return true;
+        if(device.type == od.DeviceType.ANALOG
+            || device.type == od.DeviceType.FLOAT2
+            || device.type == od.DeviceType.FLOAT4
+            || device.type == od.DeviceType.FLOAT2_SIGNED) return true;
 
         return false;
     };
@@ -541,6 +516,11 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
 
     function updateCharts(){
         angular.forEach(_this.historyCharts, function(item, index) {
+
+            if(item.initialized && _this.chartViewOptions.periodType == "REALTIME") {
+                _public.enableRealtime(item.model.monitoredDevices[0], true);
+            }
+
             if(item.initialized && !item.model.realtime) {
                 var model = angular.extend({}, item.model, _this.chartViewOptions);
                 item.update(model);
@@ -551,7 +531,8 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
 
     function createSensorChart(device){
 
-        if(device.type == od.DeviceType.ANALOG || device.type == od.DeviceType.DIGITAL){
+        if(device.type == od.DeviceType.DIGITAL || od.DeviceType.isNumeric(device.type)){
+
             var model = {
                 "id": device.id,
                 "title": device.title,

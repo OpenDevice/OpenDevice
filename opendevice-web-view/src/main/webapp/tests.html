@@ -37,7 +37,6 @@
     <link rel="stylesheet" href="css/plugins/select2.css"/>
     <!--<link rel="stylesheet" href="css/plugins/selectize.default.min.css"/>-->
     <link rel="stylesheet" href="css/plugins/awesome-bootstrap-checkbox.css"/>
-    <link rel="stylesheet" href="js/plugins/daterangepicker.css"/>
 
     <link rel="stylesheet" href="css/app.css">
     <link rel="stylesheet" href="css/icons/icons.css">
@@ -62,7 +61,7 @@
             <!-- mini logo for sidebar mini 50x50 pixels -->
             <span class="logo-mini"><b>O.D</b></span>
             <!-- logo for regular state and mobile devices -->
-            <span class="logo-lg"><b>Open</b>Device</span>
+            <span class="logo-lg"><b>Open</b>Tests</span>
         </a>
 
         <!-- Header Navbar -->
@@ -73,44 +72,8 @@
             </a>
 
             <p id="page-title" class="navbar-text">
-                <!-- DYNAMIC : Page Controller content -->
+                Tests
             </p>
-
-            <!-- Navbar Right Menu -->
-            <div class="navbar-custom-menu">
-
-                <ul class="nav navbar-nav">
-                    <!-- Notifications Menu -->
-                    <li class="dropdown notifications-menu">
-                        <!-- Menu toggle button -->
-                        <a href="#" target="_self" class="dropdown-toggle" data-toggle="dropdown">
-                            <i class="fa fa-bell-o"></i>
-                            <span class="label label-warning">1</span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li class="header">You have 1 notifications</li>
-                            <li>
-                                <!-- Inner Menu: contains the notifications -->
-                                <ul class="menu">
-                                    <li><!-- start notification -->
-                                        <a href="#">
-                                            <i class="fa fa-warning text-aqua"></i> I'm in BETA
-                                        </a>
-                                    </li>
-                                    <!-- end notification -->
-                                </ul>
-                            </li>
-                            <!--<li class="footer"><a href="javascript:void(0);">View all</a></li>-->
-                        </ul>
-                    </li>
-
-                    <li>
-                        <a href="javascript:void(0);" target="_self" ng-click="page.logout()"><i class="fa fa-sign-out"></i></a>
-                    </li>
-
-                </ul>
-            </div>
-
         </nav>
     </header>
     <!-- Left side column. contains the logo and sidebar -->
@@ -123,31 +86,6 @@
                 <!--<li class="header">HEADER</li>-->
                 <!-- Optionally, you can add icons to the links -->
                 <li><a href="#/"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
-                <li><a href="#/boards"><i class="fa fa-sitemap"></i> <span>Boards / Devices</span></a></li>
-                <li><a href="#/connections"><i class="fa fa-rss"></i> <span>Connections</span></a></li>
-                <li><a href="#/jobs"><i class="fa fa-history"></i> <span>Jobs/Timers</span></a></li>
-                <li><a href="#/rules"><i class="fa fa-magic"></i> <span>Rules</span></a></li>
-                <li><a href="#/new"><i class="fa fa-code"></i> <span>Programmer</span></a></li>
-                <li><a href="#/users"><i class="fa fa-users"></i> <span>Users</span></a></li>
-
-                <li ng-repeat="menu in ext.menu">
-                    <a href="#${menu.view}" class="fa ${menu.icon}"><span>${menu.title}</span></a>
-                </li>
-
-                <li class="header">Resources</li>
-                <li><a href="https://opendevice.atlassian.net/wiki" target="_blank"><i class="fa fa-book"></i> <span>Documentation</span></a></li>
-                <li><a href="http://github.com/OpenDevice/OpenDevice" target="_blank"><i class="fa fa-github"></i> <span>Github</span></a></li>
-
-<!--                <li class="treeview">
-                    <a href="#" target="_self"><i class="fa fa-link"></i> <span>Multilevel</span>
-                        <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
-                    </a>
-                    <ul class="treeview-menu">
-                        <li><a href="#">Link in level 2</a></li>
-                        <li><a href="#" target="_self">Link in level 2</a></li>
-                    </ul>
-                </li>-->
-
             </ul>
             <!-- /.sidebar-menu -->
         </section>
@@ -156,6 +94,14 @@
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper" ng-animate="false" ng-view>
+
+
+
+        <div id="container" style="min-width: 310px; max-width: 400px; height: 300px; margin: 0 auto"></div>
+
+
+
+
 
     </div>
     <!-- /.content-wrapper -->
@@ -170,18 +116,11 @@
     <aside class="control-sidebar control-sidebar-dark">
 
     </aside>
-    <!-- /.control-sidebar -->
-    <!-- Add the sidebar's background. This div must be placed
-         immediately after the control sidebar -->
     <div class="control-sidebar-bg"></div>
 </div>
 <!-- ./wrapper -->
 
-<!-- Confirm Dialog -->
-<div ng-include="'/pages/subpages/confirm.html'"></div>
-
 <!-- REQUIRED JS SCRIPTS -->
-
 <script src="js/jquery-2.2.3.min.js"></script>
 
 <script>
@@ -191,6 +130,130 @@
         enableControlSidebar : false,
         enableBSToppltip: true //Bootstrap.js tooltip
     };
+
+
+    $(function(){
+
+
+        Highcharts.chart('container', {
+
+                    chart: {
+                        type: 'gauge',
+                        plotBackgroundColor: null,
+                        plotBackgroundImage: null,
+                        plotBorderWidth: 0,
+                        plotShadow: false
+                    },
+
+                    title: {
+                        text: false
+                    },
+
+                    pane: {
+                        startAngle: -150,
+                        endAngle: 150,
+                        background: [{
+                            backgroundColor: {
+                                linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                                stops: [
+                                    [0, '#FFF'],
+                                    [1, '#333']
+                                ]
+                            },
+                            borderWidth: 0,
+                            outerRadius: '109%'
+                        }, {
+                            backgroundColor: {
+                                linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                                stops: [
+                                    [0, '#333'],
+                                    [1, '#FFF']
+                                ]
+                            },
+                            borderWidth: 1,
+                            outerRadius: '107%'
+                        }, {
+                            // default background
+                        }, {
+                            backgroundColor: '#DDD',
+                            borderWidth: 0,
+                            outerRadius: '105%',
+                            innerRadius: '103%'
+                        }]
+                    },
+
+                    // the value axis
+                    yAxis: {
+                        min: 0,
+                        max: 16000,
+
+                        minorTickInterval: 'auto',
+                        minorTickWidth: 1,
+                        minorTickLength: 10,
+                        minorTickPosition: 'inside',
+                        minorTickColor: '#666',
+
+                        tickPixelInterval: 30,
+                        tickWidth: 2,
+                        tickPosition: 'inside',
+                        tickLength: 10,
+                        tickColor: '#666',
+                        labels: {
+                            step: 2,
+                            rotation: 'auto'
+                        },
+                        title: {
+                            text: 'km/h'
+                        },
+                        plotBands: [{
+                            from: 0,
+                            to: 2000,
+                            color: '#55BF3B' // green
+                        }, {
+                            from: 2000,
+                            to: 6000,
+                            color: '#DDDF0D' // yellow
+                        }, {
+                            from: 6000,
+                            to: 16000,
+                            color: '#DF5353' // red
+                        }]
+                    },
+
+                    series: [{
+                        name: 'Speed',
+                        data: [80],
+                        tooltip: {
+                            valueSuffix: ' km/h'
+                        }
+                    }]
+
+                },
+// Add some life
+// Add some life
+                function (chart) {
+                    if (!chart.renderer.forExport) {
+                        setInterval(function () {
+                            var point = chart.series[0].points[0],
+                                    newVal,
+                                    inc = Math.round((Math.random() - 0.5) * 20);
+
+                            newVal = point.y + inc;
+                            if (newVal < 0 || newVal > 200) {
+                                newVal = point.y - inc;
+                            }
+
+                            point.update(newVal);
+
+                        }, 3000);
+                    }
+                });
+
+
+    });
+
+
+
 </script>
 
 
@@ -217,14 +280,6 @@
 <script type="text/javascript" src="js/opendevice/DigitalCtrlView.js"></script>
 <script type="text/javascript" src="js/opendevice/ImageCtrlView.js"></script>
 
-<!-- ----------------------------------------------------- -->
-<!-- Jquery -->
-<!-- ----------------------------------------------------- -->
-<!--<script type="text/javascript" src="plugins/jgrowl/jquery.jgrowl-min.js"></script>-->
-<!--<script type="text/javascript" src="plugins/validate/jquery.validate-min.js"></script>-->
-<script type="text/javascript" src="js/jquery.textfill.min.js"></script>
-<script src="js/fastclick.min.js"></script> <!-- library for eliminating the 300ms delay  -->
-
 <script src="js/highcharts.js"></script>
 <script src="js/highcharts-more.js"></script>
 <script src="js/highcharts-solid-gauge.js"></script>
@@ -235,12 +290,7 @@
 
 <script src="js/adminlte-app.min.js"></script> <!-- AdminLTE Theme/js -->
 
-
 <script src="js/spin.min.js"></script> <!-- Spinner -->
-
-
-<script src="js/plugins/daterangepicker.moment.min.js"></script>
-<script src="js/plugins/daterangepicker.js"></script>
 
 <!-- ----------------------------------------------------- -->
 <!-- AngularJS Code -->
@@ -260,24 +310,6 @@
 <!-- Loading bar-->
 <!--<script type="text/javascript" src="js/plugins/nprogress.js"></script>-->
 <!--<link rel="stylesheet" type="text/css" href="js/plugins/nprogress.css" media="screen"/>-->
-
-<!-- ----------------------------------------------------- -->
-<!-- Application Code -->
-<!-- ----------------------------------------------------- -->
-
-<script type="text/javascript" src="js/app/Utils.js"></script>
-<script type="text/javascript" src="js/app/app.js"></script>
-<script type="text/javascript" src="js/app/services.js"></script>
-<script type="text/javascript" src="js/app/controllers.js"></script>
-<script type="text/javascript" src="js/app/DashboardController.js"></script>
-<script type="text/javascript" src="js/app/DeviceController.js"></script>
-<script type="text/javascript" src="js/app/UserController.js"></script>
-<script type="text/javascript" src="js/app/ConnectionController.js"></script>
-<script type="text/javascript" src="js/app/ActionController.js"></script>
-<script type="text/javascript" src="js/app/RuleController.js"></script>
-<script type="text/javascript" src="js/app/JobController.js"></script>
-
-
 
 
 </body>

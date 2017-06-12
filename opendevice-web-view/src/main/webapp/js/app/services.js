@@ -49,9 +49,13 @@ app.factory('DashboardRest', ['$resource', function($resource){
         save: {method:'POST', url : "/middleware/dashboards"},
         saveItem: {method:'POST', url : "/middleware/dashboards/:dashID/item",
             transformRequest: function(data) {
-                data.layout =  JSON.stringify(data.layout); // on server is a String
+
+                if(data.layout && data.layout != "null")
+                    data.layout =  JSON.stringify(data.layout); // on server is a String
+
                 if(data.viewOptions && data.viewOptions != "null")
                     data.viewOptions = JSON.stringify(data.viewOptions); // on server is a String
+
                 return JSON.stringify(data);
             },transformResponse: function(item, headersGetter){
 

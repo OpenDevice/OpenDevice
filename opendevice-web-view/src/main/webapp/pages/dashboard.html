@@ -12,7 +12,7 @@
                     <input type="hidden" name="id" class="form-control" ng-value="ctrl.dashboard.id" />
                     <div class="input-group-btn">
                         <button class="btn btn-info" type="submit" title="Save (CTRL + S)"><i class="fa fa-save"></i></button>
-                        <button class="btn btn-danger" ng-click="ctrl.delete()" title="Delete Dashboard #${ctrl.dashboard.id}"><i class="fa fa-remove"> Delete</i></button>
+                        <button class="btn btn-danger" type="button" ng-really-click="ctrl.delete()" title="Delete Dashboard #${ctrl.dashboard.id}"><i class="fa fa-remove"> Delete</i></button>
                     </div>
                 </div>
             </form>
@@ -21,7 +21,7 @@
         <div ng-if="!ctrl.editMode" style="display:inline-block">
             <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">${ctrl.dashboard.title} &nbsp;<span class="caret"></span></a>
             <ul class="dropdown-menu" role="menu">
-                <li ng-repeat="current in ctrl.dashboardList"><a href="javascript:void(0)" target="_self" ng-click="ctrl.activateDash(current);">${current.title}</a></li>
+                <li ng-repeat="current in ctrl.dashboardList"><a href="javascript:void(0)" target="_self" ng-click="ctrl.activateDash(current);">${current.title} #${$index+1}</a></li>
             </ul>
         </div>
 
@@ -31,7 +31,7 @@
         <li><a href="javascript:void(0);" ng-if="!ctrl.editMode" ng-click="ctrl.toggleEdit(true)" class="btn btn-info pull-right" title="Edit (F2)"><i class="fa fa-edit"></i></a></li>
         <li><a href="javascript:void(0);" ng-if="ctrl.editMode" ng-click="ctrl.toggleEdit(false)" class="btn btn-warning pull-right" title="Cancel Edition (F2)"><i class="fa fa-reply"></i></a></li>
 
-        <li><a ng-click="ctrl.addNewView()" class="btn btn-info pull-right" role="button"><i class="fa fa-plus"></i> New Item/Chart</a></li>
+        <li><a ng-click="ctrl.addNewView()" class="btn btn-info pull-right" role="button" title="Shortcut: F3"><i class="fa fa-plus"></i> New Item/Chart</a></li>
         <li><a ng-click="ctrl.addNewDash()" class="btn btn-info pull-right" role="button"><i class="fa fa-plus"></i> New Dashboard</a></li>
     </ol>
 </section>
@@ -131,7 +131,7 @@
                 ng-init="$last && ctrl.onRenderDashboardItems(this)">
 
                 <div class="dash-wrapper" ng-init="ctrl.addItemListener(this, item)">
-                    <div class="dash-header dash-move" ng-if="item.title">
+                    <div class="dash-header" ng-class="ctrl.editMode ? 'dash-move' : ''" ng-if="item.title">
                         <h3>${item.title}</h3>
                     </div>
 

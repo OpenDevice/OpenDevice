@@ -69,6 +69,7 @@ $.extend(od.view.dashTypes, {
         deviceTypes: [od.DeviceType.ANALOG],
         fields: [
             // Name, required
+            ["subtype", true, null],
             ["aggregation", true],// "(!realtime)"
             ["realtime", false],
             ["period", true],
@@ -241,18 +242,18 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
                 deviceSeries.push(dserie);
             }
 
-            // =========================
+            // ===========================================================================
             // LINE_CHART for ANALOG
-            // =========================
+            // ===========================================================================
 
             var device = OpenDevice.findDevice(devices[0]);
 
-            if(device.type == od.DeviceType.ANALOG){
+            if(od.DeviceType.isNumeric(device.type)){
 
                 chart = $(this.el).highcharts({
                     chart: {
                         type: (this.model.type == 'LINE_CHART' ? 'spline' : 'area'),
-                        zoomType: 'x',
+                        zoomType: 'xy',
                         panning : true,
                         panKey : 'shift',
                         margin: [ 10, 10, 25, 43]
@@ -302,9 +303,9 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
             }
 
-            // =========================
+            // ===========================================================================
             // LINE_CHART for DIGITAL
-            // =========================
+            // ===========================================================================
 
             if(device.type == od.DeviceType.DIGITAL){
 
@@ -356,9 +357,11 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
         }
 
-        // =============================================================================================
+        // ===========================================================================
+        // GAUGE_CHART MODEL 1
+        // ===========================================================================
 
-        if (this.model.type == 'GAUGE_CHART') {
+        if (this.model.type == 'GAUGE_CHART' && this.model.viewOptions.subtype == "SOLID") {
 
             chart = $(this.el).highcharts({
 
@@ -370,7 +373,7 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
                 pane: {
                     center: ['50%', '95%'],
-                    size: '180%',
+                    size: '150%',
                     startAngle: -90,
                     endAngle: 90,
                     background: {
@@ -387,6 +390,7 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
                 plotOptions: {
                     solidgauge: {
+                        animation : false,
                         dataLabels: {
                             y: -22,
                             borderWidth: 0,
@@ -415,8 +419,8 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
                 credits: {enabled: false},
 
                 series: [{
-                    name: 'Speed',
-                    data: [10],
+                    name: 'Value',
+                    data: [0],
                     dataLabels: {
                         format: '<div style="text-align:center"><span style="font-size:22px;color:' +
                         ((Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black') + '">{y}</span><br/>'
@@ -431,7 +435,138 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
         }
 
-        // =============================================================================================
+        // ===========================================================================
+        // GAUGE_CHART MODEL 2
+        // ===========================================================================
+
+        if (this.model.type == 'GAUGE_CHART' && this.model.viewOptions.subtype == "NORMAL") {
+
+            var config = {
+
+                chart: {
+                    type: 'gauge',
+                    plotBackgroundColor: null,
+                    plotBackgroundImage: null,
+                    plotBorderWidth: 0,
+                    plotShadow: false
+                },
+
+                title: null,
+                credits: {enabled: false},
+
+                pane: {
+                    startAngle: -150,
+                    endAngle: 150,
+
+                    // Border effects
+                    background: [{
+                        backgroundColor: {
+                            linearGradient: {x1: 0, y1: 0, x2: 0, y2: 1},
+                            stops: [
+                                [0, '#FFF'],
+                                [1, '#333']
+                            ]
+                        },
+                        borderWidth: 0,
+                        outerRadius: '109%'
+                    }, {
+                        backgroundColor: {
+                            linearGradient: {x1: 0, y1: 0, x2: 0, y2: 1},
+                            stops: [
+                                [0, '#333'],
+                                [1, '#FFF']
+                            ]
+                        },
+                        borderWidth: 1,
+                        outerRadius: '107%'
+                    }, {
+                        // default background
+                    }, {
+                        backgroundColor: '#DDD',
+                        borderWidth: 0,
+                        outerRadius: '105%',
+                        innerRadius: '103%'
+                    }]
+                },
+
+                // the value axis
+                yAxis: {
+                    minorTickInterval: 'auto',
+                    minorTickWidth: 1,
+                    minorTickLength: 10,
+                    minorTickPosition: 'inside',
+                    minorTickColor: '#666',
+
+                    tickPixelInterval: 30,
+                    tickWidth: 2,
+                    tickPosition: 'inside',
+                    tickLength: 10,
+                    tickColor: '#666',
+                    labels: {
+                        step: 2,
+                        rotation: 'auto'
+                    },
+                    title: {
+                        text: null
+                    }
+                },
+
+                series: [{
+                    name: this.model.title,
+                    data: [0],
+                    dataLabels : {
+                        // borderRadius: 5,
+                        //backgroundColor: "rgba(244,109,67, 0.7)",
+                        borderWidth: 0,
+                        //borderColor: "#F46D43",
+                        style: {
+                            fontSize: "25px"
+                        },
+                        // color: "#c2c2c2",
+                        // crop: false,
+                        // overflow: "none",
+                        // formatter: function () {
+                        //     return '<span style="font-size: 30px;">' + this.point.y + '</span>';
+                        // },
+                        // y: -65,
+                        y: 30
+                        // zIndex: 10
+                    }
+                }]
+            };
+
+
+            // Generate bands
+            // =========================================
+            var min =  (viewOptions && viewOptions.min ? parseInt(viewOptions.min) : 0);
+            var max = (viewOptions && viewOptions.max ? parseInt(viewOptions.max) : 100);
+
+            config.yAxis.min = min;
+            config.yAxis.max = max;
+
+            var stepDiff = Math.round((max - min) / 3);
+            config.yAxis["plotBands"] = [];
+            var colors = [ '#55BF3B', '#DDDF0D', '#DF5353']
+
+            var step = min;
+            for(var i = 0; i < 3; i++){
+                config.yAxis["plotBands"].push({
+                    from: step,
+                    to: step+stepDiff,
+                    color: colors[i]
+                });
+                step+=stepDiff;
+            }
+
+            config.yAxis["plotBands"][2].to = max; // fix max
+
+            chart = $(this.el).highcharts(config).highcharts();
+
+        }
+
+        // ===========================================================================
+        // PIE_CHART
+        // ===========================================================================
 
         if (this.model.type == 'PIE_CHART') {
 
@@ -509,6 +644,7 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
             'deviceID' : deviceID,
             'periodType': this.model.periodType,
             'periodValue': this.model.periodValue,
+            'periodEnd': this.model.periodEnd,
             'aggregation': this.model.aggregation
         };
 
@@ -588,6 +724,7 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
                 if(this.model.type == "LINE_CHART"){
                     chart.series[index].addPoint([ (new Date()).getTime(), value], true, true);
                 }else if(this.model.type == "GAUGE_CHART"){
+                    debugger;
                     chart.series[index].points[0].update([0, value]);
                 }else if(this.model.type == "PIE_CHART"){
                     chart.series[0].data[index].update(value);

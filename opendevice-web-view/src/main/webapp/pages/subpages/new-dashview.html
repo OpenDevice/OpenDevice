@@ -69,6 +69,8 @@
                         <option value="MONTH">Month(s)</option>
                         <option value="RECORDS">Last Records</option>
                     </select>
+                    <label>End at</label>
+                    <input type="text" name="periodEnd" style="width:120px" class="form-control" ng-model="controller.current.periodEnd" placeholder="Now ..." />
                 </div>
             </div>
 
@@ -139,11 +141,15 @@
             <!-- Feilds : ImageCtrlView -->
 
             <div class="form-group" data-fname="subtype">
-                <label class="col-sm-2 control-label">Image Type</label>
+                <label class="col-sm-2 control-label">Sub-Type</label>
                 <div class="col-sm-10">
                     <select ng-model="controller.current.viewOptions.subtype" class="form-control" style="max-width: 200px">
-                        <option value="IMAGE">Image</option>
-                        <option value="VIDEO">Video</option>
+
+                        <option value="IMAGE" ng-if="controller.current.type == 'IMAGE_CONTROLLER'">Image</option>
+                        <option value="VIDEO" ng-if="controller.current.type == 'IMAGE_CONTROLLER'">Video</option>
+
+                        <option value="NORMAL" ng-if="controller.current.type == 'GAUGE_CHART'">Default</option>
+                        <option value="SOLID" ng-if="controller.current.type == 'GAUGE_CHART'">Slice</option>
                     </select>
                 </div>
             </div>

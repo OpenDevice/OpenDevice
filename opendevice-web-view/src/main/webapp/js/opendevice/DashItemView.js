@@ -38,7 +38,7 @@ od.view.dashTypes = {
             // Name, required
             ["aggregation", true],// "(!realtime)"
             ["realtime", false],
-            ["period", true],
+            ["period", true]
         ]
 
     }

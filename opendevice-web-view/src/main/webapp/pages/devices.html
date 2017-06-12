@@ -93,6 +93,7 @@
                     <li> <input type="number" class="form-control input-sm" size="2"  style="width: 60px" ng-model="ctrl.chartViewOptions.periodValue"/> </li>
                     <li>
                         <select ng-model="ctrl.chartViewOptions.periodType" class="form-control input-sm" style="width: 120px" >
+                            <option value="REALTIME">Real-Time</option>
                             <option value="MINUTE" selected="selected">Minute(s)</option>
                             <option value="HOUR">Hour(s)</option>
                             <option value="DAY">Day(s)</option>
@@ -244,6 +245,7 @@
                                 </td>
                                 <td>
                                     <button type="submit" class="btn btn-xs btn-primary"  ng-click="ctrl.editDevice(x)">Edit</button>
+                                    <button type="submit" class="btn btn-xs btn-danger"  ng-click="ctrl.delete(x, $index)">Del</button>
                                 </td>
                             </tr>
                             </tbody>

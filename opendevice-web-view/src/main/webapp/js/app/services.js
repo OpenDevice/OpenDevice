@@ -50,13 +50,15 @@ app.factory('DashboardRest', ['$resource', function($resource){
         saveItem: {method:'POST', url : "/middleware/dashboards/:dashID/item",
             transformRequest: function(data) {
 
-                if(data.layout && data.layout != "null")
-                    data.layout =  JSON.stringify(data.layout); // on server is a String
+                var toSend = angular.copy(data);
 
-                if(data.viewOptions && data.viewOptions != "null")
-                    data.viewOptions = JSON.stringify(data.viewOptions); // on server is a String
+                if(toSend.layout && toSend.layout != "null")
+                    toSend.layout =  JSON.stringify(toSend.layout); // on server is a String
 
-                return JSON.stringify(data);
+                if(toSend.viewOptions && toSend.viewOptions != "null")
+                    toSend.viewOptions = JSON.stringify(toSend.viewOptions); // on server is a String
+
+                return JSON.stringify(toSend);
             },transformResponse: function(item, headersGetter){
 
                 item = angular.fromJson(item);

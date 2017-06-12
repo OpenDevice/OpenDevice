@@ -18,8 +18,10 @@ package br.com.criativasoft.opendevice.middleware.model;
 import br.com.criativasoft.opendevice.core.metamodel.AggregationType;
 import br.com.criativasoft.opendevice.core.metamodel.PeriodType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -64,6 +66,9 @@ public class DashboardItem {
     private Integer periodValue;
 
     private PeriodType periodType;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yy HH:mm")
+    private Date periodEnd;
 
     private AggregationType aggregation;
 
@@ -150,6 +155,14 @@ public class DashboardItem {
 
     public PeriodType getPeriodType() {
         return periodType;
+    }
+
+    public void setPeriodEnd(Date periodEnd) {
+        this.periodEnd = periodEnd;
+    }
+
+    public Date getPeriodEnd() {
+        return periodEnd;
     }
 
     public void setRealtime(boolean realtime) {

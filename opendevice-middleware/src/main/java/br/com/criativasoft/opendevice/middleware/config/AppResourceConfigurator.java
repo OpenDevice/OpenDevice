@@ -20,6 +20,7 @@ import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
 import br.com.criativasoft.opendevice.middleware.persistence.PersistenceContextInjectableProvider;
 import br.com.criativasoft.opendevice.middleware.persistence.TransactionFilter;
+import br.com.criativasoft.opendevice.wsrest.io.EntityNotFoundMapper;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.ResourceConfigurator;
 import org.slf4j.Logger;

@@ -13,79 +13,11 @@
 
 package br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j;
 
-import br.com.criativasoft.opendevice.core.TenantProvider;
-import br.com.criativasoft.opendevice.middleware.model.Dashboard;
-import br.com.criativasoft.opendevice.middleware.model.DashboardItem;
-import br.com.criativasoft.opendevice.middleware.persistence.dao.DashboardDao;
-import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.GenericJpa;
-
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
-import java.util.List;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.DashboardJPA;
 
 /**
  * @author Ricardo JL Rufino on 07/05/15.
  */
-public class DashboardDaoNeo4j extends GenericJpa<Dashboard> implements DashboardDao {
+public class DashboardDaoNeo4j extends DashboardJPA{
 
-
-    public DashboardDaoNeo4j() {
-        super(Dashboard.class);
-    }
-
-    @Override
-    public void activate(Dashboard dashboard) {
-
-        List<Dashboard> dashboards = listAll();
-        for (Dashboard current : dashboards) {
-            if(current.getId() != dashboard.getId()) current.setActive(false);
-            em().persist(current);
-        }
-
-        dashboard.setActive(true);
-        em().persist(dashboard);
-
-    }
-
-
-    @Override
-    public void persistItem(DashboardItem DashboardItem) {
-
-    }
-
-    @Override
-    public void deleteItem(DashboardItem DashboardItem) {
-
-    }
-
-    @Override
-    public DashboardItem getItemByID(long id) {
-        return em().find(DashboardItem.class, id);
-    }
-
-
-    @Override
-    public void persist(Dashboard entity) {
-        entity.setApplicationID(TenantProvider.getCurrentID());
-        super.persist(entity);
-    }
-
-    @Override
-    public List<Dashboard> listAll() {
-
-        TypedQuery<Dashboard> query = em().createQuery("from Dashboard where applicationID = :TENANT", Dashboard.class);
-
-        query.setParameter("TENANT", TenantProvider.getCurrentID());
-
-        return query.getResultList();
-    }
-
-    @Override
-    public List<DashboardItem> listItems(long id) {
-        Query query = em().createNativeQuery("MATCH (n:DashboardItem)-[:parent]->(d:Dashboard) where d.id = {dashID} RETURN n ORDER BY n.id", DashboardItem.class);
-        query.setParameter("dashID",id);
-        // FIXME: add tenantID for security...
-        return query.getResultList();
-
-    }
 }

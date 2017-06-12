@@ -26,7 +26,7 @@ import java.util.List;
 public class UsbConnection extends AbstractStreamConnection implements IUsbConnection, SerialPortEventListener  {
 	
 	protected static final Logger log = LoggerFactory.getLogger(UsbConnection.class);
-	
+
 	// ===============================================
 	//  Constants
 	// ===============================================
@@ -48,6 +48,8 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
 	/** Tempo necessário para o arduino inicializar a USB  */
 	// TODO: Verificar se isso é necessário no windows/mac (pois o auto reset só ocorre no windows.)
 	private static int ARDUINO_BOOT_TIME = 1200;
+
+    private int deviceBootTime = ARDUINO_BOOT_TIME;
 	
 	// ===============================================
 	//  Properties
@@ -122,10 +124,9 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
 			serialPort.openPort();
 			
 			// set port parameters
-			serialPort.setParams(BAUDRATE, SerialPort.DATABITS_8,SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+			serialPort.setParams(BAUDRATE, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 			
-                        // NOTE: Not working with arduino.nano
-			// serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |  SerialPort.FLOWCONTROL_RTSCTS_OUT);
+			 serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
 			
 			// add event listeners
 			int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS + SerialPort.MASK_DSR + SerialPort.MASK_ERR + SerialPort.MASK_RING + SerialPort.MASK_BREAK;//Prepare mask
@@ -133,10 +134,9 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
                         serialPort.addEventListener(this);
 			// serialPort.notifyOnDataAvailable(true);
 
-
 			// Wait a while to boot the Arduino.
             // NOTE: Perhaps this is only required for Arduino
-			Thread.sleep(ARDUINO_BOOT_TIME);
+            if(deviceBootTime > 0)  Thread.sleep(deviceBootTime);
 
             log.info("Connected ! " + serialPort.getPortName());
 
@@ -184,8 +184,18 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
                     throw new ConnectionException(e);
             }
 	}
-	
-       @Override
+
+    /**
+     * Sets the time used to wait for device initialization, some arduinos reset when the initial connection is made.<br/>
+     * Use this function to disable or increase the waiting time.<br/>
+     * Default value is {@link #ARDUINO_BOOT_TIME}
+     * @param deviceBootTime
+     */
+    public void setDeviceBootTime(int deviceBootTime) {
+        this.deviceBootTime = deviceBootTime;
+    }
+
+    @Override
     public synchronized void serialEvent(SerialPortEvent event) {
 
         if (log.isTraceEnabled()) {

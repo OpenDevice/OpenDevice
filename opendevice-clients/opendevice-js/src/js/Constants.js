@@ -19,10 +19,21 @@ var od = od || {};
 od.DeviceType = {
     DIGITAL:1,
     ANALOG:2,
-    NUMERIC:3,
-    CHARACTER:4,
+    ANALOG_SIGNED:3,
+    NUMERIC:4,
+    FLOAT2:5,
+    FLOAT2_SIGNED:6,
+    FLOAT4:7,
+    CHARACTER:8,
     BOARD:10,
-    MANAGER:11
+    MANAGER:11,
+
+    isNumeric : function(type){
+        return type == od.DeviceType.ANALOG
+        || type == od.DeviceType.FLOAT2
+        || type == od.DeviceType.FLOAT4
+        || type == od.DeviceType.FLOAT2_SIGNED
+    }
 };
 
 // Like OpenDevice JAVA-API

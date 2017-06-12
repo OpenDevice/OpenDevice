@@ -18,6 +18,7 @@ package br.com.criativasoft.opendevice.middleware.resources;
 import br.com.criativasoft.opendevice.middleware.model.Dashboard;
 import br.com.criativasoft.opendevice.middleware.model.DashboardItem;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.DashboardDao;
+import br.com.criativasoft.opendevice.restapi.io.ErrorResponse;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,13 +97,22 @@ public class DashboardRest {
 
         Dashboard dashboard = dao.getById(id);
 
-        dao.delete(dashboard);
+        if(dashboard == null) return ErrorResponse.status(Response.Status.NOT_FOUND, "Dashboard not found !");
+
+        log.info("Removing Dash: " + dashboard.getTitle() + " #"+dashboard.getId());
 
         // change active
         if(dashboard.isActive()){
             List<Dashboard> list = dao.listAll();
             if(!list.isEmpty()) dao.activate(list.get(0));
         }
+
+        Set<DashboardItem> items = dashboard.getItems();
+        for (DashboardItem item : items) {
+            dao.deleteItem(item);
+        }
+
+        dao.delete(dashboard);
 
         return Response.status(Response.Status.OK).build();
     }
@@ -158,6 +168,7 @@ public class DashboardRest {
             updated.setMonitoredDevices(item.getMonitoredDevices());
             updated.setPeriodType(item.getPeriodType());
             updated.setPeriodValue(item.getPeriodValue());
+            updated.setPeriodEnd(item.getPeriodEnd());
             updated.setRealtime(item.getRealtime());
             updated.setContent(item.getContent());
             updated.setScripts(item.getScripts());

@@ -446,7 +446,7 @@ od.DeviceManager = function(connection){
 
         // Device changed in another client..
         if(CType.isDeviceCommand(message.type)){
-            console.log("Device changed in another client..");
+            // console.log("Device changed in another client..");
 
             var device = _this.findDevice(message.deviceID);
 

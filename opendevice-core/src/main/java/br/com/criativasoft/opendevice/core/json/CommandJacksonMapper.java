@@ -42,6 +42,11 @@ public class CommandJacksonMapper  {
             mapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING); // Uses Enum.toString() for deserialization of an Enum
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
+//            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm");
+//            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+//            mapper.setDateFormat(dateFormat);
+//            mapper.setTimeZone(TimeZone.getTimeZone("GMT"));
+
             SimpleModule module = new SimpleModule("OpenDeviceModule", new Version(0, 1, 0, "alpha"));
 
             module.addSerializer(CommandType.class, new EnumCodeSerializer());

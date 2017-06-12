@@ -13,6 +13,8 @@
 
 package br.com.criativasoft.opendevice.core.metamodel;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -27,6 +29,8 @@ public class DeviceHistoryQuery {
     private int periodValue;
     private PeriodType periodType;
     private AggregationType aggregation;
+
+    @JsonFormat(pattern = "dd/MM/yy HH:mm", timezone = "America/Bahia")
     private Date periodEnd;
 
     public DeviceHistoryQuery(){
@@ -79,12 +83,11 @@ public class DeviceHistoryQuery {
         return deviceUID;
     }
 
-    public void setPeriodEnd(Date periodEnd) {
-        this.periodEnd = periodEnd;
+    public Date getPeriodEnd() {
+        return periodEnd;
     }
 
-    public Date getPeriodEnd() {
-        if(periodEnd == null) return new Date();
-        return periodEnd;
+    public void setPeriodEnd(Date periodEnd) {
+        this.periodEnd = periodEnd;
     }
 }

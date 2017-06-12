@@ -110,15 +110,27 @@ public abstract class DeviceJPA extends GenericJpa<Device> implements DeviceDao{
                 query.setMaxResults(params.getPeriodValue());
             }else{
                 Calendar calendar = Calendar.getInstance();
+                Date end;
+                if(params.getPeriodEnd() != null){
+                    end = params.getPeriodEnd();
+                }else{
+                    end = new Date();
+                    params.setPeriodEnd(end);
+                }
+
+                calendar.setTime(end);
+
+                // Calculate new time from 'end' to 'PeriodType/PeriodValue'
                 calendar.add(params.getPeriodType().getValue(), -params.getPeriodValue());
                 query.setParameter("start", calendar.getTimeInMillis());
-                query.setParameter("end", new Date().getTime());
+                query.setParameter("end" , end.getTime());
+
+//                System.err.println("query: "+new Date(calendar.getTimeInMillis())+" - "+end);
             }
 
             query.setMaxResults(1000);
 
             List<DeviceHistory> list = query.getResultList();
-
             return list;
         }
 

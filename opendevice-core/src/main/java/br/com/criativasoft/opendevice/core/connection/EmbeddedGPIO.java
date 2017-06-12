@@ -16,7 +16,9 @@
 package br.com.criativasoft.opendevice.core.connection;
 
 import br.com.criativasoft.opendevice.connection.DeviceConnection;
-import br.com.criativasoft.opendevice.core.model.PhysicalDevice;
+import br.com.criativasoft.opendevice.core.model.Device;
+
+import java.util.Collection;
 
 /**
  * Connections that are used in devices that have the integrated GPIO (like Raspberry)
@@ -24,5 +26,13 @@ import br.com.criativasoft.opendevice.core.model.PhysicalDevice;
  * @author Ricardo JL Rufino on 22/10/14.
  */
 public interface EmbeddedGPIO extends DeviceConnection {
-    void attach(PhysicalDevice device);
+
+    /**
+     * Function used to link a device with this connection. </br>
+     * Note that in some implementations of DeviceManager this function is called automatically
+     * @param device
+     */
+    void attach(Device device);
+
+    Collection<Device> getDevices();
 }

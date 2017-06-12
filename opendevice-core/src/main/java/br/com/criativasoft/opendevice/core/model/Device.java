@@ -41,7 +41,7 @@ import java.util.Set;
  */
 @Entity
 //@Inheritance(strategy=JOINED)
-@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="uid")
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="name")
 public class Device implements Serializable {
 
     private static final Logger log = LoggerFactory.getLogger(Device.class);
@@ -178,6 +178,7 @@ public class Device implements Serializable {
     }
 
 	public String getName() {
+        if(name == null) return "NULL";
 		return name;
 	}
 	public void setName(String name) {

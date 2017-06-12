@@ -24,7 +24,7 @@ import br.com.criativasoft.opendevice.core.metamodel.EnumCode;
 public enum CommandType implements EnumCode {
     /** Indicates that the values are 0 or 1 (HIGH or LOW) */
     DIGITAL                 (1, DeviceCommand.class),
-    ANALOG                  (2, DeviceCommand.class),
+    ANALOG                  (2, DeviceCommand.class), // For devices: ANALOG, FLOAT's
     NUMERIC                 (3, DeviceCommand.class),
     /** Commands sent directly to the pins (digitalWrite) */
     GPIO_DIGITAL            (4, null),

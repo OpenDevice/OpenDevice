@@ -23,10 +23,15 @@ import br.com.criativasoft.opendevice.core.metamodel.EnumCode;
  */
 public enum DeviceType implements EnumCode {
 
-    DIGITAL(1, "Digital"),
+    DIGITAL(1, "Digital"), // TODO:CHANGE TO BYNARY
     ANALOG(2, "Analog"),
-    NUMERIC(3, "Numeric"), // Similar to ANALOG , but launches the event 'onChange' every time a reading is taken
-    CHARACTER(4, "Character"),
+    ANALOG_SIGNED(3, "Analog+"),
+    NUMERIC(4, "Numeric"), // Similar to ANALOG , but launches the event 'onChange' every time a reading is taken
+    FLOAT2(5, "Float2"),
+    FLOAT2_SIGNED(6, "Float+"),
+    FLOAT4(7, "Float4"),
+    CHARACTER(8, "Character"),
+
     //
     BOARD(10, "Board"), // Hold Multiple Devices
     MANAGER(11, "MANAGER") // Middleware/Server

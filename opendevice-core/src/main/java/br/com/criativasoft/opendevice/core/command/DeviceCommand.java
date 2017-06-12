@@ -86,7 +86,11 @@ public class DeviceCommand extends Command {
     public static CommandType getCommandType(DeviceType deviceType){
         if (deviceType == DeviceType.DIGITAL) {
             return CommandType.DIGITAL;
-        }else if (deviceType == DeviceType.ANALOG) {
+        }else if (deviceType == DeviceType.ANALOG
+                || deviceType == DeviceType.ANALOG_SIGNED
+                || deviceType == DeviceType.FLOAT2
+                || deviceType == DeviceType.FLOAT4 ||
+                deviceType == DeviceType.FLOAT2_SIGNED) {
             return CommandType.ANALOG;
         }else if (deviceType == DeviceType.NUMERIC) {
             return CommandType.NUMERIC;

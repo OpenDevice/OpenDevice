@@ -28,6 +28,7 @@ import br.com.criativasoft.opendevice.core.filter.CommandFilter;
 import br.com.criativasoft.opendevice.core.listener.DeviceListener;
 import br.com.criativasoft.opendevice.core.listener.OnDeviceChangeListener;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
+import br.com.criativasoft.opendevice.core.metamodel.PeriodType;
 import br.com.criativasoft.opendevice.core.model.*;
 import br.com.criativasoft.opendevice.core.model.test.DeviceCategoryRegistry;
 import org.slf4j.Logger;
@@ -144,6 +145,15 @@ public abstract class BaseDeviceManager implements DeviceManager {
         deviceCategoryRegistry.add(klass);
     }
 
+    /**
+     * Find by UID or Name
+     * @param device
+     * @return
+     */
+    public Device findDevice(Device device) {
+        return (device.getUid() > 0 ? findDeviceByUID(device.getUid()) : findDeviceByName(device.getName()));
+    }
+
     @Override
     public Device findDeviceByUID(int deviceUID) {
 
@@ -169,7 +179,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
         List<DeviceHistory> list = getValidDeviceDao().getDeviceHistory(query);
 
         Device device = findDeviceByUID(query.getDeviceUID());
-        if(device != null){
+        if(device != null && query.getPeriodType() != PeriodType.RECORDS){
             DeviceHistory last = new DeviceHistory();
             last.setDeviceID(query.getDeviceID());
             last.setTimestamp(query.getPeriodEnd().getTime());
@@ -221,6 +231,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
     @Override
     public void addDevice(Device device) {
         if(device == null) throw new IllegalArgumentException("Device is null");
+
         if(findDeviceByUID(device.getUid()) == null) {
             getValidDeviceDao().persist(device);
             getCurrentContext().addDevice(device); // add to cache.
@@ -381,7 +392,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 	}
 
     /**
-     * Synchronize devices with connections that require additional information such as GPIO.
+     * Get remote devices and synchronize (embedded) devices with connections that require additional information such as GPIO. <br/>
      * (An example is the raspberry that already has support built GPIO)
      * @param connection
      * @param request
@@ -390,17 +401,31 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
         if(connection instanceof EmbeddedGPIO){
             EmbeddedGPIO gpioConn = (EmbeddedGPIO) connection;
-            Collection<Device> devices = getDevices();
-            if(devices != null){
-                for (Device device : devices){
-                    if(device instanceof PhysicalDevice) gpioConn.attach((PhysicalDevice) device);
+
+            // TODO: this may cause problems if devices is not related to GPIO, like devices from atached microcontrolers (raspberry + arduino)
+            // This is a convenient way to register devices instantiated but not attached to "Embedded Connection"
+            if(getConfig().isAutoRegisterLocalDevice()) {
+                Collection<Device> devices = getDevices();
+                if (devices != null) {
+                    for (Device device : devices) {
+                        if (device instanceof PhysicalDevice) gpioConn.attach((PhysicalDevice) device);
+                    }
+                } else {
+                    log.warn("None device registered !");
                 }
-            }else{
-                log.warn("None device registered !");
             }
+
+            // If AutoRegister is disabled, registrer manualy atached devices
+            if(! getConfig().isAutoRegisterLocalDevice()){
+                Collection<Device> devices = gpioConn.getDevices();
+                if(devices != null){
+                    addDevices(devices);
+                }
+            }
+
         }
 
-        if((connection instanceof StreamConnection || /* ws,rest = */connection instanceof IRemoteClientConnection )
+        if((connection instanceof StreamConnection || /* ws/rest clients = */connection instanceof IRemoteClientConnection )
                 && outputConnections.exist(connection)){
             try {
                 sendTo(request, connection);

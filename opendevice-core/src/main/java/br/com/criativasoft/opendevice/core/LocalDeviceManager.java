@@ -162,9 +162,13 @@ public class LocalDeviceManager extends BaseDeviceManager {
 
     @Override
     public void addDevice(Device device) {
-        super.addDevice(device);
 
-        if(findDeviceByUID(device.getUid()) == null) {
+        // Devices UID = 0 its runtime at the time it syncronize...
+        if(device.getUid() > 0) {
+            super.addDevice(device);
+        }
+
+        if(findDevice(device) == null) {
             runtimeDevices.add(device);
         }
     }
@@ -190,6 +194,20 @@ public class LocalDeviceManager extends BaseDeviceManager {
         }
 
         return super.findDeviceByUID(deviceUID);
+    }
+
+    @Override
+    public Device findDeviceByName(String name) {
+
+        if(!runtimeDevices.isEmpty()){
+            for (Device runtimeDevice : runtimeDevices) {
+                if(runtimeDevice.getName() != null && runtimeDevice.getName().equals(name)){
+                    return runtimeDevice;
+                }
+            }
+        }
+
+        return super.findDeviceByName(name);
     }
 
     @Override

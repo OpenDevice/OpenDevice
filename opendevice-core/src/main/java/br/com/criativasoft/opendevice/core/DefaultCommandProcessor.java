@@ -237,9 +237,12 @@ public class DefaultCommandProcessor {
                 }
             }
 
+        // When received from microcontrollers, this will received multiple times (1 for device)
         } else if (type == CommandType.GET_DEVICES_RESPONSE) {
 
-            boolean fromDevice = !(connection instanceof IRemoteClientConnection);
+            // note if connection is IRemoteClientConnection, is a client not the 'server' running
+            // this flag is used to control devices registratin and sync UIDs
+            boolean fromClientOrDevice = !(connection instanceof IRemoteClientConnection);
 
             GetDevicesResponse response = (GetDevicesResponse) command;
 
@@ -270,7 +273,7 @@ public class DefaultCommandProcessor {
                 // If the name/id does not match, the name has priority
                 if(found == null || !found.getName().equals(device.getName())){
                     found =  manager.findDeviceByName(device.getName());
-                    if(fromDevice) device.setUID(0); // clear, need resyc
+                    if(fromClientOrDevice) device.setUID(0); // clear, need resyc
                 }
 
                 if(found == null){
@@ -291,7 +294,7 @@ public class DefaultCommandProcessor {
                 }else{
 
                     // For devices (check if need send/sync IDs to devices)
-                    if(fromDevice){
+                    if(fromClientOrDevice){
 
                         // Firmware has ben cleared/replaced
                         // This will help recover IDs.
@@ -300,12 +303,16 @@ public class DefaultCommandProcessor {
                             syncIds = true;
                         }
 
-                        // For Clientes (update DeviceID on Local)
-
+                    // For Clientes (update DeviceID on Local)
                     }else{
 
                         //  NOTE: probably found a device with the same name on the server, so we should update the client
                         found.setUID(device.getUid());
+
+                        // Runtime devices from LocalDeviceManager (see addDevice)
+                        if(!found.isManaged()){
+                            found.setManaged(true);
+                        }
 
                     }
 

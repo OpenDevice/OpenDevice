@@ -35,10 +35,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Device Rest Interface for controling devices. <br/>
@@ -107,9 +104,11 @@ public class DeviceRest {
 
         if(device != null){
             return new DeviceVO(device);
+        }else{
+            throw new NullPointerException("Device not found"); // use custom serializer
         }
 
-        return null;
+
     }
 
     @DELETE
@@ -142,12 +141,16 @@ public class DeviceRest {
 
     @POST
     @Path("/{uid}/history")
-    public List<DeviceHistory> getDeviceHistory(@PathParam("uid") int uid, DeviceHistoryQuery query) {
+    public List<DeviceHistory> getDeviceHistory(@PathParam("uid") int uid, DeviceHistoryQuery query ) {
         Device device = manager.findDeviceByUID(uid); // find user device
+
         if (device != null) {
             query.setDeviceID(device.getId());
             query.setDeviceUID(uid);
-            return manager.getDeviceHistory(query);
+
+            List<DeviceHistory> list = manager.getDeviceHistory(query);
+
+            return list;
         } else {
             return new ArrayList<DeviceHistory>();
         }

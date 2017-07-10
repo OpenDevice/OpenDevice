@@ -13,6 +13,8 @@
 
 package br.com.criativasoft.opendevice.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -27,6 +29,7 @@ public class DeviceHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @JsonIgnore
     private long id;
 
     private long timestamp;
@@ -34,6 +37,13 @@ public class DeviceHistory {
     private double value;
 
     private long deviceID;
+
+    /** If this must syncronized with server */
+    @JsonIgnore
+    private boolean needSync;
+
+    @JsonIgnore
+    private String applicationID;
 
     public DeviceHistory(){
     }
@@ -76,5 +86,21 @@ public class DeviceHistory {
 
     public void setDeviceID(long deviceID) {
         this.deviceID = deviceID;
+    }
+
+    public void setNeedSync(boolean needSync) {
+        this.needSync = needSync;
+    }
+
+    public boolean isNeedSync() {
+        return needSync;
+    }
+
+    public void setApplicationID(String applicationID) {
+        this.applicationID = applicationID;
+    }
+
+    public String getApplicationID() {
+        return applicationID;
     }
 }

@@ -15,15 +15,13 @@ package br.com.criativasoft.opendevice.core;
 
 import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.connection.IRemoteClientConnection;
+import br.com.criativasoft.opendevice.connection.ServerConnection;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.core.command.*;
 import br.com.criativasoft.opendevice.core.connection.MultipleConnection;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
-import br.com.criativasoft.opendevice.core.model.Board;
-import br.com.criativasoft.opendevice.core.model.Device;
-import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
-import br.com.criativasoft.opendevice.core.model.PhysicalDevice;
+import br.com.criativasoft.opendevice.core.model.*;
 import br.com.criativasoft.opendevice.core.model.test.GenericDevice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -279,7 +277,7 @@ public class DefaultCommandProcessor {
                 if(found == null){
 
                     // Device not have ID, Get next ID from database
-                    if(device.getUid() <= 0){
+                    if(device.getUid() <= 0 && !config.isRemoteIDGeneration()){
                         if(nextID == -1) nextID = dao.getNextUID();
                         syncIds = true;
                         device.setUID(nextID++);
@@ -323,9 +321,20 @@ public class DefaultCommandProcessor {
             }
 
             if(syncIds){
-
                 try {
-                    manager.sendTo(new SyncDevicesIdCommand(loadDevices), connection);
+
+                    // If command received from a client application
+                    if(connection instanceof ServerConnection){
+                        GetDevicesResponse devicesResponse = new GetDevicesResponse(new LinkedList<Device>(loadDevices), command.getConnectionUUID());
+                        devicesResponse.setApplicationID(command.getApplicationID());
+                        manager.sendTo(devicesResponse, connection);
+                     // If from microcontrollers/device send only IDs
+                    }else{
+                        SyncDevicesIdCommand syncDevicesIdCommand = new SyncDevicesIdCommand(new LinkedList<Device>(loadDevices));
+                        syncDevicesIdCommand.setApplicationID(command.getApplicationID());
+                        manager.sendTo(syncDevicesIdCommand, connection);
+                    }
+
                 } catch (IOException e) {
                     log.error(e.getMessage(), e);
                 }
@@ -369,6 +378,27 @@ public class DefaultCommandProcessor {
             }else{
                 throw new IllegalStateException("Device with UID dont exist ! At this time it is not possible to create devices.");
             }
+
+
+        // Sync offline data from clients
+        } else if (type == CommandType.SYNC_HISTORY) {
+
+            SyncHistoryCommand syncHistoryCommand = (SyncHistoryCommand) command;
+
+            Collection<DeviceHistory> list = syncHistoryCommand.getList();
+
+            for (DeviceHistory history : list) {
+
+                Device device = manager.findDeviceByUID((int) history.getDeviceID());
+
+                // Replace to real/database ID
+                if(device != null){
+                    history.setDeviceID(device.getId());
+                    history.setNeedSync(false);
+                }
+                manager.saveDeviceHistory(device, history);
+            }
+
 
         }
     }

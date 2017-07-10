@@ -56,6 +56,11 @@ public class IPCamDevice extends GenericDevice {
         public int getCode() {
             return code;
         }
+
+        @Override
+        public String getDescription() {
+            return name();
+        }
     }
 
     private static final Logger log = LoggerFactory.getLogger(IPCamDevice.class);

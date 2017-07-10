@@ -10,7 +10,7 @@
     <logger name="org.atmosphere.cpr.AtmosphereFramework" level="WARN"/>
     <logger name="org.atmosphere.interceptor.OnDisconnectInterceptor" level="WARN"/>
 
-    <root level="ALL"> <!-- ALL / DEBUG-->
+    <root level="DEBUG"> <!-- ALL / DEBUG-->
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

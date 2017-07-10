@@ -49,7 +49,7 @@ public class Esp2688ConfigWIFI extends LocalDeviceManager {
 //        AddConnection addCmd = new AddConnection(ConnectionType.WIFI, "ricardo-ap", "abcdefghij");
         AddConnection addCmd = new AddConnection(ConnectionType.WIFI, "ricardoandroid", "87654321");
 
-        send(addCmd, true);
+        send(addCmd, true, false);
 
         delay(1500); // delay to send..
 

@@ -38,14 +38,18 @@ public class BlinkTest extends LocalDeviceManager {
 
     public void start() throws IOException {
 
-        Device led = new Device(1, Device.DIGITAL);
+        Device led = new Device("LED1", Device.DIGITAL);
 
 //        connect(new MQTTServerConnection());
 
 //        connect(out.tcp("192.168.3.100:8182"));
 //        connect(out.tcp("192.168.3.100:8182"));
-//        connect(out.tcp("192.168.43.149:8182"));
-        connect(out.usb());
+//        connect(out.tcp("192.168.3.117:8182"));
+//        connect(out.usb("/tmp/simavr-uart0"));
+//        UsbConnection.BAUDRATE = 9600;
+//        connect(out.usb("/tmp/simavr-uart0"));
+          connect(out.usb());
+
 //        connect(out.bluetooth("20:13:01:24:01:93"));
 
 //        led.on();
@@ -74,9 +78,9 @@ public class BlinkTest extends LocalDeviceManager {
 //        // Quando desabilita a WIFI do PC, ele não detectou.
 //        // Quando o Modulo cancela a cexçao, fica dando erro.
         while(isConnected()){
-            led.on();
-            delay(1000);
-            led.off();
+//            led.on();
+//            delay(1000);
+//            led.off();
             delay(1000);
         }
 

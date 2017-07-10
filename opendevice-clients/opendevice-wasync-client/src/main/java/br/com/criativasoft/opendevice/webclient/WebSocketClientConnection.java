@@ -181,6 +181,7 @@ public class WebSocketClientConnection extends AbstractConnection implements Rec
 
                     ObjectMapper mapper = new ObjectMapper();
                     Map<String, String> resp = mapper.readValue(r.getResponseBody(),new TypeReference<Map<String, String>>() {});
+                    asyncHttpClient.close();
 
                     authToken = resp.get("token");
 

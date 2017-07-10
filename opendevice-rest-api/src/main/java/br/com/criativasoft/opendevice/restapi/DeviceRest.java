@@ -141,7 +141,7 @@ public class DeviceRest {
 
     @POST
     @Path("/{uid}/history")
-    public List<DeviceHistory> getDeviceHistory(@PathParam("uid") int uid, DeviceHistoryQuery query ) {
+    public List<DeviceHistory> getHistory(@PathParam("uid") int uid, DeviceHistoryQuery query ) {
         Device device = manager.findDeviceByUID(uid); // find user device
 
         if (device != null) {
@@ -155,6 +155,24 @@ public class DeviceRest {
             return new ArrayList<DeviceHistory>();
         }
     }
+
+    @DELETE
+    @Path("/{uid}/history")
+    public Response deleteHistory(@PathParam("uid") int uid) {
+        Device device = manager.findDeviceByUID(uid); // find user device
+
+        if (device != null) {
+
+            // List<DeviceHistory> list = manager.getDeviceHistory(query);
+            dao.deleteHistory(device);
+            device.setValue(0);
+
+            return Response.status(Response.Status.OK).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+    }
+
 
     @GET
     @Path("/sync")

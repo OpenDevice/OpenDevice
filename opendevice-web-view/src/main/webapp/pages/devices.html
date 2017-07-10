@@ -213,7 +213,7 @@
     </div>
 
     <!----------------------------------------------------------------->
-    <!-- Manage Devices                                                  -->
+    <!-- Manage Devices / List                                                 -->
     <!----------------------------------------------------------------->
     <div id="manageDevices" class="modal fade"  tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
@@ -246,6 +246,7 @@
                                 <td>
                                     <button type="submit" class="btn btn-xs btn-primary"  ng-click="ctrl.editDevice(x)">Edit</button>
                                     <button type="submit" class="btn btn-xs btn-danger"  ng-click="ctrl.delete(x, $index)">Del</button>
+                                    <button type="submit" class="btn btn-xs btn-danger"  ng-click="ctrl.deleteHistory(x, $index)">Del History</button>
                                 </td>
                             </tr>
                             </tbody>

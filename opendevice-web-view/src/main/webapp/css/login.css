@@ -21,7 +21,8 @@ html {
 
 body {
   background: #bac0c1;
-  font-family: 'Titillium Web', sans-serif;
+  /*font-family: 'Titillium Web', sans-serif;*/
+  font-family: 'Source Sans Pro',sans-serif;
 }
 
 a {

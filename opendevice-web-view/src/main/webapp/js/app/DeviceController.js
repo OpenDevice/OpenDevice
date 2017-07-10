@@ -206,6 +206,17 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
 
     };
 
+    _public.deleteHistory = function(item, index){
+
+        ODev.deleteHitory(_this.devices[index]).then(function( data, textStatus, jqXHR ) {
+            $.notify({message: "Removed"}, {type:"warning"});
+        }).fail(function(req){
+            if(req.responseJSON && req.responseJSON.message){
+                $.notify({message: req.responseJSON.message});
+            }
+        });
+    };
+
 
 
     _public.updateApiKeys = function(){

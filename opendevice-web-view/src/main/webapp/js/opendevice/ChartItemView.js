@@ -246,6 +246,7 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
             if(od.DeviceType.isNumeric(device.type)){
 
+                // chart = $(this.el).highcharts({
                 chart = $(this.el).highcharts({
                     chart: {
                         type: (this.model.type == 'LINE_CHART' ? 'spline' : 'areaspline'),
@@ -285,12 +286,13 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
                     },
 
                     plotOptions: {
+                        //  spline: { animation: false, enableMouseTracking: false, stickyTracking: true, shadow: false, dataLabels: { style: { textShadow: false } } },
                         series: {
                             animation: false,
                             states: { hover: false }
                         },
                         spline: {
-                            marker: { enabled: false }
+                            marker: { enabled: false },
                         },
                         areaspline: {
                             marker: {enabled: false}
@@ -721,9 +723,8 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
             if(chart){
 
                 if(this.model.type == "LINE_CHART"){
-                    chart.series[index].addPoint([ (new Date()).getTime(), value], true, true);
+                    chart.series[index].addPoint([ (new Date()).getTime(), value], /*redraw=*/ true, /*shift=*/true, /*animation=*/true);
                 }else if(this.model.type == "GAUGE_CHART"){
-                    debugger;
                     chart.series[index].points[0].update([0, value]);
                 }else if(this.model.type == "PIE_CHART"){
                     chart.series[0].data[index].update(value);

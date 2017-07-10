@@ -50,7 +50,9 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
     private BluetoothSocket connection;
     private Context context;
 
-    boolean secure = false;
+    private boolean secure = false;
+    private boolean connectUsingThread = false;
+
 
     public BluetoothConnection(){
         this(null);
@@ -79,8 +81,19 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
 
             // Check paired
 //            if(isPaired()){
-                ConnectThread connectThread = new ConnectThread(getBluetoothDevice());
+
+            ConnectTask connectTask = new ConnectTask(getBluetoothDevice());
+
+            if(connectUsingThread){
+                Thread connectThread = new Thread(connectTask);
+                connectThread.setName("BluetoothConnection");
                 connectThread.start();
+                setStatus(ConnectionStatus.CONNECTING); // use this for backgroud connection
+            }else{
+                connectTask.run();
+            }
+
+
 //            }else{
 //                setStatus(ConnectionStatus.DISCONNECTED);
 //                Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
@@ -156,11 +169,10 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
      * with a device. It runs straight through; the connection either
      * succeeds or fails.
      */
-    private class ConnectThread extends Thread {
-        private BluetoothSocket socket;
+    private class ConnectTask implements Runnable {
         private BluetoothDevice device;
 
-        public ConnectThread(BluetoothDevice device) {
+        public ConnectTask(BluetoothDevice device) {
             this.device = device;
 
 
@@ -169,18 +181,15 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
             try {
                 log.trace("Creating connection socket to: " + device);
 
-                socket = device.createRfcommSocketToServiceRecord(UUID_SPP);
+                connection = device.createRfcommSocketToServiceRecord(UUID_SPP);
 
             } catch (Exception e) {
                log.error(e.getMessage(), e);
             }
 
-            connection = socket;
         }
 
         public void run() {
-
-            setName("ConnectThread");
 
             // Always cancel discovery because it will slow down a connection
             bluetoothAdapter.cancelDiscovery();
@@ -190,24 +199,37 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
 
                 // This is a blocking call and will only return on a
                 // successful connection or an exception
-                socket.connect();
-
+                connection.connect();
 
             } catch (IOException e) {
 
-                setStatus(ConnectionStatus.FAIL);
+                log.error(e.getMessage());
 
-                log.error(e.getMessage(), e);
-
-                // Close the socket
                 try {
-                    socket.close();
-                } catch (IOException e2) {
+                    // FIX for erros in android >=4.2 (ref: https://stackoverflow.com/a/25647197)
+                    log.info("trying fallback...");
+
+                    connection = (BluetoothSocket) device.getClass().getMethod("createRfcommSocket", new Class[]{int.class}).invoke(device, 1);
+                    connection.connect();
+
+                    log.info("Connected using fallback");
+                } catch (Exception e2) {
+                    setStatus(ConnectionStatus.FAIL);
+
                     log.error(e.getMessage(), e);
+
+                    // Close the socket
+                    try {
+                        connection.close();
+                    } catch (IOException e3) {
+                        log.error(e.getMessage(), e);
+                    }
+
+                    return;
                 }
+
                 // Start the service over to restart listening mode
                 //BluetoothSerialService.this.start();
-                return;
             }
 
 
@@ -231,7 +253,6 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
             }
 
         }
-
 
     }
 

@@ -19,10 +19,21 @@ var od = od || {};
 od.DeviceType = {
     DIGITAL:1,
     ANALOG:2,
-    NUMERIC:3,
-    CHARACTER:4,
+    ANALOG_SIGNED:3,
+    NUMERIC:4,
+    FLOAT2:5,
+    FLOAT2_SIGNED:6,
+    FLOAT4:7,
+    CHARACTER:8,
     BOARD:10,
-    MANAGER:11
+    MANAGER:11,
+
+    isNumeric : function(type){
+        return type == od.DeviceType.ANALOG
+        || type == od.DeviceType.FLOAT2
+        || type == od.DeviceType.FLOAT4
+        || type == od.DeviceType.FLOAT2_SIGNED
+    }
 };
 
 // Like OpenDevice JAVA-API
@@ -200,6 +211,18 @@ od.Device = function(data){
 
         sync = typeof sync !== 'undefined' ? sync : true; // default true
 
+        // Do data conversions
+        if(this.type == od.DeviceType.FLOAT2){
+            value = value / 100;
+        }else if(this.type == od.DeviceType.FLOAT4){
+            value = value / 10000;
+        }else if(this.type == od.DeviceType.FLOAT2_SIGNED){
+            alert("FLOAT2_SIGNED - conversion not implemented");
+        }else if(this.type == od.DeviceType.ANALOG_SIGNED){
+            alert("ANALOG_SIGNED - conversion not implemented");
+        }
+
+        // Only fire events if change... (or is Numeric (RFID/etc..))
         if(this.type == od.DeviceType.NUMERIC || this.value != value){
 
             this.value = value;
@@ -912,7 +935,7 @@ od.DeviceManager = function(connection){
 
         // Device changed in another client..
         if(CType.isDeviceCommand(message.type)){
-            console.log("Device changed in another client..");
+            // console.log("Device changed in another client..");
 
             var device = _this.findDevice(message.deviceID);
 

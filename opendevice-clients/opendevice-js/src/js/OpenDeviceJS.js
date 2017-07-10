@@ -42,6 +42,7 @@ return {
     findDevice : manager.findDevice,
     get : manager.findDevice,
     removeDevice : manager.removeDevice,
+    deleteHitory : manager.deleteHitory,
     getDevices : manager.getDevices,
     getDevicesByType : manager.getDevicesByType,
     getDevicesByBoard : manager.getDevicesByBoard,
@@ -213,6 +214,10 @@ OpenDevice.devices = {
 
     delete : function(uid, callback, errorCallback){
         return OpenDevice.rest(this.path + "/" + uid, { async : true, type : "DELETE", success : callback, error : errorCallback});
+    },
+
+    deleteHistory : function(uid, callback, errorCallback){
+        return OpenDevice.rest(this.path + "/" + uid + "/history", { async : true, type : "DELETE", success : callback, error : errorCallback});
     }
 
 };

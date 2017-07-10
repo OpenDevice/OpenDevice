@@ -93,6 +93,10 @@ od.DeviceManager = function(connection){
 
     };
 
+    this.deleteHitory = function(device){
+        return ODev.devices.deleteHistory(device.id);
+    };
+
     this.getDevices = function(){
 
         if(devices.length > 0) return devices; // return from cache...

@@ -13,6 +13,7 @@
 
 package br.com.criativasoft.opendevice.middleware.test;
 
+import br.com.criativasoft.opendevice.core.BaseDeviceManager;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.TenantContext;
 import br.com.criativasoft.opendevice.core.TenantProvider;
@@ -193,7 +194,8 @@ public class TestRest {
 
         // Files path: {root}/data/files/uploads/firmwares
         try {
-            manager.send(new FirmwareUpdateCommand("firmware.bin"), true, false);
+
+            ((BaseDeviceManager)manager).send(new FirmwareUpdateCommand("firmware.bin"), true, false);
         } catch (IOException e) {
             e.printStackTrace();
         }

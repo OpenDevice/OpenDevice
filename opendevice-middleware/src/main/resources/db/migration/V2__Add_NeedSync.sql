@@ -1,0 +1,1 @@
+alter table DeviceHistory add needSync boolean not null DEFAULT(false)

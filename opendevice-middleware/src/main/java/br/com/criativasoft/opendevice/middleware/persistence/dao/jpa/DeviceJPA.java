@@ -55,6 +55,19 @@ public abstract class DeviceJPA extends GenericJpa<Device> implements DeviceDao{
     }
 
     @Override
+    public Device getByName(String name) {
+        TypedQuery<Device> query = em().createQuery("select x from Device x where x.name = :p1 and x.applicationID = :TENANT", Device.class);
+        query.setParameter("p1", name);
+        query.setParameter("TENANT", TenantProvider.getCurrentID());
+
+        try {
+            return query.getSingleResult();
+        }catch (NoResultException ex){
+            return null;
+        }
+    }
+
+    @Override
     public int getNextUID() {
 
         TypedQuery<Integer> query = em().createQuery("select MAX(x.uid) from Device x where x.applicationID = :TENANT", Integer.class);
@@ -79,6 +92,14 @@ public abstract class DeviceJPA extends GenericJpa<Device> implements DeviceDao{
     @Override
     public void deleteHistory(Device device) {
         int deletedCount = em().createQuery("DELETE FROM DeviceHistory where deviceID = :uid").setParameter("uid", device.getId()).executeUpdate();
+    }
+
+    @Override
+    public List<DeviceHistory> getOfflineHistory() {
+        TypedQuery<DeviceHistory> query = em().createQuery("select x from DeviceHistory x where x.needSync = :p1 and x.applicationID = :TENANT", DeviceHistory.class);
+        query.setParameter("p1", true);
+        query.setParameter("TENANT", TenantProvider.getCurrentID());
+        return query.getResultList();
     }
 
     @Override

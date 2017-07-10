@@ -121,7 +121,7 @@ public class PopulateDatabase {
             em.persist(device);
 
         }
-        board.setDevices(devices);
+        board.addDevices(devices);
         em.persist(board);
     }
 

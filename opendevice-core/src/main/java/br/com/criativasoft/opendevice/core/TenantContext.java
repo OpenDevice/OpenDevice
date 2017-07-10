@@ -32,6 +32,10 @@ public interface TenantContext {
 
     public Device getDeviceByUID(int uid);
 
+    /**
+     * Return the context ID
+     * @return
+     */
     public String getId();
 
     Device getDeviceByName(String name);

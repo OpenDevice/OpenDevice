@@ -26,20 +26,20 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class LocalTenantContext implements TenantContext {
 
-    private String id;
+    private String tenantID;
 
-    // Map <UID, Device>
-    protected Map<Integer, Device> devices;
+    // Map <Name, Device>
+    protected Map<String, Device> devices;
 
     public LocalTenantContext(String id) {
-        this.id = id;
-        devices = new ConcurrentHashMap<Integer, Device>();
+        this.tenantID = id;
+        devices = new ConcurrentHashMap<String, Device>();
     }
 
     @Override
     public void addDevice(Device device) {
         device.setManaged(true);
-        devices.put(device.getUid(), device);
+        devices.put(device.getName(), device);
     }
 
     @Override
@@ -50,12 +50,19 @@ public class LocalTenantContext implements TenantContext {
     @Override
     public void removeDevice(Device device) {
         device.setManaged(false);
-        devices.remove(device.getUid());
+        devices.remove(device.getName());
     }
 
     @Override
     public Device getDeviceByUID(int uid) {
-        return devices.get(uid);
+
+        if(uid <= 0) return null;
+
+        for (Device device : devices.values()) {
+            if(device.getUid() == uid) return device;
+        }
+
+        return null;
     }
 
     @Override
@@ -73,6 +80,6 @@ public class LocalTenantContext implements TenantContext {
     }
 
     public String getId() {
-        return id;
+        return tenantID;
     }
 }

@@ -16,9 +16,8 @@
 package br.com.criativasoft.opendevice.core.connection;
 
 import br.com.criativasoft.opendevice.connection.DeviceConnection;
+import br.com.criativasoft.opendevice.core.model.Board;
 import br.com.criativasoft.opendevice.core.model.Device;
-
-import java.util.Collection;
 
 /**
  * Connections that are used in devices that have the integrated GPIO (like Raspberry)
@@ -34,5 +33,9 @@ public interface EmbeddedGPIO extends DeviceConnection {
      */
     void attach(Device device);
 
-    Collection<Device> getDevices();
+    /**
+     * Return Bord information for this connection.
+     * @return
+     */
+    Board getBoardInfo();
 }

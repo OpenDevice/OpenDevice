@@ -145,12 +145,10 @@ public abstract class AbstractStreamConnection extends AbstractConnection implem
 	
 	@Override
 	public void send(Message message) throws IOException {
-
-        if(message instanceof ByteMessage){
-            write( ((ByteMessage) message).getBytes() );
-        }
-        else if(getSerializer() != null){
-			write((byte[])getSerializer().serialize(message));
+        if(getSerializer() != null){
+			write(getSerializer().serialize(message));
+		}else if(message instanceof ByteMessage){
+			write( ((ByteMessage) message).getBytes() );
 		}
 	}
 	

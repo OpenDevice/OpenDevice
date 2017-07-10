@@ -66,6 +66,7 @@ public abstract class AbstractConnection implements DeviceConnection {
 	public void notifyListeners(final Message message) {
 
         if(listeners.isEmpty())  log.warn("No listener was registered ! use: addListener");
+        if(message == null)  log.trace("Ignore null response from Serializer");
 
         if(message.getConnectionUUID() == null) {
             message.setConnectionUUID(this.getUID());
@@ -143,7 +144,7 @@ public abstract class AbstractConnection implements DeviceConnection {
             }
             else lastConnectionDate = new Date();
         }
-        if(listeners.isEmpty())  log.warn("No listener was registered ! use: addListener");
+        if(listeners.isEmpty())  log.debug("No listener was registered ! use: addListener");
         synchronized (listeners){
             for (ConnectionListener listener : listeners) {
                 listener.connectionStateChanged(this, status);

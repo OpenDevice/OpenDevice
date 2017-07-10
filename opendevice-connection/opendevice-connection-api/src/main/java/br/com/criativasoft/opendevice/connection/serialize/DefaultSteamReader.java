@@ -67,6 +67,10 @@ public class DefaultSteamReader implements Runnable, Cloneable, StreamReader {
 	public void setEndOfMessageToken(byte endOfMessageToken) {
 		this.endOfMessageToken = endOfMessageToken;
 	}
+
+	public void setEndOfMessageToken(char endOfMessageToken) {
+		this.endOfMessageToken = (byte) endOfMessageToken;
+	}
 	
 	public byte getEndOfMessageToken() {
 		return endOfMessageToken;

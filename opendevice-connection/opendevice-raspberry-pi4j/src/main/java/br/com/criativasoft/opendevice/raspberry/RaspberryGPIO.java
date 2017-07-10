@@ -53,6 +53,12 @@ public class RaspberryGPIO extends AbstractConnection implements EmbeddedGPIO {
 
     private final Set<Device> devices = Collections.synchronizedSet(new LinkedHashSet<Device>());
 
+    private Board board;
+
+    public RaspberryGPIO(String name) {
+        board = new Board(-1, name);
+    }
+
     @Override
     public void connect() throws ConnectionException {
 
@@ -135,6 +141,7 @@ public class RaspberryGPIO extends AbstractConnection implements EmbeddedGPIO {
     public void attach(Device device, Pin pin){
 
         devices.add(device);
+        board.addDevice(device);
 
         if(device instanceof Sensor){
 
@@ -166,8 +173,8 @@ public class RaspberryGPIO extends AbstractConnection implements EmbeddedGPIO {
     }
 
     @Override
-    public Collection<Device> getDevices() {
-        return devices;
+    public Board getBoardInfo() {
+        return board;
     }
 
     /**

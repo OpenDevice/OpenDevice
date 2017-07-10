@@ -65,7 +65,7 @@ public class Device implements Serializable {
     @JsonIgnore
     private long id; // Database ID (internal)
 
-	private int uid; // Logic level user ID.
+	private int uid; // Logic level user ID (remote ID)
 	private String name;
     private String title;
 	private DeviceType type;
@@ -161,7 +161,7 @@ public class Device implements Serializable {
     }
 
 
-    protected void setId(long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -178,7 +178,7 @@ public class Device implements Serializable {
     }
 
 	public String getName() {
-        if(name == null) return "NULL";
+        if(name == null) return "NULL:"+hashCode();
 		return name;
 	}
 	public void setName(String name) {

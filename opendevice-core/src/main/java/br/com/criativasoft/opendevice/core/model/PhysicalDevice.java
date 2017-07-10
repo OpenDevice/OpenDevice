@@ -14,7 +14,6 @@
 package br.com.criativasoft.opendevice.core.model;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -29,7 +28,7 @@ import javax.persistence.Transient;
  * @date 12/10/16
  */
 @Entity
-@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="uid")
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="name")
 public class PhysicalDevice extends Device {
 
     @Transient
@@ -37,7 +36,8 @@ public class PhysicalDevice extends Device {
     protected volatile GpioInfo gpio;
 
     @ManyToOne(fetch= FetchType.LAZY)
-    @JsonIdentityReference(alwaysAsId = true)
+    //@JsonIdentityReference(alwaysAsId = true)
+    @JsonIgnore
     private Board board;
 
     public PhysicalDevice() {

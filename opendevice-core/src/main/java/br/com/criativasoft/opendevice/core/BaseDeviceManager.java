@@ -75,7 +75,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     private Message lastMessage;
 
-    private DefaultCommandProcessor commandProcessor = new DefaultCommandProcessor(this);
+    protected DefaultCommandProcessor commandProcessor = new DefaultCommandProcessor(this);
 
     public BaseDeviceManager(){
         instance = this;
@@ -171,6 +171,8 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
         Device device = getCurrentContext().getDeviceByName(name);
 
+        if(device == null) getValidDeviceDao().getByName(name);
+
         return device;
     }
 
@@ -232,7 +234,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
     public void addDevice(Device device) {
         if(device == null) throw new IllegalArgumentException("Device is null");
 
-        if(findDeviceByUID(device.getUid()) == null) {
+        if(findDevice(device) == null) {
             getValidDeviceDao().persist(device);
             getCurrentContext().addDevice(device); // add to cache.
             device.setManaged(true);
@@ -240,6 +242,16 @@ public abstract class BaseDeviceManager implements DeviceManager {
                 listener.onDeviceRegistred(device);
             }
         }
+    }
+
+    /**
+     * Remove existing and add new device
+     * @param existing
+     * @param device
+     */
+    private void replaceDevice(Device existing, Device device) {
+        removeDevice(existing);
+        addDevice(device);
     }
 
     @Override
@@ -255,12 +267,15 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
         if(device instanceof Board){
             Set<PhysicalDevice> devices = ((Board) device).getDevices();
-            for (PhysicalDevice physicalDevice : devices) {
+            for (Device physicalDevice : devices) {
                 removeDevice(physicalDevice);
             }
         }
 
-        device = getValidDeviceDao().getById(device.getId());
+        // force load persistent state from database
+        if(device.getId() > 0){
+            device = getValidDeviceDao().getById(device.getId());
+        }
         getValidDeviceDao().delete(device);
         getCurrentContext().removeDevice(device); // remove from cache
     }
@@ -317,15 +332,27 @@ public abstract class BaseDeviceManager implements DeviceManager {
         if(!commandProcessor.isProcessingNewDevices()) { // ignore events from device syncronization/initialization  (GET_DEVICES_RESPONSE)...
 
             boolean alreadyExist = transactionBegin();
-            saveDeviceHistory(device);
+
+            // Save history
+            DeviceHistory history = new DeviceHistory();
+            history.setDeviceID(device.getId());
+            history.setValue(device.getValue());
+            history.setTimestamp(System.currentTimeMillis());
+            history.setApplicationID(device.getApplicationID());
+            saveDeviceHistory(device, history);
+
             if (!alreadyExist) transactionEnd();
 
             if (sync) {
                 try {
-                    CommandType type = DeviceCommand.getCommandType(device.getType());
-                    DeviceCommand cmd = new DeviceCommand(type, device.getUid(), device.getValue());
-                    if (device.getApplicationID() != null) cmd.setApplicationID(device.getApplicationID());
-                    send(cmd);
+                    if(device.getUid() > 0) {
+                        CommandType type = DeviceCommand.getCommandType(device.getType());
+                        DeviceCommand cmd = new DeviceCommand(type, device.getUid(), device.getValue());
+                        if (device.getApplicationID() != null) cmd.setApplicationID(device.getApplicationID());
+                        send(cmd);
+                    }else{
+                        log.debug("Can't sync device with UID = 0 ("+device.getName()+") ! Need sync with server or enable local id generation");
+                    }
                 } catch (IOException ex) {
                     log.error(ex.getMessage(), ex);
                 }
@@ -415,11 +442,26 @@ public abstract class BaseDeviceManager implements DeviceManager {
                 }
             }
 
-            // If AutoRegister is disabled, registrer manualy atached devices
-            if(! getConfig().isAutoRegisterLocalDevice()){
-                Collection<Device> devices = gpioConn.getDevices();
-                if(devices != null){
-                    addDevices(devices);
+            // Sync dynamic devices generated on-the-fly by connection
+            Board board = gpioConn.getBoardInfo();
+            if(board != null){
+                List<Device> devices = new LinkedList<Device>();
+                devices.add(board);
+                devices.addAll(board.getDevices());
+
+                for (Device device : devices) {
+                    if(!device.isManaged()){
+
+                        // Check if exist a device with same name (2th connection) !
+                        Device found = findDeviceByName(device.getName());
+                        if(found != null){
+                            device.setUID(found.getUid());
+                            replaceDevice(found, device);
+                        }else{
+                            addDevice(device);
+                        }
+
+                    }
                 }
             }
 
@@ -433,7 +475,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
         }
 
         if(connection instanceof MultipleConnection){
-            Set<DeviceConnection> connections = outputConnections.getConnections();
+            Set<DeviceConnection> connections = ((MultipleConnection) connection).getConnections();
             for (DeviceConnection current : connections) {
                 syncDevices(current, request);
             }
@@ -442,7 +484,9 @@ public abstract class BaseDeviceManager implements DeviceManager {
     }
 
 
-	public void addInput(DeviceConnection connection){
+
+
+    public void addInput(DeviceConnection connection){
 		
 		if(inputConnections.getSize() == 0) initInputConnections();
 
@@ -481,6 +525,10 @@ public abstract class BaseDeviceManager implements DeviceManager {
 		
 		if(outputConnections.getSize() == 0) initOutputConnections();
 
+        if(connection.getApplicationID() == null) {
+            connection.setApplicationID(TenantProvider.getCurrentID());
+        }
+
         if(outputConnections.exist(connection)){
             log.info("Connection with ID: " + connection.getUID()+ " already exist !");
             return;
@@ -503,7 +551,6 @@ public abstract class BaseDeviceManager implements DeviceManager {
             connection.setSerializer(new CommandStreamSerializer()); // data conversion..
         }
 
-        connection.setApplicationID(TenantProvider.getCurrentID());
         connection.setConnectionManager(this);
 		outputConnections.addConnection(connection);
 	}
@@ -525,10 +572,6 @@ public abstract class BaseDeviceManager implements DeviceManager {
         send(command, true, true);
 	}
 
-    /*
-     * (non-Javadoc)
-     * @see br.com.criativasoft.opendevice.core.DeviceManager#send(br.com.criativasoft.opendevice.core.command.Command)
-     */
     public void send(Command command, boolean output, boolean input) throws IOException {
 
         if(command.getApplicationID() == null) command.setApplicationID(TenantProvider.getCurrentID());
@@ -636,18 +679,15 @@ public abstract class BaseDeviceManager implements DeviceManager {
         return inputConnections.findConnection(uid);
     }
 
-    protected OpenDeviceConfig getConfig(){
-        return OpenDeviceConfig.get();
-    }
-
-    protected void saveDeviceHistory(Device device){
+    protected void saveDeviceHistory(Device device, DeviceHistory history){
 //        transactionBegin();
-        DeviceHistory history = new DeviceHistory();
-        history.setDeviceID(device.getId());
-        history.setValue(device.getValue());
-        history.setTimestamp(System.currentTimeMillis());
+        history.setApplicationID(device.getApplicationID());
         getDeviceDao().persistHistory(history);
 //        transactionEnd();
+    }
+
+    protected OpenDeviceConfig getConfig(){
+        return OpenDeviceConfig.get();
     }
 
 

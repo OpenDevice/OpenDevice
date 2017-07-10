@@ -163,14 +163,12 @@ public class LocalDeviceManager extends BaseDeviceManager {
     @Override
     public void addDevice(Device device) {
 
-        // Devices UID = 0 its runtime at the time it syncronize...
-        if(device.getUid() > 0) {
-            super.addDevice(device);
-        }
+        super.addDevice(device);
 
-        if(findDevice(device) == null) {
-            runtimeDevices.add(device);
-        }
+//        if(findDevice(device) == null) {
+//            runtimeDevices.add(device);
+//            device.setManaged(true);
+//        }
     }
 
     /**

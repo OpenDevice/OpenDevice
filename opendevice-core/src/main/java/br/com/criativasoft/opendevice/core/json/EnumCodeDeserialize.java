@@ -15,6 +15,7 @@ package br.com.criativasoft.opendevice.core.json;
 
 import br.com.criativasoft.opendevice.core.command.CommandType;
 import br.com.criativasoft.opendevice.core.metamodel.EnumCode;
+import br.com.criativasoft.opendevice.core.model.DeviceType;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -43,6 +44,13 @@ public abstract class EnumCodeDeserialize<T extends EnumCode> extends JsonDeseri
         @Override
         public CommandType getByCode(int code) {
             return CommandType.getByCode(code);
+        }
+    }
+
+    static class DeviceTypeDeserialize extends EnumCodeDeserialize<DeviceType>{
+        @Override
+        public DeviceType getByCode(int code) {
+            return DeviceType.getByCode(code);
         }
     }
 }

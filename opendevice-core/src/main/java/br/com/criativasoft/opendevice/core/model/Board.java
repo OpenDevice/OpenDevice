@@ -14,7 +14,7 @@
 package br.com.criativasoft.opendevice.core.model;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.CascadeType;
@@ -32,11 +32,12 @@ import java.util.Set;
  * @date 12/10/16
  */
 @Entity
-@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="uid")
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="name")
 public class Board extends Device {
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch= FetchType.EAGER)
-    @JsonIdentityReference(alwaysAsId = true)
+    //@JsonIdentityReference(alwaysAsId = true)
+    @JsonIgnore
     private Set<PhysicalDevice> devices = new LinkedHashSet<PhysicalDevice>();
 
     public Board() {
@@ -70,7 +71,7 @@ public class Board extends Device {
         this.devices = devices;
     }
 
-    public void setDevices(List<Device> devices) {
+    public void addDevices(List<Device> devices) {
         for (Device device : devices) {
             if(device instanceof PhysicalDevice) {
                 this.devices.add((PhysicalDevice) device);

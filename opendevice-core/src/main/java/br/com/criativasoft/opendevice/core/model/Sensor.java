@@ -13,7 +13,7 @@ import javax.persistence.Entity;
  * @see br.com.criativasoft.opendevice.core.model.Device
  */
 @Entity
-@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="uid")
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="name")
 public class Sensor extends PhysicalDevice {
 
     public Sensor() {} // NONE: used only for persistence/load

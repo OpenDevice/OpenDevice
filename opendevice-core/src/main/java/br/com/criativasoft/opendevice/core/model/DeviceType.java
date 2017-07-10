@@ -23,32 +23,34 @@ import br.com.criativasoft.opendevice.core.metamodel.EnumCode;
  */
 public enum DeviceType implements EnumCode {
 
-    DIGITAL(1, "Digital"), // TODO:CHANGE TO BYNARY
-    ANALOG(2, "Analog"),
-    ANALOG_SIGNED(3, "Analog+"),
-    NUMERIC(4, "Numeric"), // Similar to ANALOG , but launches the event 'onChange' every time a reading is taken
-    FLOAT2(5, "Float2"),
-    FLOAT2_SIGNED(6, "Float+"),
-    FLOAT4(7, "Float4"),
-    CHARACTER(8, "Character"),
+    DIGITAL(1, "Digital", PhysicalDevice.class), // TODO:CHANGE TO BYNARY
+    ANALOG(2, "Analog", PhysicalDevice.class),
+    ANALOG_SIGNED(3, "Analog+", PhysicalDevice.class),
+    NUMERIC(4, "Numeric", PhysicalDevice.class), // Similar to ANALOG , but launches the event 'onChange' every time a reading is taken
+    FLOAT2(5, "Float2", PhysicalDevice.class),
+    FLOAT2_SIGNED(6, "Float+", PhysicalDevice.class),
+    FLOAT4(7, "Float4", PhysicalDevice.class),
+    CHARACTER(8, "Character", null),
 
     //
-    BOARD(10, "Board"), // Hold Multiple Devices
-    MANAGER(11, "MANAGER") // Middleware/Server
+    BOARD(10, "Board", Board.class), // Hold Multiple Devices
+    MANAGER(11, "MANAGER", null) // Middleware/Server
     ;
 
 	private int code;
 	private String description;
+    private Class klass;
 		
 	/**
-	 *  	
-	 * @param code - Device type code. MAX 127.
+	 *  @param code - Device type code. MAX 127.
 	 * @param description
-	 */
-	private DeviceType(int code, String description) {
+     * @param klass
+     */
+	private DeviceType(int code, String description, Class klass) {
 		this.code = (byte) code;
 		this.description = description;
-	}
+        this.klass = klass;
+    }
 
 
 	public int getCode() {
@@ -58,6 +60,10 @@ public enum DeviceType implements EnumCode {
 	public String getDescription() {
 		return description;
 	}
+
+    public Class getKlass() {
+        return klass;
+    }
 
     public static DeviceType getByCode(int code){
         DeviceType[] values = DeviceType.values();

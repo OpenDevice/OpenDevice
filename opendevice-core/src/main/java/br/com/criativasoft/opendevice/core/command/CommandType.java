@@ -55,7 +55,8 @@ public enum CommandType implements EnumCode {
     DEVICE_DEL 				(34, null), // NOT.IMPLEMENTED
     CLEAR_DEVICES 			(35, null), // NOT.IMPLEMENTED
     SYNC_DEVICES_ID 		(36, null), // NOT.IMPLEMENTED
-    FIRMWARE_UPDATE         (37, FirmwareUpdateCommand.class),
+    SYNC_HISTORY            (37, SyncHistoryCommand.class),
+    FIRMWARE_UPDATE         (38, FirmwareUpdateCommand.class),
 
     GET_CONNECTIONS 		(40, null), // NOT.IMPLEMENTED
     GET_CONNECTIONS_RESPONSE (41, null), // NOT.IMPLEMENTED

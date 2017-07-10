@@ -36,16 +36,18 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
         super(TYPE, CommandStatus.CREATED);
     }
 
-    public GetDevicesResponse(Collection<Device> devices, int index, int length) {
+    public GetDevicesResponse(Collection<? extends Device> devices, int index, int length) {
         super(TYPE, CommandStatus.CREATED, null);
-        this.devices = devices;
+        this.devices.addAll(devices);
         this.index = index;
         this.length = length;
     }
 
-	public GetDevicesResponse(Collection<Device> devices, String connectionUUID) {
+	public GetDevicesResponse(Collection<? extends Device> devices, String connectionUUID) {
 		super(TYPE, CommandStatus.CREATED, connectionUUID);
-		this.devices = devices;
+		this.devices.addAll(devices);
+        this.length = devices.size();
+        this.index = devices.size();
 	}
 
 	public Collection<Device> getDevices() {
@@ -87,7 +89,7 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
         }
 
         if(board != null){
-            board.setDevices(deviceList);
+            board.addDevices(deviceList);
             for (Device device : deviceList) {
                 if(device instanceof PhysicalDevice){
                     ((PhysicalDevice) device).setBoard(board);

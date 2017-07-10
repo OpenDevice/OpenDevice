@@ -25,8 +25,6 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.util.*;
 
 /**
- * TODO: PENDING DOC
- *
  * @author Ricardo JL Rufino
  * @date 27/08/14.
  */
@@ -48,6 +46,8 @@ public class DeviceDaoMemory implements DeviceDao {
     @Override
     public Device getById(long id) {
 
+        if(id == 0) return null;
+
         List<Device> devices = getCurrentDevices();
 
         if(devices == null) return null;
@@ -63,12 +63,31 @@ public class DeviceDaoMemory implements DeviceDao {
 
     public Device getByUID(int uid) {
 
+        if(uid <= 0) return null;
+
         List<Device> devices = getCurrentDevices();
 
         if(devices == null) return null;
 
         for (Device device : devices){
             if(device.getUid() == uid){
+                return device;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public Device getByName(String name) {
+        if(name == null) return null;
+
+        List<Device> devices = getCurrentDevices();
+
+        if(devices == null) return null;
+
+        for (Device device : devices){
+            if(device.getName() != null && device.getName().equals(name)){
                 return device;
             }
         }
@@ -100,7 +119,8 @@ public class DeviceDaoMemory implements DeviceDao {
             if(devices == null) return false;
 
             for (Device find : devices){
-                if(device == find || device.equals(find)){ // check if same instance.
+                if(device == find || device.equals(find) ||
+                        (device.getName() != null && device.getName().equals(find.getName()))){ // check if same instance.
                     return true;
                 }
             }
@@ -115,7 +135,7 @@ public class DeviceDaoMemory implements DeviceDao {
 
         if(!exist(entity)){
 
-            if(devices == null){
+            if(devices == null){ // init context
                 devices = new LinkedList<Device>();
                 deviceMap.put(TenantProvider.getCurrentID(), devices);
             }
@@ -150,6 +170,16 @@ public class DeviceDaoMemory implements DeviceDao {
             Device find = getById(entity.getId());
             if(find != null){
                 devices.remove(find);
+                return;
+            }
+        }
+
+        // remove by Name.
+        if(!removed && entity.getName() != null){
+            Device find = getByName(entity.getName());
+            if(find != null){
+                devices.remove(find);
+                return;
             }
         }
 
@@ -170,6 +200,11 @@ public class DeviceDaoMemory implements DeviceDao {
     @Override
     public List<DeviceHistory> getDeviceHistory(DeviceHistoryQuery query) {
         throw new NotImplementedException();
+    }
+
+    @Override
+    public List<DeviceHistory> getOfflineHistory() {
+        return new ArrayList<DeviceHistory>();
     }
 
     @Override

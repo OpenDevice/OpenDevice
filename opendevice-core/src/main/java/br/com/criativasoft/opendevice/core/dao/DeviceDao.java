@@ -28,9 +28,13 @@ public interface DeviceDao extends Dao<Device> {
 
     Device getByUID(int uid);
 
+    Device getByName(String name);
+
     DeviceCategory getCategoryByCode(int code);
 
     List<DeviceHistory> getDeviceHistory(DeviceHistoryQuery query);
+
+    List<DeviceHistory> getOfflineHistory();
 
     void persistHistory(DeviceHistory history);
 

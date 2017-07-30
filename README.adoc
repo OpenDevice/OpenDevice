@@ -13,6 +13,7 @@ This allows you to focus on your project and innovation, leave obscure details o
 TIP: Plug your device (Arduino/Raspberypi/Other) to the Cloud and sync in real-time	
 
 === Code Sample
+
 [source,java]
 *Simple like this (Java/Android):*
 ----

@@ -37,6 +37,22 @@ TIP: Plug your device (Arduino/Raspberypi/Other) to the Cloud and sync in real-t
 
 But not only that... (You can also do in javascript and other languages.)
 
+[source,c++]
+.Arduino Side
+----
+#include <OpenDevice.h>
+
+void setup(){
+    ODev.name("ODevSerial");
+    ODev.addDevice("LED1", 13, Device::DIGITAL);
+    ODev.begin(); // by default call Serial.begin() and while(!Serial) on Leonardo
+}
+
+void loop(){
+	ODev.loop();
+}
+----
+
 == Technology
 
 image:http://opendevice.criativasoft.com.br/images/site-technology.png[]

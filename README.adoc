@@ -10,7 +10,9 @@ The main objective is monitor and control inexpensive hardwares like *Arduino,ES
 
 This allows you to focus on your project and innovation, leave obscure details of communication protocols and specifications with OpenDevice, you will make a major step towards the success of your project.
 
-TIP: Plug your device (Arduino/Raspberypi/Other) to the Cloud and sync in real-time	
+TIP: Plug your device (Arduino/Raspberypi/Other) to the Cloud and sync in real-time
+
+link:https://opendevice.atlassian.net/wiki/spaces/DOC/overview[See overview]
 
 === Code Sample
 
@@ -87,6 +89,8 @@ void loop() {
 }
 ----
 
+See: https://opendevice.atlassian.net/wiki/display/DOC/Setting-up+the+Server
+
 == Technology
 
 image:http://opendevice.criativasoft.com.br/images/site-technology.png[]
@@ -116,7 +120,7 @@ https://github.com/OpenDevice/opendevice-examples
 
 == Install
 
-https://opendevice.atlassian.net/wiki/display/DOC/A.+First+Steps+with+OpenDevice
+https://opendevice.atlassian.net/wiki/spaces/DOC/pages/491526/Getting+started
 
 == Contributing
 

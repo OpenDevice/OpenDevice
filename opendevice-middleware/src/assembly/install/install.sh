@@ -50,7 +50,7 @@ main() {
   ODEV_URL="https://api.github.com/repos/OpenDevice/OpenDevice/releases/latest"
 
 #  ODEV_LATEST=$(curl -s -i -H "Accept: application/vnd.github.v3+json" $ODEV_URL | grep -Po '"browser_download_url": "\K(.*.zip)')
-  ODEV_LATEST=$(curl -s -i -H "Accept: application/vnd.github.v3+json" $ODEV_URL | sed -n 's/.*"browser_download_url": "\(.*\)"/\1/p'
+  ODEV_LATEST=$(curl -s -i -H "Accept: application/vnd.github.v3+json" $ODEV_URL | sed -n 's/.*"browser_download_url": "\(.*\)"/\1/p')
 
   echo $ODEV_LATEST
 

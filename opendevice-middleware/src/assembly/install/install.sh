@@ -49,7 +49,7 @@ main() {
 
   wget -O opendevice.zip $ODEV_LATEST
 
-  mkdir --parents $ODEV_PATH
+  mkdir -p $ODEV_PATH
 
   unzip opendevice.zip -d $ODEV_PATH
 

@@ -49,6 +49,8 @@ main() {
 
   wget -O opendevice.zip $ODEV_LATEST
 
+  mkdir --parents $ODEV_PATH
+
   unzip opendevice.zip -d $ODEV_PATH
 
   rm opendevice.zip

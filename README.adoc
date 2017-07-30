@@ -15,7 +15,7 @@ TIP: Plug your device (Arduino/Raspberypi/Other) to the Cloud and sync in real-t
 === Code Sample
 
 [source,java]
-*Simple like this (Java/Android):*
+.*Simple like this (Java/Android):*
 ----
     public class BlinkDeviceDemo extends LocalDeviceManager {
 
@@ -41,7 +41,7 @@ But not only that... (You can also do in javascript and other languages.)
 
 
 [source,c++]
-*Arduino Side:*
+.*Arduino Side:*
 ----
 #include <OpenDevice.h>
 

@@ -12,8 +12,9 @@ This allows you to focus on your project and innovation, leave obscure details o
 
 TIP: Plug your device (Arduino/Raspberypi/Other) to the Cloud and sync in real-time	
 
+=== Code Sample
 [source,java]
-.Simple like this
+*Simple like this (Java/Android):*
 ----
     public class BlinkDeviceDemo extends LocalDeviceManager {
 
@@ -37,8 +38,9 @@ TIP: Plug your device (Arduino/Raspberypi/Other) to the Cloud and sync in real-t
 
 But not only that... (You can also do in javascript and other languages.)
 
+
 [source,c++]
-.Arduino Side
+*Arduino Side:*
 ----
 #include <OpenDevice.h>
 

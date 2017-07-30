@@ -38,13 +38,6 @@ main() {
     exit
   fi
 
-  # Prevent the cloned repository from having insecure permissions. Failing to do
-  # so causes compinit() calls to fail with "command not found: compdef" errors
-  # for users with insecure umasks (e.g., "002", allowing group writability). Note
-  # that this will be ignored under Cygwin by default, as Windows ACLs take
-  # precedence over umasks except for filesystems mounted with option "noacl".
-  umask g-w,o-w
-
   printf "${BLUE}Downloding OpenDevice...${NORMAL}\n"
 
   ODEV_URL="https://api.github.com/repos/OpenDevice/OpenDevice/releases/latest"
@@ -56,7 +49,7 @@ main() {
 
   wget -O opendevice.zip $ODEV_LATEST
 
-  sudo unzip opendevice.zip -d $ODEV_PATH
+  unzip opendevice.zip -d $ODEV_PATH
 
   rm opendevice.zip
 

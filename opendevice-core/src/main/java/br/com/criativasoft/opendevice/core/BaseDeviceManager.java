@@ -28,7 +28,6 @@ import br.com.criativasoft.opendevice.core.filter.CommandFilter;
 import br.com.criativasoft.opendevice.core.listener.DeviceListener;
 import br.com.criativasoft.opendevice.core.listener.OnDeviceChangeListener;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
-import br.com.criativasoft.opendevice.core.metamodel.PeriodType;
 import br.com.criativasoft.opendevice.core.model.*;
 import br.com.criativasoft.opendevice.core.model.test.DeviceCategoryRegistry;
 import org.slf4j.Logger;
@@ -180,14 +179,14 @@ public abstract class BaseDeviceManager implements DeviceManager {
     public List<DeviceHistory> getDeviceHistory(DeviceHistoryQuery query) {
         List<DeviceHistory> list = getValidDeviceDao().getDeviceHistory(query);
 
-        Device device = findDeviceByUID(query.getDeviceUID());
-        if(device != null && query.getPeriodType() != PeriodType.RECORDS){
-            DeviceHistory last = new DeviceHistory();
-            last.setDeviceID(query.getDeviceID());
-            last.setTimestamp(query.getPeriodEnd().getTime());
-            last.setValue(device.getValue());
-            list.add(last);
-        }
+//        Device device = findDeviceByUID(query.getDeviceUID());
+//        if(device != null && query.getPeriodType() != PeriodType.RECORDS  && query.getPeriodType() != PeriodType.MONTH){
+//            DeviceHistory last = new DeviceHistory();
+//            last.setDeviceID(query.getDeviceID());
+//            last.setTimestamp(query.getPeriodEnd().getTime());
+//            last.setValue(device.getValue());
+//            list.add(last);
+//        }
 
         return list;
     }
@@ -431,7 +430,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
             // TODO: this may cause problems if devices is not related to GPIO, like devices from atached microcontrolers (raspberry + arduino)
             // This is a convenient way to register devices instantiated but not attached to "Embedded Connection"
-            if(getConfig().isAutoRegisterLocalDevice()) {
+            if(getConfig().getBindLocalVariables()) {
                 Collection<Device> devices = getDevices();
                 if (devices != null) {
                     for (Device device : devices) {
@@ -502,6 +501,10 @@ public abstract class BaseDeviceManager implements DeviceManager {
             }
         }
 
+        if(connection instanceof DeviceListener){
+            addListener((DeviceListener) connection);
+        }
+
         connection.setSerializer(new CommandStreamSerializer()); // data conversion..
         connection.setConnectionManager(this);
         connection.setApplicationID(TenantProvider.getCurrentID());
@@ -513,6 +516,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
     public void removeInput(DeviceConnection connection) {
         log.info("Remove input connection: {}", connection);
         inputConnections.removeConnection(connection);
+
     }
 
     @Override
@@ -543,6 +547,10 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
         if(connection instanceof ITcpConnection){
             ((ITcpConnection) connection).setDiscoveryService(discoveryService);
+        }
+
+        if(connection instanceof DeviceListener){
+            addListener((DeviceListener) connection);
         }
 
         delivery.addConnection(connection);

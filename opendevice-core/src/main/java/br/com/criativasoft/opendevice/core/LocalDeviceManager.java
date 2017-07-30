@@ -119,12 +119,12 @@ public class LocalDeviceManager extends BaseDeviceManager {
     /**
      * This method is called from {@link Device} constructor, to auto-register devices if enabled. <br/>
      * This allow local application registar devices without call addDevice
-     * @see OpenDeviceConfig#setAutoRegisterLocalDevice(boolean)
+     * @see OpenDeviceConfig#setBindLocalVariables(boolean)
      * @param device
      */
     public void autoRegisterDevice(Device device) {
 
-        if(getConfig().isAutoRegisterLocalDevice()){
+        if(getConfig().getBindLocalVariables()){
 
             StackTraceElement[] stack = Thread.currentThread().getStackTrace();
             int maxint = 10;

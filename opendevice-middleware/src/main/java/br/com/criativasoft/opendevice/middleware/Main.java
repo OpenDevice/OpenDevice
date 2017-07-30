@@ -162,7 +162,7 @@ public class Main extends LocalDeviceManager {
         if(config.isTenantsEnabled()){
 
             MainTenantProvider provider = new MainTenantProvider(manager);
-            config.setAutoRegisterLocalDevice(false);
+            config.setBindLocalVariables(false);
             TenantProvider.setProvider(provider);
 
             // Init accounts

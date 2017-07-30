@@ -77,14 +77,18 @@ od.CommandType = {
     DEVICE_SAVE_RESPONSE	:33,
     DEVICE_DEL              :34,
     CLEAR_DEVICES           :35,
-    GET_CONNECTIONS         :36,
-    GET_CONNECTIONS_RESPONSE:37,
-    CONNECTION_ADD          :38,
-    CONNECTION_ADD_RESPONSE :39,
-    CONNECTION_DEL          :40,
-    CLEAR_CONNECTIONS       :41,
-    CONNECT 		        :42,
-    CONNECT_RESPONSE 		:43,
+    SYNC_DEVICES_ID 		:36,
+    SYNC_HISTORY         	:37,
+    FIRMWARE_UPDATE         :38,
+
+    GET_CONNECTIONS         :40,
+    GET_CONNECTIONS_RESPONSE:41,
+    CONNECTION_ADD          :42,
+    CONNECTION_ADD_RESPONSE :43,
+    CONNECTION_DEL          :44,
+    CLEAR_CONNECTIONS       :45,
+    CONNECT 		        :46,
+    CONNECT_RESPONSE 		:47,
 
     USER_EVENT              :98,
     USER_COMMAND            :99,
@@ -582,6 +586,10 @@ od.DeviceManager = function(connection){
 
     };
 
+    this.deleteHitory = function(device){
+        return ODev.devices.deleteHistory(device.id);
+    };
+
     this.getDevices = function(){
 
         if(devices.length > 0) return devices; // return from cache...
@@ -1017,6 +1025,7 @@ return {
     findDevice : manager.findDevice,
     get : manager.findDevice,
     removeDevice : manager.removeDevice,
+    deleteHitory : manager.deleteHitory,
     getDevices : manager.getDevices,
     getDevicesByType : manager.getDevicesByType,
     getDevicesByBoard : manager.getDevicesByBoard,
@@ -1188,6 +1197,10 @@ OpenDevice.devices = {
 
     delete : function(uid, callback, errorCallback){
         return OpenDevice.rest(this.path + "/" + uid, { async : true, type : "DELETE", success : callback, error : errorCallback});
+    },
+
+    deleteHistory : function(uid, callback, errorCallback){
+        return OpenDevice.rest(this.path + "/" + uid + "/history", { async : true, type : "DELETE", success : callback, error : errorCallback});
     }
 
 };

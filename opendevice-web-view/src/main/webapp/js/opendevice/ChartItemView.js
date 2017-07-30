@@ -704,9 +704,11 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
     function removeRealtimeListeners() {
         this.model.monitoredDevices.forEach(function(deviceID, index) {
             var device = ODev.get(deviceID);
-            var list = realtimeListeners[index];
-            console.log("Removing Listeners : " + deviceID);
-            device.removeListener(list);
+            if(device){
+                var list = realtimeListeners[index];
+                console.log("Removing Listeners : " + deviceID);
+                device.removeListener(list);
+            }
         });
     }
 

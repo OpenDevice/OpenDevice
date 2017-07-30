@@ -43,7 +43,7 @@ public class OpenDeviceConfig {
 
     private Properties properties;
 
-    private Boolean autoRegisterLocalDevice; // as attribute for fast access.
+    private Boolean bindLocalVariables; // as attribute for fast access.
     private Boolean remoteIDGeneration; // as attribute for fast access.
 
 
@@ -230,10 +230,10 @@ public class OpenDeviceConfig {
 
 
     /**
-     * @see #isAutoRegisterLocalDevice()
+     * @see #getBindLocalVariables()
      */
-    public void setAutoRegisterLocalDevice(boolean value) {
-        this.autoRegisterLocalDevice = value;
+    public void setBindLocalVariables(boolean value) {
+        this.bindLocalVariables = value;
         set(ConfigKey.internal_autoregister, value);
     }
 
@@ -242,9 +242,9 @@ public class OpenDeviceConfig {
      * Note: This is a experimental feature and may slow down app initialization
      * @see br.com.criativasoft.opendevice.core.LocalDeviceManager#autoRegisterDevice(Device)
      */
-    public boolean isAutoRegisterLocalDevice() {
-        if(this.autoRegisterLocalDevice == null ) autoRegisterLocalDevice = getBoolean(ConfigKey.internal_autoregister);
-        return autoRegisterLocalDevice;
+    public boolean getBindLocalVariables() {
+        if(this.bindLocalVariables == null ) bindLocalVariables = getBoolean(ConfigKey.internal_autoregister);
+        return bindLocalVariables;
     }
 
     /**

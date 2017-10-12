@@ -148,7 +148,7 @@ od.DeviceConnection = function(config){
     };
 
     this.isConnected = function(){
-        return _this.status = Status.CONNECTED;
+        return _this.status == Status.CONNECTED;
     };
 
     this.getConnectionUUID = function(){
@@ -166,6 +166,8 @@ od.DeviceConnection = function(config){
 
     function setConnectionStatus(status){
 
+        _this.status = status;
+
         for(var i = 0; i<listeners.length; i++){
             var listener = listeners[i]["connectionStateChanged"];
             if (typeof listener === "function") {
@@ -173,7 +175,6 @@ od.DeviceConnection = function(config){
             }
         }
 
-        _this.status = status;
     }
 
     function _onMessageReceived(response){

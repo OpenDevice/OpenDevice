@@ -65,7 +65,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Set;
 
-import static br.com.criativasoft.opendevice.restapi.auth.BearerTokenRealm.TOKEN_CACHE;
+import static br.com.criativasoft.opendevice.restapi.auth.BearerAuthRealm.TOKEN_CACHE;
 
 
 /**
@@ -111,6 +111,11 @@ public class AuthRest {
         // Basic Auth (Token)
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null) {
+
+            if(!authHeader.contains("Basic")){
+                return ErrorResponse.BAD_REQUEST("Send Authorization Basic using base64");
+            }
+
             // Decode Authorization header user/pass
             byte[] decode = Base64.decode(authHeader.replace("Basic ", "").getBytes());
             String auth = new String(decode);
@@ -276,19 +281,13 @@ public class AuthRest {
            return noCache(Response.status(Status.OK));
     }
 
-//    @GET
-//    @Path("googleoauth")
-//    public Response googleoauth(String data) {
-//        System.out.println("teste >>> " + data);
-//        return noCache(Response.status(Status.OK));
-//    }
 
     @POST
     @Path("loginGoogle")
     public Response loginGoogle(@Auth Subject currentUser,
                                 @FormParam("idtoken") String idtoken, @FormParam("invitation")  String invitation) {
 
-        System.err.println("invitation >>> " + invitation);
+        LOG.debug("InvitationCode = " + invitation);
 
         try {
             String url = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=";
@@ -298,7 +297,7 @@ public class AuthRest {
 
             if(response.getStatusLine().getStatusCode() == 200){
 
-                System.out.println("google resp : " + bodyAsString);
+                LOG.debug("GoogleAuth resp : " + bodyAsString);
 
                 String appID = ODev.getConfig().getString(OpenDeviceConfig.ConfigKey.google_appid);
 
@@ -311,7 +310,7 @@ public class AuthRest {
                 if(!appID.equals(aud)) return noCache(Response.status(Status.UNAUTHORIZED));
 
 
-                // Add new User (to Account) and Login
+                // Link new User (to Account) and Login
                 if(invitation != null){
 
                     invitation = encryptionCipher.decript(invitation);

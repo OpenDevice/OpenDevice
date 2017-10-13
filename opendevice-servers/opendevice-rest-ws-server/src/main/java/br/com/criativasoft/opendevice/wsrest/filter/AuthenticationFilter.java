@@ -13,7 +13,10 @@
 
 package br.com.criativasoft.opendevice.wsrest.filter;
 
-import br.com.criativasoft.opendevice.restapi.auth.BearerAuthenticationToken;
+import br.com.criativasoft.opendevice.restapi.auth.BearerAuthRealm;
+import br.com.criativasoft.opendevice.restapi.auth.BearerAuthToken;
+import br.com.criativasoft.opendevice.restapi.auth.GoogleAuthToken;
+import br.com.criativasoft.opendevice.restapi.model.dao.UserDao;
 import br.com.criativasoft.opendevice.wsrest.io.WebUtils;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
@@ -22,12 +25,13 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 
+import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.ext.Provider;
 
 /**
  * Check the authentication token via the Bearer header, and performs validation using
- * {@link br.com.criativasoft.opendevice.restapi.auth.BearerTokenRealm BearerTokenRealm}. <br/>
+ * {@link BearerAuthRealm BearerTokenRealm}. <br/>
  * Validation rules are enforced by class: {@link org.secnod.shiro.jersey.ShiroAnnotationResourceFilter ShiroAnnotationResourceFilter} using annoted resources
  * @author Ricardo JL Rufino
  * @date 10/09/16
@@ -35,6 +39,8 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class AuthenticationFilter implements ContainerRequestFilter {
 
+    @Inject
+    private UserDao userDao;
 
     @Override
     public ContainerRequest filter(ContainerRequest request) {
@@ -49,16 +55,35 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
         Session session = subject.getSession(false);
 
-        if(session != null && subject.isAuthenticated()) session.touch();
+        if(session != null && subject.isAuthenticated()){
+            session.touch();
+            return request;
+        }
 
-        // Extract the token from the HTTP Authorization header
-        String authorizationHeader = request.getHeaderValue(HttpHeaders.AUTHORIZATION);
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String token = authorizationHeader.substring("Bearer".length()).trim(); // API_KEY
+        if(!subject.isAuthenticated()) {
 
-            if(!subject.isAuthenticated()){
+            // Google OAuth ( Ex.: Alexa Skill )
+            String authorizationHeader = request.getHeaderValue(HttpHeaders.AUTHORIZATION);
+            if (authorizationHeader != null && authorizationHeader.startsWith("Google ")) {
+                String token = authorizationHeader.substring("Google".length()).trim(); // Token
 
-                BearerAuthenticationToken bearerToken = new BearerAuthenticationToken(token);
+                GoogleAuthToken bearerToken = new GoogleAuthToken(token);
+
+                try{
+                    subject.login(bearerToken); // Use BearerTokenRealm
+
+                }catch (AuthenticationException e){
+                    throw new AuthenticationException("Invalid AuthToken");
+                }
+
+            }
+
+            // Extract the token from the HTTP Authorization header
+            authorizationHeader = request.getHeaderValue(HttpHeaders.AUTHORIZATION);
+            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                String token = authorizationHeader.substring("Bearer".length()).trim(); // API_KEY
+
+                BearerAuthToken bearerToken = new BearerAuthToken(token);
 
                 try{
                     subject.login(bearerToken); // Use BearerTokenRealm
@@ -69,6 +94,9 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             }
 
         }
+
+
+        // NOTE: if not Autenticated, the UnauthenticatedException will throw (AuthorizationExceptionMap)
 
         return request;
     }

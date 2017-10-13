@@ -25,15 +25,31 @@ public final class WebUtils {
 
     public static boolean isWebResource(String path){
 
+        int dot = path.lastIndexOf(".");
+        if (dot < 0) {
+            return false;
+        }
+
+        String ext = path.substring(dot + 1);
+        int queryString = ext.indexOf("?");
+        if (queryString > 0) {
+            ext = ext.substring(0, queryString);
+        }
+
         // Ignore Web Resources.
-        if(path != null && (
-                path.endsWith(".css") ||
-                path.endsWith(".css.map") ||
-                path.endsWith(".ico")  ||
-                path.endsWith(".js")  ||
-                path.endsWith(".js.map")  ||
-                path.endsWith(".png") ||
-                path.endsWith(".jpg")) ){
+        if(ext != null && (
+                ext.endsWith("css") ||
+                ext.endsWith("css.map") ||
+                ext.endsWith("ico")  ||
+                ext.endsWith("js")  ||
+                ext.endsWith("js.map")  ||
+                ext.endsWith("map")  ||
+                ext.endsWith("ttf")  ||
+                ext.endsWith("woff")  ||
+                ext.endsWith("woff2")  ||
+                ext.endsWith("png") ||
+                ext.endsWith("jpeg") ||
+                ext.endsWith("jpg")) ){
 
             return true;
         }

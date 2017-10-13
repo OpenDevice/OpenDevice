@@ -30,7 +30,8 @@ import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.core.util.StringUtils;
 import br.com.criativasoft.opendevice.restapi.WaitResponseListener;
 import br.com.criativasoft.opendevice.restapi.auth.AccountDaoRealm;
-import br.com.criativasoft.opendevice.restapi.auth.BearerTokenRealm;
+import br.com.criativasoft.opendevice.restapi.auth.BearerAuthRealm;
+import br.com.criativasoft.opendevice.restapi.auth.GoogleAuthRealm;
 import br.com.criativasoft.opendevice.wsrest.filter.CrossOriginInterceptor;
 import br.com.criativasoft.opendevice.wsrest.filter.NewShiroInterceptor;
 import br.com.criativasoft.opendevice.wsrest.guice.config.ConnectionGuiceProvider;
@@ -162,7 +163,8 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             // Authentication
             if(odevc.isAuthRequired()){
                 List<Realm> realms = new LinkedList<Realm>();
-                realms.add(new BearerTokenRealm((DeviceManager) getConnectionManager()));
+                realms.add(new BearerAuthRealm((DeviceManager) getConnectionManager()));
+                realms.add(new GoogleAuthRealm((DeviceManager) getConnectionManager()));
                 realms.add(new AccountDaoRealm((DeviceManager) getConnectionManager()));
 
                 RestWebSecurityManager securityManager = new RestWebSecurityManager(realms);

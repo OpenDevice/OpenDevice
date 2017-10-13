@@ -38,7 +38,7 @@ public class AuthorizationExceptionMap implements ExceptionMapper<AuthorizationE
         log.debug(exception.getMessage());
 
         if(exception instanceof UnauthenticatedException){
-            return ErrorResponse.status(Response.Status.UNAUTHORIZED,"Authorization Required");
+            return ErrorResponse.UNAUTHORIZED("Authorization Required", "WWW-Authenticate");
         }
 
         return ErrorResponse.status(Response.Status.UNAUTHORIZED,"Unauthorized");

@@ -31,6 +31,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -57,40 +58,21 @@ public class IndexRest {
         Subject subject = (Subject) request.getAttribute(FrameworkConfig.SECURITY_SUBJECT);
 
         String location;
-        File path = null;
+
         if(!config.isAuthRequired() || subject.isAuthenticated()){
-            location = "admin.html";
+            location = "index.html";
         }else{
             location = "login.html";
         }
 
-        // Find base path
-        if(connection instanceof WSServerConnection){
-            List<String> webresources = ((WSServerConnection) connection).getWebresources();
-            path = findInWebPath(webresources, location);
-        }
-
-//        if(!config.isAuthRequired() || subject.isAuthenticated()){
-//            location = new java.net.URI("admin.html");
-//        }else{
-//            location = new java.net.URI("login.html");
-//        }
-//        return Response.temporaryRedirect(location).build();
-
-        if(path != null){
-            return new FileInputStream(path);
-        }else{
-            throw new IllegalStateException(location + " not found in webapp path");
-        }
-
-
+        return resource(location);
     }
 
     @GET
-    @Path("/admin")
+    @Path("/login")
     @Produces({MediaType.TEXT_HTML})
-    public InputStream admin( @Context AtmosphereResource res) throws Exception {
-        return index(res);
+    public InputStream login( @Context AtmosphereResource res) throws Exception {
+        return resource("login.html");
     }
 
     @GET
@@ -103,6 +85,21 @@ public class IndexRest {
         return Response.ok().build();
     }
 
+    private InputStream resource(String location) throws FileNotFoundException {
+        // Find base path
+        File path = null;
+
+        if(connection instanceof WSServerConnection){
+            List<String> webresources = ((WSServerConnection) connection).getWebresources();
+            path = findInWebPath(webresources, location);
+        }
+
+        if(path != null){
+            return new FileInputStream(path);
+        }else{
+            throw new IllegalStateException(location + " not found in webapp path");
+        }
+    }
 
     private File findInWebPath(List<String> webresources, String file){
         for (String webresource : webresources) {

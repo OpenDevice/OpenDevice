@@ -26,6 +26,41 @@
 
     <div class="row">
 
+        <div class="col-md-12" ng-if="ctrl.devices.length == 0">
+
+            <div class="box box-widget">
+                <div class="box-body">
+
+                    <div class="media">
+                        <div class="media-left">
+                            <img src="images/boards/preview_board.svg" alt="Preview" class="media-object  hidden-xs" style="width: 450px;height: auto;border-radius: 4px;box-shadow: 0 1px 3px rgba(0,0,0,.15);">
+                        </div>
+                        <div class="media-body">
+                            <div class="clearfix">
+                                <h3 style="margin-top: 0">You have no  Boards</h3>
+                                <p class="lead text-muted">
+                                    A board can hold multiple sensors and actuators. The OpenDevice SDK provides libraries and APIs to facilitate the creation of devices that connect with the
+                                    platform using various communication technologies and protocols.
+                                </p>
+
+                                <p class="lead text-muted">
+                                    The boads using arduino framework (like ESP8266) <a href="https://github.com/OpenDevice/OpenDevice/wiki/Supported-Devices">are compatible</a> with OpenDevice by default, other devices will be supported via plugins or the REST API.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.box-body -->
+
+                <!-- /.box-footer -->
+                <div class="box-footer">
+
+                </div>
+                <!-- /.box-footer -->
+            </div>
+        </div>
+
         <div class="col-md-4" ng-repeat="device in ctrl.devices | filter:searchFilter">
 
                 <div class="box box-widget widget-user" >
@@ -110,7 +145,8 @@
     <script type="text/ng-template" id="boards/initialHelp.htmlx">
         <h4> <mark>1.</mark> Choose a compatible board</h4>
         <p> The boads using arduino framework (like ESP8266) are compatible with OpenDevice <br/> See
-            <a href="https://github.com/OpenDevice/OpenDevice/wiki/Supported-Devices" target="_blank">supported devices</a> for additional information </p>
+            <a href="https://github.com/OpenDevice/OpenDevice/wiki/Supported-Devices" target="_blank">supported devices</a> for additional information, some device types not require libraries.
+        </p>
 
         <h4> <mark>2.</mark> Install the Library</h4>
         You can install the library using <a href="http://www.arduino.cc/en/guide/libraries" target="_blank">Arduino Library Manager</a> ou download current version from
@@ -120,6 +156,7 @@
         <p>You can use code samples provided in Arduino IDE (Examples > OpenDevice) <br/>
             More advanced projects can be found in: <a href="https://github.com/OpenDevice/opendevice-examples" target="_blank">opendevice-examples</a>
         </p>
+
     </script>
 
 
@@ -129,7 +166,7 @@
             <div class="col-lg-6 col-xs-12">
                 <div class="dash-add-box small-box bg-aqua" ng-click="ctrl.newBordPage = 'mqtt'">
                     <div class="inner">
-                        <h3>MQTT</h3>
+                        <h3>MQTT & Generic</h3>
                     </div>
                     <div class="icon">
                         <i class="fa fa-connectdevelop"></i>
@@ -185,11 +222,10 @@
 
         <div class="callout callout-info">
             <h4><i class="icon fa fa-info"></i> Info!</h4>
-            MQTT connections are initiated by the client devices, requires no direct server configuration. <br/>
-            You should just follow the <a ng-click="ctrl.newBordPage = 'initialHelp'">initial instructions</a> , and configure ApiKey on your device
+            MQTT connections are initiated by the client devices (self-registration), requires no direct server configuration. <br/>
         </div>
 
-        <h4> <mark>4.</mark> Change API Key</h4>
+        <h4> <mark>4.</mark> Use API Key</h4>
         <p>Use one of the keys below (<a href ng-click="ctrl.updateApiKeys()">refresh</a>):</p>
 
         <blockquote>

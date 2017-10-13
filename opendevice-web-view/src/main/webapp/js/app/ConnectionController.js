@@ -29,7 +29,7 @@ pkg.controller('ConnectionController', function ($scope,$route, ConnectionRest) 
     // ==========================
     var _this = this;
     var _public = this;
-    var updateInterval;
+    // var updateInterval;
 
 
     // Public
@@ -45,7 +45,7 @@ pkg.controller('ConnectionController', function ($scope,$route, ConnectionRest) 
 
         // Destroy Controller Event
         $scope.$on("$destroy", function() {
-            $interval.cancel(updateInterval);
+            // $interval.cancel(updateInterval);
         });
 
 

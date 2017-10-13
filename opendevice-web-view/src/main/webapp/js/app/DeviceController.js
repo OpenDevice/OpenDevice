@@ -58,10 +58,10 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
 
         // Wait for devices full loaded
         if(!ODev.isConnected()){
-            _this.odevListeners.push(ODev.onConnect(function(){
+            odevListeners.push(ODev.onConnect(function(){
                 _this.init();
             }));
-            return;
+            // return; (allow off-line)
         }
 
         if($routeParams.boardID == "standalone"){ // Standalone Devices (DeviceList)

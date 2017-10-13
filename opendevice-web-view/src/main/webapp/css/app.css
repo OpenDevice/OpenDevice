@@ -72,6 +72,14 @@
     url('/fonts/Source-Sans-Pro-700/Source-Sans-Pro-700.svg#SourceSansPro') format('svg');
 }
 
+/* Settings for Plugins
+----------------------------------------------------------------------------------------------------*/
+@media  (max-width: 480px) {
+    .main-header a.logo{
+        display: none;
+    }
+}
+
 
 /* Settings for Plugins
 ----------------------------------------------------------------------------------------------------*/

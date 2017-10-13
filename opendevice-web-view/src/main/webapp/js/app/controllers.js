@@ -35,6 +35,7 @@ pkg.controller('PageController', function ( $http, $scope) {
 
 
     $scope.$on("$routeChangeSuccess", function () {
+
         // Activate SideBar on Route Change
         var hrefs = window.location.hash; //html5: true
         angular.forEach($('ul.sidebar-menu a'), function (a) {
@@ -45,6 +46,10 @@ pkg.controller('PageController', function ( $http, $scope) {
                 a.parent().removeClass('active');
             };
         });
+
+        if(Utils.isMobile()){
+            $('body').removeClass("sidebar-open");
+        }
 
 
     });
@@ -71,8 +76,9 @@ pkg.controller('PageController', function ( $http, $scope) {
 
 
     _public.logout = function(){
+        sessionStorage.setItem("logged", false);
         ODev.logout(function(){
-            window.location = "/?logout=true";
+            window.location = "/login.html?logout=true";
         });
     };
 

@@ -49,8 +49,15 @@ app.run(function($rootScope) {
         $.get("/api/auth/ping");
     }, 1000 * 60 * 15); //15min
 
+
+    // If not logged go to login page
+    if(!sessionStorage.getItem("logged") || sessionStorage.getItem("logged") == 'false'){
+        window.location = "/login.html";
+    }
+
     ODev.on("loginFail", function(){
-        window.location = "/?message=Not%20Logged%20or%20Expired";
+        sessionStorage.setItem("logged", false);
+        window.location = "/login.html?message=Not%20Logged%20or%20Expired";
     });
 
     $( document ).ajaxError(function( event, jqXHR, ajaxSettings, thrownError ) {
@@ -90,13 +97,15 @@ app.config(['$routeProvider', function($routeProvider) {
     var odev_wait = {
         "check":function($q){
             var defer = $q.defer();
-            if(ODev.isConnected()){
-                defer.resolve(true);
-            }else{
-                ODev.onConnect(function(){
-                    defer.resolve(true);
-                });
-            }
+
+            defer.resolve(true); // disable wait connection
+            // if(ODev.isConnected()){
+            //     defer.resolve(true);
+            // }else{
+            //     ODev.onConnect(function(){
+            //         defer.resolve(true);
+            //     });
+            // }
             return defer.promise; // route will wait the promise
         }
     };
@@ -201,3 +210,50 @@ app.filter('deviceNameRef', function() {
 
     }
 });
+
+
+// Service Worker for off-line capabilities
+// SEE: https://developers.google.com/web/fundamentals/codelabs/your-first-pwapp/
+if ('serviceWorkerXXXX' in navigator) {
+    // Delay registration until after the page has loaded, to ensure that our
+    // precaching requests don't degrade the first visit experience.
+    // See https://developers.google.com/web/fundamentals/instant-and-offline/service-worker/registration
+    window.addEventListener('load', function() {
+        // Your service-worker.js *must* be located at the top-level directory relative to your site.
+        // It won't be able to control pages unless it's located at the same level or higher than them.
+        // *Don't* register service worker file in, e.g., a scripts/ sub-directory!
+        // See https://github.com/slightlyoff/ServiceWorker/issues/468
+        navigator.serviceWorker.register('service-worker.js').then(function(reg) {
+            // updatefound is fired if service-worker.js changes.
+            reg.onupdatefound = function() {
+                // The updatefound event implies that reg.installing is set; see
+                // https://w3c.github.io/ServiceWorker/#service-worker-registration-updatefound-event
+                var installingWorker = reg.installing;
+
+                installingWorker.onstatechange = function() {
+                    switch (installingWorker.state) {
+                        case 'installed':
+                            if (navigator.serviceWorker.controller) {
+                                // At this point, the old content will have been purged and the fresh content will
+                                // have been added to the cache.
+                                // It's the perfect time to display a "New content is available; please refresh."
+                                // message in the page's interface.
+                                console.log('New or updated content is available.');
+                            } else {
+                                // At this point, everything has been precached.
+                                // It's the perfect time to display a "Content is cached for offline use." message.
+                                console.log('Content is now available offline!');
+                            }
+                            break;
+
+                        case 'redundant':
+                            console.error('The installing service worker became redundant.');
+                            break;
+                    }
+                };
+            };
+        }).catch(function(e) {
+            console.error('Error during service worker registration:', e);
+        });
+    });
+}

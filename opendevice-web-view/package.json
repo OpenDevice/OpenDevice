@@ -1,0 +1,22 @@
+{
+  "name": "opendevice-web-view",
+  "version": "1.0.0",
+  "description": "Default UI for OpenDevice Server",
+  "main": "service-worker.js",
+  "dependencies": {
+    "gulp-clean-css": "^3.9.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^3.0.0",
+    "gulp-useref": "^3.1.2",
+    "sw-precache": "^5.2.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "opendeivce",
+    "arduino"
+  ],
+  "author": "Ricardo JL Rufino",
+  "license": "Eclipse Public License v1.0"
+}

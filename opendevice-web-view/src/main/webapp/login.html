@@ -192,7 +192,8 @@
         $(".message").html("");
         localStorage.setItem("AuthToken", data.token);
         sessionStorage.setItem("LastPath", window.location.hash);
-        window.location = "/admin";
+        sessionStorage.setItem("logged", true);
+        window.location = "/";
     }
 
     $("#login").find("form").submit(function(event){

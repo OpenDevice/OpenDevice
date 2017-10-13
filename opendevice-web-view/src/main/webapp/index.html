@@ -19,28 +19,39 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
+    <link rel="manifest" href="/manifest.json">
+    <!-- Add to home screen for Safari on iOS -->
+    <meta name="theme-color" content="#3c8dbc">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="OpenDevice">
+    <link rel="apple-touch-icon" href="images/icons/logo-256x256.png">
+
     <link rel="icon" type="image/png" href="/images/favicon.png" />
 
-    <!-- Bootstrap 3.3.6 -->
+    <!-- build:css dist/css/contrib.min.css -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/animate.min.css">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="css/font-awesome.min.css">
-    <!-- Ionicons -->
-    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">-->
-    <!-- Theme style -->
+    <!-- endbuild -->
+
+    <!-- build:css dist/css/main.min.css -->
     <link rel="stylesheet" href="css/AdminLTE.min.css">
     <link rel="stylesheet" href="css/skin-blue.min.css">
-
-    <!-- angular ui-select-->
-    <link rel="stylesheet" type="text/css" href="js/angular/angular-ui-select.min.css" media="screen" />
-    <link rel="stylesheet" href="css/plugins/select2.css"/>
-    <!--<link rel="stylesheet" href="css/plugins/selectize.default.min.css"/>-->
-    <link rel="stylesheet" href="css/plugins/awesome-bootstrap-checkbox.css"/>
-    <link rel="stylesheet" href="js/plugins/daterangepicker.css"/>
-
     <link rel="stylesheet" href="css/app.css">
     <link rel="stylesheet" href="css/icons/icons.css">
+    <!-- endbuild -->
+
+    <!-- build:css dist/css/plugins.min.css -->
+    <link rel="stylesheet" href="css/animate.min.css">
+    <link rel="stylesheet" href="js/angular/angular-ui-select.min.css"  />
+    <link rel="stylesheet" type="text/css" href="js/angular/angular-gridster.min.css" media="screen"/>
+    <link rel="stylesheet" href="css/plugins/select2.css"/>
+    <link rel="stylesheet" href="css/plugins/awesome-bootstrap-checkbox.css"/>
+    <link rel="stylesheet" href="js/plugins/daterangepicker.css"/>
+    <!-- endbuild -->
+
+
+
 
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -181,9 +192,6 @@
 <div ng-include="'/pages/subpages/confirm.html'"></div>
 
 <!-- REQUIRED JS SCRIPTS -->
-
-<script src="js/jquery-2.2.3.min.js"></script>
-
 <script>
     // Defining AdminLTEOptions
     var AdminLTEOptions = {
@@ -194,36 +202,12 @@
 </script>
 
 
-
-<!-- ----------------------------------------------------- -->
-<!-- OpenDevice -->
-<!-- ----------------------------------------------------- -->
-
-<script type="text/javascript" src="js/atmosphere.js"></script>
-
-<script type="text/javascript" src="js/opendevice.js"></script>
-<!-- Development Files Coment in Production -->
-<script type="text/javascript" src="js/Constants.js"></script>
-<script type="text/javascript" src="js/Device.js"></script>
-<script type="text/javascript" src="js/DeviceConnection.js"></script>
-<script type="text/javascript" src="js/DeviceManager.js"></script>
-<script type="text/javascript" src="js/OpenDeviceJS.js"></script>
-
-
-<!-- mvn:dependency -->
-<script type="text/javascript" src="js/app/extend.js"></script>
-<script type="text/javascript" src="js/opendevice/DashItemView.js"></script>
-<script type="text/javascript" src="js/opendevice/ChartItemView.js"></script>
-<script type="text/javascript" src="js/opendevice/DigitalCtrlView.js"></script>
-<script type="text/javascript" src="js/opendevice/ImageCtrlView.js"></script>
-
 <!-- ----------------------------------------------------- -->
 <!-- Jquery -->
 <!-- ----------------------------------------------------- -->
-<!--<script type="text/javascript" src="plugins/jgrowl/jquery.jgrowl-min.js"></script>-->
-<!--<script type="text/javascript" src="plugins/validate/jquery.validate-min.js"></script>-->
-<script type="text/javascript" src="js/jquery.textfill.min.js"></script>
-<script src="js/fastclick.min.js"></script> <!-- library for eliminating the 300ms delay  -->
+
+<!-- build:js dist/js/contrib.bundle.js -->
+<script src="js/jquery-2.2.3.min.js"></script>
 
 <script src="js/highcharts.js"></script>
 <script src="js/highcharts-more.js"></script>
@@ -235,35 +219,66 @@
 
 <script src="js/adminlte-app.min.js"></script> <!-- AdminLTE Theme/js -->
 
-
-<script src="js/spin.min.js"></script> <!-- Spinner -->
-
-
 <script src="js/plugins/daterangepicker.moment.min.js"></script>
 <script src="js/plugins/daterangepicker.js"></script>
+<script src="js/spin.min.js"></script> <!-- Spinner -->
+
+<script type="text/javascript" src="js/jquery.textfill.min.js"></script>
+<script src="js/fastclick.min.js"></script> <!-- library for eliminating the 300ms delay  -->
+<!-- endbuild -->
+
 
 <!-- ----------------------------------------------------- -->
 <!-- AngularJS Code -->
 <!-- ----------------------------------------------------- -->
 
-<script type="text/javascript" src="js/angular/angular.min-1.5.8.js"></script>
+<!-- build:js dist/js/angular.bundle.js -->
+<script type="text/javascript" src="js/angular/angular-1.5.8.min.js"></script>
 <script type="text/javascript" src="js/angular/angular-route.min.js"></script>
 <script type="text/javascript" src="js/angular/angular-resource.min.js"></script>
 <script type="text/javascript" src="js/angular/angular-sanitize.min.js"></script> <!-- for ui-select -->
 <script type="text/javascript" src="js/angular/angular-ui-select.min.js"></script>
 <script type="text/javascript" src="js/angular/angular-animate.min.js"></script>
-
-<link rel="stylesheet" type="text/css" href="js/angular/angular-gridster.min.css" media="screen"/>
 <script type="text/javascript" src="js/angular/angular-gridster-resizedep.js"></script>
-<script type="text/javascript" src="js/angular/angular-gridster.js"></script>
+<script type="text/javascript" src="js/angular/angular-gridster.min.js"></script>
+<!-- endbuild -->
+
 
 <!-- Loading bar-->
 <!--<script type="text/javascript" src="js/plugins/nprogress.js"></script>-->
 <!--<link rel="stylesheet" type="text/css" href="js/plugins/nprogress.css" media="screen"/>-->
 
+
+<!-- ----------------------------------------------------- -->
+<!-- OpenDevice -->
+<!-- ----------------------------------------------------- -->
+
+<!-- build:js dist/js/opendevice.bundle.js -->
+<script type="text/javascript" src="js/atmosphere.js"></script> <!-- OpenDevice DEP -->
+<script type="text/javascript" src="js/opendevice.js"></script> <!-- mvn-dependency -->
+<!-- endbuild -->
+
+<!-- OpenDevice: Development Files (mvn-dependency) - Removed in Production -->
+<!-- build:remove -->
+<script type="text/javascript" src="js/Constants.js"></script>
+<script type="text/javascript" src="js/Device.js"></script>
+<script type="text/javascript" src="js/DeviceConnection.js"></script>
+<script type="text/javascript" src="js/DeviceStorage.js"></script>
+<script type="text/javascript" src="js/DeviceManager.js"></script>
+<script type="text/javascript" src="js/OpenDeviceJS.js"></script>
+<!-- endbuild -->
+
+
 <!-- ----------------------------------------------------- -->
 <!-- Application Code -->
 <!-- ----------------------------------------------------- -->
+
+<!-- build:js dist/js/main.min.js -->
+<script type="text/javascript" src="js/app/extend.js"></script>
+<script type="text/javascript" src="js/opendevice/DashItemView.js"></script>
+<script type="text/javascript" src="js/opendevice/ChartItemView.js"></script>
+<script type="text/javascript" src="js/opendevice/DigitalCtrlView.js"></script>
+<script type="text/javascript" src="js/opendevice/ImageCtrlView.js"></script>
 
 <script type="text/javascript" src="js/app/Utils.js"></script>
 <script type="text/javascript" src="js/app/app.js"></script>
@@ -276,8 +291,7 @@
 <script type="text/javascript" src="js/app/ActionController.js"></script>
 <script type="text/javascript" src="js/app/RuleController.js"></script>
 <script type="text/javascript" src="js/app/JobController.js"></script>
-
-
+<!-- endbuild -->
 
 
 </body>

@@ -84,6 +84,10 @@ public class User {
         return accounts;
     }
 
+    public UserAccount getLasLoginAccount() {
+        return accounts.iterator().next(); // TODO: set last login account
+    }
+
     public void setAccounts(Set<UserAccount> accounts) {
         this.accounts = accounts;
     }

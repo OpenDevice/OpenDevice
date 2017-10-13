@@ -30,23 +30,23 @@ import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BearerTokenRealm extends AbstractAuthorizingRealm {
+public class BearerAuthRealm extends AbstractAuthorizingRealm {
 
     public static final String TOKEN_CACHE = "AuthTokenCache";
 
-    private static final Logger log = LoggerFactory.getLogger(BearerTokenRealm.class);
+    private static final Logger log = LoggerFactory.getLogger(BearerAuthRealm.class);
 
     private DeviceManager manager;
 
-    public BearerTokenRealm(DeviceManager manager) {
+    public BearerAuthRealm(DeviceManager manager) {
         this.manager = manager;
         setAuthenticationCachingEnabled(true);
-        setAuthenticationTokenClass(BearerAuthenticationToken.class);
+        setAuthenticationTokenClass(BearerAuthToken.class);
     }
 
     public AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
 
-        BearerAuthenticationToken authToken = (BearerAuthenticationToken)token;
+        BearerAuthToken authToken = (BearerAuthToken)token;
 
         String authTokenS = (String) authToken.getPrincipal();
 

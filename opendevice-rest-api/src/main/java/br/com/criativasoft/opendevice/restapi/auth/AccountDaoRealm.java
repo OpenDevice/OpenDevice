@@ -41,7 +41,7 @@ public class AccountDaoRealm extends AbstractAuthorizingRealm {
     }
 
     @Override
-    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)  {
 
         AccountAuth accountAuth = (AccountAuth) token;
 

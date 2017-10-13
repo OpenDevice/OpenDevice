@@ -16,31 +16,25 @@ package br.com.criativasoft.opendevice.restapi.auth;
 import org.apache.shiro.authc.AuthenticationToken;
 
 /**
- * Autentication using accountID (see AuthenticationFilter)
+ * Autentication using token (see: AuthenticationFilter)
+ * @see
  * @see BearerAuthRealm
  */
-public class AccountAuth implements AuthenticationToken {
+public class BearerAuthToken implements AuthenticationToken {
 
-    private long userAccountID;
+    private String token;
 
-    private long userID;
-
-    public AccountAuth(long userAccountID, long userID) {
-        this.userAccountID = userAccountID;
-        this.userID = userID;
+    public BearerAuthToken(String token) {
+        this.token = token;
     }
 
     @Override
     public Object getPrincipal() {
-        return userAccountID;
+        return token;
     }
 
     @Override
     public Object getCredentials() {
-        return userAccountID;
-    }
-
-    public long getUserAccountID() {
-        return userAccountID;
+        return token;
     }
 }

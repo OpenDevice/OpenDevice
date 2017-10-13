@@ -15,16 +15,11 @@ package br.com.criativasoft.opendevice.restapi.auth;
 
 import org.apache.shiro.authc.AuthenticationToken;
 
-/**
- * Autentication using token (see: AuthenticationFilter)
- * @see
- * @see BearerTokenRealm
- */
-public class BearerAuthenticationToken implements AuthenticationToken {
+public class GoogleAuthToken implements AuthenticationToken {
 
     private String token;
 
-    public BearerAuthenticationToken(String token) {
+    public GoogleAuthToken(String token) {
         this.token = token;
     }
 

@@ -15,6 +15,7 @@ package br.com.criativasoft.opendevice.restapi;
 
 import br.com.criativasoft.opendevice.core.DataManager;
 import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
+import br.com.criativasoft.opendevice.restapi.model.dao.UserDao;
 
 /**
  * TODO: Add docs.
@@ -25,5 +26,7 @@ import br.com.criativasoft.opendevice.restapi.model.dao.AccountDao;
 public interface ApiDataManager extends DataManager {
 
     public AccountDao getAccountDao();
+
+    public UserDao getUserDao();
 
 }

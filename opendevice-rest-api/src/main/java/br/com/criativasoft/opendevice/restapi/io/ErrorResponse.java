@@ -66,6 +66,12 @@ public class ErrorResponse {
         return Response.status(status).entity(new ErrorMessage(status, message)).type(MediaType.APPLICATION_JSON_TYPE).build();
     }
 
+    public static Response UNAUTHORIZED(String message, String header){
+        int status = Response.Status.UNAUTHORIZED.getStatusCode();
+        return Response.status(status).entity(new ErrorMessage(status, message)).type(MediaType.APPLICATION_JSON_TYPE)
+                .header(header, "Token").build();
+    }
+
     public static Response BAD_REQUEST(String message){
         int status = Response.Status.BAD_REQUEST.getStatusCode();
         return Response.status(status).entity(new ErrorMessage(status, message)).type(MediaType.APPLICATION_JSON_TYPE).build();

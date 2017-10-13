@@ -38,6 +38,14 @@ od.Device = function(data){
         this.manager = od.deviceManager;
 
         // Dynamic Properties and Funtions
+        this.updateRawData(data);
+    }
+
+    /**
+     * Update dynamic Properties and Funtions
+     * @param data
+     */
+    this.updateRawData = function(data){
 
         for (var attrname in data) this[attrname] = data[attrname];
 
@@ -53,9 +61,7 @@ od.Device = function(data){
                 _this.manager.send({type : CType.ACTION, deviceID : _this.id, action : method, params : paramlist });
             }
         });
-
-    }
-
+    };
     function notifyListeners(){
 
     }

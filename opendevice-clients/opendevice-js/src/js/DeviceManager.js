@@ -84,6 +84,9 @@ od.DeviceManager = function(connection){
     this.removeDevice = function(device){
 
         return ODev.devices.delete(device.id, function(){
+
+            var devices = _this.getDevices();
+
             var index = devices.indexOf(device);
             if(index >= 0) devices.splice(index, 1);
 

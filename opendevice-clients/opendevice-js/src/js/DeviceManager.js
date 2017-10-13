@@ -35,8 +35,8 @@ od.DeviceManager = function(connection){
     var DeviceType = od.DeviceType;
 
     // Private
-    var devices = [];
     var types = [];
+    var storage = new od.DeviceStorage();
 
     var listenersMap = {};
     var listenerReceiver = []; // current listerners (for single page model)
@@ -99,7 +99,12 @@ od.DeviceManager = function(connection){
 
     this.getDevices = function(){
 
-        if(devices.length > 0) return devices; // return from cache...
+        var devices = storage.getDevices();
+
+        if(devices && devices.length > 0){
+            initialized = true;
+            return devices; // return from cache...
+        }
 
         devices = this.sync(/*notify=*/false); // load remote
 
@@ -158,7 +163,7 @@ od.DeviceManager = function(connection){
      */
     this.findDevice = function(deviceID, deviceList){
 
-        if(!deviceList) deviceList = devices;
+        if(!deviceList) deviceList = this.getDevices();
 
         if(deviceList){
             for(var i = 0; i < deviceList.length; i++){
@@ -182,9 +187,9 @@ od.DeviceManager = function(connection){
     this.sync = function(notify, forceSync){
 
         // load remote.
-        devices = _getDevicesRemote();
+        var devices = _getDevicesRemote();
 
-        // force sync (send GetDeviceRequest for all devices)
+        // force sync (send GetDeviceRequest for all physical devices)
         if(forceSync || (devices && devices.length == 0)) {
             _this.send({type : CType.GET_DEVICES, forceSync : forceSync});
         }
@@ -333,12 +338,9 @@ od.DeviceManager = function(connection){
         return false;
     };
 
-
-
     this.isConnected = function(){
-        return _this.connection.isConnected() && initialized;
+        return _this.connection.isConnected();
     };
-
 
     this.notifyDeviceListeners = function(device, sync){
 
@@ -362,6 +364,10 @@ od.DeviceManager = function(connection){
         // Notify Global Listeners
         notifyListeners(DEvent.DEVICE_CHANGED, device);
 
+    };
+
+    this.notifyListeners = function(event, data){
+        notifyListeners(event, data);
     };
 
     function notifyListeners(event, data){
@@ -394,6 +400,10 @@ od.DeviceManager = function(connection){
         var response = OpenDevice.devices.list(); // rest !
 
         var devices = [];
+
+        if(response.length > 0){
+            storage.updateDevices(response);
+        }
 
         for(var i = 0; i < response.length; i++ ){
             var device = new od.Device(response[i]);

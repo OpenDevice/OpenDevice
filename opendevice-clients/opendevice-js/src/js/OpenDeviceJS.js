@@ -14,6 +14,7 @@
 var od = od || {};
 
 od.SESSION_ID = "AuthToken"; // For cookie/localstore search
+od.DEVICES_STORAGE_ID = "odev_devices"; //
 
 od.version = "0.3.2";
 od.appID = "*"; // ApyKey Value
@@ -34,6 +35,7 @@ return {
     // Manager delegate
     on : manager.on,
     removeListener : manager.removeListener,
+    notifyListeners : manager.notifyListeners,
     setListenerReceiver : manager.setListenerReceiver,
     onDeviceChange : manager.onDeviceChange,
     onChange : manager.onDeviceChange,
@@ -86,6 +88,9 @@ return {
 
         response.fail(function(){
             console.error("Rest fail, status ("+response.status+"): " + response.responseText );
+            if(response.status == 401){
+                manager.notifyListeners(od.Event.LOGIN_FAILURE, od.CommandStatus.UNAUTHORIZED);
+            }
         });
 
         // TODO: fazer tratamento dos possíveis erros (como exceptions e servidor offline ou 404)

@@ -109,7 +109,7 @@ public class NewShiroInterceptor extends AtmosphereInterceptorAdapter {
             // Disable session creation for Rest (make stateless)
             if(request instanceof HttpServletRequest){
                 String header = ((HttpServletRequest) request).getHeader(HttpHeaders.AUTHORIZATION);
-                if (header != null && (header.startsWith("Bearer ") || header.startsWith("Basic "))) {
+                if (header != null && (header.startsWith("Bearer ") || header.startsWith("Basic ") || header.startsWith("Google ") )) {
                     getSubjectContext().setSessionCreationEnabled(false);
                     request.setAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED, false);
                 }

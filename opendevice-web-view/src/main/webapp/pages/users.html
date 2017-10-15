@@ -11,25 +11,27 @@
                     <form ng-submit="ctrl.save(model)">
                         <img class="profile-user-img img-responsive img-circle" src="/images/icons/medium/add-user.png" alt="User profile picture">
 
-                        <h3 class="profile-username text-center">Register User</h3>
+                        <a href="javascript:void(0)" ng-click="editUser=true" class=""><h3 class="text-center">Register User</h3></a>
 
                         <input type="hidden"  autocomplete="false" ng-model="model.id" />
 
-                        <ul class="list-group list-group-unbordered">
-                            <li class="list-group-item">
-                                <div class="has-feedback">
-                                    <input type="text" class="form-control" placeholder="Email / User Name" autocomplete="false" ng-model="model.username" required="required"/>
-                                    <span class="form-control-feedback"><i class="fa fa-user"></i></span>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <div class="has-feedback">
-                                    <input type="password" class="form-control" placeholder="Password" autocomplete="false" ng-model="model.password" required="required"/>
-                                    <span class="form-control-feedback"><i class="fa fa-key"></i></span>
-                                </div>
-                            </li>
-                        </ul>
-                        <button type="submit" class="btn btn-primary btn-block">Save</button>
+                        <div ng-show="editUser == true">
+                            <ul class="list-group list-group-unbordered">
+                                <li class="list-group-item">
+                                    <div class="has-feedback">
+                                        <input type="text" class="form-control" placeholder="Email / User Name" autocomplete="false" ng-model="model.username" required="required"/>
+                                        <span class="form-control-feedback"><i class="fa fa-user"></i></span>
+                                    </div>
+                                </li>
+                                <li class="list-group-item">
+                                    <div class="has-feedback">
+                                        <input type="password" class="form-control" placeholder="Password" autocomplete="false" ng-model="model.password" required="required"/>
+                                        <span class="form-control-feedback"><i class="fa fa-key"></i></span>
+                                    </div>
+                                </li>
+                            </ul>
+                            <button type="submit" class="btn btn-primary btn-block">Save</button>
+                        </div>
                     </form>
                 </div>
                 <!-- /.box-body -->

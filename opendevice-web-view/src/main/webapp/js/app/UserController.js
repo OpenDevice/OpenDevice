@@ -79,6 +79,7 @@ pkg.controller('UserController', function ($scope, AccountRest) {
 
         $scope.model = angular.copy(user);
         $scope.model.index = index;
+        $scope.editUser=true;
 
     };
 

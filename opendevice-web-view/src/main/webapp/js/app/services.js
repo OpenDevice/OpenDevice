@@ -88,6 +88,7 @@ app.factory('AccountRest', ['$resource', function($resource){
 
     return $resource(PATH+'/:id', { id: '@id' }, { // configure defauls
         listUsers: {method:'GET', url : PATH+"/users", isArray:true},
+        lisKeys: {method:'GET', url : PATH+"/keys", isArray:true},
         addUser: {method:'POST', url : PATH+"/users"},
         deleteUser: {method:'DELETE', url : PATH+"/users/:id"}
     });

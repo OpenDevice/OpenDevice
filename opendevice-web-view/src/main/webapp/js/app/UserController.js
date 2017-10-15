@@ -38,6 +38,8 @@ pkg.controller('UserController', function ($scope, AccountRest) {
 
     this.accounts = [];
 
+    this.keys = [];
+
     $scope.model = {}; // curren editing
 
     _public.init = function(){
@@ -117,6 +119,25 @@ pkg.controller('UserController', function ($scope, AccountRest) {
 
     };
 
+
+    _public.showApiKeys = function(){
+
+        var keys = AccountRest.lisKeys();
+        keys.$promise.then(function(list) {
+
+            debugger;
+            list.forEach(function(item){
+                var data = encodeURIComponent(location.host + "," + item.key);
+                item.qrcode = data;
+            });
+
+            _this.keys = keys;
+
+        });
+
+
+
+    };
 
 
     // ============================================================================================

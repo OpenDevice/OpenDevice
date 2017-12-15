@@ -128,7 +128,7 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
             if(oconfig.isAuthRequired() || oconfig.isTenantsEnabled()){
                 server.setAuthenticator(new IAuthenticator() {
                     @Override
-                    public boolean checkValid(String username, byte[] password) {
+                    public boolean checkValid(String clientID, String username, byte[] password) {
                         return TenantProvider.getTenantProvider().exist(username);
                     }
                 });
@@ -174,6 +174,16 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
     private InterceptHandler serverListener = new InterceptHandler() {
 
         @Override
+        public String getID() {
+            return "MQTTServerConnection";
+        }
+
+        @Override
+        public Class<?>[] getInterceptedMessageTypes() {
+            return InterceptHandler.ALL_MESSAGE_TYPES;
+        }
+
+        @Override
         public void onConnect(InterceptConnectMessage msg) {
             log.debug("onConnect: {}", msg.getClientID());
 
@@ -191,15 +201,26 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
         @Override
         public void onDisconnect(InterceptDisconnectMessage msg) {
             log.debug("onDisconnect: {}", msg.getClientID());
+            onDisconnectionOrLost(msg.getClientID());
+        }
 
-            String appID = msg.getClientID().split("/")[0];
-            String moduleName = msg.getClientID().split("/")[1];
+
+        @Override
+        public void onConnectionLost(InterceptConnectionLostMessage msg) {
+            log.debug("onConnectionLost: {}", msg.getClientID());
+            onDisconnectionOrLost(msg.getClientID());
+        }
+
+        private void onDisconnectionOrLost(String clientID){
+
+            String appID = clientID.split("/")[0];
+            String moduleName = clientID.split("/")[1];
 
             TenantProvider.setCurrentID(appID);
 
             BaseDeviceManager manager = (BaseDeviceManager) MQTTServerConnection.this.manager;
 
-            MQTTResource resource = (MQTTResource) manager.findConnection(msg.getClientID());
+            MQTTResource resource = (MQTTResource) manager.findConnection(clientID);
 
             if(resource == null) resource = (MQTTResource) manager.findConnection(appID +"/in/"+moduleName);
 
@@ -208,9 +229,16 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
             }
         }
 
+
         @Override
         public void onPublish(InterceptPublishMessage msg) {
-            System.err.println("<<"+msg.getClientID()+">> Received on topic: " + msg.getTopicName() + " content: " + new String(msg.getPayload().array()));
+
+            byte[] data = new byte[msg.getPayload().capacity()];
+            msg.getPayload().getBytes(0, data);
+
+            System.err.println("<<"+msg.getClientID()+">> Received on topic: " + msg.getTopicName() + " content: " + new String(data));
+
+            msg.getPayload();
 
             String appID = msg.getClientID().split("/")[0];
             String moduleName = msg.getClientID().split("/")[1];
@@ -231,7 +259,7 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
 
                 MessageSerializer serializer = getSerializer();
 
-                Message message = serializer.parse(msg.getPayload().array());
+                Message message = serializer.parse(data);
                 if(message instanceof Command) {
                     message.setConnectionUUID(connection.getUID());
                     ((Command) message).setApplicationID(appID);
@@ -280,6 +308,11 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
         @Override
         public void onUnsubscribe(InterceptUnsubscribeMessage msg) {
 
+
+        }
+
+        @Override
+        public void onMessageAcknowledged(InterceptAcknowledgedMessage msg) {
 
         }
     };

@@ -18,8 +18,10 @@ import br.com.criativasoft.opendevice.connection.ConnectionStatus;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.connection.serialize.MessageSerializer;
-import io.moquette.proto.messages.AbstractMessage;
-import io.moquette.proto.messages.PublishMessage;
+import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.mqtt.MqttMessageBuilders;
+import io.netty.handler.codec.mqtt.MqttPublishMessage;
+import io.netty.handler.codec.mqtt.MqttQoS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,11 +61,15 @@ public class MQTTResource extends AbstractConnection {
     public void send(Message message) throws IOException {
 
         MessageSerializer serializer = getSerializer();
-        PublishMessage publishMessage = new PublishMessage();
-        publishMessage.setTopicName(topic);
-        publishMessage.setPayload(ByteBuffer.wrap(serializer.serialize(message)));
-        publishMessage.setQos(AbstractMessage.QOSType.MOST_ONE);
-        server.internalPublish(publishMessage);
+
+        MqttPublishMessage publish = MqttMessageBuilders.publish()
+                .topicName(topic)
+                .retained(true)
+                .qos(MqttQoS.AT_LEAST_ONCE)
+                .payload(Unpooled.copiedBuffer(ByteBuffer.wrap(serializer.serialize(message))))
+                .build();
+
+        server.internalPublish(publish);
 
     }
 

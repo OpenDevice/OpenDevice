@@ -15,17 +15,13 @@ package br.com.criativasoft.opendevice.mqtt;
 
 import io.moquette.BrokerConstants;
 import io.moquette.interception.InterceptHandler;
-import io.moquette.proto.messages.PublishMessage;
-import io.moquette.server.ServerAcceptor;
-import io.moquette.server.config.FilesystemConfig;
+import io.moquette.server.Server;
 import io.moquette.server.config.IConfig;
 import io.moquette.server.config.MemoryConfig;
-import io.moquette.server.netty.NettyAcceptor;
-import io.moquette.spi.impl.ProtocolProcessor;
-import io.moquette.spi.impl.SimpleMessaging;
 import io.moquette.spi.security.IAuthenticator;
 import io.moquette.spi.security.IAuthorizator;
 import io.moquette.spi.security.ISslContextCreator;
+import io.netty.handler.codec.mqtt.MqttPublishMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,11 +40,7 @@ public class MoquetteServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(MoquetteServer.class);
 
-    private ServerAcceptor m_acceptor;
-
-    private volatile boolean m_initialized;
-
-    private ProtocolProcessor m_processor;
+    private Server mqttBroker = new Server();
 
     IConfig config;
 
@@ -60,13 +52,6 @@ public class MoquetteServer {
 
     IAuthorizator authorizator;
 
-    /**
-     * Create Moquette bringing the configuration from the file
-     * located at m_config/moquette.conf
-     */
-    public MoquetteServer() throws IOException {
-        this(new FilesystemConfig());
-    }
 
     /**
      * Create the server with the given properties.
@@ -103,16 +88,12 @@ public class MoquetteServer {
         if(authenticator != null){
             config.setProperty(BrokerConstants.ALLOW_ANONYMOUS_PROPERTY_NAME, "false");
         }
-        final ProtocolProcessor processor = SimpleMessaging.getInstance().init(config, handlers, authenticator, authorizator);
 
         if (sslCtxCreator == null) {
             sslCtxCreator = new DefaultMoquetteSslContextCreator(config);
         }
 
-        m_acceptor = new NettyAcceptor();
-        m_acceptor.initialize(processor, config, sslCtxCreator);
-        m_processor = processor;
-        m_initialized = true;
+        mqttBroker.startServer(config, handlers, sslCtxCreator, authenticator, authorizator);
     }
 
     /**
@@ -122,18 +103,13 @@ public class MoquetteServer {
      * @param msg the message to forward.
      * @throws IllegalStateException if the server is not yet started
      * */
-    public void internalPublish(PublishMessage msg) {
-        if (!m_initialized) {
-            throw new IllegalStateException("Can't publish on a server is not yet started");
-        }
-        m_processor.internalPublish(msg);
+    public void internalPublish(MqttPublishMessage msg) {
+        mqttBroker.internalPublish(msg, "mqttServer");
     }
 
     public void stop() {
         LOG.info("Server stopping...");
-        m_acceptor.close();
-        SimpleMessaging.getInstance().shutdown();
-        m_initialized = false;
+        mqttBroker.stopServer();
         LOG.info("Server stopped");
     }
 

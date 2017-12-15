@@ -281,13 +281,25 @@ public class DefaultCommandProcessor {
                         if(nextID == -1) nextID = dao.getNextUID();
                         syncIds = true;
                         device.setUID(nextID++);
-                        // TODO: Notify Client Applications ??
+                        // TODO: Notify Client Applications ???
                     }
 
                     device.setApplicationID(response.getApplicationID());
                     if(device.getCategory() != null) {
                         device.setCategory(dao.getCategoryByCode(device.getCategory().getCode())); // update reference
                     }
+
+                    // Adding new device to existing Board
+                    if(device instanceof PhysicalDevice){
+                        PhysicalDevice physical = (PhysicalDevice) device;
+                        Board board = physical.getBoard();
+                        if(board != null){
+                            board = (Board) manager.findDeviceByName(board.getName());
+                            physical.setBoard(board);
+                        }
+
+                    }
+
                     manager.addDevice(device);
                 }else{
 

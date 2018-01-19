@@ -253,7 +253,13 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
                         zoomType: 'xy',
                         panning : true,
                         panKey : 'shift',
-                        margin: [ 10, 10, 25, 43]
+                        margin: [ 10, 10, 25, 43],
+                        resetZoomButton: {
+                            position: {
+                                x: 5,
+                                y: -5
+                            }
+                        }
                     },
                     title: {
                         text: '', style: {display: 'none'}

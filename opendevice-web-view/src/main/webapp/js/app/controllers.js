@@ -63,6 +63,12 @@ pkg.controller('PageController', function ( $http, $scope) {
 
     $(function () {
 
+        // First-Time Access
+        if(!localStorage.getItem('SetupDevices')){
+            localStorage.setItem('SetupDevices', 'true');
+            window.location = "#/boards"
+        }
+
         // Restore last page acessed, on session timeout Or if passed from external website.
         if(sessionStorage.getItem("LastPath")){
             window.location = sessionStorage.getItem("LastPath");

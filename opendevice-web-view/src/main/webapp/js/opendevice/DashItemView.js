@@ -90,6 +90,8 @@ od.view.DashItemView = Class.extend(function() {
 
         var reloadDataset = false;  // some changes in Model, need reload chart
 
+        if(this.model.error) reloadDataset = true;
+
         if(data.type != this.model.type) reloadDataset = true;
 
         if(data.realtime != this.model.realtime) reloadDataset = true;

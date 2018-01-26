@@ -113,18 +113,19 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
         if (this.model.realtime) {
 
-            initChart.call(this);
-
             for (var i = 0; i < this.model.monitoredDevices.length; i++) {
                 var device = ODev.get(this.model.monitoredDevices[i]);
                 if(device){
                     var listener = device.onChange(updateRealtimeData, this);
                     realtimeListeners.push(listener);
                 }else{
-                    console.log("Falied on render, not found device: " + this.model.monitoredDevices[i] + ", index: " + i);
+                    this.model.error = true;
+                    this.model.errorMessage = "Device Not Found";
+                    console.error("Chart Error ("+this.model.type+"), not found device: " + this.model.monitoredDevices[i] + ", index: " + i);
                 }
-
             }
+
+            initChart.call(this);
 
         }else{
 
@@ -175,6 +176,10 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
             if(chart && data.viewOptions && data.viewOptions.max != this.model.viewOptions.max) reloadDataset = true;
         }
 
+        // Clear previous errors
+        this.model.error = false;
+        this.model.errorMessage = null;
+
         if(reloadDataset){
             this.destroy();
             this.render(this.el);
@@ -184,6 +189,9 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
     };
 
+    this.getChart = function(){
+        return chart;
+    }
 
 
     // ==========================================================================
@@ -199,6 +207,16 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
         var viewOptions = this.model.viewOptions;
         this.initialized = true;
 
+
+
+        // ===========================================================================
+        // ERROR handler
+        // ===========================================================================
+
+        if (this.model.error) {
+            $(this.el).html(this.model.errorMessage);
+            return true;
+        }
 
         // =============================================================================================
 
@@ -647,6 +665,15 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
         // console.log(this.title + ", Load: " + index);
 
+        // Validade Device
+        if(!ODev.get(deviceID)){
+            this.model.error = true;
+            this.model.errorMessage = "Device Not Found";
+            initChart.call(this, this.data);
+            return false;
+        }
+
+
         var query = {
             'deviceID' : deviceID,
             'periodType': this.model.periodType,
@@ -668,11 +695,14 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
                 data.push([response[i].timestamp, response[i].value]);
             }
 
+            console.log("Loaded Data ["+(_this.data.length+1)+"]: "+_this.title+", length: "+ data.length);
+
             spinner.stop();
 
+            // For single value chart
             var value = 0;
 
-            if(data.length > 0 && ( _this.model.aggregation || _this.model.aggregation != "NONE")){
+            if(data.length > 0 && ( _this.model.aggregation && _this.model.aggregation != "NONE")){
                 var value  = data[0][1];
                 if(value % 1 != 0){
                     value = data[0][1].toFixed(2);

@@ -271,7 +271,7 @@ pkg.controller('DashboardController', ['$timeout', '$http', '$scope', 'Dashboard
     };
 
     _public.insertNewItem = function(data){
-
+        _this.toggleEdit(true);
         var dashType = od.view.dashTypes[data.type];
         var klass = eval(dashType.klass); // get reference to implementation class
         _this.dashboardItems.push(new klass(data)); // will trigger 'ng-repeat' and 'onRenderDashboardItems'
@@ -659,6 +659,8 @@ pkg.controller('NewDashController', ['$scope','$timeout', 'DashboardRest', funct
         var $btn = $el.find("button:submit");
         $btn.data("loading-text", "Saving...");
         $btn.button('loading');
+
+        if(!isEdit) _this.current.active = true;
 
         // Save on server
         var req = DashboardRest.save(_this.current, function(data){

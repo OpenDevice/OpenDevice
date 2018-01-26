@@ -124,6 +124,10 @@ public class DashboardRest {
 
         dao.persist(dashboard);
 
+        if(dashboard.isActive()){
+            dao.activate(dashboard);
+        }
+
         return dashboard;
 
     }

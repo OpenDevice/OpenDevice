@@ -201,6 +201,7 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
     function initChart(data) {
 
         // Create series
+        var _this = this;
         var devices = this.model.monitoredDevices;
         var deviceSeries = [];
         var showLegends = false; // TODO: FROM CONFIG
@@ -445,7 +446,7 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
                 series: [{
                     name: 'Value',
-                    data: [0],
+                    data: [getCurrentDeviceValue.call(_this)],
                     dataLabels: {
                         format: '<div style="text-align:center"><span style="font-size:22px;color:' +
                         ((Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black') + '">{y}</span><br/>'
@@ -538,7 +539,7 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
                 series: [{
                     name: this.model.title,
-                    data: [0],
+                    data: [getCurrentDeviceValue.call(_this)],
                     dataLabels : {
                         // borderRadius: 5,
                         //backgroundColor: "rgba(244,109,67, 0.7)",
@@ -746,6 +747,20 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
                 device.removeListener(list);
             }
         });
+    }
+
+    function getCurrentDeviceValue(){
+
+        var deviceID = this.model.monitoredDevices[0];
+
+        var device = ODev.get(deviceID);
+
+        if(device){
+            return device.value;
+        }else{
+            return -1;
+        }
+
     }
 
     /**

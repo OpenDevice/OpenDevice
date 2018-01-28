@@ -22,14 +22,12 @@ import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceCategory;
 import br.com.criativasoft.opendevice.core.model.DeviceHistory;
 import br.com.criativasoft.opendevice.middleware.persistence.HibernateProvider;
+import br.com.criativasoft.opendevice.middleware.tools.DownsampleLTTB;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Ricardo JL Rufino
@@ -117,10 +115,10 @@ public abstract class DeviceJPA extends GenericJpa<Device> implements DeviceDao{
 
             StringBuilder jpql = new StringBuilder("from DeviceHistory where deviceID = :deviceID");
 
-            if(params.getPeriodType() != PeriodType.RECORDS){
-                jpql.append(" and timestamp between :start and :end");
+            if(params.getPeriodType() == PeriodType.RECORDS){
                 jpql.append(" ORDER BY timestamp ASC");
             }else{
+                jpql.append(" and timestamp between :start and :end");
                 jpql.append(" ORDER BY timestamp DESC");
             }
 
@@ -143,15 +141,33 @@ public abstract class DeviceJPA extends GenericJpa<Device> implements DeviceDao{
 
                 // Calculate new time from 'end' to 'PeriodType/PeriodValue'
                 calendar.add(params.getPeriodType().getValue(), -params.getPeriodValue());
-                query.setParameter("start", calendar.getTimeInMillis());
+                query.setParameter("start", calendar.getTime().getTime());
                 query.setParameter("end" , end.getTime());
 
 //                System.err.println("query: "+new Date(calendar.getTimeInMillis())+" - "+end);
             }
 
-            query.setMaxResults(1000);
+
+            int maxForAnalisys = params.getMaxResults(10000);
+            int maxForView = 1000;
+
+            query.setMaxResults(maxForAnalisys);
 
             List<DeviceHistory> list = query.getResultList();
+
+            // downsample data to improve Rendering
+            if(list.size() > maxForView){
+                list = DownsampleLTTB.execute(list, maxForView);
+            }
+
+            // Data must be sorted to show in chart's
+            Collections.sort(list, new Comparator<DeviceHistory>() {
+                @Override
+                public int compare(DeviceHistory o1, DeviceHistory o2) {
+                    return (int) (o1.getTimestamp() - o2.getTimestamp());
+                }
+            });
+
             return list;
         }
 

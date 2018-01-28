@@ -85,6 +85,21 @@ public class AccountJPA extends GenericJpa<Account> implements AccountDao {
     }
 
     @Override
+    public ApiKey findKey(String appName, String key) {
+        TypedQuery<ApiKey> query = em().createQuery("select x from ApiKey x where x.appName = :p1 and x.key = :p2", ApiKey.class);
+
+        query.setParameter("p1", appName);
+        query.setParameter("p2", key);
+
+        List<ApiKey> list = query.getResultList();
+
+        if(list.isEmpty()) return null;
+        if(list.size() > 1) throw new IllegalStateException("More then one ApiKey with same key = " + key);
+
+        return list.iterator().next();
+    }
+
+    @Override
     public List<User> listUsers(Account account) {
 
         CriteriaBuilder cb = em().getCriteriaBuilder();

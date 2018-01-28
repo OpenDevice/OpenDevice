@@ -1,0 +1,1 @@
+alter table Device ALTER COLUMN `value` DOUBLE;

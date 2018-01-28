@@ -221,16 +221,6 @@ od.Device = function(data){
 
         sync = typeof sync !== 'undefined' ? sync : true; // default true
 
-        // // Do data conversions
-        // if(this.type == od.DeviceType.FLOAT2){
-        //     value = value / 100;
-        // }else if(this.type == od.DeviceType.FLOAT4){
-        //     value = value / 10000;
-        // }else if(this.type == od.DeviceType.FLOAT2_SIGNED){
-        //     value = value / 100;
-        // }else if(this.type == od.DeviceType.ANALOG_SIGNED){
-        //     alert("ANALOG_SIGNED - conversion not implemented");
-        // }
 
         // Only fire events if change... (or is Numeric (RFID/etc..))
         if(this.type == od.DeviceType.NUMERIC || this.value != value){

@@ -19,6 +19,7 @@ import br.com.criativasoft.opendevice.middleware.model.jobs.JobSpec;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.JobSpecDao;
 import br.com.criativasoft.opendevice.middleware.rules.RuleManager;
 import br.com.criativasoft.opendevice.middleware.rules.RuleManagerJob;
+import br.com.criativasoft.opendevice.middleware.rules.action.ActionFactory;
 import org.knowm.sundial.SundialJobScheduler;
 import org.quartz.core.JobExecutionContext;
 import org.quartz.core.Scheduler;

@@ -24,7 +24,7 @@ import br.com.criativasoft.opendevice.core.model.Board;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.PhysicalDevice;
 import br.com.criativasoft.opendevice.middleware.tools.SimulationService;
-import br.com.criativasoft.opendevice.restapi.DeviceRest;
+import br.com.criativasoft.opendevice.restapi.resources.DeviceRest;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -17,6 +17,8 @@ import br.com.criativasoft.opendevice.connection.ServerConnection;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.wsrest.WSServerConnection;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.util.SavedRequest;
+import org.apache.shiro.web.util.WebUtils;
 import org.atmosphere.cpr.AtmosphereRequest;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.FrameworkConfig;
@@ -32,7 +34,7 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -51,8 +53,15 @@ public class IndexRest {
     private ServerConnection connection;
 
     @GET
+    @Path("index.html") /* request send from ServiceWorker/cache*/
     @Produces({MediaType.TEXT_HTML})
-    public InputStream index(@Context AtmosphereResource res) throws Exception {
+    public Response index2(@Context AtmosphereResource res) throws Exception {
+        return index(res);
+    }
+
+    @GET
+    @Produces({MediaType.TEXT_HTML})
+    public Response index(@Context AtmosphereResource res) throws Exception {
 
         AtmosphereRequest request = res.getRequest();
         Subject subject = (Subject) request.getAttribute(FrameworkConfig.SECURITY_SUBJECT);
@@ -60,7 +69,15 @@ public class IndexRest {
         String location;
 
         if(!config.isAuthRequired() || subject.isAuthenticated()){
-            location = "index.html";
+
+            SavedRequest savedRequest = WebUtils.getAndClearSavedRequest(request);
+            if(savedRequest != null){
+//                AtmosphereResponse response = res.getResponse();
+//                WebUtils.redirectToSavedRequest(request, response, "admin.html");
+                return Response.temporaryRedirect(new URI(savedRequest.getRequestURI()+"?"+savedRequest.getQueryString())).build();
+            }
+
+            location = "dist/index.html";
         }else{
             location = "login.html";
         }
@@ -71,7 +88,7 @@ public class IndexRest {
     @GET
     @Path("/login")
     @Produces({MediaType.TEXT_HTML})
-    public InputStream login( @Context AtmosphereResource res) throws Exception {
+    public Response login( @Context AtmosphereResource res) throws Exception {
         return resource("login.html");
     }
 
@@ -85,7 +102,7 @@ public class IndexRest {
         return Response.ok().build();
     }
 
-    private InputStream resource(String location) throws FileNotFoundException {
+    private Response resource(String location) throws FileNotFoundException {
         // Find base path
         File path = null;
 
@@ -95,7 +112,7 @@ public class IndexRest {
         }
 
         if(path != null){
-            return new FileInputStream(path);
+            return Response.ok(new FileInputStream(path)).build();
         }else{
             throw new IllegalStateException(location + " not found in webapp path");
         }

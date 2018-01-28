@@ -51,9 +51,7 @@ public class RuleRest {
     }
 
     @PUT @Path("/{id}/activate")
-    public Response activate(RuleSpec rule, @QueryParam("value") boolean value) throws IOException {
-
-//        RuleSpec rule = ruleManager.getById(id);
+    public Response activate(@PathParam("id") long id, RuleSpec rule, @QueryParam("value") boolean value) throws IOException {
 
         if(rule == null) throw new NotFoundException();
 

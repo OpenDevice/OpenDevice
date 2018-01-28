@@ -19,6 +19,7 @@ import org.knowm.sundial.Job;
 import org.knowm.sundial.exceptions.JobInterruptException;
 
 /**
+ * Handled by {@link JobManager} execute RuleManager to work with time based rules.
  * @author Ricardo JL Rufino
  * @date 06/11/16
  * @see JobManager#createDefaultJobs()
@@ -32,7 +33,7 @@ public class RuleManagerJob extends Job {
 
         RuleManager instance = getJobContext().get("instance");
 
-        instance.eval();
+        instance.eval(true);
 
         ODev.getDeviceManager().transactionEnd();
 

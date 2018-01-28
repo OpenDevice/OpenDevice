@@ -22,6 +22,7 @@ import br.com.criativasoft.opendevice.core.listener.DeviceListener;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.middleware.jobs.AbstractAction;
 import br.com.criativasoft.opendevice.middleware.jobs.ActionException;
+import br.com.criativasoft.opendevice.middleware.model.rules.ActiveTimeConditionSpec;
 import br.com.criativasoft.opendevice.middleware.model.rules.ConditionSpec;
 import br.com.criativasoft.opendevice.middleware.model.rules.RuleSpec;
 import br.com.criativasoft.opendevice.middleware.model.rules.RuleEnums.ExecutionStatus;
@@ -50,8 +51,6 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
     private Set<AbstractRule> rules = new LinkedHashSet();
 
     private RuleFactory ruleFactory;
-
-    private Timer timer;
 
     private Executor executor;
 
@@ -115,7 +114,9 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
 
             fireRulesUpdate();
 
-            if(spec.isEnabled())  eval(); // TODO: A direct call can affect performance in certain situations
+            if(spec.isEnabled() && spec.getCondition() != null){
+                eval(false); // TODO: A direct call can affect performance in certain situations
+            }
         }
 
 
@@ -127,7 +128,7 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
      * Execution is controlled through the class {@link ActionTask}
      * @see #executeActionsFor(List)
      */
-    protected void eval(){
+    protected void eval(boolean timeBased){
 
         List<AbstractRule> toExecute = new LinkedList<AbstractRule>();
 
@@ -158,8 +159,15 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
                 }
             }
 
+            // Timebased (called from RuleManagerJob) only work with TimeCondition
+            ConditionSpec condition = spec.getCondition();
+            if(timeBased && (condition == null || !(condition instanceof ActiveTimeConditionSpec))){
+                continue;
+            }
+
             if(rule.evaluate()){
-                if(spec.getStatus() != ExecutionStatus.ACTIVE){
+
+                if(rule.allowExection()){ // This check if action can be executed.
                     toExecute.add(rule);
                 }
             }else{
@@ -222,7 +230,7 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
 
     @Override
     public void onDeviceChanged(Device device) {
-        eval();
+        eval(false);
     }
 
     @Override
@@ -297,6 +305,15 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
             RuleSpec spec = abstractRule.getSpec();
 
             AbstractAction action = abstractRule.getAction();
+
+            long resourceID = spec.getResourceID();
+
+            if(resourceID > 0){
+                TenantProvider.setCurrentID(spec.getAccount().getUuid());
+                TenantContext context = TenantProvider.getCurerntContext();
+                Device device = context.getDeviceByUID((int) resourceID);
+                action.setTargetDevice(device);
+            }
 
             Account account = spec.getAccount();
 

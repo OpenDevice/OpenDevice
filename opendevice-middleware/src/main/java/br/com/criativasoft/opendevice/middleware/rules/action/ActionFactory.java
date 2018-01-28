@@ -11,12 +11,17 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.middleware.jobs;
+package br.com.criativasoft.opendevice.middleware.rules.action;
 
+import br.com.criativasoft.opendevice.middleware.jobs.AbstractAction;
 import br.com.criativasoft.opendevice.middleware.model.actions.ActionSpec;
-import br.com.criativasoft.opendevice.middleware.model.actions.ControlActionSpec;
+import br.com.criativasoft.opendevice.middleware.rules.HandledBy;
 
 /**
+ * Instantiate the class responsible for implementing ActionSpec logic.
+ * To work you need the annotation: @HandledBy(ControlAction.class) in the Spec class, and
+ * add to list of @JsonSubTypes in {@link ActionSpec}
+ *
  * @author Ricardo JL Rufino
  * @date 04/11/16
  */
@@ -25,8 +30,14 @@ public class ActionFactory {
     public AbstractAction create(ActionSpec spec){
         AbstractAction action = null;
 
-        if(spec instanceof ControlActionSpec){
-            action = new ControlAction();
+        if (spec.getClass().isAnnotationPresent(HandledBy.class)) {
+            HandledBy annotation = spec.getClass().getAnnotation(HandledBy.class);
+            Class value = annotation.value();
+            try {
+                action = (AbstractAction) value.newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         if (action == null) throw new IllegalStateException("Implementation for Action : " + spec + ", not found !");

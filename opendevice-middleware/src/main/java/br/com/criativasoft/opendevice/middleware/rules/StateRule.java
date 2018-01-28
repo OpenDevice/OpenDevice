@@ -17,7 +17,8 @@ import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.middleware.model.rules.StateRuleSpec;
 
 /**
- *
+ * This type of rule is evaluated when any device changes its value.
+ * The logic is fired in: {@link RuleManager#onDeviceChanged(Device)}
  * @author Ricardo JL Rufino
  * @date 03/11/16
  */
@@ -34,7 +35,12 @@ public class StateRule extends AbstractRule<StateRuleSpec> implements IResourceR
 
         long value = getSpec().getValue();
 
-        return device.getValue() == value;
+        return /*always condition==*/ value == -1 || device.getValue() == value ;
     }
 
+    @Override
+    public boolean allowExection() {
+        long value = getSpec().getValue();
+        return /*always condition==*/ value == -1  || super.allowExection();
+    }
 }

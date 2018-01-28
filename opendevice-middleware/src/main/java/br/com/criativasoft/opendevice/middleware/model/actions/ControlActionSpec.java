@@ -13,6 +13,8 @@
 
 package br.com.criativasoft.opendevice.middleware.model.actions;
 
+import br.com.criativasoft.opendevice.middleware.rules.action.ControlAction;
+import br.com.criativasoft.opendevice.middleware.rules.HandledBy;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import javax.persistence.Entity;
@@ -23,6 +25,7 @@ import javax.persistence.Entity;
  */
 @Entity
 @JsonTypeName(value = "control")
+@HandledBy(ControlAction.class)
 public class ControlActionSpec extends ActionSpec {
 
     private long resourceID;

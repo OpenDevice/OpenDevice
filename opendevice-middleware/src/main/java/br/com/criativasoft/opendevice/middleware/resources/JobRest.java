@@ -52,7 +52,7 @@ public class JobRest {
     }
 
     @PUT @Path("/{id}/activate")
-    public Response activate(JobSpec rule, @QueryParam("value") boolean value) throws IOException {
+    public Response activate(@PathParam("id") long id, JobSpec rule, @QueryParam("value") boolean value) throws IOException {
 
         if(rule == null) throw new NotFoundException();
 

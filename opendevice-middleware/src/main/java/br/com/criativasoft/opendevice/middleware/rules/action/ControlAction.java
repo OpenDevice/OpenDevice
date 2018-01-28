@@ -11,10 +11,12 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.middleware.jobs;
+package br.com.criativasoft.opendevice.middleware.rules.action;
 
 import br.com.criativasoft.opendevice.core.ODev;
 import br.com.criativasoft.opendevice.core.model.Device;
+import br.com.criativasoft.opendevice.middleware.jobs.AbstractAction;
+import br.com.criativasoft.opendevice.middleware.jobs.ActionException;
 import br.com.criativasoft.opendevice.middleware.model.actions.ControlActionSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

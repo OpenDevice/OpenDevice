@@ -13,7 +13,7 @@
 
 package br.com.criativasoft.opendevice.middleware.rules;
 
-import br.com.criativasoft.opendevice.middleware.jobs.ActionFactory;
+import br.com.criativasoft.opendevice.middleware.rules.action.ActionFactory;
 import br.com.criativasoft.opendevice.middleware.model.actions.ActionSpec;
 import br.com.criativasoft.opendevice.middleware.model.rules.ConditionSpec;
 import br.com.criativasoft.opendevice.middleware.model.rules.RuleSpec;

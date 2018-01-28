@@ -14,6 +14,7 @@
 package br.com.criativasoft.opendevice.middleware.rules;
 
 import br.com.criativasoft.opendevice.middleware.jobs.AbstractAction;
+import br.com.criativasoft.opendevice.middleware.model.rules.RuleEnums;
 import br.com.criativasoft.opendevice.middleware.model.rules.RuleSpec;
 import br.com.criativasoft.opendevice.middleware.rules.condition.AbstractCondition;
 
@@ -72,6 +73,14 @@ public abstract class AbstractRule<T extends RuleSpec>  {
 
     }
 
+    /**
+     * This check if action can be executed.
+     * Sometimes it is not interesting to run the same alert/action several times
+     * @return
+     */
+    public boolean allowExection() {
+        return spec.getStatus() != RuleEnums.ExecutionStatus.ACTIVE;
+    }
 
     public abstract boolean check();
 }

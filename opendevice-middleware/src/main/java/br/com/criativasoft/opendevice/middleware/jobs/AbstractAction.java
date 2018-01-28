@@ -13,6 +13,8 @@
 
 package br.com.criativasoft.opendevice.middleware.jobs;
 
+import br.com.criativasoft.opendevice.core.model.Device;
+import br.com.criativasoft.opendevice.core.model.DeviceType;
 import br.com.criativasoft.opendevice.middleware.model.actions.ActionSpec;
 
 /**
@@ -24,6 +26,8 @@ public abstract class AbstractAction<T extends ActionSpec> {
 
     protected T spec;
 
+    protected Device targetDevice; // DEVICE
+
     public void setSpec(T spec) {
         this.spec = spec;
     }
@@ -32,6 +36,28 @@ public abstract class AbstractAction<T extends ActionSpec> {
         return spec;
     }
 
+    public void setTargetDevice(Device targetDevice) {
+        this.targetDevice = targetDevice;
+    }
+
+    public Device getTargetDevice() {
+        return targetDevice;
+    }
+
     public abstract void execute() throws ActionException;
+
+    protected String replaceDeviceVariables(String text){
+        if(targetDevice != null){
+
+            if(targetDevice.getType() == DeviceType.DIGITAL){
+                text = text.replaceAll("\\$VALUE", (targetDevice.getValue() == 0 ? "OFF" : "ON"));
+            }else{
+                text = text.replaceAll("\\$VALUE", ""+targetDevice.getValue());
+            }
+            text = text.replaceAll("\\$DEVICE_NAME", ""+targetDevice.getName());
+            text = text.replaceAll("\\$DEVICE_TITLE", ""+targetDevice.getTitle());
+        }
+        return text;
+    }
 
 }

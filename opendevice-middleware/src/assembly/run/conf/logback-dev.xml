@@ -9,6 +9,7 @@
 
     <logger name="org.atmosphere.cpr.AtmosphereFramework" level="WARN"/>
     <logger name="org.atmosphere.interceptor.OnDisconnectInterceptor" level="WARN"/>
+    <logger name="io.moquette.server.netty" level="INFO"/>
     <logger name="org.quartz" level="INFO"/>
     <logger name="org.hibernate" level="INFO"/>
 

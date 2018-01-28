@@ -17,6 +17,7 @@ import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.LocalDeviceManager;
 import br.com.criativasoft.opendevice.core.model.PhysicalDevice;
 import br.com.criativasoft.opendevice.middleware.model.actions.ControlActionSpec;
+import br.com.criativasoft.opendevice.middleware.rules.action.ActionFactory;
 import org.knowm.sundial.SundialJobScheduler;
 import org.quartz.core.JobExecutionContext;
 import org.quartz.core.Scheduler;

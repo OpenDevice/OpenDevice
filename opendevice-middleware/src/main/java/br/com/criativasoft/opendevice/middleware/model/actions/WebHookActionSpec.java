@@ -13,34 +13,39 @@
 
 package br.com.criativasoft.opendevice.middleware.model.actions;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import br.com.criativasoft.opendevice.middleware.rules.HandledBy;
+import br.com.criativasoft.opendevice.middleware.rules.action.WebHookAction;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
 
 /**
- *
  * @author Ricardo JL Rufino
  * @date 02/11/16
  */
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="type")
-@JsonSubTypes({
-        @JsonSubTypes.Type(ControlActionSpec.class),
-        @JsonSubTypes.Type(WebHookActionSpec.class),
-})
-public abstract class ActionSpec {
+@JsonTypeName(value = "webhook")
+@HandledBy(WebHookAction.class)
+public class WebHookActionSpec extends ActionSpec {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private String url;
 
-    public long getId() {
-        return id;
+    private String parameters;
+
+    public String getUrl() {
+        return url;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setUrl(String url) {
+        this.url = url;
     }
+
+    public String getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(String parameters) {
+        this.parameters = parameters;
+    }
+
 }

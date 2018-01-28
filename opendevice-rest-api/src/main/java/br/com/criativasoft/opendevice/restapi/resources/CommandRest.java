@@ -11,7 +11,7 @@
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.restapi;
+package br.com.criativasoft.opendevice.restapi.resources;
 
 import br.com.criativasoft.opendevice.connection.ServerConnection;
 import br.com.criativasoft.opendevice.connection.message.Request;

@@ -38,6 +38,8 @@ public interface AccountDao extends Dao<Account> {
 
     List<ApiKey> listKeys(long userAccountID);
 
+    ApiKey findKey(String appName,  String key);
+
     List<User> listUsers(Account account);
 
     boolean existUser(Account account, User user);

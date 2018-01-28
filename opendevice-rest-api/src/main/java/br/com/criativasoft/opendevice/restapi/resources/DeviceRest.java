@@ -1,17 +1,17 @@
 /*
- * ******************************************************************************
- *  Copyright (c) 2013-2014 CriativaSoft (www.criativasoft.com.br)
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  which accompanies this distribution, and is available at
- *  http://www.eclipse.org/legal/epl-v10.html
+ * *****************************************************************************
+ * Copyright (c) 2013-2014 CriativaSoft (www.criativasoft.com.br)
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
  *
  *  Contributors:
  *  Ricardo JL Rufino - Initial API and Implementation
  * *****************************************************************************
  */
 
-package br.com.criativasoft.opendevice.restapi;
+package br.com.criativasoft.opendevice.restapi.resources;
 
 
 import br.com.criativasoft.opendevice.connection.ServerConnection;
@@ -35,7 +35,10 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Device Rest Interface for controling devices. <br/>
@@ -89,7 +92,7 @@ public class DeviceRest {
         Device device = manager.findDeviceByUID(uid);
 
         if(device != null){
-            return Long.toString(device.getValue());
+            return Double.toString(device.getValue());
         }
 
         return "";// TODO: return error ?
@@ -126,12 +129,13 @@ public class DeviceRest {
     @GET
     public List<DeviceVO> list() throws IOException {
 
-        List<DeviceVO> devices = new LinkedList<DeviceVO>();
-
         Collection<Device> deviceList = manager.getDevices();
+
+        List<DeviceVO> devices = new LinkedList<DeviceVO>();
 
         if(deviceList != null){
             for (Device device : deviceList) {
+                if(device.getType() == null) throw new IllegalStateException("Device type is NULL = " + device);
                 devices.add(new DeviceVO(device));
             }
         }
@@ -149,6 +153,18 @@ public class DeviceRest {
             query.setDeviceUID(uid);
 
             List<DeviceHistory> list = manager.getDeviceHistory(query);
+
+//            try {
+//                PrintStream out = new PrintStream(new FileOutputStream("/media/ricardo/Dados/TEMP/teste/data1.csv"));
+//                int index = 0;
+//                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+//                for (DeviceHistory history : list) {
+//                    out.println((index++) + "," + history.getValue() + "," + sdf.format(new Date(history.getTimestamp())));
+//
+//                out.close();
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            }
 
             return list;
         } else {

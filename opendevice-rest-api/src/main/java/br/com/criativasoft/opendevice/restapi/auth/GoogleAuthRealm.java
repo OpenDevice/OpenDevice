@@ -102,7 +102,7 @@ public class GoogleAuthRealm extends AbstractAuthorizingRealm {
 
                     String aud = json.get("aud").asText();
 
-                    // TODO: need validate, but this may ne used for another appletavions IDs
+                    // TODO: need validate, but this may ne used for another appletavions IDs (ALEXA, MIDDLEWARE)
 //                    if(!appID.equals(aud)){
 //                        throw new AuthenticationException("Invalid Google Token");
 //                    }

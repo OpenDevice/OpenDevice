@@ -14,8 +14,8 @@
 package br.com.criativasoft.opendevice.wsrest;
 
 import br.com.criativasoft.opendevice.connection.IRestServerConnection;
-import br.com.criativasoft.opendevice.restapi.CommandRest;
-import br.com.criativasoft.opendevice.restapi.DeviceRest;
+import br.com.criativasoft.opendevice.restapi.resources.CommandRest;
+import br.com.criativasoft.opendevice.restapi.resources.DeviceRest;
 import br.com.criativasoft.opendevice.restapi.resources.AccountRest;
 import br.com.criativasoft.opendevice.wsrest.resource.ApiInfoRest;
 import br.com.criativasoft.opendevice.wsrest.resource.AuthRest;

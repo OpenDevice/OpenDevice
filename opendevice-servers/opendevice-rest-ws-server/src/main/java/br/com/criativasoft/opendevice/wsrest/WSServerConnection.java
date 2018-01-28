@@ -14,7 +14,7 @@
 package br.com.criativasoft.opendevice.wsrest;
 
 import br.com.criativasoft.opendevice.connection.IWSServerConnection;
-import br.com.criativasoft.opendevice.restapi.DeviceRest;
+import br.com.criativasoft.opendevice.restapi.resources.DeviceRest;
 import org.atmosphere.nettosphere.Config;
 
 

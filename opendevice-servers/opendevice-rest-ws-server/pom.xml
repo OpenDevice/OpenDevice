@@ -15,7 +15,7 @@
     <properties>
         <jersey-version>1.19</jersey-version>
         <jaxb-version>2.1</jaxb-version>
-        <nettosphere-version>2.4.11-SNAPSHOT</nettosphere-version>
+        <nettosphere-version>2.4.12-SNAPSHOT</nettosphere-version>
         <atmosphere-version>2.4.7</atmosphere-version>
         <atmosphere-extensions>2.4.3</atmosphere-extensions>
         <shiro-version>1.2.4</shiro-version>
@@ -113,6 +113,8 @@
             <version>2.9.0.pr3</version>
         </dependency>
 
+        <!-- security -->
+
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-core</artifactId>
@@ -140,6 +142,20 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+
+        <!-- oauth -->
+
+        <dependency>
+            <groupId>org.apache.oltu.oauth2</groupId>
+            <artifactId>org.apache.oltu.oauth2.authzserver</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+<!--        <dependency>
+            <groupId>org.apache.oltu.oauth2</groupId>
+            <artifactId>org.apache.oltu.oauth2.resourceserver</artifactId>
+            <version>1.0.1</version>
+        </dependency>-->
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

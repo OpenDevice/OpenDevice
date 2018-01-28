@@ -77,6 +77,7 @@ import static br.com.criativasoft.opendevice.restapi.auth.BearerAuthRealm.TOKEN_
  *
  * @author Ricardo JL Rufino
  * @date 08/09/16
+ * @see OAuthRest
  */
 @Path("/api/auth")
 @Produces(MediaType.APPLICATION_JSON)

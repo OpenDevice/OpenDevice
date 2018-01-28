@@ -39,6 +39,8 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class AuthenticationFilter implements ContainerRequestFilter {
 
+    public static final String TOKEN_CACHE = "AuthTokenCache";
+
     @Inject
     private UserDao userDao;
 

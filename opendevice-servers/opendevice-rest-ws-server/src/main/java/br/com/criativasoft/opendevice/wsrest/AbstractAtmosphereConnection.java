@@ -32,6 +32,7 @@ import br.com.criativasoft.opendevice.restapi.WaitResponseListener;
 import br.com.criativasoft.opendevice.restapi.auth.AccountDaoRealm;
 import br.com.criativasoft.opendevice.restapi.auth.BearerAuthRealm;
 import br.com.criativasoft.opendevice.restapi.auth.GoogleAuthRealm;
+import br.com.criativasoft.opendevice.restapi.resources.DeviceRest;
 import br.com.criativasoft.opendevice.wsrest.filter.CrossOriginInterceptor;
 import br.com.criativasoft.opendevice.wsrest.filter.NewShiroInterceptor;
 import br.com.criativasoft.opendevice.wsrest.guice.config.ConnectionGuiceProvider;
@@ -290,7 +291,7 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
     /**
      * Used to broadcast events/commands.</br>
-     * Is fired by {@linkplain br.com.criativasoft.opendevice.restapi.DeviceRest} AND {@linkplain WebSocketResource}
+     * Is fired by {@linkplain DeviceRest} AND {@linkplain WebSocketResource}
      *
      * @param message
      * @param connection

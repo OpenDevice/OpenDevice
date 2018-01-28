@@ -24,6 +24,7 @@
         <class>br.com.criativasoft.opendevice.middleware.model.rules.ThresholdRuleSpec</class>
         <class>br.com.criativasoft.opendevice.middleware.model.rules.ActiveTimeConditionSpec</class>
         <class>br.com.criativasoft.opendevice.middleware.model.actions.ControlActionSpec</class>
+        <class>br.com.criativasoft.opendevice.middleware.model.actions.WebHookActionSpec</class>
         <class>br.com.criativasoft.opendevice.middleware.model.jobs.CronJobSpec</class>
 
 

@@ -1,0 +1,12 @@
+{
+  "api_auth": {
+    "type": "oauth2",
+    "authorizationUrl": "https://cloud.opendevice.io/oauth2/authorize",
+    "tokenUrl": "https://cloud.opendevice.io/oauth2/authorize",
+    "flow": "accessCode",
+    "scopes": {
+      "profile": "Profile Data",
+      "email": "User mail"
+    }
+  }
+}

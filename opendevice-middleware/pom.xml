@@ -185,11 +185,26 @@
             <scope>test</scope>
         </dependency>
 
+
+        <!-- ============ Utils ============ -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
             <version>4.2.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>1.5.3</version>
+        </dependency>
+
+        <!--<dependency>-->
+            <!--<groupId>io.swagger</groupId>-->
+            <!--<artifactId>swagger-jersey-jaxrs</artifactId>-->
+            <!--<version>1.5.0</version>-->
+        <!--</dependency>-->
+
 
         <!--<dependency>-->
             <!--<groupId>org.jmdns</groupId>-->
@@ -268,6 +283,59 @@
                 <configuration>
                     <mainClass>br.com.criativasoft.opendevice.middleware.Main</mainClass>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.kongchen</groupId>
+                <artifactId>swagger-maven-plugin</artifactId>
+                <version>3.1.6</version>
+                <configuration>
+                    <skipSwaggerGeneration>false</skipSwaggerGeneration>
+                    <apiSources>
+                        <apiSource>
+                            <springmvc>false</springmvc>
+                            <locations>
+                                <location>br.com.criativasoft.opendevice.middleware.resources</location>
+                                <location>br.com.criativasoft.opendevice.restapi.resources</location>
+                            </locations>
+                            <typesToSkip>
+                                <typeToSkip>br.com.criativasoft.opendevice.middleware.resources.IndexRest</typeToSkip>
+                                <typeToSkip>br.com.criativasoft.opendevice.restapi.resources.AccountRest</typeToSkip>
+                            </typesToSkip>
+                            <schemes><scheme>https</scheme><scheme>http</scheme></schemes>
+                            <host>cloud.opendevice.io</host>
+                            <!--<host>localhost:8181</host>-->
+                            <basePath>/api</basePath>
+                            <info>
+                                <title>OpenDevice Rest API</title>
+                                <description>API for server and device management</description>
+                                <version>1.0</version>
+                            </info>
+                            <securityDefinitions>
+                                <securityDefinition>
+                                    <jsonPath>${basedir}/src/main/resources/META-INF/swagger-security.json</jsonPath>
+                                </securityDefinition>
+                            </securityDefinitions>
+                            <swaggerDirectory>${project.build.outputDirectory}/META-INF</swaggerDirectory>
+                            <swaggerFileName>swagger-api.yaml</swaggerFileName>
+                            <outputFormats>yaml</outputFormats>
+                        </apiSource>
+
+                        <!--<apiSource>-->
+                            <!--<springmvc>false</springmvc>-->
+                            <!--<locations>-->
+                                <!--<location>br.com.criativasoft.opendevice.restapi.resources</location>-->
+                            <!--</locations>-->
+                        <!--</apiSource>-->
+                    </apiSources>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>

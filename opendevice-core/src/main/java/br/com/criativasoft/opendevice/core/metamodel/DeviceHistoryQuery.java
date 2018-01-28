@@ -29,6 +29,7 @@ public class DeviceHistoryQuery {
     private int periodValue;
     private PeriodType periodType;
     private AggregationType aggregation;
+    private int maxResults;
 
     @JsonFormat(pattern = "dd/MM/yy HH:mm", timezone = "America/Bahia")
     private Date periodEnd;
@@ -89,5 +90,18 @@ public class DeviceHistoryQuery {
 
     public void setPeriodEnd(Date periodEnd) {
         this.periodEnd = periodEnd;
+    }
+
+    public void setMaxResults(int maxResults) {
+        this.maxResults = maxResults;
+    }
+
+    public int getMaxResults() {
+        return maxResults;
+    }
+
+    public int getMaxResults(int defaultValue) {
+        if(maxResults <= 0) return defaultValue;
+        return maxResults;
     }
 }

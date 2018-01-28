@@ -59,7 +59,7 @@ public class PhysicalDevice extends Device {
         super(uid, name, type, category);
     }
 
-    public PhysicalDevice(int uid, String name, DeviceType type, DeviceCategory category, long value) {
+    public PhysicalDevice(int uid, String name, DeviceType type, DeviceCategory category, double value) {
         super(uid, name, type, category, value);
     }
 

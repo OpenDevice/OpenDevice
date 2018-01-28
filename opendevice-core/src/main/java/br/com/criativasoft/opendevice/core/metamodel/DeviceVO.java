@@ -28,7 +28,7 @@ public class DeviceVO {
 	private String title;
 	private int type;
 	private int category;
-	private long value;
+	private double value;
 	private int parentID;
     private boolean sensor=false;
 	
@@ -88,11 +88,11 @@ public class DeviceVO {
         this(id, name, type.getCode(), category.getCode(), value);
     }
 
-    public DeviceVO(int id, String name, int type, int category, long value) {
+    public DeviceVO(int id, String name, int type, int category, double value) {
         this(id, name, type, category, value, 0, null);
     }
 
-	public DeviceVO(int id, String name, int type, int category, long value,long lastUpdate, Date dateCreated) {
+	public DeviceVO(int id, String name, int type, int category, double value,long lastUpdate, Date dateCreated) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -128,10 +128,10 @@ public class DeviceVO {
 	public void setCategory(int category) {
 		this.category = category;
 	}
-	public long getValue() {
+	public double getValue() {
 		return value;
 	}
-	public void setValue(long value) {
+	public void setValue(double value) {
 		this.value = value;
 	}
 	public long getLastUpdate() {

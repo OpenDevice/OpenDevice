@@ -48,6 +48,11 @@ public class DeviceHistory {
     public DeviceHistory(){
     }
 
+    public DeviceHistory(long timestamp, double value) {
+        this.timestamp = timestamp;
+        this.value = value;
+    }
+
     public DeviceHistory(double value) {
         this.value = value;
     }
@@ -55,6 +60,7 @@ public class DeviceHistory {
     public DeviceHistory(long value) {
         this.value = value;
     }
+
 
     public long getId() {
         return id;

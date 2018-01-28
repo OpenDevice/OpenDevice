@@ -77,7 +77,7 @@ public class CommandStreamSerializer implements MessageSerializer{
 		if(DeviceCommand.isCompatible(type)){
 
 			int deviceID = Integer.parseInt(split[2]);
-			long value = Long.parseLong(split[3]);
+			double value = Double.parseDouble(split[3]);
 			command = new DeviceCommand(type, deviceID, value);
 
 		}else if(SimpleCommand.isCompatible(type)){

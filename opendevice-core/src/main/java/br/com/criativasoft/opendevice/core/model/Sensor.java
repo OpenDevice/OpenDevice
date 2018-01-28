@@ -75,7 +75,7 @@ public class Sensor extends PhysicalDevice {
      * @param type Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}
      * @param category Does not influence the communication logic, only the GUIs
      */
-    public Sensor(int uid, String name, DeviceType type, DeviceCategory category, long value) {
+    public Sensor(int uid, String name, DeviceType type, DeviceCategory category, double value) {
         super(uid, name, type, category, value);
     }
 

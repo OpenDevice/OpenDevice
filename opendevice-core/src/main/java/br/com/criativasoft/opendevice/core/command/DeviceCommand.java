@@ -28,7 +28,7 @@ public class DeviceCommand extends Command {
      * @param deviceID - Device UID ({@link br.com.criativasoft.opendevice.core.model.Device#getUid()})
      * @param value
      */
-	public DeviceCommand(CommandType type, int deviceID, long value) {
+	public DeviceCommand(CommandType type, int deviceID, double value) {
 		super(type);
 		this.deviceID = deviceID;
 		this.value = value;
@@ -37,13 +37,13 @@ public class DeviceCommand extends Command {
 	private static final long serialVersionUID = 3448172706632529764L;
 	
 	private int deviceID;
-	private long value;
+	private double value;
 	
 	public int getDeviceID() {
 		return deviceID;
 	}
 	
-	public long getValue() {
+	public double getValue() {
 		return value;
 	}
 

@@ -71,9 +71,8 @@ public class Device implements Serializable {
 	private DeviceType type;
     private long lastUpdate;
     private Date dateCreated;
-    private long value = VALUE_LOW;
+    private double value = VALUE_LOW;
 
-    private transient boolean managed; // Already been linked to the Manager
 
     @OneToOne(cascade = CascadeType.MERGE)
     @JsonIdentityReference(alwaysAsId = true)
@@ -85,6 +84,9 @@ public class Device implements Serializable {
     @Transient
     @JsonIgnore
     private volatile Set<OnDeviceChangeListener> listeners = new HashSet<OnDeviceChangeListener>();
+
+    @Transient
+    private transient boolean managed; // Already been linked to the Manager
 
     public Device(){
 
@@ -146,7 +148,7 @@ public class Device implements Serializable {
      * @param category - Does not influence the communication logic, only the GUIs
      * @param value
      */
-	public Device(int uid, String name, DeviceType type, DeviceCategory category, long value) {
+	public Device(int uid, String name, DeviceType type, DeviceCategory category, double value) {
 		super();
 		this.uid = uid;
         this.name = name;
@@ -202,7 +204,7 @@ public class Device implements Serializable {
 	}
 
 
-    public void setValue(long value) {
+    public void setValue(double value) {
         this.setValue(value, true);
     }
 
@@ -211,7 +213,7 @@ public class Device implements Serializable {
      * @param value
      * @param sync - sync state with server
      */
-	public void setValue(long value, boolean sync) {
+	public void setValue(double value, boolean sync) {
 
         // fire the event 'onChange' every time a reading is taken
         if(type == NUMERIC || value != this.value){
@@ -265,11 +267,11 @@ public class Device implements Serializable {
         }
     }
 
-    public long getValue() {
-		return value;
-	}
-	
-	public void setCategory(DeviceCategory category) {
+    public double getValue() {
+        return value;
+    }
+
+    public void setCategory(DeviceCategory category) {
 		this.category = category;
 	}
 

@@ -76,7 +76,7 @@ public class DefaultCommandProcessor {
             DeviceCommand deviceCommand = (DeviceCommand) command;
 
             int deviceID = deviceCommand.getDeviceID();
-            long value = deviceCommand.getValue();
+            double value = deviceCommand.getValue();
 
             Device device = manager.findDeviceByUID(deviceID);
 

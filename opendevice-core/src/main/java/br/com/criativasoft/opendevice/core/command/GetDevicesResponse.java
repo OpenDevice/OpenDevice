@@ -70,14 +70,14 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
             String[] deviceSplit = deviceStr.split(",");
             String name = deviceSplit[0];
             int uid = Integer.parseInt(deviceSplit[1]);
-            long value = Long.parseLong(deviceSplit[3]);
+            double value = Double.parseDouble(deviceSplit[3]);
             boolean isSensor = Integer.parseInt(deviceSplit[5]) > 0;
 
             DeviceType deviceType =  DeviceType.getByCode(Integer.parseInt(deviceSplit[6]));
 
             if(deviceType == DeviceType.BOARD) {
                 if (StringUtils.isEmpty(name)) name = "Board " + uid;
-                board = new Board(uid, name, deviceType, DeviceCategory.GENERIC, value);
+                board = new Board(uid, name, deviceType, DeviceCategory.GENERIC, 1);
             } else if(isSensor){
                 if(StringUtils.isEmpty(name)) name = "Sensor " + uid;
                 Sensor sensor = new Sensor(uid, name, deviceType, DeviceCategory.GENERIC, value);
@@ -155,7 +155,7 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
         return index == length;
     }
 
-    public static void resolveParents(Collection<Device> devices){
+    public static Board resolveParents(Collection<Device> devices){
 
         Board board = null;
 
@@ -173,5 +173,6 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
             }
         }
 
+        return board;
     }
 }

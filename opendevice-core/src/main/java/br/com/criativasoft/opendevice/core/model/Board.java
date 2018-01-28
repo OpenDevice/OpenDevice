@@ -87,12 +87,12 @@ public class Board extends Device {
     }
 
     @Override
-    public void setValue(long value) {
+    public void setValue(double value) {
         // ignore.
     }
 
     @Override
-    public long getValue() {
+    public double getValue() {
         return 1;
     }
 

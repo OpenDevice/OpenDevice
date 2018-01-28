@@ -150,11 +150,11 @@ pkg.filter('actionType', function() {
         if(obj.type == "control"){
             var device = ODev.findDevice(obj.resourceID) || { name : "[Not Found Error]"};
             return "Control " + device.name;
+        }else if(obj.type == "webhook"){
+            return "Call " + obj.url.substring(0, 30) + "...";
         }
 
-        obj = obj || '';
-
-        return obj;
+        return obj.type;
     };
 });
 

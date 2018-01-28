@@ -37,7 +37,7 @@
                         </div>
                         <div class="media-body">
                             <div class="clearfix">
-                                <h3 style="margin-top: 0">You have no  Boards</h3>
+                                <h3 style="margin-top: 0">You have no Boards / Devices</h3>
                                 <p class="lead text-muted">
                                     A board can hold multiple sensors and actuators. The OpenDevice SDK provides libraries and APIs to facilitate the creation of devices that connect with the
                                     platform using various communication technologies and protocols.
@@ -45,6 +45,10 @@
 
                                 <p class="lead text-muted">
                                     The boads using arduino framework (like ESP8266) <a href="https://github.com/OpenDevice/OpenDevice/wiki/Supported-Devices">are compatible</a> with OpenDevice by default, other devices will be supported via plugins or the REST API.
+                                </p>
+
+                                <p class="text-center">
+                                    <a ng-click="ctrl.newBoard()" class="btn btn-info" role="button"><i class="fa fa-plus"></i> New Board / Device</a>
                                 </p>
                             </div>
                         </div>
@@ -149,7 +153,7 @@
         </p>
 
         <h4> <mark>2.</mark> Install the Library</h4>
-        You can install the library using <a href="http://www.arduino.cc/en/guide/libraries" target="_blank">Arduino Library Manager</a> ou download current version from
+        Install the OpenDevice library using <a href="http://www.arduino.cc/en/guide/libraries" target="_blank">Arduino Library Manager</a> ou download source code from
         <a href="https://github.com/OpenDevice/opendevice-lib-arduino"  target="_blank">github</a>.
 
         <h4> <mark>3.</mark> Upload Code</h4>
@@ -179,7 +183,7 @@
             <div class="col-lg-6 col-xs-12">
                 <div class="dash-add-box small-box bg-green" ng-click="ctrl.selectBoardConnection('USB')">
                     <div class="inner">
-                        <h3>Usb</h3>
+                        <h3>Usb (Desktop)</h3>
                     </div>
                     <div class="icon">
                         <i class="fa fa-usb"></i>
@@ -192,7 +196,7 @@
             <div class="col-lg-6 col-xs-12">
                 <div class="dash-add-box small-box bg-yellow" ng-click="ctrl.selectBoardConnection('BLUETOOTH')">
                     <div class="inner">
-                        <h3>Bluetooth</h3>
+                        <h3>Bluetooth (Desktop)</h3>
                     </div>
                     <div class="icon">
                         <i class="fa fa-bluetooth"></i>
@@ -220,13 +224,11 @@
 
     <script type="text/ng-template" id="boards/connection/mqtt.htmlx">
 
-        <div class="callout callout-info">
-            <h4><i class="icon fa fa-info"></i> Info!</h4>
-            MQTT connections are initiated by the client devices (self-registration), requires no direct server configuration. <br/>
-        </div>
+        <p class="lead text-muted">
+            MQTT connections are initiated by the client devices (self-registration), requires no server configuration. <br/>
+        </p>
 
-        <h4> <mark>4.</mark> Use API Key</h4>
-        <p>Use one of the keys below (<a href ng-click="ctrl.updateApiKeys()">refresh</a>):</p>
+        <h4> <mark>4.</mark> Copy API Key (<a href ng-click="ctrl.updateApiKeys()">reload</a>)</h4>
 
         <blockquote>
             <ul class="apiKeyList" ng-init="ctrl.updateApiKeys()">

@@ -420,6 +420,26 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
         }
     };
 
+    _public.showFullScreen = function(item){
+        // var item = findDashboardItem(deviceID);
+        if(item){
+            $(item.el).toggleClass('chart-modal');
+            item.getChart().reflow();
+
+            $(document).one('keydown', function(e) {
+                // ESCAPE key pressed
+                if (e.keyCode == 27) {
+                    $(item.el).toggleClass('chart-modal');
+                    item.getChart().reflow();
+                }
+            });
+
+        }
+    };
+
+
+
+
     _public.setChartSize = function(kclass){
 
         var sizeClass = {

@@ -298,7 +298,6 @@
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    background: #fff url(../../images/core/mws-report-bg.png) repeat-x;
     border: 1px solid #ccc;
     -webkit-border-radius: 6px;
     -o-border-radius: 6px;
@@ -663,4 +662,24 @@
 /* Bootstrap notify, with textarea inside */
 .alert span textarea{
     color: #2a2a2a;
+}
+
+.vcenter {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+}
+
+
+.chart-modal {
+    position: fixed;
+    width: 100% !important;
+    height: 100% !important;
+    top: 0;
+    left: 0;
+    z-index: 65000;
+    background: rgba(0, 0, 0, 0.7);
+}
+.chart-modal .chart {
+    height: 90%;
 }

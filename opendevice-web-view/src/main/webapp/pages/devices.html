@@ -138,6 +138,8 @@
                                 ng-click="ctrl.enableRealtime(chart.id, true)">Real-time</i></button>
                         <button type="button" class="btn btn-xs ng-class:(!chart.realtime ? 'btn-primary' : 'btn-default')"
                                 ng-click="ctrl.enableRealtime(chart.id, false)">Historical</button>
+                        <button type="button" class="btn btn-xs btn-default"
+                                ng-click="ctrl.showFullScreen(chart)"><i class="fa fa-arrows-alt"></i></button>
                     </div>
 
                     <!--<div class="btn-group" data-toggle="btn-toggle">-->

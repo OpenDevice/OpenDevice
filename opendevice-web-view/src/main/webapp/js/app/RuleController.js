@@ -47,8 +47,7 @@ pkg.controller('RuleController', function ($scope, $location, $timeout, $routePa
 
     $scope.options = {
         conditionTypes : [
-            { code : "none", description : "None"},
-            { code : "time", description : "Time"},
+            { code : "none", description : "Always"},
             { code : "activeTime", description : "Active Time"}
         ]
         ,evalConditionTypes : [
@@ -67,6 +66,9 @@ pkg.controller('RuleController', function ($scope, $location, $timeout, $routePa
 
     _public.init = function(){
 
+
+
+        // PAGE: New / EDIT
         if($routeParams.id == "new" || $routeParams.id != null){
 
             _this.deviceTypes = ODev.getTypes();
@@ -80,10 +82,11 @@ pkg.controller('RuleController', function ($scope, $location, $timeout, $routePa
                         $scope.model.deviceType = device.type;
                         _public.filterDevices();
                     }
-                })
+                });
             }
 
-        } else { //  List Page
+        // PAGE: LIST
+        } else {
 
             _this.list = RuleRest.query();
 
@@ -114,7 +117,7 @@ pkg.controller('RuleController', function ($scope, $location, $timeout, $routePa
 
     _public.save = function(){
 
-        if($scope.model.condition.type == 'none') $scope.model.condition = null;
+        if(!$scope.model.condition || $scope.model.condition.type == 'none') $scope.model.condition = null;
 
         $scope.model.$saveOrUpdate(function (response) {
             $.notify({message: "Saved"}, {type:"success"});
@@ -139,7 +142,7 @@ pkg.controller('RuleController', function ($scope, $location, $timeout, $routePa
 
         var type = $scope.model.deviceType;
 
-        if(type == 'all')  _this.devices = ODev.getDevices();
+        if(type == 'all' || !type)  _this.devices = ODev.getDevices();
         else  _this.devices = ODev.getDevicesByType(type);
 
         if(type == DType.BOARD){
@@ -149,6 +152,7 @@ pkg.controller('RuleController', function ($scope, $location, $timeout, $routePa
             ];
         }else{
             _this.deviceStates = [
+                { code : -1, description : "Any Value"},
                 { code : 1, description : "ON"},
                 { code : 0, description : "OFF"}
             ];

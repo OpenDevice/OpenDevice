@@ -3,16 +3,9 @@
 <!-- Main content -->
 <section class="content" data-ng-init="ctrl.init()">
 
-
-    <div class="alert alert-info alert-dismissible" ng-if="::alertNew">
-        <button type="button" class="close" data-dismiss="alert" aria-hidden="true" ng-click="ctrl.disableAlert('alertNew')">×</button>
-        <h4><i class="icon fa fa-info"></i> Info!</h4>
-        Most connections are initiated by devices (see Boards page). Some temporary connections can be created with devices for testing
-    </div>
-
     <div class="box box-info">
         <div class="box-header with-border">
-            <h3 class="box-title">Connections List</h3>
+            <h3 class="box-title">Active Connections List</h3>
 
             <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" ng-click="ctrl.update()" title="Refresh"><i class="fa fa-refresh"></i></button>

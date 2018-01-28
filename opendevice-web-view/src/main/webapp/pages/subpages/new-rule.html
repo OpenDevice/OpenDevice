@@ -31,11 +31,11 @@
                                     <label for="type1"> State Change</label>
                                 </div>
                                 <div class="radio radio-success radio-inline">
-                                    <input type="radio" id="type2" value="threshold" ng-model="model.type">
+                                    <input type="radio" id="type2" value="threshold" ng-model="model.type" disabled>
                                     <label for="type2"> Threshold </label>
                                 </div>
                                 <div class="radio radio-success radio-inline">
-                                    <input type="radio" id="type3" value="script" ng-model="model.type">
+                                    <input type="radio" id="type3" value="script" ng-model="model.type" disabled>
                                     <label for="type3"> Script </label>
                                 </div>
                             </div>
@@ -73,7 +73,6 @@
                                         <div ng-bind-html="obj.description | highlight: $select.search"></div>
                                     </ui-select-choices>
                                 </ui-select>
-
                             </div>
                         </div>
                     </fieldset>

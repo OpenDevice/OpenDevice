@@ -214,7 +214,7 @@ app.filter('deviceNameRef', function() {
 
 // Service Worker for off-line capabilities
 // SEE: https://developers.google.com/web/fundamentals/codelabs/your-first-pwapp/
-if ('serviceWorkerXXXX' in navigator) {
+if ('serviceWorker-DISABLEDDDDDDDDDDDDDDDDDD' in navigator) {
     // Delay registration until after the page has loaded, to ensure that our
     // precaching requests don't degrade the first visit experience.
     // See https://developers.google.com/web/fundamentals/instant-and-offline/service-worker/registration

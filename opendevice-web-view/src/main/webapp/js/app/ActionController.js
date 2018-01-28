@@ -41,11 +41,10 @@ pkg.controller('ActionController', function ($scope) {
 
     $scope.options = {
         actionTypes : [
-            { code : "control", description : "Control Devices"},
-            { code : "email", description : "Email Notification"},
-            { code : "whatsapp", description : "Whatsapp Notification"},
-            { code : "script", description : "Execute Script"},
-            { code : "action", description : "Saved Action(s)"}
+            { code : "control", description : "Control other device(s)"},
+            { code : "notification", description : "Notification"},
+            { code : "webhook", description : "Webhook"},
+            { code : "script", description : "Execute Script"}
         ]
     };
 

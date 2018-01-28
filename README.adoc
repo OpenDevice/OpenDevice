@@ -6,7 +6,7 @@ OpenDevice is a set of tools and APIs to build solutions for the *"Internet of T
 Provide an open and unified framework to interconnect IoT devices, data, and applications over the Web,
 if you need communication between software and hardware, probably your place is here.
 
-The main objective is monitor and control inexpensive hardwares like *Arduino,ESP8266, RaspberryPI and similar platforms*, local(offline) or over the *cloud* using high-level programing languages and with abstraction of protocols and low-level details.
+The main objective is monitor and control inexpensive hardwares like *Arduino, ESP8266, RaspberryPI and similar platforms*, local(offline) or over the *cloud* using high-level programing languages and with abstraction of protocols and low-level details.
 
 This allows you to focus on your project and innovation, leave obscure details of communication protocols and specifications with OpenDevice, you will make a major step towards the success of your project.
 
@@ -89,7 +89,11 @@ void loop() {
 }
 ----
 
-See: https://opendevice.atlassian.net/wiki/display/DOC/Setting-up+the+Server
+== Running the Server
+
+The server run as standalone application, and you can also run using docker
+
+See more: https://opendevice.atlassian.net/wiki/display/DOC/Setting-up+the+Server
 
 == Technology
 
@@ -116,9 +120,11 @@ See documentation and examples at:
 
 http://opendevice.io
 
+https://opendevice.atlassian.net/wiki
+
 https://github.com/OpenDevice/opendevice-examples
 
-== Install
+== Getting Started
 
 https://opendevice.atlassian.net/wiki/spaces/DOC/pages/491526/Getting+started
 

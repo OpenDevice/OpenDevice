@@ -69,7 +69,9 @@ public class JobManager implements JobSpecDao{
         // Load Initial Specs from datasource.
         List<JobSpec> specs = dao.listAll();
         for (JobSpec spec : specs) {
-            addJob(spec);
+            if(spec.isEnabled()){
+                addJob(spec);
+            }
         }
 
         try {
@@ -182,7 +184,7 @@ public class JobManager implements JobSpecDao{
     @Override
     public JobSpec update(JobSpec entity) {
 
-        entity = dao.update(entity);
+        entity = dao.update(entity); // rync database...
 
         try {
 
@@ -194,7 +196,7 @@ public class JobManager implements JobSpecDao{
             log.error(e.getMessage(), e);
         }
 
-        return dao.update(entity);
+        return dao.update(entity); // sync addJob changes...
     }
 
     @Override
@@ -219,6 +221,8 @@ public class JobManager implements JobSpecDao{
         return dao.listAll();
     }
 
-
-
+    @Override
+    public List<JobSpec> listAllByUser() {
+        return dao.listAllByUser();
+    }
 }

@@ -13,8 +13,13 @@
 
 package br.com.criativasoft.opendevice.middleware.persistence.dao.jpa;
 
+import br.com.criativasoft.opendevice.core.TenantProvider;
+import br.com.criativasoft.opendevice.middleware.model.jobs.JobSpec;
 import br.com.criativasoft.opendevice.middleware.model.rules.RuleSpec;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.RuleSpecDao;
+
+import javax.persistence.TypedQuery;
+import java.util.List;
 
 /**
  * @author Ricardo JL Rufino
@@ -32,4 +37,10 @@ public class RuleSpecJPA extends GenericJpa<RuleSpec>  implements RuleSpecDao {
         super.persist(entity);
     }
 
+    @Override
+    public List<RuleSpec> listAllByUser() {
+        TypedQuery<RuleSpec> query = em().createQuery("from RuleSpec where account.uuid = :TENANT", RuleSpec.class);
+        query.setParameter("TENANT", TenantProvider.getCurrentID());
+        return query.getResultList();
+    }
 }

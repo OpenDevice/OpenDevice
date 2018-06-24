@@ -13,8 +13,10 @@
 
 package br.com.criativasoft.opendevice.middleware.resources;
 
+import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.middleware.model.rules.RuleSpec;
 import br.com.criativasoft.opendevice.middleware.rules.RuleManager;
+import br.com.criativasoft.opendevice.restapi.io.ErrorResponse;
 import com.sun.jersey.api.NotFoundException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 
@@ -41,23 +43,32 @@ public class RuleRest {
     @GET
     @Path("/{id}")
     public RuleSpec get(@PathParam("id") long id) throws IOException {
-        return ruleManager.getById(id);
+
+        RuleSpec spec = ruleManager.getById(id);
+
+        if(spec != null && !spec.getAccount().getUuid().equals( TenantProvider.getCurrentID())){
+            throw new NotFoundException();
+        }
+
+        return spec;
     }
 
     @GET
     public List<RuleSpec> list() throws IOException {
-        List<RuleSpec> list = ruleManager.listAll();
+        List<RuleSpec> list = ruleManager.listAllByUser();
         return list;
     }
 
     @PUT @Path("/{id}/activate")
-    public Response activate(@PathParam("id") long id, RuleSpec rule, @QueryParam("value") boolean value) throws IOException {
+    public Response activate(@PathParam("id") long id, RuleSpec spec, @QueryParam("value") boolean value) throws IOException {
 
-        if(rule == null) throw new NotFoundException();
+        if(spec == null) throw new NotFoundException();
 
-//        rule.setEnabled(value);
+        if(spec != null && !spec.getAccount().getUuid().equals( TenantProvider.getCurrentID())){
+            return null;
+        }
 
-        ruleManager.update(rule);
+        ruleManager.update(spec);
 
         return Response.ok().build();
     }
@@ -75,9 +86,13 @@ public class RuleRest {
 
     @PUT
     @Path("{id}")
-    public Response update(RuleSpec rule) throws IOException {
+    public Response update(RuleSpec spec) throws IOException {
 
-        ruleManager.update(rule);
+        if(spec != null && !spec.getAccount().getUuid().equals( TenantProvider.getCurrentID())){
+            return ErrorResponse.UNAUTHORIZED("UNAUTHORIZED - Invalid Account !");
+        }
+
+        ruleManager.update(spec);
 
         return Response.ok().build();
 
@@ -88,6 +103,10 @@ public class RuleRest {
     public Response delete(@PathParam("id") long id) throws IOException {
 
         RuleSpec spec = ruleManager.getById(id);
+
+        if(spec != null && !spec.getAccount().getUuid().equals( TenantProvider.getCurrentID())){
+            return ErrorResponse.UNAUTHORIZED("UNAUTHORIZED - Invalid Account !");
+        }
 
         ruleManager.delete(spec);
 

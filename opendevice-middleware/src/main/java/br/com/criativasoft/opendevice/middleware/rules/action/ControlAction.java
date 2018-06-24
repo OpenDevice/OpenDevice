@@ -32,7 +32,7 @@ public class ControlAction extends AbstractAction<ControlActionSpec> {
     @Override
     public void execute() throws ActionException {
 
-        if(log.isDebugEnabled()) log.debug("Executing ...");
+        if(log.isDebugEnabled()) log.debug("Executing [Device "+ spec.getResourceID()+" -> "+spec.getValue()+"]");
 
         long resourceID = spec.getResourceID();
 

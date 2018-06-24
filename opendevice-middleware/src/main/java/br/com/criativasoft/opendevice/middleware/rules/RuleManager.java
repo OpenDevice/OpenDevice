@@ -24,8 +24,9 @@ import br.com.criativasoft.opendevice.middleware.jobs.AbstractAction;
 import br.com.criativasoft.opendevice.middleware.jobs.ActionException;
 import br.com.criativasoft.opendevice.middleware.model.rules.ActiveTimeConditionSpec;
 import br.com.criativasoft.opendevice.middleware.model.rules.ConditionSpec;
-import br.com.criativasoft.opendevice.middleware.model.rules.RuleSpec;
 import br.com.criativasoft.opendevice.middleware.model.rules.RuleEnums.ExecutionStatus;
+import br.com.criativasoft.opendevice.middleware.model.rules.RuleSpec;
+import br.com.criativasoft.opendevice.middleware.persistence.HibernateProvider;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.RuleSpecDao;
 import br.com.criativasoft.opendevice.restapi.model.Account;
 import org.slf4j.Logger;
@@ -38,7 +39,7 @@ import java.util.*;
 import java.util.concurrent.Executor;
 
 /**
- * Class responsible for checking the registered rules and conditions and performing the corresponding actions. <br/>
+ * Rule System - responsible for checking the registered rules and conditions and performing the corresponding actions. <br/>
  * Specifications and definitions are available in class implementations: {@link RuleSpec}, {@link ConditionSpec}, {@link AbstractAction}
  * @author Ricardo JL Rufino
  * @date 01/11/16
@@ -115,7 +116,7 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
             fireRulesUpdate();
 
             if(spec.isEnabled() && spec.getCondition() != null){
-                eval(false); // TODO: A direct call can affect performance in certain situations
+                eval(false, spec.getAccount().getUuid()); // TODO: A direct call can affect performance in certain situations
             }
         }
 
@@ -128,7 +129,7 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
      * Execution is controlled through the class {@link ActionTask}
      * @see #executeActionsFor(List)
      */
-    protected void eval(boolean timeBased){
+    protected void eval(boolean timeBased, String tenantID){
 
         List<AbstractRule> toExecute = new LinkedList<AbstractRule>();
 
@@ -143,6 +144,11 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
             RuleSpec spec = rule.getSpec();
 
             long resourceID = spec.getResourceID();
+
+            // If has tenantID, only execute of the same context
+            if(tenantID != null && !spec.getAccount().getUuid().equals(tenantID)){
+                continue;
+            }
 
             if(rule instanceof IResourceRule && resourceID > 0){
 
@@ -173,7 +179,12 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
             }else{
                 if(spec.getStatus() != ExecutionStatus.INACTIVE){
                     spec.setStatus(ExecutionStatus.INACTIVE);
-                    ruleSpecDao.update(spec);
+                    try{
+                        System.out.println("ruleSpecDao Hibernate : " + HibernateProvider.getInstance());
+                        ruleSpecDao.update(spec);
+                    }catch (Exception ex){
+                        log.error(ex.getMessage(), ex);
+                    }
                     fireRulesUpdate();
                 }
 
@@ -194,11 +205,18 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
         if(log.isDebugEnabled()) log.debug("Executing rules : " + rules.size());
 
         for (AbstractRule rule : rules) {
+
+            executor.execute(new ActionTask(rule));
+
             RuleSpec spec = rule.getSpec();
             spec.setStatus(ExecutionStatus.ACTIVE);
             spec.setLastExecution(new Date());
-            ruleSpecDao.update(spec);
-            executor.execute(new ActionTask(rule));
+
+            try{
+                ruleSpecDao.update(spec);
+            }catch (Exception ex){
+                log.error(ex.getMessage(), ex);
+            }
 
             // FIXME: Save executions history  ?!?!?
         }
@@ -230,7 +248,7 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
 
     @Override
     public void onDeviceChanged(Device device) {
-        eval(false);
+        eval(false, device.getApplicationID());
     }
 
     @Override
@@ -290,6 +308,15 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
         return ruleSpecDao.listAll();
     }
 
+    @Override
+    public List<RuleSpec> listAllByUser() {
+        return ruleSpecDao.listAllByUser();
+    }
+
+
+    // ============================================================================
+    // ActionTask
+    // ============================================================================
 
     private static class ActionTask implements Runnable{
 
@@ -301,6 +328,8 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
 
         @Override
         public void run() {
+
+            ODev.getDeviceManager().transactionBegin();
 
             RuleSpec spec = abstractRule.getSpec();
 
@@ -332,6 +361,7 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
 
             TenantProvider.setCurrentID(null);
 
+            ODev.getDeviceManager().transactionEnd();
         }
     }
 }

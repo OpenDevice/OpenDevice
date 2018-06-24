@@ -13,9 +13,11 @@
 
 package br.com.criativasoft.opendevice.middleware.resources;
 
+import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.middleware.jobs.JobManager;
 import br.com.criativasoft.opendevice.middleware.model.jobs.JobSpec;
 import br.com.criativasoft.opendevice.middleware.rules.RuleManager;
+import br.com.criativasoft.opendevice.restapi.io.ErrorResponse;
 import com.sun.jersey.api.NotFoundException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 
@@ -42,21 +44,32 @@ public class JobRest {
     @GET
     @Path("/{id}")
     public JobSpec get(@PathParam("id") long id) throws IOException {
-        return jobManager.getById(id);
+
+        JobSpec spec = jobManager.getById(id);
+
+        if(spec != null && !spec.getAccount().getUuid().equals( TenantProvider.getCurrentID())){
+            throw new NotFoundException();
+        }
+
+        return spec;
     }
 
     @GET
     public List<JobSpec> list() throws IOException {
-        List<JobSpec> list = jobManager.listAll();
+        List<JobSpec> list = jobManager.listAllByUser();
         return list;
     }
 
     @PUT @Path("/{id}/activate")
-    public Response activate(@PathParam("id") long id, JobSpec rule, @QueryParam("value") boolean value) throws IOException {
+    public Response activate(@PathParam("id") long id, JobSpec spec, @QueryParam("value") boolean value) throws IOException {
 
-        if(rule == null) throw new NotFoundException();
+        if(spec == null) throw new NotFoundException();
 
-        jobManager.update(rule);
+        if(spec != null && !spec.getAccount().getUuid().equals( TenantProvider.getCurrentID())){
+            return ErrorResponse.UNAUTHORIZED("UNAUTHORIZED - Invalid Account !");
+        }
+
+        jobManager.update(spec);
 
         return Response.ok().build();
     }
@@ -72,9 +85,13 @@ public class JobRest {
 
     @PUT
     @Path("{id}")
-    public Response update(JobSpec rule) throws IOException {
+    public Response update(JobSpec spec) throws IOException {
 
-        jobManager.update(rule);
+        if(spec != null && !spec.getAccount().getUuid().equals( TenantProvider.getCurrentID())){
+            return ErrorResponse.UNAUTHORIZED("UNAUTHORIZED - Invalid Account !");
+        }
+
+        jobManager.update(spec);
 
         return Response.ok().build();
 
@@ -85,6 +102,10 @@ public class JobRest {
     public Response delete(@PathParam("id") long id) throws IOException {
 
         JobSpec spec = jobManager.getById(id);
+
+        if(spec != null && !spec.getAccount().getUuid().equals( TenantProvider.getCurrentID())){
+            return ErrorResponse.UNAUTHORIZED("UNAUTHORIZED - Invalid Account !");
+        }
 
         jobManager.delete(spec);
 

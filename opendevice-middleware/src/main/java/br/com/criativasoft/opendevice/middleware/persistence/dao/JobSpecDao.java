@@ -16,9 +16,13 @@ package br.com.criativasoft.opendevice.middleware.persistence.dao;
 import br.com.criativasoft.opendevice.core.dao.Dao;
 import br.com.criativasoft.opendevice.middleware.model.jobs.JobSpec;
 
+import java.util.List;
+
 /**
  * @author Ricardo JL Rufino
  * @date 01/11/16
  */
 public interface JobSpecDao extends Dao<JobSpec> {
+
+    List<JobSpec> listAllByUser();
 }

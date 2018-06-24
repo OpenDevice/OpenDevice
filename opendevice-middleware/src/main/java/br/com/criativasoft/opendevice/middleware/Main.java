@@ -49,7 +49,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.script.SimpleBindings;
 import java.io.*;
-import java.util.*;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -141,8 +143,6 @@ public class Main extends LocalDeviceManager {
 //        };
 //        addOutput(conn);
 
-        this.connect();
-
         EntityManager entityManager = null;
 
         if(config.isDatabaseEnabled()){
@@ -159,26 +159,30 @@ public class Main extends LocalDeviceManager {
         GuiceInjectProvider.setInjector(injector);
         injector.injectMembers(manager);
 
-        if(config.isTenantsEnabled()){
 
+        // Setup tenant provider (or use LocalTenantProvider)
+        if(config.isTenantsEnabled()){
             MainTenantProvider provider = new MainTenantProvider(manager);
             config.setBindLocalVariables(false);
             TenantProvider.setProvider(provider);
+        }
 
-            // Init accounts
-            if(entityManager != null){
-                // FIXME: this can show startup
-                EntityTransaction tx = entityManager.getTransaction();
-                tx.begin();
-                List<Account> accounts = manager.getAccountDao().listAll();
 
-                if(accounts.isEmpty()) accounts = initDatabase(entityManager);
+        // Init accounts
+        if(entityManager != null){
+            // FIXME: this can show startup
+            EntityTransaction tx = entityManager.getTransaction();
+            tx.begin();
+            List<Account> accounts = manager.getAccountDao().listAll();
 
-                for (Account account : accounts) {
-                    provider.addNewContext(account.getUuid());
-                }
-                tx.commit();
+            if(accounts.isEmpty()) accounts = initDatabase(entityManager);
+
+            TenantProvider provider = TenantProvider.getTenantProvider();
+
+            for (Account account : accounts) {
+                provider.addNewContext(account.getUuid());
             }
+            tx.commit();
         }
 
         // TODO: Instead of looking for the entities manually it would be interesting to implement a
@@ -189,6 +193,9 @@ public class Main extends LocalDeviceManager {
 
         JobManager jobManager = injector.getInstance(JobManager.class);
         jobManager.start();
+
+
+        this.connect();
 
 //        // Create a JmDNS instance
 //        JmDNS jmdns = JmDNS.create(InetAddress.getLocalHost());
@@ -249,9 +256,17 @@ public class Main extends LocalDeviceManager {
 
     private String getWebAppDir(){
 
-        String current = getClass().getResource("").getPath();
+        String current = getClass().getClassLoader().getResource("").getPath();
 
-        // Current directory (of JAR)
+        OpenDeviceConfig config = ODev.getConfig();
+
+        String profile = config.getProfile();
+
+        if(profile.equals(OpenDeviceConfig.PROFILE_DEV)){
+            current = current.replaceAll("/target/classes", "/src/main/resources");
+        }
+
+        // Current directory (based in JAR)
         File webapp = new File(current + File.separator + "webapp" );
         if(webapp.exists()){
             return webapp.getPath();
@@ -284,38 +299,21 @@ public class Main extends LocalDeviceManager {
     protected boolean extractResources() {
         try {
 
-            String destPath = System.getProperty("user.dir") +  File.separator + "target" + File.separator;
-
-            extractResources(Main.class, destPath);
+            String destPath = getWebAppDir();
 
             // Load: User Interface Extensions
             // ======================================
 
-            ServiceLoader<ViewExtension> service = ServiceLoader.load(ViewExtension.class);
+            List<ViewExtension> extensions = getExtensions(ViewExtension.class);
 
-            Iterator<ViewExtension> iterator = service.iterator();
-            List<String> userExtensions = new ArrayList<String>();
+            log.info("Additional user interface extension: ");
 
-            File plugins = new File(destPath, "webapp/ext/dynamic_plugins.js");
-            if(!plugins.exists()) plugins.createNewFile();
-            PrintWriter dynamic_plugins = new PrintWriter(plugins);
-
-            while (iterator.hasNext()) {
-                ViewExtension extension = iterator.next();
-                boolean extracted = extractResources(extension.getClass(), destPath);
-                if (extracted){
-                    dynamic_plugins.println("$.getScript('"+extension.loadScripts().get(0)+"', function(){\n" +
-                            "\n" +
-                            "   console.log('Additional user interface extension: "+extension.loadScripts().get(0)+"');\n" +
-                            "\n" +
-                            "});");
-                }
-                userExtensions.addAll(extension.loadScripts());
+            for (ViewExtension extension : extensions) {
+                log.info(" - " + extension.getClass());
+                // Copy resources for webapp folder...
+                extractResources(extension.getClass(), extension, destPath);
             }
 
-            dynamic_plugins.close();
-
-            log.info("Additional user interface extension: " + userExtensions);
 
         } catch (IOException ex) {
             log.error(ex.getMessage(), ex);
@@ -324,7 +322,7 @@ public class Main extends LocalDeviceManager {
         return true;
     }
 
-    protected boolean extractResources(Class klass, String destPath) throws IOException {
+    protected boolean extractResources(Class klass, ViewExtension extension, String destPath) throws IOException {
 
         String jarSource = klass.getProtectionDomain().getCodeSource().getLocation().getPath();
         log.debug("Extracting contents to: " + destPath);

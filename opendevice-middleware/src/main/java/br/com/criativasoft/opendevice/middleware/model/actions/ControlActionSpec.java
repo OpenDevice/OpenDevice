@@ -47,4 +47,9 @@ public class ControlActionSpec extends ActionSpec {
     public void setResourceID(long resourceID) {
         this.resourceID = resourceID;
     }
+
+    @Override
+    public String toString() {
+        return "Control["+resourceID + " -> "+value+"]";
+    }
 }

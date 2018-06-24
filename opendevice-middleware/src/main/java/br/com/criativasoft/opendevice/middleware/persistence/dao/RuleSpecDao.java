@@ -16,6 +16,8 @@ package br.com.criativasoft.opendevice.middleware.persistence.dao;
 import br.com.criativasoft.opendevice.core.dao.Dao;
 import br.com.criativasoft.opendevice.middleware.model.rules.RuleSpec;
 
+import java.util.List;
+
 /**
  * TODO: Add docs.
  *
@@ -23,4 +25,7 @@ import br.com.criativasoft.opendevice.middleware.model.rules.RuleSpec;
  * @date 01/11/16
  */
 public interface RuleSpecDao extends Dao<RuleSpec> {
+
+    List<RuleSpec> listAllByUser();
+
 }

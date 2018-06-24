@@ -67,6 +67,7 @@ public class ConnectionsRest {
 
         String appID = TenantProvider.getCurrentID();
 
+        // Clients
         if(connection instanceof AbstractAtmosphereConnection){
             List<ConnectionInfo> connections = ((AbstractAtmosphereConnection) connection).getConnections();
 
@@ -101,6 +102,9 @@ public class ConnectionsRest {
                 }else if (deviceConnection instanceof IBluetoothConnection) {
                     info.setHost(((IBluetoothConnection) deviceConnection).getConnectionURI());
                     info.setType(ConnectionType.BLUETOOTH.name());
+                }else if (! (deviceConnection instanceof ServerConnection)){
+                    info.setHost(connection.getUID());
+                    info.setType(ConnectionType.WIFI.name());
                 }else{
                     info = null;
                 }

@@ -13,6 +13,8 @@
 
 package br.com.criativasoft.opendevice.middleware.test;
 
+import br.com.criativasoft.opendevice.core.ODev;
+import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.core.util.DefaultPasswordGenerator;
 import br.com.criativasoft.opendevice.restapi.model.*;
 import org.apache.shiro.authc.credential.DefaultPasswordService;
@@ -45,7 +47,9 @@ public class PopulateInitialData {
 
     private List<Account> createUsers() {
         List<Account> list = new ArrayList<Account>();
-        list.add(saveUser("admin", "admin", AccountType.CLOUD_MANAGER, new String(new DefaultPasswordGenerator().generatePassword())));
+        String key = new String(new DefaultPasswordGenerator().generatePassword());
+        if(!ODev.getConfig().isTenantsEnabled()) key = OpenDeviceConfig.LOCAL_APP_ID;
+        list.add(saveUser("admin", "admin", AccountType.CLOUD_MANAGER, key));
         return list;
     }
 

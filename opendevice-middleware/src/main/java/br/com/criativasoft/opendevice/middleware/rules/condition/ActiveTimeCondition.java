@@ -15,6 +15,8 @@ package br.com.criativasoft.opendevice.middleware.rules.condition;
 
 import br.com.criativasoft.opendevice.middleware.model.rules.ActiveTimeConditionSpec;
 import br.com.criativasoft.opendevice.middleware.model.rules.RuleEnums;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ricardo JL Rufino
@@ -24,13 +26,12 @@ public class ActiveTimeCondition extends AbstractCondition<ActiveTimeConditionSp
 
     private long fistTrigger;
 
+    private static final Logger log = LoggerFactory.getLogger(ActiveTimeCondition.class);
 
     @Override
     public boolean evalRuleTrigged(){
 
         if(fistTrigger == 0){
-
-            System.out.println("Initial .... ");
             fistTrigger = System.currentTimeMillis();
         }
         else{
@@ -45,7 +46,7 @@ public class ActiveTimeCondition extends AbstractCondition<ActiveTimeConditionSp
             long targetSec = spec().getTime() * getMultp(spec().getIntervalType());
 
             if(intervalSec >= targetSec){
-                System.out.println("Elapsed Time : " + interval + "ms");
+                log.debug("ACTIVE || Elapsed Time : " + interval + "ms, of: " + getSpec().getTime() + "/" + getSpec().getIntervalType());
                 return true;
             }
 

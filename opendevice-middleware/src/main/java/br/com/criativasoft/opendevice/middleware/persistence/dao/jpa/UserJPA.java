@@ -66,7 +66,7 @@ public class UserJPA extends GenericJpa<User> implements UserDao {
 
         ApiKey key = new ApiKey();
         key.setKey(account.getUuid());
-        key.setAppName("UserKey");
+        key.setAppName("ApplicationID");
         key.setAccount(userAccount);
         userAccount.getKeys().add(key);
 

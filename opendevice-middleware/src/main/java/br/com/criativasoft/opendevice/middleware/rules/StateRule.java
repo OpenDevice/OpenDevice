@@ -43,4 +43,10 @@ public class StateRule extends AbstractRule<StateRuleSpec> implements IResourceR
         long value = getSpec().getValue();
         return /*always condition==*/ value == -1  || super.allowExection();
     }
+
+    @Override
+    public String toString() {
+        StateRuleSpec spec = getSpec();
+        return "StateRule[When "+ spec.getResourceID() + "==" + spec.getValue() +", action: " + spec.getAction()+"]";
+    }
 }

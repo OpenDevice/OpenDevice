@@ -13,8 +13,13 @@
 
 package br.com.criativasoft.opendevice.middleware.persistence.dao.jpa;
 
+import br.com.criativasoft.opendevice.core.TenantProvider;
+import br.com.criativasoft.opendevice.middleware.model.Dashboard;
 import br.com.criativasoft.opendevice.middleware.model.jobs.JobSpec;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.JobSpecDao;
+
+import javax.persistence.TypedQuery;
+import java.util.List;
 
 /**
  * @author Ricardo JL Rufino
@@ -36,5 +41,13 @@ public class JobSpecJPA extends GenericJpa<JobSpec>  implements JobSpecDao {
     public JobSpec update(JobSpec entity) {
         entity.setAccount(getCurrentAccount());
         return super.update(entity);
+    }
+
+
+    @Override
+    public List<JobSpec> listAllByUser() {
+        TypedQuery<JobSpec> query = em().createQuery("from JobSpec where account.uuid = :TENANT", JobSpec.class);
+        query.setParameter("TENANT", TenantProvider.getCurrentID());
+        return query.getResultList();
     }
 }

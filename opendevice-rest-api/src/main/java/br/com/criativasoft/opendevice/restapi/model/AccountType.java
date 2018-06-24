@@ -18,9 +18,10 @@ package br.com.criativasoft.opendevice.restapi.model;
  * @date 24/09/16
  */
 public enum AccountType {
-    CLOUD_MANAGER,
+    CLOUD_MANAGER, // Service provider (like: cloud.opendevice.io)
     ACCOUNT_MANAGER,
-    USER;
+    USER,
+    DEVICE; // Standalone / bridged devices (like sonoff)
 
     // For Rest
     public static class ROLES {

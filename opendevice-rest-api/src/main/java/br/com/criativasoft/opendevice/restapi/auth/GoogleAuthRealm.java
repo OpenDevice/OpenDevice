@@ -90,8 +90,6 @@ public class GoogleAuthRealm extends AbstractAuthorizingRealm {
 
                 if(response.getStatusLine().getStatusCode() == 200){
 
-                    System.out.println("google resp : " + bodyAsString);
-
                     String appID = ODev.getConfig().getString(OpenDeviceConfig.ConfigKey.google_appid);
 
                     if(appID == null){

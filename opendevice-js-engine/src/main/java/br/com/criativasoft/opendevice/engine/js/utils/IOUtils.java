@@ -35,4 +35,19 @@ public class IOUtils {
     public static String toString(File file) throws IOException {
         return toString(new FileInputStream(file));
     }
+
+    public static void write(String target, InputStream inputStream) throws IOException {
+        int read = 0;
+        byte[] bytes = new byte[1024];
+
+        OutputStream out = new FileOutputStream(new File(target));
+        while ((read = inputStream.read(bytes)) != -1)
+        {
+            out.write(bytes, 0, read);
+        }
+        out.flush();
+        out.close();
+    }
+
+
 }

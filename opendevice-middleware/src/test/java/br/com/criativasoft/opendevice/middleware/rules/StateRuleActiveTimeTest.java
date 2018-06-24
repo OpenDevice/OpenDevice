@@ -26,6 +26,9 @@ import br.com.criativasoft.opendevice.restapi.model.Account;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import static org.junit.Assert.*;
 
 /**
@@ -37,19 +40,37 @@ public class StateRuleActiveTimeTest {
 
     private DeviceManager manager;
     private RuleManager ruleManager;
+    private Timer timer;
 
     @Before
     public void setUp() throws Exception {
-
         manager = new LocalDeviceManager();
         manager.addDevice(new Sensor(1, Device.DIGITAL));
         manager.addDevice(new PhysicalDevice(2, Device.DIGITAL));
 
         ruleManager = new RuleManager();
+        ruleManager.setRuleSpecDao(new RuleSpecDaoTest());
         manager.addListener(ruleManager);
     }
 
+    private void startTimer(){
+        if(timer != null) timer.cancel();
+        timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                ruleManager.eval(true, null);
+            }
+        };
+
+        timer.scheduleAtFixedRate(task, 1000, 1000);
+    }
+
     public StateRuleSpec createSpecActiveTime(int value, int time){
+        return createSpecActiveTime(value, time, 2);
+    }
+
+    public StateRuleSpec createSpecActiveTime(int value, int time, int targetDevice){
 
         Account account = new Account();
         account.setUuid("1");
@@ -58,6 +79,7 @@ public class StateRuleActiveTimeTest {
         spec.setResourceID(1);
         spec.setValue(value);
         spec.setAccount(account);
+        spec.setEnabled(true);
 
         ActiveTimeConditionSpec condition = new ActiveTimeConditionSpec();
         condition.setTime(time);
@@ -66,7 +88,27 @@ public class StateRuleActiveTimeTest {
 
         ControlActionSpec action = new ControlActionSpec();
         action.setValue(1);
-        action.setResourceID(2);
+        action.setResourceID(targetDevice);
+
+        spec.setAction(action);
+
+        return spec;
+    }
+
+    public StateRuleSpec createFollow(int value, int followDeviceID, int targetDevice){
+
+        Account account = new Account();
+        account.setUuid("1");
+
+        StateRuleSpec spec = new StateRuleSpec();
+        spec.setResourceID(followDeviceID);
+        spec.setValue(value);
+        spec.setAccount(account);
+        spec.setEnabled(true);
+
+        ControlActionSpec action = new ControlActionSpec();
+        action.setValue(value);
+        action.setResourceID(targetDevice);
 
         spec.setAction(action);
 
@@ -87,7 +129,7 @@ public class StateRuleActiveTimeTest {
         ruleManager.addRule(spec1);
         ruleManager.addRule(spec2);
 
-        ruleManager.start();
+        startTimer();
         Thread.sleep(100);
 
         assertNotNull(spec1.getLastExecution());
@@ -104,7 +146,7 @@ public class StateRuleActiveTimeTest {
 
         ruleManager.addRule(spec1);
 
-        ruleManager.start();
+        startTimer();
         Thread.sleep(100);
 
         assertEquals(RuleEnums.ExecutionStatus.FAIL, spec1.getStatus());
@@ -121,7 +163,7 @@ public class StateRuleActiveTimeTest {
 
         ruleManager.addRule(spec1);
 
-        ruleManager.start();
+        startTimer();
 
         Thread.sleep(500);
         assertNull(spec1.getLastExecution());
@@ -142,13 +184,12 @@ public class StateRuleActiveTimeTest {
 
         ruleManager.addRule(spec1);
 
-        ruleManager.start();
+        startTimer();
 
         Thread.sleep(500);
         assertNull(spec1.getLastExecution());
-        Thread.sleep(500);
-        assertNull(spec1.getLastExecution());
-        Thread.sleep(500);
+
+        Thread.sleep(1000);
         assertNotNull(spec1.getLastExecution());
 
     }
@@ -162,7 +203,7 @@ public class StateRuleActiveTimeTest {
 
         ruleManager.addRule(spec1);
 
-        ruleManager.start();
+        startTimer();
         Thread.sleep(500);
         assertNull(spec1.getLastExecution());
 
@@ -181,7 +222,7 @@ public class StateRuleActiveTimeTest {
 
         ruleManager.addRule(spec1);
 
-        ruleManager.start();
+        startTimer();
         Thread.sleep(2000);
         assertNotNull(spec1.getLastExecution());
         assertEquals(spec1.getStatus(), RuleEnums.ExecutionStatus.ACTIVE);
@@ -189,6 +230,44 @@ public class StateRuleActiveTimeTest {
         device.setValue(0);
         Thread.sleep(2000);
         assertEquals(spec1.getStatus(), RuleEnums.ExecutionStatus.INACTIVE);
+    }
+
+
+    /**
+     * Rule1: Self controller
+     * - On device 1 ON, after 2 secons goto OFF
+     *
+     * Rule2: Device 2 Follow chante on device 1
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void testActiveTimeRuleChain() throws InterruptedException {
+        Device device = manager.findDeviceByUID(1);
+        Device device2 = manager.findDeviceByUID(2);
+
+        StateRuleSpec spec1 = createSpecActiveTime(/*value=*/1, /*time=*/1, /*target=*/1);
+
+        //  change to OFF ofter time
+        ControlActionSpec action = (ControlActionSpec) spec1.getAction();
+        action.setValue(0);
+
+        ruleManager.addRule(spec1);
+        ruleManager.addRule(createFollow(/*value=*/0, /*source=*/1, /*target=*/2));
+        ruleManager.addRule(createFollow(/*value=*/1, /*source=*/1, /*target=*/2));
+
+        startTimer();
+
+        device.setValue(1);
+        Thread.sleep(1000);
+        assertEquals(1f, device2.getValue(), 0); // follow change ???
+
+        Thread.sleep(3000);
+        assertNotNull(spec1.getLastExecution());
+        assertEquals(0f, device.getValue(), 0); // action trigger ?
+
+        assertEquals(0f, device2.getValue(), 0); // follow change (over time) ??? (rule chain)
+
     }
 
 

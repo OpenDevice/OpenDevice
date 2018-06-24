@@ -43,6 +43,15 @@ public class ApiKey {
 //    @JsonBackReference
     private UserAccount account;
 
+    public ApiKey() {
+
+    }
+
+    public ApiKey(String appName, String key) {
+        this.key = key;
+        this.appName = appName;
+    }
+
     public long getId() {
         return id;
     }

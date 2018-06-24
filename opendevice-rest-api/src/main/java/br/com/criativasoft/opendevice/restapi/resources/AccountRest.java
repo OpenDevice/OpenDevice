@@ -113,8 +113,6 @@ public class AccountRest {
 
         String decript = cipher.decript(link);
 
-        System.out.println(decript);
-
         return Response.ok().entity("{\"invitation\" : \""+link+"\"}").build();
     }
 

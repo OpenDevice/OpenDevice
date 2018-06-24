@@ -22,11 +22,16 @@ import br.com.criativasoft.opendevice.core.event.EventHookManager;
  * @author Ricardo JL Rufino
  * @date 30/08/15.
  */
-public class ExtensionPoint implements OpenDeviceExtension {
+public class ExtensionPoint extends OpenDeviceExtension {
 
     @Override
     public String getName() {
         return "opendevice-js-engine";
+    }
+
+    @Override
+    public String getVersion() {
+        return "1.0";
     }
 
     @Override

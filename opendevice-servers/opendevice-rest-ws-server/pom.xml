@@ -13,9 +13,10 @@
     <artifactId>opendevice-rest-ws-server</artifactId>
 
     <properties>
-        <jersey-version>1.19</jersey-version>
+        <jersey-version>1.19</jersey-version> <!-- 1.19.4 -->
         <jaxb-version>2.1</jaxb-version>
-        <nettosphere-version>2.4.11-SNAPSHOT</nettosphere-version>
+        <nettosphere-version>3.0.4-SNAPSHOT</nettosphere-version>
+        <!--<nettosphere-version>2.4.11-SNAPSHOT</nettosphere-version>-->
         <atmosphere-version>2.4.7</atmosphere-version>
         <atmosphere-extensions>2.4.3</atmosphere-extensions>
         <shiro-version>1.2.4</shiro-version>
@@ -52,12 +53,11 @@
             </exclusions>
         </dependency>
 
-        <dependency>
+  <!--      <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty</artifactId>
             <version>3.10.5.Final</version>
-        </dependency>
-
+        </dependency>-->
 
         <dependency>
             <groupId>org.atmosphere</groupId>

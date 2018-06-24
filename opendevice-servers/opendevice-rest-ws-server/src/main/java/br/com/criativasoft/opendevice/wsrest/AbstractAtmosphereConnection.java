@@ -48,12 +48,9 @@ import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.atmosphere.cpr.*;
 import org.atmosphere.nettosphere.Config;
 import org.atmosphere.nettosphere.Nettosphere;
-import org.jboss.netty.handler.ssl.SslContext;
-import org.jboss.netty.handler.ssl.SslProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -70,6 +67,8 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
     private int port;
 
     private Nettosphere server;
+
+    private BroadcasterFactory broadcasterFactory;
 
     private List<String> webresources = new LinkedList<String>();
     private List<Class<?>> resources = new LinkedList<Class<?>>();
@@ -152,13 +151,13 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             // SSL Support
             String certificate = odevc.getCertificateFile();
             if(!StringUtils.isEmpty(certificate)){
-                File cert = new File(certificate);
-                if(!cert.exists()) throw new IllegalArgumentException("Certificate not found !");
-                File key = new File(odevc.getCertificateKey());
-                if(!key.exists()) throw new IllegalArgumentException("Certificate key must be provided !");
-
-                SslContext sslContext = SslContext.newServerContext(SslProvider.JDK, cert, key, odevc.getCertificatePass());
-                conf.sslContext(sslContext);
+//                File cert = new File(certificate);
+//                if(!cert.exists()) throw new IllegalArgumentException("Certificate not found !");
+//                File key = new File(odevc.getCertificateKey());
+//                if(!key.exists()) throw new IllegalArgumentException("Certificate key must be provided !");
+//
+//                SslContext sslContext = SslContext.newServerContext(SslProvider.JDK, cert, key, odevc.getCertificatePass());
+//                conf.sslContext(sslContext);
             }
 
             // Authentication
@@ -183,6 +182,8 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             }
 
             server = new Nettosphere.Builder().config(conf.build()).build();
+
+            broadcasterFactory = server.framework().getBroadcasterFactory();
         }
     }
 
@@ -318,8 +319,6 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
         if(server == null) return;
 
-        AtmosphereConfig atmosphereConfig = server.framework().getAtmosphereConfig();
-
         if(message instanceof  Command){
 
             Command cmd = (Command) message;
@@ -327,9 +326,9 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
             // Get broadcast group for client.
             Broadcaster broadcaster;
             if(getConfig().isTenantsEnabled()){
-                broadcaster = atmosphereConfig.getBroadcasterFactory().lookup(cmd.getApplicationID());
+                broadcaster = broadcasterFactory.lookup(cmd.getApplicationID());
             }else{
-                broadcaster = atmosphereConfig.getBroadcasterFactory().lookup(OpenDeviceConfig.LOCAL_APP_ID);
+                broadcaster = broadcasterFactory.lookup(OpenDeviceConfig.LOCAL_APP_ID);
             }
 
             if(broadcaster != null){
@@ -363,9 +362,8 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
     public List<ConnectionInfo> getConnections(){
         String appID = TenantProvider.getCurrentID();
-        AtmosphereConfig atmosphereConfig = server.framework().getAtmosphereConfig();
 
-        Collection<Broadcaster> broadcasters = server.framework().getBroadcasterFactory().lookupAll();
+        Collection<Broadcaster> broadcasters = broadcasterFactory.lookupAll();
 
         List<ConnectionInfo> resources = new LinkedList();
 

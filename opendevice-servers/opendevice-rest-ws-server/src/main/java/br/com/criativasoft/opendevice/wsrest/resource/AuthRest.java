@@ -64,6 +64,7 @@ import javax.ws.rs.core.Response.Status;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static br.com.criativasoft.opendevice.restapi.auth.BearerAuthRealm.TOKEN_CACHE;
 
@@ -217,6 +218,11 @@ public class AuthRest {
 
                 Set<UserAccount> uaccounts = user.getAccounts();
 
+                // Filter normal accounts
+                uaccounts = uaccounts.stream()
+                        .filter(accountx -> accountx.getType() != AccountType.DEVICE)
+                        .collect(Collectors.toSet());
+
                 if(uaccounts.isEmpty()) throw new AuthenticationException("No accounts for user");
 
                 if(uaccounts.size() > 1){
@@ -283,6 +289,9 @@ public class AuthRest {
     }
 
 
+    /**
+     * Login or create new Account using Google
+     */
     @POST
     @Path("loginGoogle")
     public Response loginGoogle(@Auth Subject currentUser,
@@ -311,7 +320,7 @@ public class AuthRest {
                 if(!appID.equals(aud)) return noCache(Response.status(Status.UNAUTHORIZED));
 
 
-                // Link new User (to Account) and Login
+                // Link new User (to existing Account) and Login
                 if(invitation != null){
 
                     invitation = encryptionCipher.decript(invitation);

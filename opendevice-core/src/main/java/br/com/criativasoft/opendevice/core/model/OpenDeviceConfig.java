@@ -15,6 +15,7 @@
 
 package br.com.criativasoft.opendevice.core.model;
 
+import br.com.criativasoft.opendevice.core.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,11 @@ public class OpenDeviceConfig {
 
     public static final String LOCAL_APP_ID = "*";
 
+    // Profile
+    public static final String PROFILE_KEY = "odev.profile";
+    public static final String PROFILE_DEV = "dev";
+    public static final String PROFILE_PROD = "production";
+
     public static final int DEFAULT_PORT = 8181;
 
     private static OpenDeviceConfig INSTANCE;
@@ -49,6 +55,7 @@ public class OpenDeviceConfig {
 
     public enum ConfigKey{
         web_port("web.port", null, DEFAULT_PORT),
+        profile("profile", null, "dev"),
         log_config("log.config", null, "logback-dev.xml"),
         web_external_resources("web.external_resources", null, new ArrayList<String>()),
         startup_script("startup_script", null, null),
@@ -94,7 +101,13 @@ public class OpenDeviceConfig {
 
             String configDir = getConfigDirectory();
 
-            File config = new File(configDir + File.separator + "odev.conf");
+            // Get profile from system properties
+            String profile = System.getProperty(PROFILE_KEY);
+
+            File config = new File(configDir + File.separator + "odev-"+profile+".conf");
+
+            if(!config.exists()) config = new File(configDir + File.separator + "odev.conf");
+
             if(config.exists()){
                 try {
                     Properties properties = new Properties();
@@ -109,6 +122,9 @@ public class OpenDeviceConfig {
                 log.info("Using default config");
             }
 
+            if(!StringUtils.isEmpty(profile)){
+                INSTANCE.set(ConfigKey.profile, profile);
+            }
 
         }
         return INSTANCE;
@@ -224,6 +240,10 @@ public class OpenDeviceConfig {
         return getPath(ConfigKey.database_path);
     }
 
+    public String getProfile() {
+        return get(ConfigKey.profile);
+    }
+
     public void setDatabaseEngine(String value) {set(ConfigKey.database_path, value);}
 
     public String getDatabaseEngine() { return getString(ConfigKey.database_engine);}
@@ -278,7 +298,12 @@ public class OpenDeviceConfig {
     //
 
     private String get(ConfigKey config) {
-        return get(config.getKey());
+        String val = get(config.getKey());
+        if(val == null){
+            Object obj = config.getDefaultValue();
+            if(obj != null) val = obj.toString();
+        }
+        return val;
     }
 
     private String get(String key) {

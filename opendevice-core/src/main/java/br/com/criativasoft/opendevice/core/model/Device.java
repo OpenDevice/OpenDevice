@@ -44,7 +44,7 @@ import java.util.Set;
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="name")
 public class Device implements Serializable {
 
-    private static final Logger log = LoggerFactory.getLogger(Device.class);
+    protected static final Logger log = LoggerFactory.getLogger(Device.class);
 
 	private static final long serialVersionUID = 1L;
 	

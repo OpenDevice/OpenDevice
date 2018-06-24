@@ -36,6 +36,7 @@ public class DeviceHistory {
 
     private double value;
 
+    /** Device database ID*/
     private long deviceID;
 
     /** If this must syncronized with server */

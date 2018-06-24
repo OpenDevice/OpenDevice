@@ -41,6 +41,7 @@ public class Board extends Device {
     private Set<PhysicalDevice> devices = new LinkedHashSet<PhysicalDevice>();
 
     public Board() {
+        super(-1, DeviceType.BOARD);
     }
 
     public Board(int uid) {
@@ -75,6 +76,8 @@ public class Board extends Device {
         for (Device device : devices) {
             if(device instanceof PhysicalDevice) {
                 this.devices.add((PhysicalDevice) device);
+            }else{
+                log.warn("This is not a PhysicalDevice device");
             }
         }
     }

@@ -22,7 +22,6 @@ import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceCategory;
 import br.com.criativasoft.opendevice.core.model.DeviceHistory;
 import br.com.criativasoft.opendevice.middleware.persistence.HibernateProvider;
-import br.com.criativasoft.opendevice.middleware.tools.DownsampleLTTB;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -149,18 +148,13 @@ public abstract class DeviceJPA extends GenericJpa<Device> implements DeviceDao{
 
 
             int maxForAnalisys = params.getMaxResults(10000);
-            int maxForView = 1000;
 
             query.setMaxResults(maxForAnalisys);
 
             List<DeviceHistory> list = query.getResultList();
 
-            // downsample data to improve Rendering
-            if(list.size() > maxForView){
-                list = DownsampleLTTB.execute(list, maxForView);
-            }
-
             // Data must be sorted to show in chart's
+            // NOTE: Show last data frist !!
             Collections.sort(list, new Comparator<DeviceHistory>() {
                 @Override
                 public int compare(DeviceHistory o1, DeviceHistory o2) {

@@ -13,6 +13,7 @@
 
 package br.com.criativasoft.opendevice.middleware.persistence;
 
+import br.com.criativasoft.opendevice.core.extension.OpenDeviceExtension;
 import br.com.criativasoft.opendevice.core.extension.PersistenceExtension;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import com.google.inject.Provider;
@@ -43,14 +44,17 @@ public class LocalEntityManagerFactory implements Provider<EntityManagerFactory>
             // Load: Persistence Extensions
             // ======================================
 
-            ServiceLoader<PersistenceExtension> service = ServiceLoader.load(PersistenceExtension.class);
-
-            Iterator<PersistenceExtension> iterator = service.iterator();
+            // lockup....
+            ServiceLoader<OpenDeviceExtension> service = ServiceLoader.load(OpenDeviceExtension.class);
+            Iterator<OpenDeviceExtension> iterator = service.iterator();
             List<Class> persistentClasses = new ArrayList<Class>();
 
             while (iterator.hasNext()) {
-                PersistenceExtension extension = iterator.next();
-                persistentClasses.addAll(extension.loadClasses());
+                OpenDeviceExtension extension = iterator.next();
+                PersistenceExtension persistenceExtension = extension.getPersistenceExtension();
+                if(persistenceExtension != null){
+                    persistentClasses.addAll(persistenceExtension.getEntityClasses());
+                }
             }
 
             log.info("Additional persistence classes: " + persistentClasses);

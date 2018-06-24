@@ -15,7 +15,9 @@
 
 package br.com.criativasoft.opendevice.middleware.config;
 
+import br.com.criativasoft.opendevice.core.BaseDeviceManager;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
+import br.com.criativasoft.opendevice.core.extension.PersistenceExtension;
 import br.com.criativasoft.opendevice.middleware.jobs.JobManager;
 import br.com.criativasoft.opendevice.middleware.persistence.HibernateProvider;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.DashboardDao;
@@ -35,6 +37,8 @@ import br.com.criativasoft.opendevice.wsrest.guice.config.GuiceModule;
 import com.google.inject.Binder;
 
 import javax.persistence.EntityManager;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -59,6 +63,16 @@ public class DependencyConfig extends GuiceModule {
         binder.bind(RuleSpecDao.class).to(RuleSpecJPA.class);
         binder.bind(JobSpecDao.class).to(JobSpecJPA.class);
 
+        // DAOs from Extenions
+        List<PersistenceExtension> extensions = BaseDeviceManager.getInstance().getExtensions(PersistenceExtension.class);
+        for (PersistenceExtension extension : extensions) {
+            Map<Class, Class> daoClasses = extension.getDaoClasses();
+            if(daoClasses != null){
+                for (Class daointerface : daoClasses.keySet()) {
+                    binder.bind(daointerface).to(daoClasses.get(daointerface));
+                }
+            }
+        }
 
     }
 

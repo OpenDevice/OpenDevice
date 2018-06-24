@@ -14,6 +14,8 @@
 package br.com.criativasoft.opendevice.middleware.resources;
 
 import br.com.criativasoft.opendevice.connection.ServerConnection;
+import br.com.criativasoft.opendevice.core.BaseDeviceManager;
+import br.com.criativasoft.opendevice.core.extension.ViewExtension;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.wsrest.WSServerConnection;
 import org.apache.shiro.subject.Subject;
@@ -47,7 +49,7 @@ import java.util.List;
 public class IndexRest {
 
     @Inject
-    OpenDeviceConfig config;
+    private OpenDeviceConfig config;
 
     @Inject
     private ServerConnection connection;
@@ -100,6 +102,14 @@ public class IndexRest {
         // admin/invitation/asdasdasdasd
 
         return Response.ok().build();
+    }
+
+    @GET
+    @Path("admin/viewExtensions")
+    @Produces({MediaType.APPLICATION_JSON})
+    public List<ViewExtension> viewExtensions() throws Exception {
+        BaseDeviceManager deviceManager = BaseDeviceManager.getInstance();
+        return deviceManager.getExtensions(ViewExtension.class);
     }
 
     private Response resource(String location) throws FileNotFoundException {

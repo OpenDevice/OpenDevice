@@ -187,7 +187,7 @@ public class TestRest {
 //    }
 
 
-    @GET
+        @GET
     @Path("/updateFiemware")
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateFiemware() {

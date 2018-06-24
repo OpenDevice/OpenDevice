@@ -13,8 +13,6 @@
 
 package br.com.criativasoft.opendevice.core.extension;
 
-import java.util.List;
-
 /**
  * Extension Point for User Interface.
  *
@@ -23,6 +21,9 @@ import java.util.List;
  */
 public interface ViewExtension {
 
-    List<String> loadScripts();
+    String getLoadScript();
+
+    /** Return single path name used for directory and url */
+    String getPathName();
 
 }

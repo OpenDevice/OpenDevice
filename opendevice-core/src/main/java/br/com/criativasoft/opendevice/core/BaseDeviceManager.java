@@ -24,6 +24,8 @@ import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.discovery.DiscoveryServiceImpl;
 import br.com.criativasoft.opendevice.core.event.EventHookManager;
 import br.com.criativasoft.opendevice.core.extension.OpenDeviceExtension;
+import br.com.criativasoft.opendevice.core.extension.PersistenceExtension;
+import br.com.criativasoft.opendevice.core.extension.ViewExtension;
 import br.com.criativasoft.opendevice.core.filter.CommandFilter;
 import br.com.criativasoft.opendevice.core.listener.DeviceListener;
 import br.com.criativasoft.opendevice.core.listener.OnDeviceChangeListener;
@@ -127,6 +129,36 @@ public abstract class BaseDeviceManager implements DeviceManager {
     public DiscoveryService getDiscoveryService() {
         return discoveryService;
     }
+
+    public List<OpenDeviceExtension> getExtensions() {
+        return extensions;
+    }
+
+    public <T> List<T> getExtensions(Class<T> kclass) {
+        List<OpenDeviceExtension> extensions = getExtensions();
+        List<T> list = new LinkedList();
+        for (OpenDeviceExtension extension : extensions) {
+
+            T found = null;
+
+            if(ViewExtension.class.isAssignableFrom(kclass)){
+                found = (T) extension.getViewExtension();
+            }
+
+            if(PersistenceExtension.class.isAssignableFrom(kclass)){
+                found = (T) extension.getPersistenceExtension();
+            }
+
+            if(found != null){
+                list.add((T)found);
+            }
+
+        }
+        return list;
+    }
+
+
+
 
     public CommandDelivery getCommandDelivery() {
         return delivery;
@@ -233,7 +265,9 @@ public abstract class BaseDeviceManager implements DeviceManager {
     public void addDevice(Device device) {
         if(device == null) throw new IllegalArgumentException("Device is null");
 
-        if(findDevice(device) == null) {
+        Device found = findDevice(device);
+
+        if(found == null) {
             getValidDeviceDao().persist(device);
             getCurrentContext().addDevice(device); // add to cache.
             device.setManaged(true);
@@ -428,13 +462,13 @@ public abstract class BaseDeviceManager implements DeviceManager {
         if(connection instanceof EmbeddedGPIO){
             EmbeddedGPIO gpioConn = (EmbeddedGPIO) connection;
 
-            // TODO: this may cause problems if devices is not related to GPIO, like devices from atached microcontrolers (raspberry + arduino)
+            // TODO: this may cause problems if devices is not related to GPIO, like devices from atached microcontrolers (raspberry <-usb-> arduino)
             // This is a convenient way to register devices instantiated but not attached to "Embedded Connection"
             if(getConfig().getBindLocalVariables()) {
                 Collection<Device> devices = getDevices();
                 if (devices != null) {
                     for (Device device : devices) {
-                        if (device instanceof PhysicalDevice) gpioConn.attach((PhysicalDevice) device);
+                        if (device instanceof PhysicalDevice) gpioConn.attach(device);
                     }
                 } else {
                     log.warn("None device registered !");
@@ -448,6 +482,11 @@ public abstract class BaseDeviceManager implements DeviceManager {
                 devices.add(board);
                 devices.addAll(board.getDevices());
 
+                OpenDeviceConfig config = ODev.getConfig();
+                int nextID = -1;
+
+                DeviceDao dao = getDeviceDao();
+
                 for (Device device : devices) {
                     if(!device.isManaged()){
 
@@ -457,6 +496,16 @@ public abstract class BaseDeviceManager implements DeviceManager {
                             device.setUID(found.getUid());
                             replaceDevice(found, device);
                         }else{
+
+                            // Device not have ID, Get next ID from database
+                            if(device.getUid() <= 0 && !config.isRemoteIDGeneration()){
+                                if(nextID == -1) nextID = dao.getNextUID();
+                                device.setUID(nextID++);
+                            }
+
+                            if(device.getCategory() != null) {
+                                device.setCategory(dao.getCategoryByCode(device.getCategory().getCode())); // update reference
+                            }
                             addDevice(device);
                         }
 
@@ -523,6 +572,17 @@ public abstract class BaseDeviceManager implements DeviceManager {
     public void removeOutput(DeviceConnection connection) {
         log.info("Remove output connection: {}", connection);
         outputConnections.removeConnection(connection);
+    }
+
+    @Override
+    public void addConnection(DeviceConnection connection) {
+        addOutput(connection);
+    }
+
+    @Override
+    public void removeConnection(DeviceConnection connection) {
+        removeOutput(connection);
+        removeInput(connection);
     }
 
     public void addOutput(DeviceConnection connection){

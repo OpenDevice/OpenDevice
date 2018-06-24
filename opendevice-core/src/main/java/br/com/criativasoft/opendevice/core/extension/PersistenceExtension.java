@@ -14,6 +14,7 @@
 package br.com.criativasoft.opendevice.core.extension;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Extension Point to add new JPA Entities
@@ -22,6 +23,12 @@ import java.util.List;
  */
 public interface PersistenceExtension {
 
-    List<Class> loadClasses();
+    List<Class> getEntityClasses();
+
+    /**
+     * Get Entity DAO
+     * @return Map<Interface, Implementation>
+     */
+    Map<Class, Class> getDaoClasses();
 
 }

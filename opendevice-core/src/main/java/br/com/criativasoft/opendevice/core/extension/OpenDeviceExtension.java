@@ -21,12 +21,24 @@ import br.com.criativasoft.opendevice.core.DeviceManager;
  * @author Ricardo JL Rufino
  * @date 30/08/15.
  */
-public interface OpenDeviceExtension {
+public abstract class OpenDeviceExtension {
 
-    String getName();
+    public abstract String getName();
 
-    void init(DeviceManager manager);
+    public String getDescription(){ return null; };
 
-    void destroy();
+    public abstract String getVersion();
+
+    public abstract void init(DeviceManager manager);
+
+    public abstract void destroy();
+
+    //
+    // Extension points
+    //
+
+    public ViewExtension getViewExtension() {return null;};
+
+    public PersistenceExtension getPersistenceExtension() {return null;}
 
 }

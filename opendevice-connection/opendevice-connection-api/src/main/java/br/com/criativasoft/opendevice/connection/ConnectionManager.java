@@ -27,4 +27,7 @@ public interface ConnectionManager {
 
     public DeviceConnection findConnection(String uid);
 
+    public void addConnection(DeviceConnection connection);
+
+    public void removeConnection(DeviceConnection connection);
 }

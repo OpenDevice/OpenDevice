@@ -25,6 +25,7 @@ import br.com.criativasoft.opendevice.core.discovery.DiscoveryServiceImpl;
 import br.com.criativasoft.opendevice.core.event.EventHookManager;
 import br.com.criativasoft.opendevice.core.extension.OpenDeviceExtension;
 import br.com.criativasoft.opendevice.core.extension.PersistenceExtension;
+import br.com.criativasoft.opendevice.core.extension.PluginLoader;
 import br.com.criativasoft.opendevice.core.extension.ViewExtension;
 import br.com.criativasoft.opendevice.core.filter.CommandFilter;
 import br.com.criativasoft.opendevice.core.listener.DeviceListener;
@@ -101,15 +102,21 @@ public abstract class BaseDeviceManager implements DeviceManager {
         }
 
         // lockup....
-        ServiceLoader<OpenDeviceExtension> service = ServiceLoader.load(OpenDeviceExtension.class);
+//        ServiceLoader<OpenDeviceExtension> service = ServiceLoader.load(OpenDeviceExtension.class);
+//        Iterator<OpenDeviceExtension> iterator = service.iterator();
 
-        Iterator<OpenDeviceExtension> iterator = service.iterator();
+        List<OpenDeviceExtension> found = PluginLoader.load();
 
-        if(iterator.hasNext()){
-            OpenDeviceExtension extension = iterator.next();
+        log.info("Found Extensions: " + found.size());
+
+        for (OpenDeviceExtension extension : found) {
             log.info("Loading Extension: " + extension.getName() + ", class: " + extension.getClass());
-            extension.init(this);
-            extensions.add(extension);
+            try {
+                extension.init(this);
+                extensions.add(extension);
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
         }
 
     }

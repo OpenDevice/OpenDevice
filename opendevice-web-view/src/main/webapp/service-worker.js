@@ -37,11 +37,9 @@
 /* eslint-disable indent, no-unused-vars, no-multiple-empty-lines, max-nested-callbacks, space-before-function-paren, quotes, comma-spacing */
 'use strict';
 
-var precacheConfig = [["/login","ea1674ead325d662e0a24e888a7b0b89"],["css/login.css","d6129053d53e77bfb982022ab203ea9f"],["css/normalize.css","8a43efb3691961b9bf37675bee31311f"],["dist/css/contrib.min.css","6d41ab23dc00bdcae4b54f31573ee68b"],["dist/css/main.min.css","35998d2f3f63c41d21309fc54472c7e4"],["dist/css/plugins.min.css","3c56be2b385e916d6a581b4e32dad5a1"],["dist/js/angular.bundle.js","daf01ae9ceaeb255c22577c6d97ccc6e"],["dist/js/contrib.bundle.js","86c131d1e84dbb23645607714458d310"],["dist/js/main.min.js","eaaa3f996771fc04e5d9795e54cfa35f"],["dist/js/opendevice.bundle.js","61e91df196cf3f19d4f3a56e5199a935"],["fonts/Source-Sans-Pro-300/Source-Sans-Pro-300.ttf","6a9d4d28a117a8364376de2f17ee5ff9"],["fonts/Source-Sans-Pro-700/Source-Sans-Pro-700.ttf","206f41ff7cdb7df5dbfeda33c847b793"],["fonts/Source-Sans-Pro-regular/Source-Sans-Pro-regular.ttf","f2d83436dcf3f53375518292e917643c"],["fonts/fontawesome-webfont.eot","25a32416abee198dd821b0b17a198a8f"],["fonts/fontawesome-webfont.svg","d7c639084f684d66a1bc66855d193ed8"],["fonts/fontawesome-webfont.ttf","1dc35d25e61d819a9c357074014867ab"],["fonts/fontawesome-webfont.woff","c8ddf1e5e5bf3682bc7bebf30f394148"],["fonts/fontawesome-webfont.woff2","e6cf7c6ec7c2d6f670ae9d762604cb0b"],["images/boards/ESP8266.png","d7ea8993c65a570b3cbf1eb67c4b94ba"],["images/boards/generic-blue.png","9362702e801ccd06298946e3b29546bf"],["images/boards/generic-green.png","95988089a122e2db9e5c934c02b68865"],["images/boards/generic.svg","0bd848813e9d08f40d61b2ee6cb55d09"],["images/boards/preview_board.svg","fb2eb0e35c072aae2fc95b144d02cb2b"],["images/devices/battery.png","e5f6261e4f2607dbc0449e69118017e3"],["images/devices/battery_half.png","78cb05bcb113521b5fcb0b23e2324587"],["images/devices/battery_off.png","c05fe84be67fbd6a86aa897a25c4b2b8"],["images/devices/battery_on.png","f8f055faa6f4cc14c5adc0b1dec236f3"],["images/devices/lightbulb_add.png","e18f4a723521f8227e3b1c797501f8ea"],["images/devices/lightbulb_delete.png","bc84e3140794b3538eacef47dc70d14f"],["images/devices/lightbulb_off.png","29d0cadd8baa828bcd507dda95ca4345"],["images/devices/lightbulb_on.png","3ccb47636350441343153d2499e492b7"],["images/devices/sensor_off.png","69cd4229ac3c37b6f09697bd9b39546e"],["images/devices/sensor_on.png","9ba6d420a215575bf821a7185bbbf8b2"],["images/favicon.png","763cb75bf2e5813fef3221f7ba96e157"],["images/mws-logo.png","9b5b0035523e57960de42c9731d7e7d7"],["images/profile.jpg","982ad1f98b5729ab54d97bd1afa5f7b1"],["js/jquery-2.2.3.min.js","2a4b79b7b95ce5d591f19ca0a2b64e62"],["login.html","7344b3952192eb2231f4a430be83c39d"],["pages/boards.html","8de8a79ba746ff997490def679fed6ca"],["pages/connections.html","5d70d3ac3d5e487678d3ee57118d769b"],["pages/dashboard.html","2f0c86cf03443d2a95f7caa0d03d0d0e"],["pages/devices.html","8c3d55ffc2c8b02e69544f08f60644c8"],["pages/jobs.html","e1194882fb0a2cb1a7e3b5b7af764ea7"],["pages/new.html","d41d8cd98f00b204e9800998ecf8427e"],["pages/rules.html","6d9f358f4e4cb9f21beac4e5fb4dfcb9"],["pages/subpages/actions.html","ac07574bbab25ca23d1b15efb4ed24a3"],["pages/subpages/confirm.html","657a8e23cd1b7cd5dca18f420a15c96a"],["pages/subpages/new-dashview.html","aab992f5df3b6d96c8c7ef34df07a32d"],["pages/subpages/new-job.html","6b2c00aed24298f004728ae30bd41d86"],["pages/subpages/new-rule.html","d7d874e16dfc00a0bd0e33f7c3f2d9da"],["pages/users.html","aeb37d6783dc985df29de1ec4168b6d2"]];
+var precacheConfig = [["/login","ea1674ead325d662e0a24e888a7b0b89"]];
 var cacheName = 'sw-precache-v3--' + (self.registration ? self.registration.scope : '');
 
-
-var ignoreUrlParametersMatching = [/^utm_/];
 
 
 
@@ -205,63 +203,6 @@ self.addEventListener('activate', function(event) {
     })
   );
 });
-
-
-self.addEventListener('fetch', function(event) {
-  if (event.request.method === 'GET') {
-    // Should we call event.respondWith() inside this fetch event handler?
-    // This needs to be determined synchronously, which will give other fetch
-    // handlers a chance to handle the request if need be.
-    var shouldRespond;
-
-    // First, remove all the ignored parameters and hash fragment, and see if we
-    // have that URL in our cache. If so, great! shouldRespond will be true.
-    var url = stripIgnoredUrlParameters(event.request.url, ignoreUrlParametersMatching);
-    shouldRespond = urlsToCacheKeys.has(url);
-
-    // If shouldRespond is false, check again, this time with 'index.html'
-    // (or whatever the directoryIndex option is set to) at the end.
-    var directoryIndex = '';
-    if (!shouldRespond && directoryIndex) {
-      url = addDirectoryIndex(url, directoryIndex);
-      shouldRespond = urlsToCacheKeys.has(url);
-    }
-
-    // If shouldRespond is still false, check to see if this is a navigation
-    // request, and if so, whether the URL matches navigateFallbackWhitelist.
-    var navigateFallback = '/index.html';
-    if (!shouldRespond &&
-        navigateFallback &&
-        (event.request.mode === 'navigate') &&
-        isPathWhitelisted([], event.request.url)) {
-      url = new URL(navigateFallback, self.location).toString();
-      shouldRespond = urlsToCacheKeys.has(url);
-    }
-
-    // If shouldRespond was set to true at any point, then call
-    // event.respondWith(), using the appropriate cache key.
-    if (shouldRespond) {
-      event.respondWith(
-        caches.open(cacheName).then(function(cache) {
-          return cache.match(urlsToCacheKeys.get(url)).then(function(response) {
-            if (response) {
-              return response;
-            }
-            throw Error('The cached response that was expected is missing.');
-          });
-        }).catch(function(e) {
-          // Fall back to just fetch()ing the request if some unexpected error
-          // prevented the cached response from being valid.
-          console.warn('Couldn\'t serve response for "%s" from cache: %O', event.request.url, e);
-          return fetch(event.request);
-        })
-      );
-    }
-  }
-});
-
-
-
 
 
 

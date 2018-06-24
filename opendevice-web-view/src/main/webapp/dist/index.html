@@ -11,7 +11,7 @@
   ~  Ricardo JL Rufino - Initial API and Implementation
   ~ ******************************************************************************
   -->
-<html xmlns:ng="http://angularjs.org" ng-app="opendevice">
+<html xmlns:ng="http://angularjs.org">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -29,11 +29,26 @@
 
     <link rel="icon" type="image/png" href="/images/favicon.png" />
 
-    <link rel="stylesheet" href="dist/css/contrib.min.css">
+    <!-- build:css dist/css/contrib.min.css -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <!-- endbuild -->
 
-    <link rel="stylesheet" href="dist/css/main.min.css">
+    <!-- build:css dist/css/main.min.css -->
+    <link rel="stylesheet" href="css/AdminLTE.min.css">
+    <link rel="stylesheet" href="css/skin-blue.min.css">
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/icons/icons.css">
+    <!-- endbuild -->
 
-    <link rel="stylesheet" href="dist/css/plugins.min.css">
+    <!-- build:css dist/css/plugins.min.css -->
+    <link rel="stylesheet" href="css/animate.min.css">
+    <link rel="stylesheet" href="js/angular/angular-ui-select.min.css"  />
+    <link rel="stylesheet" type="text/css" href="js/angular/angular-gridster.min.css" media="screen"/>
+    <link rel="stylesheet" href="css/plugins/select2.css"/>
+    <link rel="stylesheet" href="css/plugins/awesome-bootstrap-checkbox.css"/>
+    <link rel="stylesheet" href="js/plugins/daterangepicker.css"/>
+    <!-- endbuild -->
 
 
 
@@ -123,7 +138,7 @@
                 <li><a href="#/connections"><i class="fa fa-rss"></i> <span>Connections</span></a></li>
                 <li><a href="#/jobs"><i class="fa fa-history"></i> <span>Jobs/Timers</span></a></li>
                 <li><a href="#/rules"><i class="fa fa-magic"></i> <span>Rules</span></a></li>
-                <li><a href="#/new"><i class="fa fa-code"></i> <span>Programmer</span></a></li>
+                <!--<li><a href="#/new"><i class="fa fa-code"></i> <span>Programmer</span></a></li>-->
                 <li><a href="#/users"><i class="fa fa-users"></i> <span>Users</span></a></li>
 
                 <li ng-repeat="menu in ext.menu">
@@ -134,15 +149,15 @@
                 <li><a href="https://opendevice.atlassian.net/wiki" target="_blank"><i class="fa fa-book"></i> <span>Documentation</span></a></li>
                 <li><a href="http://github.com/OpenDevice/OpenDevice" target="_blank"><i class="fa fa-github"></i> <span>Github</span></a></li>
 
-<!--                <li class="treeview">
-                    <a href="#" target="_self"><i class="fa fa-link"></i> <span>Multilevel</span>
-                        <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
-                    </a>
-                    <ul class="treeview-menu">
-                        <li><a href="#">Link in level 2</a></li>
-                        <li><a href="#" target="_self">Link in level 2</a></li>
-                    </ul>
-                </li>-->
+                <!--                <li class="treeview">
+                                    <a href="#" target="_self"><i class="fa fa-link"></i> <span>Multilevel</span>
+                                        <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+                                    </a>
+                                    <ul class="treeview-menu">
+                                        <li><a href="#">Link in level 2</a></li>
+                                        <li><a href="#" target="_self">Link in level 2</a></li>
+                                    </ul>
+                                </li>-->
 
             </ul>
             <!-- /.sidebar-menu -->
@@ -191,14 +206,42 @@
 <!-- Jquery -->
 <!-- ----------------------------------------------------- -->
 
-<script src="dist/js/contrib.bundle.js"></script>
+<!-- build:js dist/js/contrib.bundle.js -->
+<script src="js/jquery-2.2.3.min.js"></script>
+
+<script src="js/highcharts.js"></script>
+<script src="js/highcharts-more.js"></script>
+<script src="js/highcharts-solid-gauge.js"></script>
+
+<script src="js/bootstrap.min.js"></script> <!-- Bootstrap 3.3.X -->
+<script src="js/plugins/bootstrap-notify.min.js"></script> <!-- Bootstrap 3.3.X -->
+
+
+<script src="js/adminlte-app.min.js"></script> <!-- AdminLTE Theme/js -->
+
+<script src="js/plugins/daterangepicker.moment.min.js"></script>
+<script src="js/plugins/daterangepicker.js"></script>
+<script src="js/spin.min.js"></script> <!-- Spinner -->
+
+<script type="text/javascript" src="js/jquery.textfill.min.js"></script>
+<script src="js/fastclick.min.js"></script> <!-- library for eliminating the 300ms delay  -->
+<!-- endbuild -->
 
 
 <!-- ----------------------------------------------------- -->
 <!-- AngularJS Code -->
 <!-- ----------------------------------------------------- -->
 
-<script src="dist/js/angular.bundle.js"></script>
+<!-- build:js dist/js/angular.bundle.js -->
+<script type="text/javascript" src="js/angular/angular-1.5.8.min.js"></script>
+<script type="text/javascript" src="js/angular/angular-route.min.js"></script>
+<script type="text/javascript" src="js/angular/angular-resource.min.js"></script>
+<script type="text/javascript" src="js/angular/angular-sanitize.min.js"></script> <!-- for ui-select -->
+<script type="text/javascript" src="js/angular/angular-ui-select.min.js"></script>
+<script type="text/javascript" src="js/angular/angular-animate.min.js"></script>
+<script type="text/javascript" src="js/angular/angular-gridster-resizedep.js"></script>
+<script type="text/javascript" src="js/angular/angular-gridster.min.js"></script>
+<!-- endbuild -->
 
 
 <!-- Loading bar-->
@@ -210,18 +253,47 @@
 <!-- OpenDevice -->
 <!-- ----------------------------------------------------- -->
 
-<script src="dist/js/opendevice.bundle.js"></script>
+<!-- build:js dist/js/opendevice.bundle.js -->
+<script type="text/javascript" src="js/atmosphere.js"></script> <!-- OpenDevice DEP -->
+<script type="text/javascript" src="js/opendevice.js"></script> <!-- mvn-dependency -->
+<!-- endbuild -->
 
 <!-- OpenDevice: Development Files (mvn-dependency) - Removed in Production -->
-
+<!-- build:remove -->
+<script type="text/javascript" src="js/Constants.js"></script>
+<script type="text/javascript" src="js/Device.js"></script>
+<script type="text/javascript" src="js/DeviceConnection.js"></script>
+<script type="text/javascript" src="js/DeviceStorage.js"></script>
+<script type="text/javascript" src="js/DeviceManager.js"></script>
+<script type="text/javascript" src="js/OpenDeviceJS.js"></script>
+<!-- endbuild -->
 
 
 <!-- ----------------------------------------------------- -->
 <!-- Application Code -->
 <!-- ----------------------------------------------------- -->
 
-<script src="dist/js/main.min.js"></script>
+<!-- build:js dist/js/main.min.js -->
+<script type="text/javascript" src="js/app/extend.js"></script>
+<script type="text/javascript" src="js/opendevice/DashItemView.js"></script>
+<script type="text/javascript" src="js/opendevice/ChartItemView.js"></script>
+<script type="text/javascript" src="js/opendevice/DigitalCtrlView.js"></script>
+<script type="text/javascript" src="js/opendevice/ImageCtrlView.js"></script>
 
+<script type="text/javascript" src="js/app/Utils.js"></script>
+<script type="text/javascript" src="js/app/app.js"></script>
+<script type="text/javascript" src="js/app/services.js"></script>
+<script type="text/javascript" src="js/app/controllers.js"></script>
+<script type="text/javascript" src="js/app/DashboardController.js"></script>
+<script type="text/javascript" src="js/app/DeviceController.js"></script>
+<script type="text/javascript" src="js/app/UserController.js"></script>
+<script type="text/javascript" src="js/app/ConnectionController.js"></script>
+<script type="text/javascript" src="js/app/ActionController.js"></script>
+<script type="text/javascript" src="js/app/RuleController.js"></script>
+<script type="text/javascript" src="js/app/JobController.js"></script>
+<!-- endbuild -->
+
+<script type="text/javascript" src="js/app/BootstrapApp.js"></script>
 
 </body>
 </html>

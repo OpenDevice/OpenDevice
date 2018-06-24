@@ -115,7 +115,14 @@ pkg.controller('RuleController', function ($scope, $location, $timeout, $routePa
     // ============================================================================================
 
 
-    _public.save = function(){
+    _public.save = function(evt){
+
+        var $form = $(evt.target);
+        if(!Utils.validate($form)) return;
+
+        if(!$scope.model.action){
+            return Utils.showSelectInvalid($form, 'model.action.type');
+        }
 
         if(!$scope.model.condition || $scope.model.condition.type == 'none') $scope.model.condition = null;
 
@@ -129,6 +136,10 @@ pkg.controller('RuleController', function ($scope, $location, $timeout, $routePa
     _public.delete = function(item, index){
         item.$delete(function(){
             _this.list.splice(index, 1);
+        }, function(error) {
+            if(error.data && error.data.message){
+                $.notify({message: error.data.message});
+            }
         });
     };
 
@@ -188,7 +199,7 @@ pkg.filter('actionType', function() {
         // Obj: {"type":"control","id":146552,"resourceID":213,"value":1}
         if(obj.type == "control"){
             var device = ODev.findDevice(obj.resourceID) || { name : "[Not Found Error]"};
-            return "Control " + device.name;
+            return "Control " + device.title;
         }
 
         obj = obj || '';

@@ -98,7 +98,14 @@ pkg.controller('JobController', function ($scope, $location, $timeout, $routePar
     // ============================================================================================
 
 
-    _public.save = function(){
+    _public.save = function(evt){
+
+        var $form = $(evt.target);
+        if(!Utils.validate($form)) return;
+
+        if(!$scope.model.action){
+            return Utils.showSelectInvalid($form, 'model.action.type');
+        }
 
         $scope.model.$saveOrUpdate(function (response) {
             $.notify({message: "Saved"}, {type:"success"});
@@ -110,6 +117,10 @@ pkg.controller('JobController', function ($scope, $location, $timeout, $routePar
     _public.delete = function(item, index){
         item.$delete(function(){
             _this.list.splice(index, 1);
+        }, function(error) {
+            if(error.data && error.data.message){
+                $.notify({message: error.data.message});
+            }
         });
     };
 
@@ -148,10 +159,10 @@ pkg.filter('actionType', function() {
 
         // Obj: {"type":"control","id":146552,"resourceID":213,"value":1}
         if(obj.type == "control"){
-            var device = ODev.findDevice(obj.resourceID) || { name : "[Not Found Error]"};
-            return "Control " + device.name;
+            var device = ODev.findDevice(obj.resourceID) || { title : "[Not Found Error]"};
+            return "Control " + device.title;
         }else if(obj.type == "webhook"){
-            return "Call " + obj.url.substring(0, 30) + "...";
+            return "Webhook " + obj.url.substring(0, 30) + "...";
         }
 
         return obj.type;

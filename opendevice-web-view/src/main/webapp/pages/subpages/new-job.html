@@ -21,11 +21,11 @@
 
     <div class="col-md-9">
         <div class="box box-success">
-            <form class="form-horizontal">
+            <form class="form-horizontal" name="frmRegister" ng-submit="ctrl.save($event)" novalidate>
                 <div class="box-body">
 
                     <fieldset>
-                        <legend><span>Name:</span> <input  ng-model="model.description" placeholder="Job description" class="no-border" style="outline: none;width: 90%;" autofocus required/></legend>
+                        <legend><span>Name:</span> <input  ng-model="model.description" placeholder="Job description" class="no-border" style="outline: none;width: 90%;"  required/></legend>
 
                         <div class="form-group">
                             <label class="col-sm-2 control-label">Schedule</label>
@@ -40,8 +40,8 @@
 
                 </div>
                 <div class="box-footer">
-                    <a rule="submit" class="btn btn-default" ng-href="#/jobs"><i class="fa fa-backward"></i> Cancel</a>
-                    <a rule="submit" class="btn btn-success pull-right" ng-click="ctrl.save()"><i class="fa fa-save"></i> Save</a>
+                    <a rule="button" class="btn btn-default" ng-href="#/jobs"><i class="fa fa-backward"></i> Cancel</a>
+                    <button class="btn btn-success pull-right" ng-disabled="!frmRegister.$valid"><i class="fa fa-save"></i> Save</button>
                 </div>
             </form>
         </div>

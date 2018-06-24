@@ -278,6 +278,13 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
                                 x: 5,
                                 y: -5
                             }
+                        },
+                        events: {
+                            selection: function(event) {
+                                if(event.xAxis != null) {
+                                    console.log("ChartSelection: (min, max):", event.xAxis[0].min, event.xAxis[0].max);
+                                }
+                            }
                         }
                     },
                     title: {
@@ -314,6 +321,7 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
                         //  spline: { animation: false, enableMouseTracking: false, stickyTracking: true, shadow: false, dataLabels: { style: { textShadow: false } } },
                         series: {
                             animation: false,
+                            stickyTracking: false,
                             states: { hover: false }
                         },
                         spline: {
@@ -369,6 +377,9 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
                         enabled: false
                     },
                     plotOptions: {
+                        series: {
+                            stickyTracking: false
+                        },
                         line: {
                             marker: {enabled: false}
                         },

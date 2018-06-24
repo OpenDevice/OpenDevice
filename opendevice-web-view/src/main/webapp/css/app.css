@@ -683,3 +683,8 @@
 .chart-modal .chart {
     height: 90%;
 }
+
+.form-invalid{
+    background:#fff url(../images/icons/invalid_line.gif) repeat-x bottom !important;
+    /*border: 1px solid #dd7870 !important;*/
+}

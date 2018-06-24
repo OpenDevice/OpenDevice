@@ -9,9 +9,11 @@
             <div class="box box-primary">
                 <div class="box-body box-profile">
                     <form ng-submit="ctrl.save(model)">
-                        <img class="profile-user-img img-responsive img-circle" src="/images/icons/medium/add-user.png" alt="User profile picture">
 
-                        <a href="javascript:void(0)" ng-click="editUser=true" class=""><h3 class="text-center">Register User</h3></a>
+                        <a href="javascript:void(0)" ng-click="editUser=true" class="">
+                            <img class="profile-user-img img-responsive img-circle" src="/images/icons/medium/add-user.png" alt="User profile picture">
+                            <h3 class="text-center">Register User</h3>
+                        </a>
 
                         <input type="hidden"  autocomplete="false" ng-model="model.id" />
 

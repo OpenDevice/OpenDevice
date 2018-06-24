@@ -46,7 +46,9 @@
                         </div>
                     </td>
                     <td>${ ::x.type }</td>
-                    <td>${ ::x.description }</td>
+                    <td>
+                        <a role="button" ng-href="#/rules/${::x.id}">${ ::x.description }</a>
+                    </td>
                     <td>
                         <small class="label bg-gray">${ ::x.resourceID | deviceNameRef } == ${ ::x.value}</small> &nbsp; ${ ::x.condition | conditionType }
                     </td>

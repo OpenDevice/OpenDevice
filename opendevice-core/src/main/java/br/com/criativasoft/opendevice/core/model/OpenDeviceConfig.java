@@ -368,6 +368,29 @@ public class OpenDeviceConfig {
         return s.replaceAll("\\/", File.separator);
     }
 
+    /**
+     * Get file in static path, or from home path
+     */
+    public File getFile(String key) {
+        String path = get(key);
+
+        if(path == null) return null;
+
+        File file = new File(path);
+
+        if(file.exists()) return file;
+
+        file = new File(getHomeDirectory(), path);
+
+        if(file.exists()) return file;
+
+        file = new File(getConfigDirectory(), path);
+
+        if(file.exists()) return file;
+
+        return null;
+    }
+
     public Class<? extends Object> getClass(ConfigKey key) {
         String className = getString(key);
         try {

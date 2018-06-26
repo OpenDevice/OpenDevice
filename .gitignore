@@ -6,5 +6,9 @@ extensions/
 opendevice-examples/
 opendevice-hardware-libraries/
 opendevice-tests/
-
+private_*
 /site.zip
+.iml
+node_modules/
+backups/
+.fuse_*

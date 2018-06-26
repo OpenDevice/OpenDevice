@@ -19,7 +19,7 @@ import br.com.criativasoft.opendevice.core.connection.Connections;
 import br.com.criativasoft.opendevice.core.listener.OnDeviceChangeListener;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.Sensor;
-import opendevice.io.tests.MediaCenterDevice;
+import opendevice.io.tests.MediaCenterDeviceUpnp;
 
 import java.io.IOException;
 
@@ -58,7 +58,7 @@ public class RFandIPCamTestUPNP extends LocalDeviceManager {
 
 //        connection.connect();
 
-        final MediaCenterDevice mediaCenter = new MediaCenterDevice();
+        final MediaCenterDeviceUpnp mediaCenter = new MediaCenterDeviceUpnp();
         Thread clientThread = new Thread(mediaCenter);
         clientThread.setDaemon(false);
         clientThread.start();

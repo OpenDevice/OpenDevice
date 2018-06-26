@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <groupId>br.com.criativasoft.opendevice</groupId>
+        <groupId>io.opendevice</groupId>
         <artifactId>opendevice-servers</artifactId>
-        <version>0.1.4-SNAPSHOT</version>
+        <version>0.1.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,7 +15,7 @@
     <properties>
         <jersey-version>1.19</jersey-version> <!-- 1.19.4 -->
         <jaxb-version>2.1</jaxb-version>
-        <nettosphere-version>3.0.4-SNAPSHOT</nettosphere-version>
+        <nettosphere-version>3.0.5</nettosphere-version>
         <!--<nettosphere-version>2.4.11-SNAPSHOT</nettosphere-version>-->
         <atmosphere-version>2.4.7</atmosphere-version>
         <atmosphere-extensions>2.4.3</atmosphere-extensions>
@@ -25,13 +25,13 @@
     <dependencies>
 
         <dependency>
-            <groupId>br.com.criativasoft.opendevice</groupId>
+            <groupId>io.opendevice</groupId>
             <artifactId>opendevice-core</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>br.com.criativasoft.opendevice</groupId>
+            <groupId>io.opendevice</groupId>
             <artifactId>opendevice-rest-api</artifactId>
             <version>${project.version}</version>
         </dependency>

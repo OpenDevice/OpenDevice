@@ -4,9 +4,9 @@
     <artifactId>opendevice-connection-stream</artifactId>
 
     <parent>
-        <groupId>br.com.criativasoft.opendevice</groupId>
+        <groupId>io.opendevice</groupId>
         <artifactId>opendevice-connection</artifactId>
-        <version>0.1.4-SNAPSHOT</version>
+        <version>0.1.5-SNAPSHOT</version>
     </parent>
 
     <dependencies>

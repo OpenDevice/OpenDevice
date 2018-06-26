@@ -4,10 +4,10 @@
                              http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>br.com.criativasoft.opendevice</groupId>
+    <groupId>io.opendevice</groupId>
     <artifactId>opendevice-pom</artifactId>
     <packaging>pom</packaging>
-    <version>0.1.4-SNAPSHOT</version>
+    <version>0.1.5-SNAPSHOT</version> <!-- mvn versions:set -DnewVersion=0.1.X-SNAPSHOT || mvn versions:commit -->
     <name>OpenDevice Package</name>
     <description>Open IoT (Internet Of Things) Platform and Framework.</description>
 
@@ -91,8 +91,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.0.2</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
@@ -139,12 +139,12 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>br.com.criativasoft.opendevice</groupId>
+                <groupId>io.opendevice</groupId>
                 <artifactId>opendevice-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>br.com.criativasoft.opendevice</groupId>
+                <groupId>io.opendevice</groupId>
                 <artifactId>opendevice-connection-api</artifactId>
                 <version>${project.version}</version>
             </dependency>

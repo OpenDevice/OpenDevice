@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <groupId>br.com.criativasoft.opendevice</groupId>
+        <groupId>io.opendevice</groupId>
         <artifactId>opendevice-servers</artifactId>
-        <version>0.1.4-SNAPSHOT</version>
+        <version>0.1.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -28,7 +28,7 @@
     <dependencies>
 
         <dependency>
-            <groupId>br.com.criativasoft.opendevice</groupId>
+            <groupId>io.opendevice</groupId>
             <artifactId>opendevice-core</artifactId>
             <version>${project.version}</version>
         </dependency>

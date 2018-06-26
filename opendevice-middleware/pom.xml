@@ -3,9 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>br.com.criativasoft.opendevice</groupId>
+        <groupId>io.opendevice</groupId>
         <artifactId>opendevice-pom</artifactId>
-        <version>0.1.4-SNAPSHOT</version>
+        <version>0.1.5-SNAPSHOT</version>
     </parent>
 
 	<artifactId>opendevice-middleware</artifactId>
@@ -55,37 +55,37 @@
         </dependency>
 
 		<dependency>
-			<groupId>br.com.criativasoft.opendevice</groupId>
+			<groupId>io.opendevice</groupId>
 			<artifactId>opendevice-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
         <dependency>
-            <groupId>br.com.criativasoft.opendevice</groupId>
+            <groupId>io.opendevice</groupId>
             <artifactId>opendevice-rest-ws-server</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>br.com.criativasoft.opendevice</groupId>
+            <groupId>io.opendevice</groupId>
             <artifactId>opendevice-mqtt</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>br.com.criativasoft.opendevice</groupId>
+            <groupId>io.opendevice</groupId>
             <artifactId>opendevice-connection-stream</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>br.com.criativasoft.opendevice</groupId>
+            <groupId>io.opendevice</groupId>
             <artifactId>opendevice-js-engine</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>br.com.criativasoft.opendevice</groupId>
+            <groupId>io.opendevice</groupId>
             <artifactId>opendevice-web-view</artifactId>
             <version>${project.version}</version>
             <type>war</type>
@@ -198,7 +198,7 @@
             <artifactId>swagger-annotations</artifactId>
             <version>1.5.3</version>
         </dependency>
-
+        
         <!--<dependency>-->
             <!--<groupId>io.swagger</groupId>-->
             <!--<artifactId>swagger-jersey-jaxrs</artifactId>-->
@@ -468,7 +468,7 @@
                                 <configuration>
                                     <artifactItems>
                                         <artifactItem>
-                                            <groupId>br.com.criativasoft.opendevice</groupId>
+                                            <groupId>io.opendevice</groupId>
                                             <artifactId>opendevice-web-view</artifactId>
                                             <version>${opendevice-version}</version>
                                             <type>war</type>
@@ -512,7 +512,7 @@
                     <version>2.1.1-SNAPSHOT</version>
                 </dependency>
                 <dependency>
-                    <groupId>br.com.criativasoft.opendevice</groupId>
+                    <groupId>io.opendevice</groupId>
                     <artifactId>opendevice-raspberry-pi4j</artifactId>
                     <version>${project.version}</version>
                 </dependency>

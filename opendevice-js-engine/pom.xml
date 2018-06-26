@@ -17,8 +17,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>opendevice-pom</artifactId>
-        <groupId>br.com.criativasoft.opendevice</groupId>
-        <version>0.1.4-SNAPSHOT</version>
+        <groupId>io.opendevice</groupId>
+        <version>0.1.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -33,13 +33,13 @@
     <dependencies>
 
         <dependency>
-            <groupId>br.com.criativasoft.opendevice</groupId>
+            <groupId>io.opendevice</groupId>
             <artifactId>opendevice-core</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>br.com.criativasoft.opendevice</groupId>
+            <groupId>io.opendevice</groupId>
             <artifactId>opendevice-connection-stream</artifactId>
             <version>${opendevice-version}</version>
         </dependency>
@@ -68,7 +68,7 @@
         </dependency>
 
         <dependency>
-            <groupId>br.com.criativasoft.opendevice</groupId>
+            <groupId>io.opendevice</groupId>
             <artifactId>opendevice-rest-ws-server</artifactId>
             <version>${opendevice-version}</version>
             <scope>test</scope>

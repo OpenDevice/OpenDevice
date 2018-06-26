@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>br.com.criativasoft.opendevice</groupId>
+        <groupId>io.opendevice</groupId>
         <artifactId>opendevice-pom</artifactId>
-        <version>0.1.4-SNAPSHOT</version>
+        <version>0.1.5-SNAPSHOT</version>
     </parent>
 
     <artifactId>opendevice-web-view</artifactId>
@@ -13,7 +13,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>br.com.criativasoft.opendevice</groupId>
+            <groupId>io.opendevice</groupId>
             <artifactId>opendevice-js</artifactId>
             <version>${project.version}</version>
             <type>war</type>

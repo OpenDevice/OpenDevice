@@ -22,9 +22,11 @@ import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceVO;
 import br.com.criativasoft.opendevice.core.metamodel.EnumVO;
+import br.com.criativasoft.opendevice.core.metamodel.PeriodType;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceHistory;
 import br.com.criativasoft.opendevice.core.model.DeviceType;
+import br.com.criativasoft.opendevice.core.util.math.DownsampleLTTB;
 import br.com.criativasoft.opendevice.restapi.io.ErrorResponse;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
@@ -34,11 +36,8 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 /**
  * Device Rest Interface for controling devices. <br/>
@@ -154,17 +153,12 @@ public class DeviceRest {
 
             List<DeviceHistory> list = manager.getDeviceHistory(query);
 
-//            try {
-//                PrintStream out = new PrintStream(new FileOutputStream("/media/ricardo/Dados/TEMP/teste/data1.csv"));
-//                int index = 0;
-//                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-//                for (DeviceHistory history : list) {
-//                    out.println((index++) + "," + history.getValue() + "," + sdf.format(new Date(history.getTimestamp())));
-//
-//                out.close();
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
+            int maxForView = 1000;
+
+            // downsample data to improve Rendering
+            if(list.size() > maxForView){
+                list = DownsampleLTTB.execute(list, maxForView);
+            }
 
             return list;
         } else {
@@ -189,6 +183,42 @@ public class DeviceRest {
         }
     }
 
+
+    @GET
+    @Path("/{uid}/download")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response download(@PathParam("uid") int uid, @QueryParam("start") long timestampStart, @QueryParam("end") long timestampEnd) throws IOException {
+
+        Device device = manager.findDeviceByUID(uid); // find user device
+
+        Date dateStart = new Date(timestampStart);
+        Date dateEnd = new Date(timestampEnd);
+
+        log.debug("Start:"+dateStart+", end:" +dateEnd);
+
+        long periodSec = (dateEnd.getTime() - dateStart.getTime()) / 1000;
+
+        DeviceHistoryQuery query = new DeviceHistoryQuery(device.getId(), PeriodType.SECOND, (int)periodSec);
+        query.setPeriodEnd(dateEnd);
+
+        List<DeviceHistory> historyList = manager.getDeviceHistory(query);
+
+        File csv = File.createTempFile(TenantProvider.getCurrentID(), device.getName());
+
+        PrintStream out = new PrintStream(new FileOutputStream(csv));
+        out.println("timestamp, value");
+        for (DeviceHistory history : historyList) {
+            out.println(history.getTimestamp() + "," + history.getValue());
+        }
+
+        out.close();
+
+        Response response = Response.status(200).
+                entity(csv).
+                header("content-disposition", "attachment; filename = "+device.getName()+"-history.csv").build();
+
+        return response;
+    }
 
     @GET
     @Path("/sync")

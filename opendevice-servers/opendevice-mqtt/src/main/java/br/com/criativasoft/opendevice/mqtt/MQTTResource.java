@@ -15,9 +15,11 @@ package br.com.criativasoft.opendevice.mqtt;
 
 import br.com.criativasoft.opendevice.connection.AbstractConnection;
 import br.com.criativasoft.opendevice.connection.ConnectionStatus;
+import br.com.criativasoft.opendevice.connection.IFirmwareConnection;
 import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.connection.serialize.MessageSerializer;
+import br.com.criativasoft.opendevice.core.command.FirmwareUpdateCommand;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.mqtt.MqttMessageBuilders;
 import io.netty.handler.codec.mqtt.MqttPublishMessage;
@@ -33,7 +35,7 @@ import java.nio.ByteBuffer;
  * @author Ricardo JL Rufino
  * @date 07/01/16
  */
-public class MQTTResource extends AbstractConnection {
+public class MQTTResource extends AbstractConnection implements IFirmwareConnection {
     private static final Logger log  = LoggerFactory.getLogger(MQTTResource.class);
 
     private String topic;
@@ -62,10 +64,17 @@ public class MQTTResource extends AbstractConnection {
 
         MessageSerializer serializer = getSerializer();
 
+        MqttQoS qoS = MqttQoS.AT_LEAST_ONCE;
+
+        // FIX to Avoid duplicate Message do Device, after reset.
+        if(message instanceof FirmwareUpdateCommand){
+            qoS = MqttQoS.AT_MOST_ONCE; // fire and forget”
+        }
+
         MqttPublishMessage publish = MqttMessageBuilders.publish()
                 .topicName(topic)
-                .retained(true)
-                .qos(MqttQoS.AT_LEAST_ONCE)
+                .retained(qoS.value() > 0)
+                .qos(qoS)
                 .payload(Unpooled.copiedBuffer(ByteBuffer.wrap(serializer.serialize(message))))
                 .build();
 
@@ -79,5 +88,10 @@ public class MQTTResource extends AbstractConnection {
      */
     public String getDeviceName() {
         return deviceName;
+    }
+
+    @Override
+    public String toString() {
+        return "MQTTResource["+topic+"]";
     }
 }

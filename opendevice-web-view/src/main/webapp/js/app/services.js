@@ -1,5 +1,10 @@
 var app = angular.module('opendevice.services', ['ngResource']);
 
+
+// =====================================
+// REST
+// =====================================
+
 app.factory('DashboardRest', ['$resource', function($resource){
 
     return $resource('/middleware/dashboards/:id', { id: '@id', dashID : '@dashID' }, { // configure defauls
@@ -147,6 +152,21 @@ app.factory('JobRest', ['$resource', function($resource){
 
 }]);
 
+
+app.factory('FirmwareRest', ['$resource', function($resource){
+
+    var PATH = "/middleware/firmwares/:id";
+
+    return $resource(PATH, { id: '@id' }, { // configure defauls
+        sendUpdate: {method:'GET', url : PATH+"/sendUpdate", isArray:false},
+    });
+
+}]);
+
+
+// =====================================
+// Utils
+// =====================================
 
 
 /**

@@ -127,6 +127,7 @@ var App = function(){
         $routeProvider.when('/new', {templateUrl: 'pages/new.html', controller: 'DeviceController',  controllerAs: 'ctrl'});
         $routeProvider.when('/users', {templateUrl: 'pages/users.html', controller: 'UserController',  controllerAs: 'ctrl'});
         $routeProvider.when('/connections', {templateUrl: 'pages/connections.html', controller: 'ConnectionController',  controllerAs: 'ctrl'});
+        $routeProvider.when('/firmwares', {templateUrl: 'pages/firmwares.html', controller: 'FirmwareController',  controllerAs: 'ctrl'});
         $routeProvider.when('/rules', {templateUrl: 'pages/rules.html', controller: 'RuleController',  controllerAs: 'ctrl'});
         $routeProvider.when('/rules/:id', {templateUrl: 'pages/subpages/new-rule.html', controller: 'RuleController',  controllerAs: 'ctrl', resolve : odev_wait});
         $routeProvider.when('/jobs', {templateUrl: 'pages/jobs.html', controller: 'JobController',  controllerAs: 'ctrl'});

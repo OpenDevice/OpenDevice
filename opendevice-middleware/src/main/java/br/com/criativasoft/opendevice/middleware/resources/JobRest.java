@@ -13,7 +13,7 @@
 
 package br.com.criativasoft.opendevice.middleware.resources;
 
-import br.com.criativasoft.opendevice.core.TenantProvider;
+import br.com.criativasoft.opendevice.middleware.MainTenantProvider;
 import br.com.criativasoft.opendevice.middleware.jobs.JobManager;
 import br.com.criativasoft.opendevice.middleware.model.jobs.JobSpec;
 import br.com.criativasoft.opendevice.middleware.rules.RuleManager;
@@ -47,7 +47,7 @@ public class JobRest {
 
         JobSpec spec = jobManager.getById(id);
 
-        if(spec != null && !spec.getAccount().getUuid().equals( TenantProvider.getCurrentID())){
+        if(MainTenantProvider.validadeEntity(spec)){
             throw new NotFoundException();
         }
 
@@ -65,7 +65,7 @@ public class JobRest {
 
         if(spec == null) throw new NotFoundException();
 
-        if(spec != null && !spec.getAccount().getUuid().equals( TenantProvider.getCurrentID())){
+        if(MainTenantProvider.validadeEntity(spec)){
             return ErrorResponse.UNAUTHORIZED("UNAUTHORIZED - Invalid Account !");
         }
 
@@ -87,7 +87,7 @@ public class JobRest {
     @Path("{id}")
     public Response update(JobSpec spec) throws IOException {
 
-        if(spec != null && !spec.getAccount().getUuid().equals( TenantProvider.getCurrentID())){
+        if(MainTenantProvider.validadeEntity(spec)){
             return ErrorResponse.UNAUTHORIZED("UNAUTHORIZED - Invalid Account !");
         }
 
@@ -103,7 +103,7 @@ public class JobRest {
 
         JobSpec spec = jobManager.getById(id);
 
-        if(spec != null && !spec.getAccount().getUuid().equals( TenantProvider.getCurrentID())){
+        if(MainTenantProvider.validadeEntity(spec)){
             return ErrorResponse.UNAUTHORIZED("UNAUTHORIZED - Invalid Account !");
         }
 

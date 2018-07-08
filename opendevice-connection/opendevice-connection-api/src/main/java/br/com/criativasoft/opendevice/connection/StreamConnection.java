@@ -23,7 +23,7 @@ import java.io.IOException;
  * @author Ricardo JL Rufino
  * @date 18/06/2014
  */
-public interface StreamConnection extends DeviceConnection, URIBasedConnection {
+public interface StreamConnection extends IFirmwareConnection, URIBasedConnection {
 	
 	public static final byte TOKEN_LF = '\n'; 
 	public static final byte TOKEN_CR = '\r'; 

@@ -21,12 +21,10 @@ import br.com.criativasoft.opendevice.core.extension.PersistenceExtension;
 import br.com.criativasoft.opendevice.middleware.jobs.JobManager;
 import br.com.criativasoft.opendevice.middleware.persistence.HibernateProvider;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.DashboardDao;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.FirmwareDao;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.JobSpecDao;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.RuleSpecDao;
-import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.AccountJPA;
-import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.JobSpecJPA;
-import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.RuleSpecJPA;
-import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.UserJPA;
+import br.com.criativasoft.opendevice.middleware.persistence.dao.jpa.*;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j.DashboardDaoNeo4j;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.neo4j.DeviceNeo4J;
 import br.com.criativasoft.opendevice.middleware.rules.RuleManager;
@@ -62,6 +60,7 @@ public class DependencyConfig extends GuiceModule {
         binder.bind(UserDao.class).to(UserJPA.class);
         binder.bind(RuleSpecDao.class).to(RuleSpecJPA.class);
         binder.bind(JobSpecDao.class).to(JobSpecJPA.class);
+        binder.bind(FirmwareDao.class).to(FirmwareJPA.class);
 
         // DAOs from Extenions
         List<PersistenceExtension> extensions = BaseDeviceManager.getInstance().getExtensions(PersistenceExtension.class);

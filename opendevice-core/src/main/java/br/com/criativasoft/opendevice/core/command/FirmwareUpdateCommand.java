@@ -42,4 +42,8 @@ public class FirmwareUpdateCommand extends Command implements ExtendedCommand{
         return sb.toString();
     }
 
+    @Override
+    public int getTimeout() {
+        return 30 * 1000; // 30sec
+    }
 }

@@ -126,7 +126,6 @@ pkg.controller('UserController', function ($scope, AccountRest) {
         var keys = AccountRest.lisKeys();
         keys.$promise.then(function(list) {
 
-            debugger;
             list.forEach(function(item){
                 var data = encodeURIComponent(location.host + "," + item.key);
                 item.qrcode = data;

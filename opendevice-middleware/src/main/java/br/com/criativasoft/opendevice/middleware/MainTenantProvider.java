@@ -15,9 +15,11 @@ package br.com.criativasoft.opendevice.middleware;
 
 import br.com.criativasoft.opendevice.core.DataManager;
 import br.com.criativasoft.opendevice.core.TenantContext;
+import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.ThreadLocalTenantProvider;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.model.Device;
+import br.com.criativasoft.opendevice.middleware.model.IAccountEntity;
 import org.mapdb.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -185,5 +187,7 @@ public class MainTenantProvider extends ThreadLocalTenantProvider {
         }
     }
 
-
+    public static boolean validadeEntity(IAccountEntity entity){
+        return entity != null && !entity.getAccount().getUuid().equals( TenantProvider.getCurrentID());
+    }
 }

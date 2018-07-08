@@ -32,7 +32,7 @@ import java.util.List;
 
 public abstract class GenericJpa<T> implements Dao<T> {
 
-    private Class<T> persistentClass;
+    protected Class<T> persistentClass;
 
     protected GenericJpa(Class<T> persistentClass) {
         this.persistentClass = persistentClass;

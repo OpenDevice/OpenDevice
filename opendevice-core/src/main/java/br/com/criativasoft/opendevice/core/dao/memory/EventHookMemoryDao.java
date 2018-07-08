@@ -58,7 +58,6 @@ public class EventHookMemoryDao implements EventHookDao {
         return null;
     }
 
-
     private boolean exist(EventHook entity){
         if(entity.getId() > 0){
             EventHook find = getById(entity.getId());

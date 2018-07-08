@@ -79,7 +79,7 @@ public class CommandDelivery implements ConnectionListener {
             for (DeviceConnection deviceConnection : connections) {
                 sendTo(command, deviceConnection);
             }
-        }else if(connection instanceof StreamConnection && !(command instanceof ResponseCommand)){
+        }else if(connection instanceof IFirmwareConnection && !(command instanceof ResponseCommand)){
             sendWithTimeout(command, connection);
         }else{
             connection.send(command);

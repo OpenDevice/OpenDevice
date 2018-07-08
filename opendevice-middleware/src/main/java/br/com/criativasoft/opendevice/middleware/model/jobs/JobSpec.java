@@ -13,6 +13,7 @@
 
 package br.com.criativasoft.opendevice.middleware.model.jobs;
 
+import br.com.criativasoft.opendevice.middleware.model.IAccountEntity;
 import br.com.criativasoft.opendevice.middleware.model.actions.ActionSpec;
 import br.com.criativasoft.opendevice.middleware.model.rules.RuleEnums;
 import br.com.criativasoft.opendevice.restapi.model.Account;
@@ -35,7 +36,7 @@ import java.util.Date;
 @JsonSubTypes({
         @JsonSubTypes.Type(CronJobSpec.class),
 })
-public class JobSpec {
+public class JobSpec implements IAccountEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

@@ -13,6 +13,7 @@
 
 package br.com.criativasoft.opendevice.middleware.model.rules;
 
+import br.com.criativasoft.opendevice.middleware.model.IAccountEntity;
 import br.com.criativasoft.opendevice.middleware.model.actions.ActionSpec;
 import br.com.criativasoft.opendevice.restapi.model.Account;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -34,7 +35,7 @@ import java.util.Date;
         @JsonSubTypes.Type(StateRuleSpec.class),
         @JsonSubTypes.Type(ThresholdRuleSpec.class)
 })
-public abstract class RuleSpec {
+public abstract class RuleSpec implements IAccountEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

@@ -1,0 +1,133 @@
+<!--
+  ~ ******************************************************************************
+  ~ Copyright (c) 2013-2014 CriativaSoft (www.criativasoft.com.br)
+  ~ All rights reserved. This program and the accompanying materials
+  ~ are made available under the terms of the Eclipse Public License v1.0
+  ~ which accompanies this distribution, and is available at
+  ~ http://www.eclipse.org/legal/epl-v10.html
+  ~
+  ~  Contributors:
+  ~  Ricardo JL Rufino - Initial API and Implementation
+  ~ ******************************************************************************
+  -->
+
+<span class="page-title"><i class="fa fa fa-users"></i> Firmwares </span>
+
+<!-- Main content -->
+<section class="content" data-ng-init="ctrl.init()">
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="box box-primary">
+                <div class="box-body box-profile">
+                    <form ng-submit="ctrl.save($event)" enctype="multipart/form-data" >
+                        <img class="profile-user-img img-responsive img-circle" src="/images/boards/generic-blue.png" >
+
+                        <a href="javascript:void(0)" ng-click="editUser=true" class=""><h3 class="text-center">New Firmware</h3></a>
+
+                        <input type="hidden"  autocomplete="false" ng-model="model.id" />
+
+                        <ul class="list-group list-group-unbordered">
+                            <li class="list-group-item">
+                                <input type="text" class="form-control" placeholder="Name, Version ..." autocomplete="false" name="title" ng-model="model.title" required="required"/>
+                            </li>
+                            <li class="list-group-item">
+                                <input type="text" class="form-control" placeholder="Description, Notes" autocomplete="false" name="description" ng-model="model.description" required="required"/>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="has-feedback">
+                                    <input type="file" class="form-control" name="file"  />
+                                    <span class="form-control-feedback"><i class="fa fa-image"></i></span>
+                                </div>
+                            </li>
+                        </ul>
+                        <button type="submit" class="btn btn-primary btn-block">Save</button>
+                    </form>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Firmware List</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                        <tr ng-repeat="x in ctrl.list">
+                            <td>${ ::x.title }</td>
+                            <td>${ ::x.description }</td>
+                            <td>${ ::x.createdAt | date:'medium' }</td>
+                            <td>
+                                <a class="btn btn-xs btn-success"  data-target="#show-connections" data-toggle="modal" ng-click="ctrl.showConnections(x, $index)"><i class="fa fa-send"></i> Deploy</a>
+                                <a class="btn btn-xs btn-info"  ng-click="ctrl.download(x)"><i class="fa fa-download"></i> Download</a>
+                                <a class="btn btn-xs btn-danger" ng-really-click="ctrl.delete(x, $index)"><i class="fa fa-remove"></i> Delete</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!----------------------------------------------------------------->
+<!-- Connections                                                 -->
+<!----------------------------------------------------------------->
+<div id="show-connections"  class="modal fade" tabindex="-1" role="dialog" >
+    <div class="modal-dialog" role="document">
+        <form class="form-horizontal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" >Active Devices / Connections</h4>
+                </div>
+                <div class="modal-body">
+
+                    <div class="table-responsive">
+                        <table class="table no-margin">
+                            <thead>
+                            <tr>
+                                <th>Host / Name</th>
+                                <th>Type</th>
+                                <th>Last Connection</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            <tr ng-repeat="item in ctrl.connections" >
+                                <td>${::item.host}</td>
+                                <td>${::item.type}</td>
+                                <td>${::item.lastConnection | date:'hh:mm dd/MM/yy'}</td>
+                                <td>
+                                    <a role="button" class="btn btn-success btn-xs" ng-click="ctrl.deploy(item.uuid)">Deploy</a>
+                                </td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

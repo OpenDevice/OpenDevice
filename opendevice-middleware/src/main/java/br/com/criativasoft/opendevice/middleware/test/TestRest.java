@@ -25,7 +25,6 @@ import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.PhysicalDevice;
 import br.com.criativasoft.opendevice.middleware.tools.SimulationService;
 import br.com.criativasoft.opendevice.restapi.resources.DeviceRest;
-import org.atmosphere.cpr.AtmosphereResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,10 +33,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.*;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -201,50 +199,6 @@ public class TestRest {
         }
 
         return Response.ok().build();
-    }
-
-    @GET
-    @Path("/firmwares/download/{id}")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public ByteArrayOutputStream downloadFiemware(@Context AtmosphereResource request, @PathParam("id") int id) {
-
-        request.getRequest().header("Transfer-Encoding", "xxxxxxxx");
-        System.out.println("Downloading....");
-
-        File file = new File("/media/ricardo/Dados/TEMP/ArduinoTestes/OpenDeviceEEPROM/.pioenvs/esp/firmware.bin");
-
-        try{
-
-            ByteArrayOutputStream ous = null;
-            InputStream ios = null;
-            try {
-                byte[] buffer = new byte[4096];
-                ous = new ByteArrayOutputStream();
-                ios = new FileInputStream(file);
-                int read = 0;
-                while ((read = ios.read(buffer)) != -1) {
-                    ous.write(buffer, 0, read);
-                }
-            }finally {
-                try {
-                    if (ous != null)
-                        ous.close();
-                } catch (IOException e) {
-                }
-
-                try {
-                    if (ios != null)
-                        ios.close();
-                } catch (IOException e) {
-                }
-            }
-
-            return ous;
-
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
 
     }
 

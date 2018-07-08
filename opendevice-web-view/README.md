@@ -4,7 +4,8 @@ opendevice-web-view
 # Development
 
 ### Fast Development: 
-Run in JavaScript DEBUG mode in IntelliJ/IDEA
+gulp build
+Next, run in JavaScript DEBUG mode in IntelliJ/IDEA
 
 # Build
 

@@ -6,19 +6,19 @@
     <parent>
         <groupId>io.opendevice</groupId>
         <artifactId>opendevice-servers</artifactId>
-        <version>0.1.5-SNAPSHOT</version>
+        <version>0.5.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>opendevice-rest-ws-server</artifactId>
 
     <properties>
-        <jersey-version>1.19</jersey-version> <!-- 1.19.4 -->
+        <jersey-version>1.19.4</jersey-version> <!-- 1.19.4 -->
         <jaxb-version>2.1</jaxb-version>
-        <nettosphere-version>3.0.5</nettosphere-version>
+        <nettosphere-version>3.0.8-SNAPSHOT</nettosphere-version>
         <!--<nettosphere-version>2.4.11-SNAPSHOT</nettosphere-version>-->
-        <atmosphere-version>2.4.7</atmosphere-version>
-        <atmosphere-extensions>2.4.3</atmosphere-extensions>
+        <atmosphere-version>2.4.27</atmosphere-version>
+        <atmosphere-extensions>2.4.19</atmosphere-extensions>
         <shiro-version>1.2.4</shiro-version>
     </properties>
 
@@ -83,6 +83,23 @@
             <version>${atmosphere-version}</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency> <!-- for Uploads -->
+            <groupId>com.sun.jersey.contribs</groupId>
+            <artifactId>jersey-multipart</artifactId>
+            <version>${jersey-version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-grizzly2</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <!--<dependency>-->
             <!--<groupId>com.sun.jersey</groupId>-->
             <!--<artifactId>jersey-server</artifactId>-->

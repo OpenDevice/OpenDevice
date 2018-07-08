@@ -117,6 +117,8 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
             Config.Builder conf = new Config.Builder();
             conf.port(port);
+            conf.supportChunking(true);
+            conf.maxChunkContentLength(5 * 1024 * 1024); // 5BM
 
             //conf.host("::0"); // bind all local IPs
             conf.host("0.0.0.0"); // bind all local IPs

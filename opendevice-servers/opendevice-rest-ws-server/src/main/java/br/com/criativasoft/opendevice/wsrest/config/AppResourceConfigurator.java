@@ -20,9 +20,13 @@ import br.com.criativasoft.opendevice.wsrest.filter.TenantFilter;
 import br.com.criativasoft.opendevice.wsrest.guice.GuiceInjectProvider;
 import br.com.criativasoft.opendevice.wsrest.io.AuthenticationExceptionMap;
 import br.com.criativasoft.opendevice.wsrest.io.AuthorizationExceptionMap;
+import br.com.criativasoft.opendevice.wsrest.io.ByteArrayWriter;
 import br.com.criativasoft.opendevice.wsrest.io.EntityJacksonReader;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.ResourceConfigurator;
+import com.sun.jersey.multipart.impl.FormDataMultiPartDispatchProvider;
+import com.sun.jersey.multipart.impl.MultiPartConfigProvider;
+import com.sun.jersey.multipart.impl.MultiPartReaderServerSide;
 import org.secnod.shiro.jersey.ShiroResourceFilterFactory;
 import org.secnod.shiro.jersey.SubjectInjectableProvider;
 
@@ -41,7 +45,14 @@ public class AppResourceConfigurator implements ResourceConfigurator {
         classes.add(AuthenticationExceptionMap.class);
         classes.add(AuthorizationExceptionMap.class);
         classes.add(EntityJacksonReader.class);
-//        classes.add(ByteArrayWriter.class);
+
+        // Download (bynary)
+        classes.add(ByteArrayWriter.class);
+
+        // Upload
+        classes.add(FormDataMultiPartDispatchProvider.class); // For Uploads from: jersey-multipart
+        classes.add(MultiPartReaderServerSide.class); // For Uploads from: jersey-multipart
+        classes.add(MultiPartConfigProvider.class); // For Uploads from: jersey-multipart
 
         OpenDeviceConfig odevConfig = ODev.getConfig();
 

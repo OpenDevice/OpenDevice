@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.opendevice</groupId>
         <artifactId>opendevice-pom</artifactId>
-        <version>0.1.5-SNAPSHOT</version>
+        <version>0.5.1-SNAPSHOT</version>
     </parent>
 
 	<artifactId>opendevice-middleware</artifactId>
@@ -263,8 +263,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.2</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.8</source>
+					<target>1.8</target>
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>

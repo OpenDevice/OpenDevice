@@ -24,6 +24,18 @@ public class BearerAuthToken implements AuthenticationToken {
 
     private String token;
 
+    private boolean apikey = false;  // Is ApiKey or Temp Token ?
+
+    /**
+     *
+     * @param token
+     * @param apikey  - true for ApiKey, false for Temporary token generated in OAuth
+     */
+    public BearerAuthToken(String token, boolean apikey) {
+        this.token = token;
+        this.apikey = apikey;
+    }
+
     public BearerAuthToken(String token) {
         this.token = token;
     }
@@ -36,5 +48,9 @@ public class BearerAuthToken implements AuthenticationToken {
     @Override
     public Object getCredentials() {
         return token;
+    }
+
+    public boolean isApikey() {
+        return apikey;
     }
 }

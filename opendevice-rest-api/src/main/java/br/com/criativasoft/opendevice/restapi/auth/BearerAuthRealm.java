@@ -57,6 +57,11 @@ public class BearerAuthRealm extends AbstractAuthorizingRealm {
 
         String apiKey = (String) cache.get(authTokenS);
 
+        // The token is API_KEY
+        if(apiKey == null && authToken.isApikey()){
+            apiKey = authTokenS;
+        }
+
         if(apiKey == null) log.warn("ApiKey not found for token : " + authTokenS);
 
         if(  apiKey != null && context instanceof ApiDataManager){

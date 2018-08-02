@@ -16,12 +16,20 @@
 // Requied to define "package" of modules.
 angular.module('opendevice.controllers', []);
 
+var AppConstants = {
+    LocalStorage: {
+        AUTH_TOKEN : "AuthToken",
+        EXTENSIONS : "odev.extensions",
+        DEVICE_CACHE : "odev_devices",
+    }
+};
+
 
 // This applications will be instantiated in BootstrapApp.js
 var App = function(){
 
     // Get dynamic extenions
-    var odev_extensions = localStorage.getItem("odev.extensions");
+    var odev_extensions = localStorage.getItem(AppConstants.LocalStorage.EXTENSIONS);
     if(odev_extensions != null){
         odev_extensions = JSON.parse(odev_extensions);
         odev_extensions = odev_extensions.map(function(item) {

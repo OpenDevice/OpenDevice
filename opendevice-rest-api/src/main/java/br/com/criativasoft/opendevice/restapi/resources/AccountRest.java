@@ -14,6 +14,7 @@
 package br.com.criativasoft.opendevice.restapi.resources;
 
 import br.com.criativasoft.opendevice.core.TenantProvider;
+import br.com.criativasoft.opendevice.restapi.auth.AccountAuth;
 import br.com.criativasoft.opendevice.restapi.auth.AccountPrincipal;
 import br.com.criativasoft.opendevice.restapi.auth.AesRuntimeCipher;
 import br.com.criativasoft.opendevice.restapi.io.ErrorResponse;
@@ -28,6 +29,7 @@ import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.subject.Subject;
+import org.secnod.shiro.jaxrs.Auth;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -100,6 +102,48 @@ public class AccountRest {
         }
 
         return accounts;
+    }
+
+
+    @GET @Path("loginAs/{id}")
+    @RequiresRoles(AccountType.ROLES.CLOUD_MANAGER)
+    public Response loginAs(@PathParam("id") long id, @Auth Subject currentUser) {
+
+        String uid = TenantProvider.getCurrentID();
+
+        Account account = dao.getById(id);
+
+        if(account == null) ErrorResponse.status(Response.Status.NOT_FOUND, "Account not found !");
+
+        if(account != null && account.getUuid().equals(uid)) {
+            return ErrorResponse.BAD_REQUEST("You already logged !");
+        }
+
+        Set<UserAccount> userAccounts = account.getUserAccounts();
+        for (UserAccount userAccount : userAccounts) {
+
+            if(userAccount.getType() == AccountType.ACCOUNT_MANAGER){
+                User user = userAccount.getUser();
+
+                // Logout
+                currentUser.logout();
+
+                // Relogin...
+                AccountAuth token = new AccountAuth(userAccount.getId(), user.getId());
+                currentUser.login(token);
+
+                if(currentUser.isAuthenticated()){
+                    String authtoken = account.getUuid();
+                    return Response.ok("{\"token\":\""+authtoken+"\"}").build();
+                }else{
+                    return Response.ok().build();
+                }
+
+            }
+
+        }
+
+        return Response.ok().build();
     }
 
 

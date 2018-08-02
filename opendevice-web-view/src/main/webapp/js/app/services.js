@@ -95,7 +95,8 @@ app.factory('AccountRest', ['$resource', function($resource){
         listUsers: {method:'GET', url : PATH+"/users", isArray:true},
         lisKeys: {method:'GET', url : PATH+"/keys", isArray:true},
         addUser: {method:'POST', url : PATH+"/users"},
-        deleteUser: {method:'DELETE', url : PATH+"/users/:id"}
+        deleteUser: {method:'DELETE', url : PATH+"/users/:id"},
+        loginAs: {method:'GET', url : PATH+"/loginAs/:id"}
     });
 
 }]);
@@ -180,14 +181,19 @@ app.directive('ngReallyClick', [function() {
             element.bind('click', function() {
 
                 var $dialog = $('#confirm-dialog');
+                var $button = $dialog.find("button:last");
 
                 var message = attrs.ngReallyMessage;
 
                 if(message) $dialog.find(".modal-title").text(message);
+                else $dialog.find(".modal-title").text("Delete Parmanently");
+
+                if(this.title) $button.text(this.title);
+                else $button.text("OK");
 
                 $dialog.modal('show');
 
-                $dialog.find("button:last").one('click', function(){
+                $button.one('click', function(){
                     scope.$apply(attrs.ngReallyClick);
                     $dialog.modal('hide');
                 });

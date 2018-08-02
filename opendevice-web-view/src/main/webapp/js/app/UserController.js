@@ -105,6 +105,25 @@ pkg.controller('UserController', function ($scope, AccountRest) {
         });
     };
 
+    _public.loginAs = function(account, index){
+        AccountRest.loginAs({id : account.id}, function(data) {
+
+            // Clear private data
+            for(var key in AppConstants.LocalStorage) {
+                localStorage.removeItem(key);
+            }
+
+            localStorage.setItem(AppConstants.LocalStorage.AUTH_TOKEN, data.token);
+
+            $.notify({message: "Reloading Page..."}, {type:"warning"});
+            window.location.reload();
+        }, function(error) {
+            if(error.data && error.data.message){
+                $.notify({message: error.data.message});
+            }
+        });
+    };
+
     _public.invitationLink = function(){
 
         $.get("/api/accounts/invitationLink", function(resp){

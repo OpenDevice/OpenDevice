@@ -167,7 +167,7 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
 
             // Timebased (called from RuleManagerJob) only work with TimeCondition
             ConditionSpec condition = spec.getCondition();
-            if(timeBased && (condition == null || !(condition instanceof ActiveTimeConditionSpec))){
+            if(timeBased && !(condition instanceof ActiveTimeConditionSpec)){
                 continue;
             }
 

@@ -15,10 +15,12 @@
 
 package br.com.criativasoft.opendevice.middleware.resources;
 
+import br.com.criativasoft.opendevice.core.ODev;
 import br.com.criativasoft.opendevice.middleware.model.Dashboard;
 import br.com.criativasoft.opendevice.middleware.model.DashboardItem;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.DashboardDao;
 import br.com.criativasoft.opendevice.restapi.io.ErrorResponse;
+import br.com.criativasoft.opendevice.wsrest.io.WebUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,10 +34,7 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * TODO: Add Docs
@@ -210,13 +209,43 @@ public class DashboardRest {
 
     @GET @Path("/deviceIcons")
     public List<String> deviceIcons() throws IOException {
-        // FIXME: get current path.
-        File path = new File("/media/ricardo/Dados/Codidos/Java/Projetos/OpenDevice/opendevice-web-view/src/main/webapp/images/devices");
-        List<String> images = new LinkedList<String>();
-        File[] files = path.listFiles();
-        for (File file : files) {
-            images.add(file.getName());
+
+        File homeDirectory = new File(ODev.getConfig().getHomeDirectory());
+        List<String> externalResources = ODev.getConfig().getExternalResources();
+
+        List<File> iconsPath = new LinkedList<>();
+
+        // Check home
+        File currentPath = new File(homeDirectory, "images/devices");
+        if(currentPath.exists()){
+            iconsPath.add(currentPath);
         }
+
+        // Check external resouces
+        for (String externalResource : externalResources) {
+            currentPath = new File(externalResource, "images/devices");
+            if(currentPath.exists()){
+                iconsPath.add(currentPath);
+            }
+        }
+
+        log.debug("Found icons directory: " + iconsPath.size());
+
+        List<String> images = new LinkedList<String>();
+        for (File path : iconsPath) {
+            Collection<File> files = WebUtils.listFileTree(path);
+            for (File file : files) {
+
+                String absolutePath = file.getAbsolutePath();
+                String relative = absolutePath.substring(absolutePath.indexOf("images/devices") + 15, absolutePath.length());
+//                System.out.println("relative: "+ relative);
+                images.add(relative);
+            }
+        }
+
+        Collections.sort(images);
+
         return images;
+
     }
 }

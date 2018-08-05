@@ -353,6 +353,13 @@ public class DefaultCommandProcessor {
 
             }
 
+            try {
+//                ODev.getDeviceManager().send(new UserEventCommand(EventConstants.DEVICE_LIST_UPDATE), false, true);
+                ODev.getDeviceManager().send(response, false, true);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+
             processingNewDevices.set(false);
             partialDevices.clear();
 
@@ -373,6 +380,7 @@ public class DefaultCommandProcessor {
                     found =  manager.getDeviceDao().getById(found.getId()); // sync with database
 
                     found.setTitle(device.getTitle());
+                    found.setIcon(device.getIcon());
                     if(device.getCategory() != null){
                         found.setCategory(device.getCategory());
                     }

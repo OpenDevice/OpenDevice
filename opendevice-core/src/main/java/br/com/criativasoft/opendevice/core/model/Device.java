@@ -72,6 +72,7 @@ public class Device implements Serializable {
     private long lastUpdate;
     private Date dateCreated;
     private double value = VALUE_LOW;
+    private String icon;
 
 
     @OneToOne(cascade = CascadeType.MERGE)
@@ -223,6 +224,14 @@ public class Device implements Serializable {
         }
 
 	}
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
 
     /**
      * Check if the value is high

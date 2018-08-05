@@ -74,7 +74,9 @@ public abstract class TenantProvider {
     }
 
     public TenantContext getTenantContext() {
-        return tenants.get(getTenantID());
+        synchronized (tenants) {
+            return tenants.get(getTenantID());
+        }
     }
 
     public static TenantProvider getTenantProvider() {

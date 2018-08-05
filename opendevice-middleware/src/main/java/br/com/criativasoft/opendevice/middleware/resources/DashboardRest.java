@@ -216,14 +216,14 @@ public class DashboardRest {
         List<File> iconsPath = new LinkedList<>();
 
         // Check home
-        File currentPath = new File(homeDirectory, "images/devices");
+        File currentPath = new File(homeDirectory, "images/devices/on");
         if(currentPath.exists()){
             iconsPath.add(currentPath);
         }
 
         // Check external resouces
         for (String externalResource : externalResources) {
-            currentPath = new File(externalResource, "images/devices");
+            currentPath = new File(externalResource, "images/devices/on");
             if(currentPath.exists()){
                 iconsPath.add(currentPath);
             }
@@ -237,7 +237,7 @@ public class DashboardRest {
             for (File file : files) {
 
                 String absolutePath = file.getAbsolutePath();
-                String relative = absolutePath.substring(absolutePath.indexOf("images/devices") + 15, absolutePath.length());
+                String relative = absolutePath.substring(absolutePath.indexOf("images/devices/on") + 18, absolutePath.length());
 //                System.out.println("relative: "+ relative);
                 images.add(relative);
             }

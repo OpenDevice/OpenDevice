@@ -17,6 +17,7 @@ import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.metamodel.AggregationType;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
+import br.com.criativasoft.opendevice.core.metamodel.OrderType;
 import br.com.criativasoft.opendevice.core.metamodel.PeriodType;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceCategory;
@@ -114,10 +115,20 @@ public abstract class DeviceJPA extends GenericJpa<Device> implements DeviceDao{
 
             StringBuilder jpql = new StringBuilder("from DeviceHistory where deviceID = :deviceID");
 
-            if(params.getPeriodType() == PeriodType.RECORDS){
+            if(params.getPeriodType() != PeriodType.RECORDS){
+                jpql.append(" and timestamp between :start and :end");
+            }
+
+            OrderType order = params.getOrder();
+
+            // Default order
+            if(order == null){
+                order = OrderType.ASC;
+            }
+
+            if(order == OrderType.ASC){
                 jpql.append(" ORDER BY timestamp ASC");
             }else{
-                jpql.append(" and timestamp between :start and :end");
                 jpql.append(" ORDER BY timestamp DESC");
             }
 
@@ -125,7 +136,7 @@ public abstract class DeviceJPA extends GenericJpa<Device> implements DeviceDao{
             query.setParameter("deviceID",  params.getDeviceID());
 
             if(params.getPeriodType() == PeriodType.RECORDS){
-                query.setMaxResults(params.getPeriodValue());
+                params.setMaxResults(params.getPeriodValue());
             }else{
                 Calendar calendar = Calendar.getInstance();
                 Date end;
@@ -146,21 +157,28 @@ public abstract class DeviceJPA extends GenericJpa<Device> implements DeviceDao{
 //                System.err.println("query: "+new Date(calendar.getTimeInMillis())+" - "+end);
             }
 
-
-            int maxForAnalisys = params.getMaxResults(10000);
+            int maxForAnalisys = params.getMaxResults(10000); //get default
 
             query.setMaxResults(maxForAnalisys);
+
+            System.out.println("maxForAnalisys :" + maxForAnalisys);
+            System.out.println("maxForAnalisys :" + params.getPeriodType());
+
+            // Paginated query
+            if(params.getPageNumber() > 0){
+                query.setFirstResult((params.getPageNumber()-1) * maxForAnalisys);
+            }
 
             List<DeviceHistory> list = query.getResultList();
 
             // Data must be sorted to show in chart's
             // NOTE: Show last data frist !!
-            Collections.sort(list, new Comparator<DeviceHistory>() {
-                @Override
-                public int compare(DeviceHistory o1, DeviceHistory o2) {
-                    return (int) (o1.getTimestamp() - o2.getTimestamp());
-                }
-            });
+//            Collections.sort(list, new Comparator<DeviceHistory>() {
+//                @Override
+//                public int compare(DeviceHistory o1, DeviceHistory o2) {
+//                    return (int) (o1.getTimestamp() - o2.getTimestamp());
+//                }
+//            });
 
             return list;
         }

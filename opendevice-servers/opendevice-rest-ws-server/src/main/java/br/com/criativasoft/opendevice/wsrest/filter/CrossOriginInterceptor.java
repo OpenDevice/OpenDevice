@@ -55,9 +55,9 @@ public class CrossOriginInterceptor extends AtmosphereInterceptorAdapter {
         }
 
         if ("OPTIONS".equals(req.getMethod())) {
-            res.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+            res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
             res.setHeader("Access-Control-Allow-Headers",
-                    "Origin, Content-Type, AuthToken, X-AppID, X-Atmosphere-Framework,  "
+                    "Origin, Content-Type, Authorization, AuthToken, X-AppID, X-Atmosphere-Framework,  "
                             + EXPOSE_HEADERS
                             + ", X-Atmosphere-Transport, X-Atmosphere-TrackMessageSize, X-atmo-protocol");
             res.setHeader("Access-Control-Max-Age", "-1");

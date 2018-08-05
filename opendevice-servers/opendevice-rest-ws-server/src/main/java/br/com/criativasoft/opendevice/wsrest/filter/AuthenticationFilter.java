@@ -18,6 +18,7 @@ import br.com.criativasoft.opendevice.restapi.auth.BearerAuthToken;
 import br.com.criativasoft.opendevice.restapi.auth.GoogleAuthToken;
 import br.com.criativasoft.opendevice.restapi.model.dao.UserDao;
 import br.com.criativasoft.opendevice.wsrest.io.WebUtils;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import org.apache.shiro.SecurityUtils;
@@ -28,6 +29,7 @@ import org.apache.shiro.subject.Subject;
 import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.ext.Provider;
+import java.io.ByteArrayInputStream;
 
 /**
  * Check the authentication token via the Bearer header, and performs validation using
@@ -66,35 +68,92 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
             // Google OAuth ( Ex.: Alexa Skill )
             String authorizationHeader = request.getHeaderValue(HttpHeaders.AUTHORIZATION);
-            if (authorizationHeader != null && authorizationHeader.startsWith("Google ")) {
+
+            if (authorizationHeader != null && authorizationHeader.startsWith("Google")) {
                 String token = authorizationHeader.substring("Google".length()).trim(); // Token
 
                 GoogleAuthToken bearerToken = new GoogleAuthToken(token);
 
                 try{
                     subject.login(bearerToken); // Use BearerTokenRealm
-
+                    return request;
                 }catch (AuthenticationException e){
                     throw new AuthenticationException("Invalid AuthToken");
                 }
 
             }
 
-            // Extract the token from the HTTP Authorization header
+            // Extract the token from the HTTP Authorization header (OAuth2)
             authorizationHeader = request.getHeaderValue(HttpHeaders.AUTHORIZATION);
-            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer")) {
                 String token = authorizationHeader.substring("Bearer".length()).trim(); // API_KEY
 
                 BearerAuthToken bearerToken = new BearerAuthToken(token);
 
                 try{
                     subject.login(bearerToken); // Use BearerTokenRealm
-
+                    return request;
                 }catch (AuthenticationException e){
                     throw new AuthenticationException("Invalid AuthToken");
                 }
             }
 
+            // ApiKey in Header (no 2 step auth)
+            String header = request.getHeaderValue("ApiKey");
+            if ((authorizationHeader != null && authorizationHeader.startsWith("ApiKey")) || header != null ) {
+                String apiKey = null;
+                if(header != null){
+                    apiKey = header;
+                }else{
+                    apiKey = authorizationHeader.substring("ApiKey".length()).trim(); // API_KEY
+                }
+
+                BearerAuthToken bearerToken = new BearerAuthToken(apiKey, true);
+
+                try{
+                    subject.login(bearerToken); // Use BearerTokenRealm
+                    return request;
+                }catch (AuthenticationException e){
+                    throw new AuthenticationException("Invalid AuthToken");
+                }
+            }
+
+            // WebSocket HttpHeader Upgrade (JavaScript Library).
+            header = request.getHeaderValue("Upgrade");
+            if (header != null && header.contains("websocket")) {
+
+                String apiKey  = path.substring(path.lastIndexOf('/')+1, path.length());
+
+                BearerAuthToken bearerToken = new BearerAuthToken(apiKey, true);
+
+                try{
+                    subject.login(bearerToken); // Use BearerTokenRealm
+                    return request;
+                }catch (AuthenticationException e){
+                    throw new AuthenticationException("Invalid AuthToken");
+                }
+            }
+
+            // GoogleAssistant / Dialogflow Integration
+            header = request.getHeaderValue("GoogleAssistant");
+            if (header != null && header.contains("Dialogflow")) {
+
+                JsonNode entity = request.getEntity(JsonNode.class);
+                JsonNode userNode = entity.get("originalDetectIntentRequest").get("payload").get("user");
+                String token = userNode.get("accessToken").asText();
+
+                BearerAuthToken bearerToken = new BearerAuthToken(token);
+
+                // request.setEntityInputStream(new ByteArrayInputStream(entity.toString().getBytes()));
+                request.setEntityInputStream(new ByteArrayInputStream(entity.toString().getBytes()));
+                System.err.println("autenticando...");
+                try{
+                    subject.login(bearerToken); // Use BearerTokenRealm
+                    return request;
+                }catch (AuthenticationException e){
+                    throw new AuthenticationException("Invalid AuthToken");
+                }
+            }
         }
 
 

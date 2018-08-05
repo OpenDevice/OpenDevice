@@ -20,10 +20,7 @@ import br.com.criativasoft.opendevice.connection.message.Request;
 import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.ODev;
 import br.com.criativasoft.opendevice.core.TenantProvider;
-import br.com.criativasoft.opendevice.core.command.Command;
-import br.com.criativasoft.opendevice.core.command.CommandType;
-import br.com.criativasoft.opendevice.core.command.DeviceCommand;
-import br.com.criativasoft.opendevice.core.command.ResponseCommand;
+import br.com.criativasoft.opendevice.core.command.*;
 import br.com.criativasoft.opendevice.core.connection.ConnectionInfo;
 import br.com.criativasoft.opendevice.core.connection.ConnectionType;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
@@ -342,7 +339,7 @@ public abstract class AbstractAtmosphereConnection extends AbstractConnection im
 
                 for (AtmosphereResource atmosphereResource : atmosphereResources) {
 
-                    if(cmd instanceof ResponseCommand){
+                    if(cmd instanceof ResponseCommand && !(cmd instanceof GetDevicesResponse)){
 
                         if(atmosphereResource.uuid().equals(cmd.getConnectionUUID())){
                             broadcaster.broadcast(message, atmosphereResource);

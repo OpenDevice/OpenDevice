@@ -13,10 +13,7 @@
 
 package br.com.criativasoft.opendevice.core.command;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Command used to send user-defined events / notifications.<br/>
@@ -39,23 +36,26 @@ public class UserEventCommand extends Command implements ExtendedCommand{
 
     private String name;
 
-    private Set<Object> params = new LinkedHashSet<Object>();
+    protected Map<String, Object> params = new LinkedHashMap();
 
-    public UserEventCommand(String name, Object ... params) {
+    public UserEventCommand(String name, Map<String, Object> params) {
         super(CommandType.USER_EVENT);
         this.name = name;
-        
         if(params != null){
-            for (Object object : params) {
-                 this.params.add(object);
-            }
+            this.params = params;
         }
     }
 
-    public Set<Object> getParams() {
+    public UserEventCommand(String name) {
+        super(CommandType.USER_EVENT);
+        this.name = name;
+    }
+
+
+    public Map<String, Object> getParams() {
         return params;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -63,7 +63,10 @@ public class UserEventCommand extends Command implements ExtendedCommand{
     @Override
     public void deserializeExtraData( String extradata ) {
         String[] strparams = extradata.split(Command.DELIMITER);
-        params.addAll(Arrays.asList(strparams));
+        List<String> strings = Arrays.asList(strparams);
+        for (int i = 0; i < strings.size(); i++) {
+            this.params.put(""+(i) ,strings.get(i));
+        }
     }
 
     @Override
@@ -73,7 +76,7 @@ public class UserEventCommand extends Command implements ExtendedCommand{
         
         StringBuilder sb = new StringBuilder();
        
-        Iterator<Object> it = params.iterator();
+        Iterator<Object> it = params.values().iterator();
         
         sb.append(name);
         if(it.hasNext()) sb.append(DELIMITER);

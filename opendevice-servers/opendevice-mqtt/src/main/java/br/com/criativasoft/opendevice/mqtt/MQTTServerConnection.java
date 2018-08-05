@@ -27,12 +27,15 @@ import br.com.criativasoft.opendevice.core.ODev;
 import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.command.Command;
 import br.com.criativasoft.opendevice.core.command.GetDevicesRequest;
+import br.com.criativasoft.opendevice.core.command.NotificationEvent;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.core.util.StringUtils;
 import io.moquette.BrokerConstants;
 import io.moquette.interception.InterceptHandler;
 import io.moquette.interception.messages.*;
+import io.moquette.spi.impl.subscriptions.Topic;
 import io.moquette.spi.security.IAuthenticator;
+import io.moquette.spi.security.IAuthorizator;
 import io.moquette.spi.security.ISslContextCreator;
 import io.netty.handler.ssl.JdkSslServerContext;
 import io.netty.handler.ssl.SslContext;
@@ -56,7 +59,7 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
 
     private  int port = BrokerConstants.PORT;
     private MoquetteServer server;
-    private DeviceManager manager;
+    private BaseDeviceManager manager;
 
     public MQTTServerConnection() {
         super();
@@ -76,7 +79,7 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
     public void setConnectionManager(ConnectionManager manager) {
         super.setConnectionManager(manager);
         if(manager instanceof DeviceManager){
-            this.manager = (DeviceManager) manager;
+            this.manager = (BaseDeviceManager) manager;
         }
     }
 
@@ -130,6 +133,28 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
                     @Override
                     public boolean checkValid(String clientID, String username, byte[] password) {
                         return TenantProvider.getTenantProvider().exist(username);
+                    }
+                });
+
+
+                server.setAuthorizator(new IAuthorizator() {
+                    @Override
+                    public boolean canWrite(Topic topic, String user, String client) {
+
+                        if(topic.isEmpty()) return false;
+
+                        String first = topic.getTokens().get(0).toString();
+
+                        if (first.equals(user)) {
+                            return true;
+                        }
+
+                        return false;
+                    }
+
+                    @Override
+                    public boolean canRead(Topic topic, String user, String client) {
+                        return canWrite(topic, user, client);
                     }
                 });
             }
@@ -227,6 +252,13 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
             if (resource != null) {
                 manager.removeOutput(resource);
             }
+
+            // Notify UI interface
+            try {
+                manager.send(new NotificationEvent("Device Disconnected", moduleName, "warning"), false, true);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
 
@@ -300,6 +332,15 @@ public class MQTTServerConnection extends AbstractConnection implements IMQTTSer
                 } catch (IOException e) {
                     log.error(e.getMessage(), e);
                 }
+
+
+                // Notify UI interface
+                try {
+                    manager.send(new NotificationEvent("Device Connected", moduleName, "info"), false, true);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
 
 

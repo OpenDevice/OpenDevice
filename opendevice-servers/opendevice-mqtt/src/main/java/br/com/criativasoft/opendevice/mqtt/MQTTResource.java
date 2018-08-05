@@ -20,6 +20,7 @@ import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
 import br.com.criativasoft.opendevice.connection.message.Message;
 import br.com.criativasoft.opendevice.connection.serialize.MessageSerializer;
 import br.com.criativasoft.opendevice.core.command.FirmwareUpdateCommand;
+import br.com.criativasoft.opendevice.core.command.GetDevicesRequest;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.mqtt.MqttMessageBuilders;
 import io.netty.handler.codec.mqtt.MqttPublishMessage;
@@ -67,7 +68,7 @@ public class MQTTResource extends AbstractConnection implements IFirmwareConnect
         MqttQoS qoS = MqttQoS.AT_LEAST_ONCE;
 
         // FIX to Avoid duplicate Message do Device, after reset.
-        if(message instanceof FirmwareUpdateCommand){
+        if(message instanceof FirmwareUpdateCommand || message instanceof GetDevicesRequest){
             qoS = MqttQoS.AT_MOST_ONCE; // fire and forget”
         }
 

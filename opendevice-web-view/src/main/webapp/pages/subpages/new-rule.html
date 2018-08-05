@@ -67,12 +67,19 @@
 
                                 Change to:
 
-                                <ui-select ng-model="model.value" theme="select2" style="width: 80px;">
-                                    <ui-select-match placeholder="State">${$select.selected.description}</ui-select-match>
-                                    <ui-select-choices repeat="obj.code as obj in ctrl.deviceStates">
-                                        <div ng-bind-html="obj.description | highlight: $select.search"></div>
-                                    </ui-select-choices>
-                                </ui-select>
+                                <div ng-if="!ctrl.isShowCustomValue()" style="display: inline-block">
+                                    <ui-select ng-model="model.value" theme="select2" style="width: 80px;">
+                                        <ui-select-match placeholder="State">${$select.selected.description}</ui-select-match>
+                                        <ui-select-choices repeat="obj.code as obj in ctrl.deviceStates">
+                                            <div ng-bind-html="obj.description | highlight: $select.search"></div>
+                                        </ui-select-choices>
+                                    </ui-select>
+                                </div>
+
+                                <div ng-if="ctrl.isShowCustomValue()" style="display: inline-block">
+                                    <input  class="form-control" ng-model="model.value"  style="width: 180px;" />
+                                </div>
+
                             </div>
                         </div>
                     </fieldset>

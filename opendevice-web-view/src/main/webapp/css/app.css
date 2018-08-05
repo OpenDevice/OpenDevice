@@ -291,7 +291,6 @@
     margin: 8px 1% !important;
     min-height: 55px;
     float: left;
-    cursor: pointer;
     display: block;
     text-decoration: none;
     color: #323232;
@@ -305,14 +304,18 @@
     -khtml-border-radius: 6px;
     border-radius: 6px;
     -webkit-touch-callout: none;
+}
+
+.device-digital {
+    cursor: pointer;
+    user-select: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    user-select: none;
 }
 
-.device-view:hover {
+.device-digital:hover {
     background-color: #d0f6ff
 }
 
@@ -370,6 +373,19 @@
     /* padding-right: 0px; */
     color: #f53809;
 }
+
+.device-view .dash-actions {
+    display: inline-block;
+    position: relative;
+    top: 41px;
+    right: -20px;
+}
+
+
+.device-view .dash-actions span:hover {
+    color: #3c8dbc;
+}
+
 
 .breadcrumb-device{
     padding: 0;
@@ -662,6 +678,13 @@
 /* Bootstrap notify, with textarea inside */
 .alert span textarea{
     color: #2a2a2a;
+}
+
+/* bootstrap-notify */
+[data-notify="container"] > [data-notify="title"] {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 5px;
 }
 
 .vcenter {

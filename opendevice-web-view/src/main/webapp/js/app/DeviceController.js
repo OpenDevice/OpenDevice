@@ -133,7 +133,7 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
         ODev.setListenerReceiver(odevListeners);
 
         // Fired by Sync or by Server
-        ODev.on(od.Event.DEVICE_LIST_UPDATE, function(devices){
+        ODev.on(od.Event.DEVICE_LIST_UPDATE, function(message){
             updateDevices();
         });
 
@@ -164,33 +164,11 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
     };
 
     _public.editDevice = function(device){
-
-        _this.formDevice = angular.copy(device);
-
-        // Remove invalid attributes.
-        delete _this.formDevice.listeners;
-        delete _this.formDevice.manager;
-        delete _this.formDevice.devices;
-        delete _this.formDevice.parent;
-
-        _this.popupDevicesPage = 'edit-device';
-
-    };
-
-    _public.saveDevice = function(event){
-
-        var $btn = $(event.target).find("button:submit");
-        $btn.data("loading-text", "Saving...");
-        $btn.button('loading');
-
-        _this.formDevice.uid = _this.formDevice.id; // change to UID (the server property)
-
-        ODev.save(_this.formDevice, function(state){
-            if(state){
-                if($btn) $btn.button('reset');
-                _this.popupDevicesPage = 'list-devices';
-            }
+        $('#manageDevices').modal('hide');
+        $("#manageDevices").on('hidden.bs.modal', function (e) {
+            window.location = "#/devices/" + device.id;
         });
+
 
     };
 
@@ -216,7 +194,6 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
             }
         });
     };
-
 
 
     _public.updateApiKeys = function(){
@@ -562,7 +539,7 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
 
     function createSensorChart(device){
 
-        if(device.type == od.DeviceType.DIGITAL || od.DeviceType.isNumeric(device.type)){
+        if(device.type == od.DeviceType.DIGITAL || od.DeviceType.isAnalog(device.type)){
 
             var model = {
                 "id": device.id,
@@ -588,23 +565,24 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
 
     function createDeviceControler(device){
 
-        if(this.isControllableDevice(device)){
+        // if(this.isControllableDevice(device)){
+
+        if(device.type != od.DeviceType.BOARD){
             var model = {
-                "type": "DIGITAL_CONTROLLER",
+                "type": "GENERIC_VIEW",
                 "monitoredDevices": [device.id],
                 "periodValue": 1,
                 "realtime": true,
                 "content": null,
                 "scripts": null,
                 "viewOptions": {
-                    "iconON": "lightbulb_on.png",
-                    "iconOFF": "lightbulb_off.png",
+                   //  "icon": "power.svg",
                     "textON": "ON",
                     "textOFF": "OFF"
                 }
             };
 
-            return new od.view.DigitalCtrlView(model);
+            return new GenericDeviceView(model);
         }else{
 
             return null;
@@ -684,5 +662,116 @@ pkg.controller('DeviceController', function ($scope, $routeParams, $timeout, $ht
 
         return null;
     }
+
+
+    // ===========================================================================================
+    // GenericDeviceView
+    // ===========================================================================================
+
+    var GenericDeviceView = od.view.DashItemView.extend(function() {
+
+        var _this = this;
+        var deviceListeners = [];
+
+        var HTML="";
+        HTML += "<div class=\"device-view\">";
+        HTML += "    <div class=\"device-view-icon\"><img src=\"/images/devices/lightbulb.png\"/><\/div>";
+        HTML += "    <div class=\"device-view-content\">";
+        HTML += "       <div class=\"dash-actions\">";
+        HTML += "           <span title=\"Options\"><i class=\"fa fa-edit\"><\/i><\/span>";
+        HTML += "       <\/div>";
+        HTML += "       <span class=\"device-view-title\">Device<\/span>";
+        HTML += "       <span class=\"device-view-value\">OFF<\/span>";
+        HTML += "    <\/div>";
+        HTML += "<\/div>";
+
+        this.render = function ($el) {
+
+            this.el = $el;
+
+            // create HTML
+
+            var _this = this;
+
+            this.model.monitoredDevices.forEach(function(deviceID){
+
+                var device = ODev.get(deviceID);
+
+                if(!device) console.error("Device with id: " + deviceID + " not found, chart: " + _this.model.title);
+
+                if(device){
+
+                    var listener = device.onChange(onDeviceChange, _this);
+                    deviceListeners.push(listener);
+
+                    var $device = $(HTML);
+                    _this.el.append($device);
+                    $device.attr("data-deviceid", deviceID);
+                    if(device.type == od.DeviceType.DIGITAL) $device.addClass("device-digital");
+                    $device.click(setValue);
+                    updateView.call(_this, $device, deviceID); // set values
+
+                    var actions = $device.find(".dash-actions span");
+
+                    actions.click(function(event){
+                        event.stopPropagation();
+                        var deviceID = $(event.currentTarget).parents('.device-view').data("deviceid");
+                        window.location = "#/devices/" + deviceID;
+                    });
+
+
+                }
+            });
+
+        };
+
+        this.destroy = function () {
+            // Remove listeners from devices.
+            this.model.monitoredDevices.forEach(function(deviceID, index) {
+                var device = ODev.get(deviceID);
+                if(device) device.removeListener(deviceListeners[index]);
+            });
+
+            this.super.destroy();
+        }
+
+        // ==========================================================================
+        // Private
+        // ==========================================================================
+
+        function onDeviceChange(value, deviceID){
+            var $device = $("[data-deviceid="+deviceID+"]", this.el);
+            updateView.call(this, $device, deviceID); // use call(this, ) becouse is a OpenDevice inner event
+        }
+
+        function updateView($device, deviceID){
+            var device = ODev.get(deviceID);
+            $(".device-view-title", $device).text(device.title);
+
+            var $value = $(".device-view-value", $device);
+
+            var icon;
+            if(device.type == od.DeviceType.DIGITAL){
+                $value.text(device.isON() ? this.model.viewOptions.textON : this.model.viewOptions.textOFF);
+                $value.removeClass("on off");
+                $value.addClass(device.isON() ? "on" : "off");
+                var iconName = device.icon || "power.svg";
+                icon = device.isON() ? "on/" + iconName : "off/" + iconName;
+
+            }else{
+                var iconName = device.icon || "temp.svg";
+                icon = "on/" + iconName;
+                $value.text(device.value);
+            }
+
+            $("img", $device).attr('src', "/images/devices/" + icon);
+        }
+
+        function setValue(event){
+            var deviceID = $(event.currentTarget).data("deviceid");
+            OpenDevice.toggleValue(deviceID);
+        }
+
+    });
 });
 

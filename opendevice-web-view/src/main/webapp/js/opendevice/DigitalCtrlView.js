@@ -23,8 +23,8 @@ $.extend(od.view.dashTypes,{
         deviceTypes: [od.DeviceType.DIGITAL],
         fields: [
             // [Name, Required, Default]
-            ["iconON", true, "lightbulb_on.png"],
-            ["iconOFF", true, "lightbulb_off.png"],
+            // ["iconON", true, "lightbulb_on.png"],
+            // ["iconOFF", true, "lightbulb_off.png"],
             ["textON", true, "ON"],
             ["textOFF", true, "OFF"],
         ]
@@ -37,7 +37,7 @@ od.view.DigitalCtrlView = od.view.DashItemView.extend(function() {
     var deviceListeners = [];
 
     var HTML="";
-    HTML += "<div class=\"device-view\">";
+    HTML += "<div class=\"device-view device-digital\">";
     HTML += "    <div class=\"device-view-icon\"><img src=\"/images/devices/lightbulb.png\"/><\/div>";
     HTML += "    <div class=\"device-view-content\">";
     HTML += "        <span class=\"device-view-title\">Device<\/span>";
@@ -103,7 +103,8 @@ od.view.DigitalCtrlView = od.view.DashItemView.extend(function() {
         $value.removeClass("on off");
         $value.addClass(device.isON() ? "on" : "off");
 
-        var icon = device.isON() ? this.model.viewOptions.iconON : this.model.viewOptions.iconOFF;
+        var iconName = device.icon || "power.svg";
+        var icon = device.isON() ? "on/" + iconName : "off/" + iconName;
         $("img", $device).attr('src', "/images/devices/" + icon);
     }
 

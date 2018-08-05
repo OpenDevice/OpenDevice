@@ -19,32 +19,12 @@ var od = od || {};
 od.view = od.view || {};
 
 od.view.availableTypes = {
-    DYNAMIC_VALUE: "Dynamic Value",
     LINE_CHART:"Line Chart",
     PIE_CHART:"Pie Chart",
     GAUGE_CHART:"Gauge"
 };
 
-od.view.dashTypes = {
-    DYNAMIC_VALUE: { // TODO: Need use Icons (On, OFF) ou background trasholder (ref: http://www.bootply.com/127431)
-        id: "DYNAMIC_VALUE",
-        name: "Dynamic Value",
-        klass: "od.view.DashItemView",
-        multipleDevices: false,
-        allowSensor : true,
-        allowDevice : false,
-        deviceTypes: [od.DeviceType.ANALOG, od.DeviceType.NUMERIC],
-        fields: [
-            // Name, required
-            ["aggregation", true],// "(!realtime)"
-            ["realtime", false],
-            ["period", true]
-        ]
-
-    }
-};
-
-
+od.view.dashTypes = {};
 
 /**
  * Responsable to render charts and view on dashboard

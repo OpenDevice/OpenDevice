@@ -64,6 +64,11 @@ var App = function(){
 
         ODev.connect();
 
+        // Notification from Server
+        ODev.on("ui_notification", function(message){
+            $.notify(message.params, {type : message.params.type, delay : 3000});
+        });
+
         // Avoid Expire session
         setInterval(function(){
             $.get("/api/auth/ping");
@@ -132,6 +137,7 @@ var App = function(){
         $routeProvider.when('/', {templateUrl: 'pages/dashboard.html', controller: 'DashboardController',  controllerAs: 'ctrl', resolve : odev_wait});
         $routeProvider.when('/boards', {templateUrl: 'pages/boards.html', controller: 'DeviceController',  controllerAs: 'ctrl', resolve : odev_wait});
         $routeProvider.when('/boards/:boardID', {templateUrl: 'pages/devices.html', controller: 'DeviceController',  controllerAs: 'ctrl', resolve : odev_wait});
+        $routeProvider.when('/devices/:deviceID', {templateUrl: 'pages/device-view.html', controller: 'DeviceViewController',  controllerAs: 'ctrl', resolve : odev_wait});
         $routeProvider.when('/new', {templateUrl: 'pages/new.html', controller: 'DeviceController',  controllerAs: 'ctrl'});
         $routeProvider.when('/users', {templateUrl: 'pages/users.html', controller: 'UserController',  controllerAs: 'ctrl'});
         $routeProvider.when('/connections', {templateUrl: 'pages/connections.html', controller: 'ConnectionController',  controllerAs: 'ctrl'});
@@ -207,7 +213,9 @@ var App = function(){
             if(device.type == od.DeviceType.DIGITAL){
                 return device.sensor ? "fa-plug" : "fa-lightbulb-o";
             }else if(device.type == od.DeviceType.ANALOG){
-                return "fa-thermometer-half";
+                return "fa-thermometer-quarter";
+            }else if(device.type == od.DeviceType.NUMERIC){
+                return "fa-bars";
             }else if(device.type == od.DeviceType.BOARD){
                 return "fa-sitemap";
             }else{

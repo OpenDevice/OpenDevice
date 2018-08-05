@@ -263,7 +263,7 @@ od.view.ChartItemView = od.view.DashItemView.extend(function() {
 
             var device = OpenDevice.findDevice(devices[0]);
 
-            if(od.DeviceType.isNumeric(device.type)){
+            if(od.DeviceType.isAnalog(device.type)){
 
                 // chart = $(this.el).highcharts({
                 chart = $(this.el).highcharts({

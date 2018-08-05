@@ -66,8 +66,6 @@ pkg.controller('RuleController', function ($scope, $location, $timeout, $routePa
 
     _public.init = function(){
 
-
-
         // PAGE: New / EDIT
         if($routeParams.id == "new" || $routeParams.id != null){
 
@@ -165,8 +163,28 @@ pkg.controller('RuleController', function ($scope, $location, $timeout, $routePa
             _this.deviceStates = [
                 { code : -1, description : "Any Value"},
                 { code : 1, description : "ON"},
-                { code : 0, description : "OFF"}
+                { code : 0, description : "OFF"},
+                { code : "other", description : "Other"}
             ];
+        }
+
+    };
+
+
+    _public.isShowCustomValue = function(){
+
+        var device = ODev.findDevice($scope.model.resourceID);
+
+        var type = $scope.model.deviceType;
+
+        if(device){
+            type = device.type;
+        }
+
+        if(od.DeviceType.DIGITAL == type){
+            return false;
+        }else{
+            return true;
         }
 
     };

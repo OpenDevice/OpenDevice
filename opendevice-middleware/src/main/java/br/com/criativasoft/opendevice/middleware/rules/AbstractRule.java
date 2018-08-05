@@ -14,6 +14,8 @@
 package br.com.criativasoft.opendevice.middleware.rules;
 
 import br.com.criativasoft.opendevice.middleware.jobs.AbstractAction;
+import br.com.criativasoft.opendevice.middleware.model.rules.ActiveTimeConditionSpec;
+import br.com.criativasoft.opendevice.middleware.model.rules.ConditionSpec;
 import br.com.criativasoft.opendevice.middleware.model.rules.RuleEnums;
 import br.com.criativasoft.opendevice.middleware.model.rules.RuleSpec;
 import br.com.criativasoft.opendevice.middleware.rules.condition.AbstractCondition;
@@ -79,7 +81,19 @@ public abstract class AbstractRule<T extends RuleSpec>  {
      * @return
      */
     public boolean allowExection() {
+
+        // if is not a Timebased rule, execute allways
+        if(!AbstractRule.isTimedRule(getSpec())){
+            return true;
+        }
+
+        // Avoid fire multiple times in Timebased rule
         return spec.getStatus() != RuleEnums.ExecutionStatus.ACTIVE;
+    }
+
+    public static boolean isTimedRule(RuleSpec spec){
+        ConditionSpec condition = spec.getCondition();
+        return condition instanceof ActiveTimeConditionSpec;
     }
 
     public abstract boolean check();

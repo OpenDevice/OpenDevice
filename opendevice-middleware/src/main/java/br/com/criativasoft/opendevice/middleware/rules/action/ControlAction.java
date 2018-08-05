@@ -40,6 +40,14 @@ public class ControlAction extends AbstractAction<ControlActionSpec> {
 
         if(device == null) throw new ActionException("Resource nor found !");
 
-        device.setValue(spec.getValue());
+//         Ignore ONE time RuleManager.onChange Listener
+        // device.setIgnoreListener(RuleManager.class);
+
+        if(device.getType() == Device.DIGITAL && spec.getValue() == -1){
+            device.toggle();
+        }else{
+            device.setValue(spec.getValue());
+        }
+
     }
 }

@@ -33,7 +33,7 @@ public class RuleManagerJob extends Job {
 
         RuleManager instance = getJobContext().get("instance");
 
-        instance.eval(true, null);
+        instance.eval(null, null);
 
         ODev.getDeviceManager().transactionEnd();
 

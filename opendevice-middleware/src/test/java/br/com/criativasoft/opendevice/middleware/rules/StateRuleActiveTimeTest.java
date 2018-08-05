@@ -59,7 +59,7 @@ public class StateRuleActiveTimeTest {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                ruleManager.eval(true, null);
+                ruleManager.eval(null, null);
             }
         };
 

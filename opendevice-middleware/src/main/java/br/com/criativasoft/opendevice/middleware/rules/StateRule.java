@@ -41,6 +41,8 @@ public class StateRule extends AbstractRule<StateRuleSpec> implements IResourceR
     @Override
     public boolean allowExection() {
         long value = getSpec().getValue();
+
+        // Avoid fire multiple times in Timebased rule
         return /*always condition==*/ value == -1  || super.allowExection();
     }
 

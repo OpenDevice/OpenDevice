@@ -22,11 +22,9 @@ import br.com.criativasoft.opendevice.core.listener.DeviceListener;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.middleware.jobs.AbstractAction;
 import br.com.criativasoft.opendevice.middleware.jobs.ActionException;
-import br.com.criativasoft.opendevice.middleware.model.rules.ActiveTimeConditionSpec;
 import br.com.criativasoft.opendevice.middleware.model.rules.ConditionSpec;
 import br.com.criativasoft.opendevice.middleware.model.rules.RuleEnums.ExecutionStatus;
 import br.com.criativasoft.opendevice.middleware.model.rules.RuleSpec;
-import br.com.criativasoft.opendevice.middleware.persistence.HibernateProvider;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.RuleSpecDao;
 import br.com.criativasoft.opendevice.restapi.model.Account;
 import org.slf4j.Logger;
@@ -116,7 +114,8 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
             fireRulesUpdate();
 
             if(spec.isEnabled() && spec.getCondition() != null){
-                eval(false, spec.getAccount().getUuid()); // TODO: A direct call can affect performance in certain situations
+                                // TODO: getDevice frim
+                eval(spec.getAccount().getUuid(), null); // TODO: A direct call can affect performance in certain situations
             }
         }
 
@@ -129,7 +128,9 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
      * Execution is controlled through the class {@link ActionTask}
      * @see #executeActionsFor(List)
      */
-    protected void eval(boolean timeBased, String tenantID){
+    protected void eval(String tenantID, Device triggerDevice){
+
+        boolean timeBased = (triggerDevice == null);
 
         List<AbstractRule> toExecute = new LinkedList<AbstractRule>();
 
@@ -156,18 +157,22 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
                 TenantContext context = TenantProvider.getCurerntContext();
 
                 Device device = context.getDeviceByUID((int) resourceID);
-                if(device != null) {
-                    ((IResourceRule) rule).setResource(device);
-                }else{
+                if(device == null) {
                     spec.setStatus(ExecutionStatus.FAIL);
                     spec.setExecutionMessage("Device/Resource not found !");
+                    continue;
+                }
+
+                ((IResourceRule) rule).setResource(device);
+
+                // Ignore rules with don't match with triggerDevice
+                if(triggerDevice != null && device.getId() != triggerDevice.getId()){
                     continue;
                 }
             }
 
             // Timebased (called from RuleManagerJob) only work with TimeCondition
-            ConditionSpec condition = spec.getCondition();
-            if(timeBased && !(condition instanceof ActiveTimeConditionSpec)){
+            if(timeBased && !AbstractRule.isTimedRule(spec)){
                 continue;
             }
 
@@ -180,7 +185,6 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
                 if(spec.getStatus() != ExecutionStatus.INACTIVE){
                     spec.setStatus(ExecutionStatus.INACTIVE);
                     try{
-                        System.out.println("ruleSpecDao Hibernate : " + HibernateProvider.getInstance());
                         ruleSpecDao.update(spec);
                     }catch (Exception ex){
                         log.error(ex.getMessage(), ex);
@@ -248,7 +252,7 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
 
     @Override
     public void onDeviceChanged(Device device) {
-        eval(false, device.getApplicationID());
+        eval(device.getApplicationID(), device);
     }
 
     @Override

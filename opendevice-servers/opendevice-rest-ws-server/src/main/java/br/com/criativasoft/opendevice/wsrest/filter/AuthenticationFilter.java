@@ -146,7 +146,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
                 // request.setEntityInputStream(new ByteArrayInputStream(entity.toString().getBytes()));
                 request.setEntityInputStream(new ByteArrayInputStream(entity.toString().getBytes()));
-                System.err.println("autenticando...");
                 try{
                     subject.login(bearerToken); // Use BearerTokenRealm
                     return request;

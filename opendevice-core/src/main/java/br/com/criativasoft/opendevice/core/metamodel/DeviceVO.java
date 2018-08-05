@@ -26,6 +26,7 @@ public class DeviceVO {
 	private int id; // Mapped to UID on Device.class
 	private String name;
 	private String title;
+	private String icon;
 	private int type;
 	private int category;
 	private double value;
@@ -50,6 +51,7 @@ public class DeviceVO {
 		     device.getValue(), device.getLastUpdate(), device.getDateCreated());
 
         this.title = device.getTitle();
+        this.icon = device.getIcon();
 
         if(device instanceof Sensor){
             setSensor(true);
@@ -193,5 +195,13 @@ public class DeviceVO {
 
 	public List<String> getActions() {
 		return actions;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+
+	public String getIcon() {
+		return icon;
 	}
 }

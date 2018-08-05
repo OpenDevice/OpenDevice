@@ -30,6 +30,8 @@ public class DeviceHistoryQuery {
     private PeriodType periodType;
     private AggregationType aggregation;
     private int maxResults;
+    private int pageNumber;
+    private OrderType order;
 
     @JsonFormat(pattern = "dd/MM/yy HH:mm", timezone = "America/Bahia")
     private Date periodEnd;
@@ -103,5 +105,21 @@ public class DeviceHistoryQuery {
     public int getMaxResults(int defaultValue) {
         if(maxResults <= 0) return defaultValue;
         return maxResults;
+    }
+
+    public void setPageNumber(int pageNumber) {
+        this.pageNumber = pageNumber;
+    }
+
+    public int getPageNumber() {
+        return pageNumber;
+    }
+
+    public void setOrder(OrderType order) {
+        this.order = order;
+    }
+
+    public OrderType getOrder() {
+        return order;
     }
 }

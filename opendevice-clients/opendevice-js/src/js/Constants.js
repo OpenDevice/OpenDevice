@@ -28,7 +28,7 @@ od.DeviceType = {
     BOARD:10,
     MANAGER:11,
 
-    isNumeric : function(type){
+    isAnalog : function(type){
         return type == od.DeviceType.ANALOG
         || type == od.DeviceType.FLOAT2
         || type == od.DeviceType.FLOAT4
@@ -129,7 +129,7 @@ od.CommandStatus = {
 od.Event = {
     DEVICE_LIST_UPDATE : "devicesUpdate",
     DEVICE_CHANGED : "deviceChanged",
-    CONNECTION_CHANGE : "connectionCgange",
+    CONNECTION_CHANGE : "connectionChange",
     CONNECTED : "connected",
     DISCONNECTED : "disconnected",
     LOGIN_FAILURE : "loginFail"

@@ -62,6 +62,7 @@ od.Device = function(data){
             }
         });
     };
+
     function notifyListeners(){
 
     }
@@ -123,7 +124,7 @@ od.Device = function(data){
 
     /**
      * Register a listener to monitor changes in this Device.
-     * @param {function} listener
+     * @param {function} listener - Receive params VALUE, ID
      * @param {Object} [context] - Context to execute listener
      * @returns {{context: *, listener: *}} - return registred listener (used in #removeListener)
      */

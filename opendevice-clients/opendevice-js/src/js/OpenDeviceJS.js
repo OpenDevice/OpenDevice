@@ -61,6 +61,10 @@ return {
         od.appID = appID;
     },
 
+    setApyKey : function(appID){
+        od.appID = appID;
+    },
+
     setServer : function(serverURL){
         od.serverURL = serverURL;
     },
@@ -77,7 +81,7 @@ return {
             type: "GET",
             url: od.serverURL + path,
             headers : {
-                'Authorization' : "Bearer " + od.appID
+                'Authorization' : "ApiKey " + od.appID
             },
             async: false // FIXME: isso não é recomendado...
         };

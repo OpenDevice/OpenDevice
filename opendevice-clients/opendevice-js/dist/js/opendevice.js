@@ -28,7 +28,7 @@ od.DeviceType = {
     BOARD:10,
     MANAGER:11,
 
-    isNumeric : function(type){
+    isAnalog : function(type){
         return type == od.DeviceType.ANALOG
         || type == od.DeviceType.FLOAT2
         || type == od.DeviceType.FLOAT4
@@ -129,7 +129,7 @@ od.CommandStatus = {
 od.Event = {
     DEVICE_LIST_UPDATE : "devicesUpdate",
     DEVICE_CHANGED : "deviceChanged",
-    CONNECTION_CHANGE : "connectionCgange",
+    CONNECTION_CHANGE : "connectionChange",
     CONNECTED : "connected",
     DISCONNECTED : "disconnected",
     LOGIN_FAILURE : "loginFail"
@@ -197,6 +197,7 @@ od.Device = function(data){
             }
         });
     };
+
     function notifyListeners(){
 
     }
@@ -258,7 +259,7 @@ od.Device = function(data){
 
     /**
      * Register a listener to monitor changes in this Device.
-     * @param {function} listener
+     * @param {function} listener - Receive params VALUE, ID
      * @param {Object} [context] - Context to execute listener
      * @returns {{context: *, listener: *}} - return registred listener (used in #removeListener)
      */
@@ -1152,6 +1153,10 @@ return {
         od.appID = appID;
     },
 
+    setApyKey : function(appID){
+        od.appID = appID;
+    },
+
     setServer : function(serverURL){
         od.serverURL = serverURL;
     },
@@ -1168,7 +1173,7 @@ return {
             type: "GET",
             url: od.serverURL + path,
             headers : {
-                'Authorization' : "Bearer " + od.appID
+                'Authorization' : "ApiKey " + od.appID
             },
             async: false // FIXME: isso não é recomendado...
         };

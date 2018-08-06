@@ -44,8 +44,8 @@ public class AppResourceConfigurator implements ResourceConfigurator {
 
         if(odev.isDatabaseEnabled()){
             TransactionFilter transactionFilter = new TransactionFilter(LocalEntityManagerFactory.getInstance());
-            config.getContainerRequestFilters().add(1, transactionFilter);
-            config.getContainerResponseFilters().add(1, transactionFilter);
+            config.getContainerRequestFilters().add(0, transactionFilter);
+            config.getContainerResponseFilters().add(0, transactionFilter);
         }
 
         Set<Class<?>> classes = config.getClasses();

@@ -147,7 +147,6 @@ public class DashboardRest {
 
     @PUT @Path("/{id}/updateLayout")
     public Response updateLayout(@PathParam("id") long id, DashboardItem item) throws IOException {
-        System.err.println("DashboardRest.updateLayout: dash:" + id + "->" + item.getLayout());
 
         DashboardItem updated = em.find(DashboardItem.class, item.getId());
 
@@ -216,7 +215,7 @@ public class DashboardRest {
         List<File> iconsPath = new LinkedList<>();
 
         // Check home
-        File currentPath = new File(homeDirectory, "images/devices/on");
+        File currentPath = new File(homeDirectory, "webapp/images/devices/on");
         if(currentPath.exists()){
             iconsPath.add(currentPath);
         }

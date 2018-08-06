@@ -161,9 +161,6 @@ public abstract class DeviceJPA extends GenericJpa<Device> implements DeviceDao{
 
             query.setMaxResults(maxForAnalisys);
 
-            System.out.println("maxForAnalisys :" + maxForAnalisys);
-            System.out.println("maxForAnalisys :" + params.getPeriodType());
-
             // Paginated query
             if(params.getPageNumber() > 0){
                 query.setFirstResult((params.getPageNumber()-1) * maxForAnalisys);

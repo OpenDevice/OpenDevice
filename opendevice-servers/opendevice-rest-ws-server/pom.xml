@@ -15,7 +15,7 @@
     <properties>
         <jersey-version>1.19.4</jersey-version> <!-- 1.19.4 -->
         <jaxb-version>2.1</jaxb-version>
-        <nettosphere-version>3.0.8-SNAPSHOT</nettosphere-version>
+        <nettosphere-version>3.0.8</nettosphere-version>
         <!--<nettosphere-version>2.4.11-SNAPSHOT</nettosphere-version>-->
         <atmosphere-version>2.4.27</atmosphere-version>
         <atmosphere-extensions>2.4.19</atmosphere-extensions>

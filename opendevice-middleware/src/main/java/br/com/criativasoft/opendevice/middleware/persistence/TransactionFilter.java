@@ -57,7 +57,7 @@ public class TransactionFilter implements ContainerRequestFilter, ContainerRespo
         }
 
         Subject subject = SecurityUtils.getSubject();
-        log.debug("filter: (" + request.getMethod() + ") " + request.getPath() + ", Auth("+subject.isAuthenticated()+")");
+        log.debug("(" + request.getMethod() + ") " + request.getPath() + ", Auth("+subject.isAuthenticated()+")");
 
         EntityManager em = emf.createEntityManager();
 

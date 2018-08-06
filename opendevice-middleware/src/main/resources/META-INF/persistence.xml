@@ -48,6 +48,12 @@
             <property name="hibernate.jdbc.batch_size" value="100"/>
             <property name="hibernate.order_inserts" value="true"/>
             <property name="hibernate.order_updates" value="true"/>
+
+            <property name="hibernate.hikari.connectionTimeout" value="20000"/>
+            <property name="hibernate.hikari.minimumIdle" value="10"/>
+            <property name="hibernate.hikari.maximumPoolSize" value="20"/>
+            <property name="hibernate.hikari.idleTimeout" value="300000"/>
+
         </properties>
 
 

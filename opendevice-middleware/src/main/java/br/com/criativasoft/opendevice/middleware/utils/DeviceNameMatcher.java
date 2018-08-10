@@ -80,13 +80,13 @@ public class DeviceNameMatcher {
         for (Device device : devices) {
             String name = sanitize(device.getTitle());
 
-            if(input.contains(name)){
+            if(input.equals(name)){
                 return device;
             }
 
             name = sanitize(device.getName()); // TODO: Change this to international property
 
-            if(input.contains(name)){
+            if(input.equals(name)){
                 return device;
             }
         }
@@ -119,9 +119,9 @@ public class DeviceNameMatcher {
             if (index >= 0){
 
                 if(input.contains(articleA)){ // Ligar a Luz da Sala
-                    index = input.indexOf(articleA);
+                    index = input.indexOf(articleA) + 3;
                 } else if(input.contains(articleO)){ // Ligar o Ventilardor
-                    index = input.indexOf(articleO);
+                    index = input.indexOf(articleO) + 3;
                 }
 
                 input = input.substring(index);
@@ -152,7 +152,7 @@ public class DeviceNameMatcher {
     }
 
     protected String sanitize(String input){
-        return StringUtils.removeSpecialChars(input.toLowerCase());
+        return StringUtils.removeSpecialChars(input.toLowerCase(), false);
     }
 
     /**

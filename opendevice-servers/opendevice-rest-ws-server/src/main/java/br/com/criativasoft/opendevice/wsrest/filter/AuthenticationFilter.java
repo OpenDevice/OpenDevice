@@ -13,6 +13,7 @@
 
 package br.com.criativasoft.opendevice.wsrest.filter;
 
+import br.com.criativasoft.opendevice.core.util.StringUtils;
 import br.com.criativasoft.opendevice.restapi.auth.BearerAuthRealm;
 import br.com.criativasoft.opendevice.restapi.auth.BearerAuthToken;
 import br.com.criativasoft.opendevice.restapi.auth.GoogleAuthToken;
@@ -25,6 +26,8 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;
@@ -42,6 +45,8 @@ import java.io.ByteArrayInputStream;
 public class AuthenticationFilter implements ContainerRequestFilter {
 
     public static final String TOKEN_CACHE = "AuthTokenCache";
+
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationFilter.class);
 
     @Inject
     private UserDao userDao;
@@ -108,6 +113,11 @@ public class AuthenticationFilter implements ContainerRequestFilter {
                     apiKey = authorizationHeader.substring("ApiKey".length()).trim(); // API_KEY
                 }
 
+                if(StringUtils.isEmpty(apiKey)){
+                    log.warn("ApiKey not found in Request");
+                    throw new AuthenticationException("ApiKey Required");
+                }
+
                 BearerAuthToken bearerToken = new BearerAuthToken(apiKey, true);
 
                 try{
@@ -140,6 +150,11 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
                 JsonNode entity = request.getEntity(JsonNode.class);
                 JsonNode userNode = entity.get("originalDetectIntentRequest").get("payload").get("user");
+
+                if(userNode == null){
+                    log.warn("User not found in Request");
+                    throw new AuthenticationException("Invalid User / Token");
+                }
                 String token = userNode.get("accessToken").asText();
 
                 BearerAuthToken bearerToken = new BearerAuthToken(token);

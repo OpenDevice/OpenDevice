@@ -12,6 +12,7 @@
     <logger name="io.moquette.server.netty" level="INFO"/>
     <logger name="org.quartz" level="INFO"/>
     <logger name="org.hibernate" level="INFO"/>
+    <logger name="com.zaxxer.hikari" level="INFO"/>
 
     <root level="debug">
         <appender-ref ref="STDOUT" />

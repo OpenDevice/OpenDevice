@@ -21,6 +21,7 @@
     <logger name="org.atmosphere.cpr.AtmosphereFramework" level="WARN"/>
     <logger name="org.atmosphere.interceptor.OnDisconnectInterceptor" level="WARN"/>
     <logger name="org.hibernate" level="INFO"/>
+    <logger name="com.zaxxer.hikari" level="INFO"/>
 
     <root level="info">
         <appender-ref ref="FILE" />

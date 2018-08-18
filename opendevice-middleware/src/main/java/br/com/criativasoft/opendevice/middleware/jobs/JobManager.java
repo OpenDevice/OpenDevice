@@ -19,6 +19,7 @@ import br.com.criativasoft.opendevice.middleware.model.jobs.JobSpec;
 import br.com.criativasoft.opendevice.middleware.persistence.dao.JobSpecDao;
 import br.com.criativasoft.opendevice.middleware.rules.RuleManager;
 import br.com.criativasoft.opendevice.middleware.rules.RuleManagerJob;
+import br.com.criativasoft.opendevice.middleware.rules.TenantContextCleanupJob;
 import br.com.criativasoft.opendevice.middleware.rules.action.ActionFactory;
 import org.knowm.sundial.SundialJobScheduler;
 import org.quartz.core.JobExecutionContext;
@@ -122,6 +123,11 @@ public class JobManager implements JobSpecDao{
         String name = "RuleManager";
         SundialJobScheduler.addJob(name, RuleManagerJob.class, params, false);
         SundialJobScheduler.addSimpleTrigger("Trigger-"+name, name, -1, 1000);
+
+        // HACK: Clear inactive contexts
+        name = "TenantContextCleanup";
+        SundialJobScheduler.addJob(name, TenantContextCleanupJob.class);
+        SundialJobScheduler.addSimpleTrigger("Trigger-"+name, name, -1, (1000 * 60) * 60);
 
         // HACK:Rule Manager, does not always run in the range of 1 second when the previous execution takes more time,
         // forcing the Quartz to sleep for 30sec. This Job makes him active.

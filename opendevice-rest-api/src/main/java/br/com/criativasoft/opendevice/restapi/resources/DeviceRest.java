@@ -19,10 +19,7 @@ import br.com.criativasoft.opendevice.core.DeviceManager;
 import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.command.*;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
-import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
-import br.com.criativasoft.opendevice.core.metamodel.DeviceVO;
-import br.com.criativasoft.opendevice.core.metamodel.EnumVO;
-import br.com.criativasoft.opendevice.core.metamodel.PeriodType;
+import br.com.criativasoft.opendevice.core.metamodel.*;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceHistory;
 import br.com.criativasoft.opendevice.core.model.DeviceType;
@@ -36,7 +33,12 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -144,7 +146,7 @@ public class DeviceRest {
 
     @POST
     @Path("/{uid}/history")
-    public List<DeviceHistory> getHistory(@PathParam("uid") int uid, DeviceHistoryQuery query ) {
+    public List<DeviceHistory> history(@PathParam("uid") int uid, DeviceHistoryQuery query ) {
         Device device = manager.findDeviceByUID(uid); // find user device
 
         if (device != null) {
@@ -177,47 +179,70 @@ public class DeviceRest {
             dao.deleteHistory(device);
             device.setValue(0);
 
-            return Response.status(Response.Status.OK).build();
+            return Response.status(Response.Status.OK).entity("{}").build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
 
 
-    @GET
-    @Path("/{uid}/download")
+    @POST
+    @Path("/{uid}/export")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response download(@PathParam("uid") int uid, @QueryParam("start") long timestampStart, @QueryParam("end") long timestampEnd) throws IOException {
+    public Response export(@PathParam("uid") int uid,
+                           @FormParam("periodType") PeriodType periodType,
+                           @FormParam("periodValue") int periodValue,
+                           @FormParam("periodEnd") Date periodEnd,
+                           @FormParam("timestamp") String timestamp
+                           ) throws IOException {
+
+
+        DeviceHistoryQuery query = new DeviceHistoryQuery();
+        query.setOrder(OrderType.DESC);
+        query.setAggregation(AggregationType.NONE);
+        query.setPeriodType(periodType);
+        query.setPeriodValue(periodValue);
+        query.setPeriodEnd(periodEnd);
+        query.setMaxResults(100000);
 
         Device device = manager.findDeviceByUID(uid); // find user device
 
-        Date dateStart = new Date(timestampStart);
-        Date dateEnd = new Date(timestampEnd);
+        if (device != null) {
 
-        log.debug("Start:"+dateStart+", end:" +dateEnd);
+            query.setDeviceID(device.getId());
+            query.setDeviceUID(uid);
 
-        long periodSec = (dateEnd.getTime() - dateStart.getTime()) / 1000;
+            List<DeviceHistory> list = manager.getDeviceHistory(query);
 
-        DeviceHistoryQuery query = new DeviceHistoryQuery(device.getId(), PeriodType.SECOND, (int)periodSec);
-        query.setPeriodEnd(dateEnd);
+            File csv = File.createTempFile(TenantProvider.getCurrentID(), device.getName());
 
-        List<DeviceHistory> historyList = manager.getDeviceHistory(query);
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
-        File csv = File.createTempFile(TenantProvider.getCurrentID(), device.getName());
+            Calendar calendar = Calendar.getInstance();
 
-        PrintStream out = new PrintStream(new FileOutputStream(csv));
-        out.println("timestamp, value");
-        for (DeviceHistory history : historyList) {
-            out.println(history.getTimestamp() + "," + history.getValue());
+            PrintStream out = new PrintStream(new FileOutputStream(csv));
+            out.println("timestamp, value");
+            for (DeviceHistory history : list) {
+                if(timestamp != null && timestamp.equals("on")){
+                    out.println(history.getTimestamp() + "," + history.getValue());
+                }else{
+                    calendar.setTimeInMillis(history.getTimestamp());
+                    out.println(dateFormat.format(calendar.getTime()) + "," + history.getValue());
+                }
+            }
+
+            out.close();
+
+            Response response = Response.status(200).entity(csv).
+                    header("content-disposition", "attachment; filename = "+device.getName()+"-history.csv").build();
+
+            return response;
+
+        } else {
+            return ErrorResponse.NOT_FOUND("Device not found");
         }
 
-        out.close();
 
-        Response response = Response.status(200).
-                entity(csv).
-                header("content-disposition", "attachment; filename = "+device.getName()+"-history.csv").build();
-
-        return response;
     }
 
     @GET

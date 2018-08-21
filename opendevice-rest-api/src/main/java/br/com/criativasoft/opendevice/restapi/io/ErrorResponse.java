@@ -81,4 +81,9 @@ public class ErrorResponse {
         int status = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
         return Response.status(status).entity(new ErrorMessage(status, message)).type(MediaType.APPLICATION_JSON_TYPE).build();
     }
+
+    public static Response NOT_FOUND(String message){
+        int status = Response.Status.NOT_FOUND.getStatusCode();
+        return Response.status(status).entity(new ErrorMessage(status, message)).type(MediaType.APPLICATION_JSON_TYPE).build();
+    }
 }

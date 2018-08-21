@@ -39,7 +39,9 @@ pkg.controller('DeviceViewController', function ($scope, $routeParams, $timeout,
     // Public
     // ==========================
     this.device;
-    this.board;
+    this.board; // used in URL
+    this.exportUrl;
+
     this.pageNumber = 1;
     this.historyOptions = {
         periodType : 'RECORDS',
@@ -66,6 +68,7 @@ pkg.controller('DeviceViewController', function ($scope, $routeParams, $timeout,
 
         this.device = ODev.get($routeParams.deviceID);
         this.board = ODev.get(this.device.parentID);
+        this.exportUrl = "/api/devices/"+this.device.id+"/export";
 
         _public.editDevice(this.device);
 
@@ -142,22 +145,11 @@ pkg.controller('DeviceViewController', function ($scope, $routeParams, $timeout,
 
     };
 
-    _public.delete = function(item, index){
+    _public.deleteHistory = function(){
 
-        ODev.removeDevice(_this.devices[index]).then(function( data, textStatus, jqXHR ) {
+        ODev.deleteHitory(_this.device).then(function( data, textStatus, jqXHR ) {
             $.notify({message: "Removed"}, {type:"warning"});
-        }).fail(function(req){
-            if(req.responseJSON && req.responseJSON.message){
-                $.notify({message: req.responseJSON.message});
-            }
-        });
-
-    };
-
-    _public.deleteHistory = function(item, index){
-
-        ODev.deleteHitory(_this.devices[index]).then(function( data, textStatus, jqXHR ) {
-            $.notify({message: "Removed"}, {type:"warning"});
+            _this.history = [];
         }).fail(function(req){
             if(req.responseJSON && req.responseJSON.message){
                 $.notify({message: req.responseJSON.message});

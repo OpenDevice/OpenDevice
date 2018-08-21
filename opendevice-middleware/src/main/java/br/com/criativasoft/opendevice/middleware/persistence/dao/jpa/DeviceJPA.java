@@ -27,7 +27,10 @@ import br.com.criativasoft.opendevice.middleware.persistence.HibernateProvider;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Ricardo JL Rufino
@@ -154,7 +157,7 @@ public abstract class DeviceJPA extends GenericJpa<Device> implements DeviceDao{
                 query.setParameter("start", calendar.getTime().getTime());
                 query.setParameter("end" , end.getTime());
 
-//                System.err.println("query: "+new Date(calendar.getTimeInMillis())+" - "+end);
+//                System.err.println("query: "+calendar.getTime()+" - "+ end);
             }
 
             int maxForAnalisys = params.getMaxResults(10000); //get default
@@ -167,6 +170,9 @@ public abstract class DeviceJPA extends GenericJpa<Device> implements DeviceDao{
             }
 
             List<DeviceHistory> list = query.getResultList();
+
+//            System.out.println("query: " + ((QueryImpl)query).getQueryString());
+//            System.out.println("result: " + list.size());
 
             // Data must be sorted to show in chart's
             // NOTE: Show last data frist !!

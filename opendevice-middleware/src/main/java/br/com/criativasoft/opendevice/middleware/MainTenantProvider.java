@@ -13,21 +13,20 @@
 
 package br.com.criativasoft.opendevice.middleware;
 
-import br.com.criativasoft.opendevice.core.DataManager;
-import br.com.criativasoft.opendevice.core.TenantContext;
-import br.com.criativasoft.opendevice.core.TenantProvider;
-import br.com.criativasoft.opendevice.core.ThreadLocalTenantProvider;
-import br.com.criativasoft.opendevice.core.dao.DeviceDao;
+import br.com.criativasoft.opendevice.core.*;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.middleware.model.IAccountEntity;
-import org.mapdb.*;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.cache.RemovalListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,15 +38,61 @@ import java.util.concurrent.TimeUnit;
  */
 public class MainTenantProvider extends ThreadLocalTenantProvider {
 
+    private static final Logger log = LoggerFactory.getLogger(MainTenantContext.class);
+
     private DataManager dataManager;
+
+    private LoadingCache<String, TenantContext> cache;   // Used to track active tenants
 
     public MainTenantProvider(DataManager dataManager) {
         this.dataManager = dataManager;
+
+        CacheLoader<String, TenantContext> loader = new CacheLoader<String, TenantContext>() {
+            @Override
+            public TenantContext load(String key) {
+                log.info("Re-loading Tenant: " + key);
+                MainTenantContext tenantContext = (MainTenantContext) getTenantContext(key);
+                tenantContext.syncronizeData();
+                return tenantContext;
+            }
+        };
+
+        // Unload cached data
+        RemovalListener<String, TenantContext> listener = n -> {
+            if (n.wasEvicted()) {
+                TenantContext tenant = n.getValue();
+                log.info("Expiring Tenant: " + n.getKey());
+                tenant.cleanUp();
+            }
+        };
+
+
+        // Used to track active tenants
+        // https://github.com/google/guava/wiki/CachesExplained
+        cache = CacheBuilder.newBuilder()
+                .expireAfterAccess(1, TimeUnit.MINUTES)
+                .weakValues()
+                .removalListener(listener)
+                .build(loader);
     }
 
     @Override
     protected TenantContext createContext(String id) {
-        return new MainTenantContext(id);
+        MainTenantContext tenantContext = new MainTenantContext(id);
+        cache.put(id, tenantContext);
+        return tenantContext;
+    }
+
+    @Override
+    public TenantContext getTenantContext() {
+
+        TenantContext tenantContext = super.getTenantContext();
+
+        if(tenantContext != null){
+            cache.getUnchecked(tenantContext.getId()); // Force KeepAlive cache...
+        }
+
+        return tenantContext;
     }
 
     @Override
@@ -56,58 +101,30 @@ public class MainTenantProvider extends ThreadLocalTenantProvider {
         super.setTenantID(appID);
     }
 
-    private class MainTenantContext implements TenantContext{
+    @Override
+    public void cleanUp() {
+        cache.cleanUp();
+    }
 
-        private final Logger log = LoggerFactory.getLogger(MainTenantContext.class);
+    private class MainTenantContext implements TenantContext{
 
         private String id;
 
-        HTreeMap<Integer, Device> map;
+        private DeviceManager manager;
 
-        private Set<Integer> expired = new HashSet();
+        private Map<Integer, Device> cache = new ConcurrentHashMap<>();
 
-        private boolean initialized = false;
+        private boolean loaded = false;
 
         public MainTenantContext(String id) {
             this.id = id;
+            this.manager = ODev.getDeviceManager();
+        }
 
-            DB dbMemory = DBMaker
-                    .newMemoryDB()
-                    .make();
-
-            map = dbMemory.createHashMap("devices-" + id)
-                    .counterEnable()
-                    .expireAfterAccess(5, TimeUnit.HOURS)
-                    .valueSerializer(Serializer.JAVA)
-                    .keySerializer(Serializer.INTEGER)
-
-                    .valueCreator(new Fun.Function1<Device, Integer>() {
-                        @Override
-                        public Device run(Integer integer) {
-                            if(expired.contains(integer)){
-                                DeviceDao deviceDao = dataManager.getDeviceDao();
-                                expired.remove(integer);
-                                return deviceDao.getByUID(integer);
-                            }else{
-                                // FIXME: Bug in MapDB 1.x, always calling this function (even if value has in map)
-                                // SEE: https://github.com/andsel/moquette/issues/140#issuecomment-253308776
-                                // This must be return NULL (in fact it will not be called)
-                                DeviceDao deviceDao = dataManager.getDeviceDao();
-                                return deviceDao.getByUID(integer);
-                            }
-                        }
-                    }).make();
-
-            map.modificationListenerAdd(new Bind.MapListener<Integer, Device>() {
-                @Override
-                public void update(Integer key, Device oldVal, Device newVal) {
-                    if(newVal == null){
-                        expired.add(key);
-                        log.debug("Expiring Device with ID: " + key);
-                    }
-                }
-            });
-
+        @Override
+        public void cleanUp() {
+            cache.clear();
+            loaded = false;
         }
 
         @Override
@@ -117,28 +134,26 @@ public class MainTenantProvider extends ThreadLocalTenantProvider {
 
         @Override
         public void addDevice(Device device) {
-            if(!initialized) syncronizeData(); // force load
-            device.setManaged(true);
-            map.put(device.getUid(), device);
+            if(!loaded) syncronizeData(); // force load/reload
+            cache.put(device.getUid(), device);
         }
 
         @Override
         public void updateDevice(Device device) {
-            device.setManaged(true);
-            map.put(device.getUid(), device);
+            cache.put(device.getUid(), device);
         }
 
         @Override
         public void removeDevice(Device device) {
-            if(initialized) map.remove(device.getUid());
+            if(loaded) cache.remove(device.getUid());
         }
 
         @Override
         public Device getDeviceByUID(int uid) {
-            if(!initialized) syncronizeData(); // force load
+            if(!loaded) syncronizeData(); // force load
 
             try {
-                return map.get(uid);
+                return cache.get(uid);
             }catch (Exception ex){
                 return null;
             }
@@ -146,7 +161,7 @@ public class MainTenantProvider extends ThreadLocalTenantProvider {
         }
         @Override
         public Device getDeviceByName(String name) {
-            if(!initialized) syncronizeData(); // force load
+            if(!loaded) syncronizeData(); // force load
 
             try {
 
@@ -166,11 +181,11 @@ public class MainTenantProvider extends ThreadLocalTenantProvider {
         @Override
         public Collection<Device> getDevices() {
 
-            if(!initialized || expired.size() > 0){
+            if(!loaded){
                 syncronizeData();
             }
 
-            return map.values();
+            return cache.values();
 
         }
 
@@ -178,12 +193,11 @@ public class MainTenantProvider extends ThreadLocalTenantProvider {
             // Load from database
             List<Device> devices = dataManager.getDeviceDao().listAll();
             for (Device device : devices) {
-                device.setManaged(true);
-                map.put(device.getUid(), device);
+                manager.bindDevice(device);
+                cache.put(device.getUid(), device);
             }
 
-            expired.clear();
-            initialized = true;
+            loaded = true;
         }
     }
 

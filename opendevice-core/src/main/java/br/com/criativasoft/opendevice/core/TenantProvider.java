@@ -79,6 +79,16 @@ public abstract class TenantProvider {
         }
     }
 
+    public TenantContext getTenantContext(String ID) {
+        synchronized (tenants) {
+            return tenants.get(ID);
+        }
+    }
+
+    public void cleanUp() {
+        // Nothing in default implementtion
+    }
+
     public static TenantProvider getTenantProvider() {
         return provider;
     }

@@ -41,4 +41,6 @@ public interface TenantContext {
     Device getDeviceByName(String name);
 
     void updateDevice(Device device);
+
+    void cleanUp();
 }

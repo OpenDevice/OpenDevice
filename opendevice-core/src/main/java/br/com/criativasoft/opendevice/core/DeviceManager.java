@@ -47,6 +47,13 @@ public interface DeviceManager extends ConnectionManager{
 
     public void addDevice(Device device);
 
+    /**
+     * Resgister the device to this Manager context.
+     * NOTE: Called from {@link #addDevice(Device)}. This will add default listeners.
+     * @param device
+     */
+    public void bindDevice(Device device);
+
     public void removeDevice(Device device);
 
     public void addDevices(Collection<Device> devices);

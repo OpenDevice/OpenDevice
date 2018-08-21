@@ -277,6 +277,13 @@ public abstract class BaseDeviceManager implements DeviceManager {
         if(found == null) {
             getValidDeviceDao().persist(device);
             getCurrentContext().addDevice(device); // add to cache.
+            bindDevice(device);
+        }
+    }
+
+    public void bindDevice(Device device) {
+        if(device == null) throw new IllegalArgumentException("Device is null");
+        if(!device.isManaged()){
             device.setManaged(true);
             for(DeviceListener listener: listeners){
                 listener.onDeviceRegistred(device);

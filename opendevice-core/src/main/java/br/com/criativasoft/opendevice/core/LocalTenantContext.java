@@ -48,6 +48,11 @@ public class LocalTenantContext implements TenantContext {
     }
 
     @Override
+    public void cleanUp() {
+
+    }
+
+    @Override
     public void removeDevice(Device device) {
         device.setManaged(false);
         devices.remove(device.getName());

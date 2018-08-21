@@ -127,7 +127,7 @@ public class JobManager implements JobSpecDao{
         // HACK: Clear inactive contexts
         name = "TenantContextCleanup";
         SundialJobScheduler.addJob(name, TenantContextCleanupJob.class);
-        SundialJobScheduler.addSimpleTrigger("Trigger-"+name, name, -1, (1000 * 60) * 60);
+        SundialJobScheduler.addSimpleTrigger("Trigger-"+name, name, -1, 1000);
 
         // HACK:Rule Manager, does not always run in the range of 1 second when the previous execution takes more time,
         // forcing the Quartz to sleep for 30sec. This Job makes him active.

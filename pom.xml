@@ -97,6 +97,14 @@
                 </configuration>
             </plugin>
 
+            <!-- Check updates : mvn versions:display-dependency-updates -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.5</version>
+            </plugin>
+
+
         </plugins>
 
         <pluginManagement>
@@ -163,7 +171,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.6.1</version>
+            <version>1.7.25</version>
         </dependency>
     </dependencies>
 </project>

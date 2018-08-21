@@ -1,0 +1,1 @@
+CREATE INDEX IDXDeviceID ON DeviceHistory(deviceID);

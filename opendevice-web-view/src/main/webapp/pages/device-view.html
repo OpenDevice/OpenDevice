@@ -86,6 +86,9 @@
                     <div class="box-tools pull-right">
 
                         <ul class="list-inline">
+                            <li><a class="btn btn-danger btn-xs" ng-really-click="ctrl.deleteHistory()">Clear History</a></li>
+                            <li><a class="btn btn-info btn-xs"  data-toggle="modal" data-target="#popup-export">Export</a></li>
+                            <li role="separator" class="divider"></li>
                             <li>Period:</li>
                             <li> <input type="number" class="form-control input-xs" size="2"  style="width: 60px" ng-model="ctrl.historyOptions.periodValue"/> </li>
                             <li>
@@ -112,22 +115,74 @@
                     </div>
                 </div>
                 <!-- /.box-header -->
-                <div class="box-body">
+                <div class="box-body table-responsive no-padding">
                     <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th width="200px">Date</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
                         <tbody>
-                        <tr>
-                            <th>Value</th>
-                            <th>Date</th>
-                        </tr>
-                        <tr ng-repeat="x in ctrl.history">
-                            <td>${x.value}</td>
-                            <td>${x.timestamp | date:'hh:mm:ss dd/MM/yy'}</td>
-                        </tr>
+                            <tr ng-repeat="x in ctrl.history">
+                                <td>${x.timestamp | date:'hh:mm:ss dd/MM/yy'}</td>
+                                <td>${x.value}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
-
 </section>
+
+
+<!----------------------------------------------------------------->
+<!-- New Board                                                   -->
+<!----------------------------------------------------------------->
+<div id="popup-export"  class="modal fade" tabindex="-1" role="dialog" >
+    <div class="modal-dialog" role="document">
+        <form class="form-horizontal" action="${::ctrl.exportUrl}" method="post">
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" >Export</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Period</label>
+                        <div class="col-sm-10 form-inline">
+                            <input type="number" style="width:60px" class="form-control" name="periodValue" value="1" />
+                            <select name="periodType" class="form-control" style="width: 120px" >
+                                <option value="MINUTE">Minute(s)</option>
+                                <option value="HOUR">Hour(s)</option>
+                                <option value="DAY">Day(s)</option>
+                                <option value="WEEK">Week(s)</option>
+                                <option value="MONTH" selected="selected">Month(s)</option>
+                                <option value="RECORDS">Last Records</option>
+                            </select>
+                            <label>End at</label>
+                            <input type="text" name="periodEnd" style="width:120px" class="form-control"  placeholder="Now ..." />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Timestamps</label>
+                        <div class="col-sm-10">
+                            <div class="checkbox">
+                                <input type="checkbox" id="timestamp-field" name="timestamp" />
+                                <label for="timestamp-field">
+                                    Enable
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Download</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

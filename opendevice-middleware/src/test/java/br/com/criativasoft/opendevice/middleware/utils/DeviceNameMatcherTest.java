@@ -36,6 +36,8 @@ public class DeviceNameMatcherTest {
     private static final List<Device> devices = new ArrayList<>();
 
     static{
+        names.add("Light");
+        names.add("Split");
         names.add("Split da Sala");
         names.add("Split do Quarto");
         names.add("Ar-Condicionado do Escritório");
@@ -91,6 +93,21 @@ public class DeviceNameMatcherTest {
 
 
     @Test
+    public void testProxNames() throws InterruptedException {
+
+        DeviceNameMatcher matcher = new DeviceNameMatcher(devices, false);
+
+        Device device = matcher.process("ligar o split");
+
+        assertEquals("Split", device.getTitle());
+
+        device = matcher.process("ligar a light");
+
+        assertEquals("Light", device.getTitle());
+    }
+
+
+    @Test
     public void testUsingVerbsON2() throws InterruptedException {
 
         DeviceNameMatcher matcher = new DeviceNameMatcher(devices, false);
@@ -111,7 +128,7 @@ public class DeviceNameMatcherTest {
 
         // test 2 - no hifen
 
-        device = matcher.process("ligar ar condicionado do escritorio");
+        device = matcher.process("ligar arcondicionado do escritorio");
 
         assertNotNull(device);
 
@@ -166,7 +183,6 @@ public class DeviceNameMatcherTest {
         Device device = matcher.process("da sala");
 
         assertEquals(null, device);
-
 
         device = matcher.process("ar-condicionado");
 

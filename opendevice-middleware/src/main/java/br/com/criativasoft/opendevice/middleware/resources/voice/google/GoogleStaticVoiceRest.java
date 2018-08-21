@@ -15,6 +15,7 @@ package br.com.criativasoft.opendevice.middleware.resources.voice.google;
 
 import br.com.criativasoft.opendevice.core.ODev;
 import br.com.criativasoft.opendevice.core.model.Device;
+import br.com.criativasoft.opendevice.core.model.Sensor;
 import br.com.criativasoft.opendevice.middleware.utils.DeviceNameMatcher;
 import br.com.criativasoft.opendevice.middleware.utils.Messages;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -124,24 +125,36 @@ public class GoogleStaticVoiceRest {
             log.debug("Device found : " + device);
 
             if(device != null){
-                // Check action
-                if(ACTION_ON.equals(action)){
-                    if(device.isON()){
-                        responseMessage = Messages.translate(Messages.DEVICE_CURRENT_ON, lang);
+
+                // Control Actions
+                if(ACTION_ON.equals(action) || ACTION_OFF.equals(action)){
+
+                    if(device.getType() == Device.DIGITAL && !(device instanceof Sensor)){
+
+                        // Check action
+                        if(ACTION_ON.equals(action)){
+                            if(device.isON()){
+                                responseMessage = Messages.translate(Messages.DEVICE_CURRENT_ON, lang);
+                            }else{
+                            }
+
+                            device.on();
+                        }
+
+                        // Check action
+                        if(ACTION_OFF.equals(action)){
+                            if(device.isOFF()){
+                                responseMessage = Messages.translate(Messages.DEVICE_CURRENT_OFF, lang);
+                            }else{
+                            }
+
+                            device.off();
+                        }
+
                     }else{
+                        log.warn("Define can not be controlled !");
+                        responseMessage = Messages.translate(Messages.DEVICE_NOT_FOUND, lang);
                     }
-
-                    device.on();
-                }
-
-                // Check action
-                if(ACTION_OFF.equals(action)){
-                    if(device.isOFF()){
-                        responseMessage = Messages.translate(Messages.DEVICE_CURRENT_OFF, lang);
-                    }else{
-                    }
-
-                    device.off();
                 }
 
             }else{

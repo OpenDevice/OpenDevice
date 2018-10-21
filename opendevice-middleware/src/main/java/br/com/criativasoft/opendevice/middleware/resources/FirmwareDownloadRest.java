@@ -29,10 +29,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.nio.file.Files;
 
 /**
@@ -56,7 +56,7 @@ public class FirmwareDownloadRest {
     @GET
     @Path("{uuid}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public ByteArrayOutputStream download(@Context AtmosphereResource request, @PathParam("uuid") String uuid) {
+    public Response download(@Context AtmosphereResource request, @PathParam("uuid") String uuid) {
 
         Firmware firmware = dao.findByUUID(uuid);
 
@@ -75,10 +75,10 @@ public class FirmwareDownloadRest {
 
         try {
             byte[] bytes = Files.readAllBytes(file.toPath());
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length);
-            baos.write(bytes, 0, bytes.length);
-            return baos;
-        } catch (IOException e) {
+             ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length);
+             baos.write(bytes, 0, bytes.length);
+            return Response.ok(baos).build();
+        } catch (Exception e) {
             e.printStackTrace();
             throw new NotFoundException();
         }

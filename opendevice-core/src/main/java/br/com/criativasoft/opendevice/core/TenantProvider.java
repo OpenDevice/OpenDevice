@@ -110,6 +110,6 @@ public abstract class TenantProvider {
     }
 
     /** Get current tenant context */
-    public static TenantContext getCurerntContext(){ return provider.getTenantContext(); };
+    public static TenantContext getCurrentContext(){ return provider.getTenantContext(); };
 
 }

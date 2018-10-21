@@ -154,7 +154,7 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
             if(rule instanceof IResourceRule && resourceID > 0){
 
                 TenantProvider.setCurrentID(spec.getAccount().getUuid());
-                TenantContext context = TenantProvider.getCurerntContext();
+                TenantContext context = TenantProvider.getCurrentContext();
 
                 Device device = context.getDeviceByUID((int) resourceID);
                 if(device == null) {
@@ -343,7 +343,7 @@ public class RuleManager implements RuleSpecDao, DeviceListener {
 
             if(resourceID > 0){
                 TenantProvider.setCurrentID(spec.getAccount().getUuid());
-                TenantContext context = TenantProvider.getCurerntContext();
+                TenantContext context = TenantProvider.getCurrentContext();
                 Device device = context.getDeviceByUID((int) resourceID);
                 action.setTargetDevice(device);
             }

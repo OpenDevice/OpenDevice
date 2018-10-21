@@ -24,10 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Create TenantContext using MapDB, with a expiration cache system. <br/>
@@ -114,6 +116,10 @@ public class MainTenantProvider extends ThreadLocalTenantProvider {
 
         private Map<Integer, Device> cache = new ConcurrentHashMap<>();
 
+        private AtomicBoolean processingNewDevices = new AtomicBoolean(false); // Devices from partial GetDevicesResponse
+
+        private List<Device> partialDevices = new LinkedList<Device>(); // Devices from partial GetDevicesResponse
+
         private boolean loaded = false;
 
         public MainTenantContext(String id) {
@@ -199,9 +205,26 @@ public class MainTenantProvider extends ThreadLocalTenantProvider {
 
             loaded = true;
         }
+
+        @Override
+        public List<Device> getDevicesInSync() {
+            return partialDevices;
+        }
+
+        @Override
+        public boolean isDevicesInSync() {
+            return processingNewDevices.get();
+        }
+
+        @Override
+        public void setDevicesInSync(boolean inSync) {
+            processingNewDevices.set(inSync);
+        }
     }
 
     public static boolean validadeEntity(IAccountEntity entity){
         return entity != null && !entity.getAccount().getUuid().equals( TenantProvider.getCurrentID());
     }
+
+
 }

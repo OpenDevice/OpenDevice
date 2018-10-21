@@ -260,7 +260,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
 
     public TenantContext getCurrentContext(){
-        return TenantProvider.getCurerntContext();
+        return TenantProvider.getCurrentContext();
     }
 
     public DeviceDao getValidDeviceDao() {
@@ -376,7 +376,9 @@ public abstract class BaseDeviceManager implements DeviceManager {
      */
     public synchronized void notifyListeners(Device device, boolean sync) {
 
-        if(!commandProcessor.isProcessingNewDevices()) { // ignore events from device syncronization/initialization  (GET_DEVICES_RESPONSE)...
+        TenantContext currentContext = TenantProvider.getCurrentContext();
+
+        if(!currentContext.isDevicesInSync()) { // ignore events from device syncronization/initialization  (GET_DEVICES_RESPONSE)...
 
             boolean alreadyExist = transactionBegin();
 

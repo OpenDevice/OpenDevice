@@ -16,6 +16,7 @@ package br.com.criativasoft.opendevice.core;
 import br.com.criativasoft.opendevice.core.model.Device;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * TenantContext acts as a kind of cache data for each client / application / tenant
@@ -43,4 +44,14 @@ public interface TenantContext {
     void updateDevice(Device device);
 
     void cleanUp();
+
+    /**
+     * Return the list used for Sync devices (from GetDevicesResponse)
+     * @return
+     */
+    List<Device> getDevicesInSync();
+
+    boolean isDevicesInSync();
+
+    void setDevicesInSync(boolean inSync);
 }

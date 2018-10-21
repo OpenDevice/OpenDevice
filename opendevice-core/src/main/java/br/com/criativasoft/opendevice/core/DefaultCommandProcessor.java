@@ -22,7 +22,6 @@ import br.com.criativasoft.opendevice.core.command.*;
 import br.com.criativasoft.opendevice.core.connection.MultipleConnection;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.model.*;
-import br.com.criativasoft.opendevice.core.model.test.GenericDevice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +30,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -44,10 +42,6 @@ public class DefaultCommandProcessor {
     private static final Logger log = LoggerFactory.getLogger(DefaultCommandProcessor.class);
 
     private BaseDeviceManager manager;
-
-    private AtomicBoolean processingNewDevices = new AtomicBoolean(false);
-
-    private List<Device> partialDevices = new LinkedList<Device>(); // Devices from partial GetDevicesResponse
 
     public DefaultCommandProcessor(BaseDeviceManager manager) {
         this.manager = manager;
@@ -137,36 +131,36 @@ public class DefaultCommandProcessor {
 
             Device device = manager.findDeviceByUID(deviceID);
 
-            if(device instanceof GenericDevice){
-                GenericDevice genericDevice = (GenericDevice) device;
-                genericDevice.setProperty(cmd.getProperty(), cmd.getValue());
-                try {
-                    if(genericDevice.getConnection() == null) log.warn("Device '" + device + "'  has no connection !");
-                    else genericDevice.getConnection().send(cmd);
-                } catch (IOException e) {
-                    e.printStackTrace(); // TODO: melhor tratamento..
-                }
-            }
+//            if(device instanceof GenericDevice){
+//                GenericDevice genericDevice = (GenericDevice) device;
+//                genericDevice.setProperty(cmd.getProperty(), cmd.getValue());
+//                try {
+//                    if(genericDevice.getConnection() == null) log.warn("Device '" + device + "'  has no connection !");
+//                    else genericDevice.getConnection().send(cmd);
+//                } catch (IOException e) {
+//                    e.printStackTrace(); // TODO: melhor tratamento..
+//                }
+//            }
 
             // FIXME ? oque precisa ser feito ainda
             // no caso da camera não precisar jogar em todos imouts
             // acho que agora vai ser a hora de fazer o mapeamento dos devices.
         } else if (type == CommandType.ACTION) {
 
-            ActionCommand cmd = (ActionCommand) command;
-
-            Device device =  manager.findDeviceByUID(cmd.getDeviceID());
-
-            if(device instanceof GenericDevice){
-                GenericDevice genericDevice = (GenericDevice) device;
-                // TODO: falta a logica interna de execucao das actions... (usar listeners normais ?)
-                //genericDevice.setProperty(cmd.getAction(), cmd.getValue());
-                try {
-                    genericDevice.getConnection().send(cmd);
-                } catch (IOException e) {
-                    e.printStackTrace(); // TODO: melhor tratamento..
-                }
-            }
+//            ActionCommand cmd = (ActionCommand) command;
+//
+//            Device device =  manager.findDeviceByUID(cmd.getDeviceID());
+//
+//            if(device instanceof GenericDevice){
+//                GenericDevice genericDevice = (GenericDevice) device;
+//                // TODO: falta a logica interna de execucao das actions... (usar listeners normais ?)
+//                //genericDevice.setProperty(cmd.getAction(), cmd.getValue());
+//                try {
+//                    genericDevice.getConnection().send(cmd);
+//                } catch (IOException e) {
+//                    e.printStackTrace(); // TODO: melhor tratamento..
+//                }
+//            }
 
 
         } else if (type == CommandType.PING_REQUEST) {
@@ -244,7 +238,11 @@ public class DefaultCommandProcessor {
 
             GetDevicesResponse response = (GetDevicesResponse) command;
 
-            processingNewDevices.set(true);
+            TenantContext context = TenantProvider.getCurrentContext();
+
+            List<Device> partialDevices = context.getDevicesInSync();
+
+            context.setDevicesInSync(true);
 
             partialDevices.addAll(response.getDevices());
 
@@ -360,7 +358,7 @@ public class DefaultCommandProcessor {
                 log.error(e.getMessage(), e);
             }
 
-            processingNewDevices.set(false);
+            context.setDevicesInSync(false);
             partialDevices.clear();
 
             // Save device properties
@@ -423,7 +421,4 @@ public class DefaultCommandProcessor {
         }
     }
 
-    public boolean isProcessingNewDevices() {
-        return processingNewDevices.get();
-    }
 }

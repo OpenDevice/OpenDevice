@@ -16,8 +16,11 @@ package br.com.criativasoft.opendevice.core;
 import br.com.criativasoft.opendevice.core.model.Device;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  *
@@ -30,6 +33,10 @@ public class LocalTenantContext implements TenantContext {
 
     // Map <Name, Device>
     protected Map<String, Device> devices;
+
+    private AtomicBoolean processingNewDevices = new AtomicBoolean(false); // Devices from partial GetDevicesResponse
+
+    private List<Device> partialDevices = new LinkedList<Device>(); // Devices from partial GetDevicesResponse
 
     public LocalTenantContext(String id) {
         this.tenantID = id;
@@ -86,5 +93,20 @@ public class LocalTenantContext implements TenantContext {
 
     public String getId() {
         return tenantID;
+    }
+
+    @Override
+    public List<Device> getDevicesInSync() {
+        return partialDevices;
+    }
+
+    @Override
+    public boolean isDevicesInSync() {
+        return processingNewDevices.get();
+    }
+
+    @Override
+    public void setDevicesInSync(boolean inSync) {
+        processingNewDevices.set(inSync);
     }
 }

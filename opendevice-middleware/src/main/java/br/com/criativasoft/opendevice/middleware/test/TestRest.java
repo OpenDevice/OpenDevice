@@ -67,7 +67,7 @@ public class TestRest {
     @Produces(MediaType.APPLICATION_JSON)
     public Response startSimulation(@PathParam("uid") int uid, @QueryParam("interval") int interval) {
         Device device = manager.findDeviceByUID(uid);
-        TenantContext context = TenantProvider.getCurerntContext();
+        TenantContext context = TenantProvider.getCurrentContext();
 
         boolean started = simulationService.start(context, device, interval);
 
@@ -93,7 +93,7 @@ public class TestRest {
     @Produces(MediaType.APPLICATION_JSON)
     public List<DeviceVO> listSimulation() {
 
-        TenantContext context = TenantProvider.getCurerntContext();
+        TenantContext context = TenantProvider.getCurrentContext();
 
         List<DeviceVO> devices = new LinkedList<DeviceVO>();
 
@@ -157,49 +157,5 @@ public class TestRest {
         return "OK";
     }
 
-
-//    TypedQuery<Device> query = em.createQuery("select x from Device x where x.applicationID = :TENANT", Device.class);
-//
-//        query.setParameter("TENANT", TenantProvider.getCurrentID());
-//
-//    List<Device> list = query.getResultList();
-//
-//        System.out.println("Devices : " + list.size());
-//
-//        for (Device device : list) {
-//
-//        if(device instanceof PhysicalDevice){
-//            System.out.println("Phy:" + ((PhysicalDevice) device).getBoard());
-//        }
-//
-//        if(device instanceof Board){
-//            System.out.println("Board : " + device.getName() + ", devices: " + ((Board) device).getDevices());
-//
-//            TypedQuery<PhysicalDevice> query2 = em.createQuery("from PhysicalDevice where board.uid = " + device.getUid(), PhysicalDevice.class);
-//
-//            List<PhysicalDevice> resultList = query2.getResultList();
-//            System.out.println(" >> " + resultList);
-//
-//
-//        }
-//    }
-
-
-        @GET
-    @Path("/updateFiemware")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updateFiemware() {
-
-        // Files path: {root}/data/files/uploads/firmwares
-        try {
-
-            ((BaseDeviceManager)manager).send(new FirmwareUpdateCommand("firmware.bin"), true, false);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return Response.ok().build();
-
-    }
 
 }

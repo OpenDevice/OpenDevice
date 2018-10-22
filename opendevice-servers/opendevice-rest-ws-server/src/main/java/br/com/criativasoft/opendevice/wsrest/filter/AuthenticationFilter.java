@@ -31,8 +31,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import java.io.ByteArrayInputStream;
+import java.util.List;
 
 /**
  * Check the authentication token via the Bearer header, and performs validation using
@@ -135,6 +137,24 @@ public class AuthenticationFilter implements ContainerRequestFilter {
                 String apiKey  = path.substring(path.lastIndexOf('/')+1, path.length());
 
                 BearerAuthToken bearerToken = new BearerAuthToken(apiKey, true);
+
+                try{
+                    subject.login(bearerToken); // Use BearerTokenRealm
+                    return request;
+                }catch (AuthenticationException e){
+                    throw new AuthenticationException("Invalid AuthToken");
+                }
+            }
+
+            // Query Param (in URL)
+
+            MultivaluedMap<String, String> queryParameters = request.getQueryParameters();
+
+            List<String> apiKeyParams = queryParameters.get("ApiKey");
+
+            if (apiKeyParams != null ){
+
+                BearerAuthToken bearerToken = new BearerAuthToken(apiKeyParams.get(0), true);
 
                 try{
                     subject.login(bearerToken); // Use BearerTokenRealm

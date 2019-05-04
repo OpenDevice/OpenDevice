@@ -166,14 +166,16 @@ od.DeviceConnection = function(config){
 
     function setConnectionStatus(status){
 
-        _this.status = status;
-
-        for(var i = 0; i<listeners.length; i++){
-            var listener = listeners[i]["connectionStateChanged"];
-            if (typeof listener === "function") {
-                listener(_this, status, _this.status);
+        if(_this.status != status){
+            for(var i = 0; i<listeners.length; i++){
+                var listener = listeners[i]["connectionStateChanged"];
+                if (typeof listener === "function") {
+                    listener(_this, status, _this.status);
+                }
             }
         }
+
+        _this.status = status;
 
     }
 

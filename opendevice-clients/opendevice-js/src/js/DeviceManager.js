@@ -56,6 +56,8 @@ od.DeviceManager = function(connection){
 
         var device = _this.findDevice(deviceID);
 
+        if(device == null) console.warn("can't find deviceID = " + deviceID);
+
         if(device){
             device.setValue(value);
         }
@@ -66,6 +68,9 @@ od.DeviceManager = function(connection){
 
         var device = _this.findDevice(deviceID);
 
+        if(device == null) console.warn("can't find deviceID = " + deviceID);
+
+        // jjhjhss
         if(device && ! device.sensor){
             device.toggle();
         }

@@ -48,7 +48,7 @@
             <plugin>
                 <groupId>com.samaxes.maven</groupId>
                 <artifactId>minify-maven-plugin</artifactId>
-                <version>1.7.4</version>
+                <version>1.7.6</version>
                 <executions>
                     <execution>
                         <id>default-minify</id>
@@ -63,6 +63,9 @@
                             <webappSourceDir>${basedir}/src</webappSourceDir>
                             <webappTargetDir>${basedir}/dist</webappTargetDir>
                             <jsEngine>CLOSURE</jsEngine>
+                            <closureWarningLevels>
+                                <nonStandardJsDocs>OFF</nonStandardJsDocs>
+                            </closureWarningLevels>
                         </configuration>
                         <goals>
                             <goal>minify</goal>

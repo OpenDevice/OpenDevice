@@ -1,7 +1,16 @@
 #!/bin/bash
 
+#
+# Script to automatic install of OpenDevice in Linux Machine
+# It also install Java if not installed
+# Install using:
+# > curl -Ls https://goo.gl/mgQGNH | bash
+# Required: unzip
+
+
 # Installation Path
 ODEV_PATH=/opt/opendevice
+
 
 
 main() {
@@ -32,7 +41,7 @@ main() {
 
   echo $ODEV_LATEST
 
-  wget -O opendevice.zip $ODEV_LATEST
+  curl -o opendevice.zip $ODEV_LATEST
 
   mkdir -p $ODEV_PATH
 

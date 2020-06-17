@@ -13,9 +13,17 @@
 
 package br.com.criativasoft.opendevice.wsrest.io;
 
+import br.com.criativasoft.opendevice.connection.IWSServerConnection;
+import br.com.criativasoft.opendevice.connection.ServerConnection;
+import br.com.criativasoft.opendevice.wsrest.WSServerConnection;
+
+import javax.ws.rs.core.Response;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -75,4 +83,38 @@ public final class WebUtils {
         return fileTree;
     }
 
+
+    /**
+     * Find resource in configured web paths ({@link IWSServerConnection#getWebresources()})
+     * @param location
+     * @param server
+     * @return
+     * @throws FileNotFoundException
+     */
+    public static Response findStaticResource(String location, ServerConnection server) throws FileNotFoundException {
+        // Find base path
+        File path = null;
+
+        if(server instanceof IWSServerConnection){
+            List<String> webresources = ((WSServerConnection) server).getWebresources();
+            path = findInWebPath(webresources, location);
+        }
+
+        if(path != null){
+            return Response.ok(new FileInputStream(path)).build();
+        }else{
+            throw new FileNotFoundException(location + " not found in webapp path");
+        }
+    }
+
+    private static File findInWebPath(List<String> resourcePaths, String resource){
+        for (String webresource : resourcePaths) {
+            File path = new File(webresource, resource);
+            if(path.exists()){
+                return path;
+            }
+        }
+
+        return null;
+    }
 }

@@ -41,4 +41,7 @@ public abstract class OpenDeviceExtension {
 
     public PersistenceExtension getPersistenceExtension() {return null;}
 
+    /* Return a list of classes used to add providers, filters and rest resources to WebServer */
+    public Class<?>[] getRestConfigClasses() {return null;}
+
 }

@@ -45,7 +45,6 @@ public class LocalTenantContext implements TenantContext {
 
     @Override
     public void addDevice(Device device) {
-        device.setManaged(true);
         devices.put(device.getName(), device);
     }
 
@@ -56,7 +55,9 @@ public class LocalTenantContext implements TenantContext {
 
     @Override
     public void cleanUp() {
-
+        devices.clear();
+        partialDevices.clear();
+        processingNewDevices.set(false);
     }
 
     @Override

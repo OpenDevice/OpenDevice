@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.opendevice</groupId>
         <artifactId>opendevice-pom</artifactId>
-        <version>0.5.1-SNAPSHOT</version>
+        <version>0.5.3-SNAPSHOT</version>
     </parent>
 
 	<artifactId>opendevice-middleware</artifactId>
@@ -97,6 +97,15 @@
             <!--<version>2.0-SNAPSHOT</version>-->
             <!--<scope>compile</scope>-->
         <!--</dependency>-->
+
+        <!--
+        See :OpenDevice/extensions/simple-device-proxy
+        <dependency>
+            <groupId>io.opendevice.extensions</groupId>
+            <artifactId>simple-device-proxy</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        -->
 
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -472,6 +481,27 @@
                                     <outputDirectory>${project.build.directory}/lib</outputDirectory>
                                 </configuration>
                             </execution>
+
+                            <!-- Extract static/webapp files from extensions -->
+                            <execution>
+                                <id>unpack-dependencies</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>unpack-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <includeGroupIds>io.opendevice.extensions</includeGroupIds>
+                                    <includes>static/**/*</includes>
+                                    <outputDirectory>${project.build.directory}/webapp/ext</outputDirectory>
+                                    <overWriteReleases>true</overWriteReleases>
+                                    <overWriteSnapshots>true</overWriteSnapshots>
+                                    <useSubDirectoryPerArtifact>true</useSubDirectoryPerArtifact>
+                                    <stripVersion>true</stripVersion>
+                                    <stripClassifier>true</stripClassifier>
+                                </configuration>
+                            </execution>
+
+                            <!-- Extract static/webapp files from built-in modules -->
                             <execution>
                                 <id>unpack</id>
                                 <phase>generate-resources</phase>

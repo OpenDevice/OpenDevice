@@ -7,7 +7,7 @@
     <groupId>io.opendevice</groupId>
     <artifactId>opendevice-pom</artifactId>
     <packaging>pom</packaging>
-    <version>0.5.1-SNAPSHOT</version> <!-- mvn versions:set -DnewVersion=0.1.X-SNAPSHOT || mvn versions:commit -->
+    <version>0.5.3-SNAPSHOT</version> <!-- mvn versions:set -DnewVersion=0.1.X-SNAPSHOT || mvn versions:commit -->
     <name>OpenDevice Package</name>
     <description>Open IoT (Internet Of Things) Platform and Framework.</description>
 

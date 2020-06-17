@@ -132,6 +132,11 @@ public class CommandStreamSerializer implements MessageSerializer{
 			List<Device> devices = new LinkedList<Device>();
 			command = new GetDevicesResponse(devices, reqID);
 
+			
+        }else if(type == CommandType.USER_COMMAND) { // Returned list of devices.
+            
+            command = new UserCommand(split[2]);
+            
 		// Custom Response (this must be in te end.)
         }else if(ResponseCommand.class.isAssignableFrom(type.getCommandClass())){
 

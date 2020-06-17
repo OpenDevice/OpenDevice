@@ -2,8 +2,8 @@ package br.com.criativasoft.opendevice.core.command;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * User-defined command, this is an easy way to extend OpenDevice protocol. <br/>
@@ -17,7 +17,7 @@ public class UserCommand extends Command implements ExtendedCommand{
 
     private String name;
     
-    private Set<Object> params = new LinkedHashSet<Object>();
+    private List<Object> params = new LinkedList<Object>();
     
     public UserCommand(String commandName, Object ... params) {
         super(CommandType.USER_COMMAND);
@@ -30,7 +30,7 @@ public class UserCommand extends Command implements ExtendedCommand{
         }
     }
 
-    public Set<Object> getParams() {
+    public List<Object> getParams() {
         return params;
     }
     
@@ -41,7 +41,7 @@ public class UserCommand extends Command implements ExtendedCommand{
     @Override
     public void deserializeExtraData( String extradata ) {
         String[] strparams = extradata.split(Command.DELIMITER);
-        params.addAll(Arrays.asList(strparams));
+        params.addAll(Arrays.asList(Arrays.copyOfRange(strparams, 1, strparams.length)));
     }
 
     @Override

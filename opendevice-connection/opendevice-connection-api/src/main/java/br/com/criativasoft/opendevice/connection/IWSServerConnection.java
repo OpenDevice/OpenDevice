@@ -1,5 +1,7 @@
 package br.com.criativasoft.opendevice.connection;
 
+import java.util.List;
+
 /**
  * WebSocket Server Connection
  *
@@ -11,4 +13,6 @@ public interface IWSServerConnection extends ServerConnection {
     void addWebResource(String path);
 
     void addResource(Class<?> resource);
+
+    List<String> getWebresources();
 }

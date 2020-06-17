@@ -23,6 +23,11 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Handle connection with usb-serial devices. Default baudrate is 115200 <br/>
+ * Plase read: {@link DeviceConnection} and {@link AbstractStreamConnection}
+ * @author Ricardo JL Rufino - (ricardo.jl.rufino@gmail.com)
+ */
 public class UsbConnection extends AbstractStreamConnection implements IUsbConnection, SerialPortEventListener  {
 	
 	protected static final Logger log = LoggerFactory.getLogger(UsbConnection.class);
@@ -110,13 +115,13 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
 			serialPort = new SerialPort(deviceURI);
 		}else{
 
-            deviceURI = getFirstAvailable();
+      deviceURI = getFirstAvailable();
 
-            if(deviceURI == null) throw new ConnectionException("Serial port name is NULL ! (It's busy , not have access or not found)");
+      if(deviceURI == null) throw new ConnectionException("Serial port name is NULL ! (It's busy , not have access or not found)");
 
-            serialPort = new SerialPort(deviceURI);
+      serialPort = new SerialPort(deviceURI);
 
-            automaticPort = true;
+      automaticPort = true;
 		}
 
 		try {
@@ -148,7 +153,7 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
 //            }
 			
 		} catch (Exception e) {
-			new ConnectionException(e);
+			throw new ConnectionException(e.getMessage(), e);
 		}
 	}
 

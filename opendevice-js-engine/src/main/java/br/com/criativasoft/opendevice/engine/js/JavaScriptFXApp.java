@@ -21,6 +21,11 @@ import javax.script.SimpleBindings;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+/*
+ * Need install dependencies on ubuntu:
+ * sudo apt install openjfx=8u161-b12-1ubuntu2 libopenjfx-java=8u161-b12-1ubuntu2 libopenjfx-jni=8u161-b12-1ubuntu2
+ */
+
 /**
  * @author Ricardo JL Rufino
  * @date 23/08/15.

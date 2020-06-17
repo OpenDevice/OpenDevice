@@ -47,7 +47,7 @@ public class CommandDelivery implements ConnectionListener {
 	
 	private AtomicInteger cmdCount = new AtomicInteger(0);
 
-    private final Set<SendTask> waitingTask =Collections.synchronizedSet(new HashSet<SendTask>());
+    private final Set<SendTask> waitingTaskList =Collections.synchronizedSet(new HashSet<SendTask>());
 	
 	public static int MAX_CMD_COUNT = 255;
 	
@@ -75,14 +75,21 @@ public class CommandDelivery implements ConnectionListener {
         }
 
         if(connection instanceof MultipleConnection){
+            
             Set<DeviceConnection> connections = ((MultipleConnection) connection).getConnections();
+            
             for (DeviceConnection deviceConnection : connections) {
                 sendTo(command, deviceConnection);
             }
+            
         }else if(connection instanceof IFirmwareConnection && !(command instanceof ResponseCommand)){
+            
             sendWithTimeout(command, connection);
+            
         }else{
+            
             connection.send(command);
+            
         }
 
 	}
@@ -90,8 +97,8 @@ public class CommandDelivery implements ConnectionListener {
     @Override
     public void onMessageReceived(Message message, DeviceConnection connection) {
 
-        synchronized (waitingTask){
-            for (SendTask sendTask : waitingTask) {
+        synchronized (waitingTaskList){
+            for (SendTask sendTask : waitingTaskList) {
                sendTask.onMessageReceived(message, connection);
             }
         }
@@ -124,6 +131,13 @@ public class CommandDelivery implements ConnectionListener {
         return cmdCount;
     }
 
+    /**
+     * Send command to connection and wait for response for a specified amount of time.
+     * The time is determined by command it-self {@link Command#getTimeout()}.
+     * Waiting tasks will put in 'waitingTaskList', and send using {@link SendTask}
+     * @param command
+     * @param connection
+     */
     private void sendWithTimeout(Command command, DeviceConnection connection){
 
         if(!connection.isConnected()){
@@ -131,10 +145,10 @@ public class CommandDelivery implements ConnectionListener {
             return;
         }
 
-        if(log.isTraceEnabled()) log.trace("Sends taks: {}, threads: {}", waitingTask.size(), Thread.activeCount());
+        if(log.isTraceEnabled()) log.trace("Sends taks: {}, threads: {}", waitingTaskList.size(), Thread.activeCount());
 
 		final SendTask sendTask = new SendTask(command, connection, this);
-        waitingTask.add(sendTask);
+        waitingTaskList.add(sendTask);
         executor.execute(sendTask);
 
 //      TODO: executor.shutdownNow();		
@@ -142,7 +156,7 @@ public class CommandDelivery implements ConnectionListener {
 
 
     protected void removeTask(SendTask task){
-        waitingTask.remove(task);
+        waitingTaskList.remove(task);
     }
 
 	public void stop(){
@@ -182,13 +196,30 @@ public class CommandDelivery implements ConnectionListener {
             log.debug("Send and Wait :: "+command.getType() + ", ID:<" + this.newID + ">");
 
             try {
+                
+                int retry = command.getRetry() + 1;
+                
+                for (int i = 1; i <= retry; i++) {
+                    
+                    if(i > 1) {
+                        String retryStr = "Retry ["+ (i-1) + "/" + command.getRetry()+"]";
+                        log.debug(retryStr +" :: "+command.getType() + ", ID:<" + command.getTrackingID() + ">");
+                    }
+                    
+                    start = System.currentTimeMillis();
+                    connection.send(command);
 
-                start = System.currentTimeMillis();
-                connection.send(command);
+                    // Wait for response (release look) in onMessageReceived
+                    synchronized(command){
+                        command.wait(command.getTimeout());
+                    }
+                    
+                    // received ..
+                    if(command.getStatus() != CommandStatus.DELIVERED){
+                        break;
+                    }
 
-                // Wait for response (release look) in onMessageReceived
-                synchronized(command){
-                    command.wait(command.getTimeout());
+
                 }
 
                 // If not received response...
@@ -196,13 +227,14 @@ public class CommandDelivery implements ConnectionListener {
                     command.setStatus(CommandStatus.FAIL);
                 }
 
-
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
+                
                 commandDelivery.removeTask(this);
+                
             }
 
         }

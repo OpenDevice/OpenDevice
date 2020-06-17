@@ -41,6 +41,7 @@ public abstract class Command implements Message{
 	private CommandType type;
 	private Date timestamp;
 	private int timeout = DEFAULT_TIMEOUT;
+	private int retry = 0;
 	private CommandStatus status = CommandStatus.CREATED;
     private ResponseCommand response;
 
@@ -125,9 +126,24 @@ public abstract class Command implements Message{
         this.timeout = timeout;
     }
 
-
     public void setResponse(ResponseCommand response) {
         this.response = response;
+    }
+    
+    /**
+     * See {@link #getRetry()}
+     * @param retry
+     */
+    public void setRetry( int retry ) {
+        this.retry = retry;
+    }
+    
+    /**
+     * Returns the number of retries after a time out
+     * @return
+     */
+    public int getRetry() {
+        return retry;
     }
 
     /**

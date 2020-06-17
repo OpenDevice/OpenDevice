@@ -74,6 +74,11 @@ public class GetDevicesRequest extends SimpleCommand implements Request {
     public boolean isForceSync() {
         return forceSync;
     }
+    
+    @Override
+    public int getRetry() {
+        return 3;
+    }
 
 }
 

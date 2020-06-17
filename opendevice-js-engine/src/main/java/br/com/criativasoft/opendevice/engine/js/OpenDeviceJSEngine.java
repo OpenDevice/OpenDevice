@@ -58,8 +58,9 @@ public class OpenDeviceJSEngine {
 
         // Use JavaFX
         if (opt.getSet().isSet("fx")) {
-            log.info("Using JavaFX");
-            javafx.application.Application.launch(JavaScriptFXApp.class, new String[]{script});
+            log.error("Java FX Disabled !");
+//            log.info("Using JavaFX");
+//            javafx.application.Application.launch(JavaScriptFXApp.class, new String[]{script});
         }else{
             try {
                 run(new File(script));

@@ -23,6 +23,14 @@ public class StreamConnectionFactory {
 	private StreamConnectionFactory(){
 	}
 	
+	/**
+	 * Create USB connection using automatic discovery
+	 * @see UsbConnection#UsbConnection()
+	 */
+	public static StreamConnection createUsb(){
+    return new UsbConnection();
+  }
+	
 	public static StreamConnection createUsb(String portName){
 		return new UsbConnection(portName);
 	}

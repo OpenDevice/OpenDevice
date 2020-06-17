@@ -250,7 +250,7 @@ public class OpenDeviceConfig {
 
 
     /**
-     * @see #getBindLocalVariables()
+     * See {@link #getBindLocalVariables()}
      */
     public void setBindLocalVariables(boolean value) {
         this.bindLocalVariables = value;

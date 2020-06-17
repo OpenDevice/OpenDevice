@@ -336,7 +336,7 @@ public class Device implements Serializable {
         // isManaged() used to avoid fire listeners on deserialization...
         if(manager != null && isManaged()) manager.notifyListeners(this, sync);
         else{
-            if(log.isDebugEnabled()) log.debug("None DeviceManager registered for this device: " + this.toString());
+            if(log.isWarnEnabled()) log.warn("None DeviceManager registered for this device: " + this.toString());
         }
 
     }

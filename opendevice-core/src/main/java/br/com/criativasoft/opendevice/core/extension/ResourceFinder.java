@@ -25,6 +25,7 @@ import java.util.jar.JarFile;
 /**
  * @author David Blevins
  * @version $Rev$ $Date$
+ * Used in {@link PluginLoader}
  */
 public class ResourceFinder {
 

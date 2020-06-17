@@ -531,7 +531,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
         }
 
-        if((connection instanceof StreamConnection || /* ws/rest clients = */connection instanceof IRemoteClientConnection )
+        if((connection instanceof StreamConnection || connection instanceof IRemoteClientConnection  /* << ws/rest clients */ )
                 && outputConnections.exist(connection)){
             try {
                 sendTo(request, connection);

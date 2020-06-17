@@ -14,7 +14,7 @@
 package br.com.criativasoft.opendevice.connection;
 
 /**
- * Interface marker for connections with Physical Devices
+ * Interface marker for direct connections with Physical Devices (like USB / Bluetooth)
  *
  * @author Ricardo JL Rufino
  *         Date: 08/07/18

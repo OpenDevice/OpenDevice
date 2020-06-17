@@ -28,6 +28,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 // TODO: Dizer que o protocole de recebimento de dados deve ser delegado ao serialReader.
+/**
+ * @author Ricardo JL Rufino - (ricardo.jl.rufino@gmail.com)
+ */
 public abstract class AbstractStreamConnection extends AbstractConnection implements StreamConnection{
 
 	protected static final Logger log = LoggerFactory.getLogger(AbstractStreamConnection.class);
@@ -85,30 +88,51 @@ public abstract class AbstractStreamConnection extends AbstractConnection implem
 	}
 	
 
+	/**
+	 * Send a {@link SimpleMessage}
+	 * @see #send(Message)
+	 */
 	@Override
 	public void write(byte value) throws IOException  {
 		send(new SimpleMessage(value));
 	}
 
+  /**
+   * Send a {@link SimpleMessage}
+   * @see #send(Message)
+   */
 	@Override
 	public void write(int value) throws IOException {
 		send(new SimpleMessage(value));
 	}
 	
+  /**
+   * Send a {@link SimpleMessage}
+   * @see #send(Message)
+   */
 	@Override
 	public void write(int[] value) throws IOException {
 		send(new SimpleMessage(value));
 	}
 	
+	/**
+   * Send a {@link SimpleMessage}
+   * @see #send(Message)
+   */
 	@Override
 	public void write(long value) throws IOException {
 		send(new SimpleMessage(value));
 	}
 	
+  /**
+   * Send a {@link SimpleMessage}
+   * @see #send(Message)
+   */
 	@Override
 	public void write(long[] value) throws IOException {
 		send(new SimpleMessage(value));
 	}
+	
 	
 	@Override
 	public void writeln(String value) throws IOException  {
@@ -122,6 +146,10 @@ public abstract class AbstractStreamConnection extends AbstractConnection implem
 		write(buffer);
 	}
 	
+	/**
+   * Send a {@link SimpleMessage}. 
+   * @see #send(Message)
+   */
 	@Override
 	public void write(String value) throws IOException  {
 		send(new SimpleMessage(value));

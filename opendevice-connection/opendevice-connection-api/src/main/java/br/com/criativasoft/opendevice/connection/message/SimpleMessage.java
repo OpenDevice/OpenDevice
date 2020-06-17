@@ -17,7 +17,7 @@ import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.connection.util.DataUtils;
 
 /**
- * Mensage used to send primitive types to a {@link DeviceConnection}.
+ * Mensage used to send Strings and primitive types to a {@link DeviceConnection}.
  * @author Ricardo JL Rufino
  * @date 18/06/2014
  */

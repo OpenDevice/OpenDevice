@@ -174,4 +174,8 @@ public class BluetoothConnection extends AbstractStreamConnection implements IBl
     }
 
 
+    @Override
+    public String toString() {
+        return "Bluetooth["+getConnectionURI()+"]";
+    }
 }

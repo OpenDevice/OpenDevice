@@ -18,35 +18,35 @@ import java.util.Collection;
 
 public class OnlyFilesWithExtension implements FilenameFilter {
 
-  String extensions[];
-  Collection<String> ignoredFiles;
+    String extensions[];
+    Collection<String> ignoredFiles;
 
-  public OnlyFilesWithExtension(String... ext) {
-    this.extensions = ext;
-  }
-  
-
-  public OnlyFilesWithExtension(Collection<String> ignoredFiles, String... ext) {
-    super();
-    this.extensions = ext;
-    this.ignoredFiles = ignoredFiles;
-  }
+    public OnlyFilesWithExtension(String... ext) {
+        this.extensions = ext;
+    }
 
 
-  public boolean accept(File dir, String name) {
-    
-    if(ignoredFiles != null){
-      if(ignoredFiles.contains(name)){
+    public OnlyFilesWithExtension(Collection<String> ignoredFiles, String... ext) {
+        super();
+        this.extensions = ext;
+        this.ignoredFiles = ignoredFiles;
+    }
+
+
+    public boolean accept(File dir, String name) {
+
+        if (ignoredFiles != null) {
+            if (ignoredFiles.contains(name)) {
+                return false;
+            }
+        }
+
+        for (String ext : extensions) {
+            if (name.endsWith(ext)) {
+                return true;
+            }
+        }
         return false;
-      }
     }
-    
-    for (String ext : extensions) {
-      if (name.endsWith(ext)) {
-        return true;
-      }
-    }
-    return false;
-  }
 
 }

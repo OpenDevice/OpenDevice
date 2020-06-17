@@ -19,23 +19,24 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
  * @author Ricardo JL Rufino
  * @date 04/11/16
  */
 public final class ODevExecutors {
 
-    private ODevExecutors(){} //
+    private ODevExecutors() {
+    } //
 
     private static ExecutorService executorService;
 
     /**
      * Obtains a shared Executor used to perform small activities, The default implementation uses the ThreadPoolExecutor
+     *
      * @return
      */
-    public static ExecutorService getSharedExecutorService(){
+    public static ExecutorService getSharedExecutorService() {
 
-        if(executorService == null){
+        if (executorService == null) {
 
             ODevThreadFactory threadFactory = new ODevThreadFactory("Shared");
 

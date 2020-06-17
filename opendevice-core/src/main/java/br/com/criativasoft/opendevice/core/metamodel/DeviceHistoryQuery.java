@@ -36,7 +36,7 @@ public class DeviceHistoryQuery {
     @JsonFormat(pattern = "dd/MM/yy HH:mm", timezone = "America/Bahia")
     private Date periodEnd;
 
-    public DeviceHistoryQuery(){
+    public DeviceHistoryQuery() {
 
     }
 
@@ -103,7 +103,7 @@ public class DeviceHistoryQuery {
     }
 
     public int getMaxResults(int defaultValue) {
-        if(maxResults <= 0) return defaultValue;
+        if (maxResults <= 0) return defaultValue;
         return maxResults;
     }
 

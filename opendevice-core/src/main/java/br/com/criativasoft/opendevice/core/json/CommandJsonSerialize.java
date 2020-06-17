@@ -19,9 +19,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * MixIn Jackson configuration
  * Ref: http://wiki.fasterxml.com/JacksonMixInAnnotations
+ *
  * @author Ricardo JL Rufino
  */
-public class CommandJsonSerialize  {
+public class CommandJsonSerialize {
 
     abstract class ResponseCommandIgnoreMixin {
         @JsonIgnore

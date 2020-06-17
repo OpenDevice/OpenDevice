@@ -34,7 +34,7 @@ import java.util.Properties;
  */
 public class OpenDeviceConfig {
 
-    private static final Logger log  = LoggerFactory.getLogger(OpenDeviceConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(OpenDeviceConfig.class);
 
     public static final String LOCAL_APP_ID = "*";
 
@@ -53,7 +53,7 @@ public class OpenDeviceConfig {
     private Boolean remoteIDGeneration; // as attribute for fast access.
 
 
-    public enum ConfigKey{
+    public enum ConfigKey {
         web_port("web.port", null, DEFAULT_PORT),
         profile("profile", null, "dev"),
         log_config("log.config", null, "logback-dev.xml"),
@@ -71,20 +71,24 @@ public class OpenDeviceConfig {
         ssl_certificateFile("ssl.certificateFile", null, null),
         ssl_certificateKey("ssl.certificateKey", null, null),
         ssl_certificatePass("ssl.certificatePass", null, null),
-        google_appid("google.appid", null, null),
-        ;
+        google_appid("google.appid", null, null),;
 
         private String key, description;
         private Object defaultValue;
-        ConfigKey(String key, String descriptions, Object defaultValue){
-            this.key = "odev."+key;
+
+        ConfigKey(String key, String descriptions, Object defaultValue) {
+            this.key = "odev." + key;
             this.description = descriptions;
             this.defaultValue = defaultValue;
         }
 
-        public String getKey() {return key;}
+        public String getKey() {
+            return key;
+        }
 
-        public String getDescription() {return description;}
+        public String getDescription() {
+            return description;
+        }
 
         public Object getDefaultValue() {
             return defaultValue;
@@ -92,11 +96,11 @@ public class OpenDeviceConfig {
     }
 
 
-    private OpenDeviceConfig(){
+    private OpenDeviceConfig() {
     }
 
-    public static OpenDeviceConfig get(){
-        if(INSTANCE == null){
+    public static OpenDeviceConfig get() {
+        if (INSTANCE == null) {
             INSTANCE = new OpenDeviceConfig();
 
             String configDir = getConfigDirectory();
@@ -104,11 +108,11 @@ public class OpenDeviceConfig {
             // Get profile from system properties
             String profile = System.getProperty(PROFILE_KEY);
 
-            File config = new File(configDir + File.separator + "odev-"+profile+".conf");
+            File config = new File(configDir + File.separator + "odev-" + profile + ".conf");
 
-            if(!config.exists()) config = new File(configDir + File.separator + "odev.conf");
+            if (!config.exists()) config = new File(configDir + File.separator + "odev.conf");
 
-            if(config.exists()){
+            if (config.exists()) {
                 try {
                     Properties properties = new Properties();
                     properties.load(new FileInputStream(config));
@@ -117,12 +121,12 @@ public class OpenDeviceConfig {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            }else{
+            } else {
                 INSTANCE.properties = new Properties();
                 log.info("Using default config");
             }
 
-            if(!StringUtils.isEmpty(profile)){
+            if (!StringUtils.isEmpty(profile)) {
                 INSTANCE.set(ConfigKey.profile, profile);
             }
 
@@ -132,30 +136,33 @@ public class OpenDeviceConfig {
 
     /**
      * Get config directory from system properties or current directory
+     *
      * @return
      */
-    public static String getConfigDirectory(){
+    public static String getConfigDirectory() {
         String configDir = System.getProperty("config-dir");
-        if(configDir == null) configDir = getHomeDirectory()  + File.separator + "conf";
+        if (configDir == null) configDir = getHomeDirectory() + File.separator + "conf";
         return configDir;
     }
 
     /**
      * Get data directory from system properties or current directory
+     *
      * @return
      */
-    public static String getDataDirectory(){
+    public static String getDataDirectory() {
         return getHomeDirectory() + File.separator + "data";
     }
 
-    public static String getHomeDirectory(){
+    public static String getHomeDirectory() {
         String dir = System.getProperty("odev-home");
-        if(dir == null) dir = System.getProperty("user.dir");
+        if (dir == null) dir = System.getProperty("user.dir");
         return dir;
     }
 
     /**
      * Checks whether the support for multi-tenant is active. This setting should only be enabled when using the platform as a service.
+     *
      * @return if multi-tenant is active
      */
     public boolean isTenantsEnabled() {
@@ -169,13 +176,16 @@ public class OpenDeviceConfig {
 
     /**
      * Sets whether to make the broadcast of a command {@link br.com.criativasoft.opendevice.core.command.DeviceCommand} received by an incoming connection to the other incoming connections
+     *
      * @param value (Default = true)
      */
     public void setBroadcastInputs(boolean value) {
         set(ConfigKey.broadcast_inputs, value);
     }
 
-    public boolean isBroadcastInputs() {return getBoolean(ConfigKey.broadcast_inputs);}
+    public boolean isBroadcastInputs() {
+        return getBoolean(ConfigKey.broadcast_inputs);
+    }
 
     public void setDatabaseEnabled(boolean value) {
         set(ConfigKey.database_enabled, value);
@@ -208,7 +218,9 @@ public class OpenDeviceConfig {
         return getString(ConfigKey.ssl_certificateKey);
     }
 
-    public String getCertificatePass() { return getString(ConfigKey.ssl_certificatePass); }
+    public String getCertificatePass() {
+        return getString(ConfigKey.ssl_certificatePass);
+    }
 
     public void setPort(int value) {
         set(ConfigKey.web_port, value);
@@ -234,7 +246,9 @@ public class OpenDeviceConfig {
         return getBoolean(ConfigKey.mqtt_enabled);
     }
 
-    public void setDatabasePath(String value) {set(ConfigKey.database_path, value); }
+    public void setDatabasePath(String value) {
+        set(ConfigKey.database_path, value);
+    }
 
     public String getDatabasePath() {
         return getPath(ConfigKey.database_path);
@@ -244,9 +258,13 @@ public class OpenDeviceConfig {
         return get(ConfigKey.profile);
     }
 
-    public void setDatabaseEngine(String value) {set(ConfigKey.database_path, value);}
+    public void setDatabaseEngine(String value) {
+        set(ConfigKey.database_path, value);
+    }
 
-    public String getDatabaseEngine() { return getString(ConfigKey.database_engine);}
+    public String getDatabaseEngine() {
+        return getString(ConfigKey.database_engine);
+    }
 
 
     /**
@@ -260,10 +278,11 @@ public class OpenDeviceConfig {
     /**
      * This allow local application register/bind local (field/variable) devices without call addDevice.<br/>>
      * Note: This is a experimental feature and may slow down app initialization
+     *
      * @see br.com.criativasoft.opendevice.core.LocalDeviceManager#autoRegisterDevice(Device)
      */
     public boolean getBindLocalVariables() {
-        if(this.bindLocalVariables == null ) bindLocalVariables = getBoolean(ConfigKey.internal_autoregister);
+        if (this.bindLocalVariables == null) bindLocalVariables = getBoolean(ConfigKey.internal_autoregister);
         return bindLocalVariables;
     }
 
@@ -271,6 +290,7 @@ public class OpenDeviceConfig {
      * Define if the UID device generation must be done by remote/cloud server.<br/>
      * This should be used when the devices are dynamically generated by the client application and
      * need to be synchronized with a remote server;
+     *
      * @param value
      */
     public void setRemoteIDGeneration(boolean value) {
@@ -279,19 +299,25 @@ public class OpenDeviceConfig {
     }
 
     /**
-     * @see #setRemoteIDGeneration(boolean)
      * @return
+     * @see #setRemoteIDGeneration(boolean)
      */
     public boolean isRemoteIDGeneration() {
-        if(this.remoteIDGeneration == null ) remoteIDGeneration = getBoolean(ConfigKey.remote_id_generation);
+        if (this.remoteIDGeneration == null) remoteIDGeneration = getBoolean(ConfigKey.remote_id_generation);
         return remoteIDGeneration;
     }
 
-    public List<String> getExternalResources() { return getList(ConfigKey.web_external_resources);}
+    public List<String> getExternalResources() {
+        return getList(ConfigKey.web_external_resources);
+    }
 
-    public String getStartupScript() { return getString(ConfigKey.startup_script);}
+    public String getStartupScript() {
+        return getString(ConfigKey.startup_script);
+    }
 
-    public String getLogConfig() { return getPath(ConfigKey.log_config);}
+    public String getLogConfig() {
+        return getPath(ConfigKey.log_config);
+    }
 
     //
     // Properties Utils
@@ -299,9 +325,9 @@ public class OpenDeviceConfig {
 
     private String get(ConfigKey config) {
         String val = get(config.getKey());
-        if(val == null){
+        if (val == null) {
             Object obj = config.getDefaultValue();
-            if(obj != null) val = obj.toString();
+            if (obj != null) val = obj.toString();
         }
         return val;
     }
@@ -374,19 +400,19 @@ public class OpenDeviceConfig {
     public File getFile(String key) {
         String path = get(key);
 
-        if(path == null) return null;
+        if (path == null) return null;
 
         File file = new File(path);
 
-        if(file.exists()) return file;
+        if (file.exists()) return file;
 
         file = new File(getHomeDirectory(), path);
 
-        if(file.exists()) return file;
+        if (file.exists()) return file;
 
         file = new File(getConfigDirectory(), path);
 
-        if(file.exists()) return file;
+        if (file.exists()) return file;
 
         return null;
     }
@@ -395,7 +421,7 @@ public class OpenDeviceConfig {
         String className = getString(key);
         try {
             return Class.forName(className);
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -406,7 +432,7 @@ public class OpenDeviceConfig {
 
         String[] array = v.split("\\s*,\\s*");
 
-        for(int i = 0; i < array.length; i++) {
+        for (int i = 0; i < array.length; i++) {
             String s = array[i];
             if ((s.startsWith("\"") && s.endsWith("\"")) || (s.startsWith("'") && s.endsWith("'"))) {
                 array[i] = s.substring(1, s.length() - 1);

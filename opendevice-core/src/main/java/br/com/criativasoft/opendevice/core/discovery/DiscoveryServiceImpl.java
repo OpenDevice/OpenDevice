@@ -27,18 +27,18 @@ import java.util.Set;
 
 /**
  * Service that allows customers to make the discovery of the web server on the network
- * 
+ *
  * @author Ricardo JL Rufino
  * @date 04/01/2014
  */
 public class DiscoveryServiceImpl extends Thread implements br.com.criativasoft.opendevice.connection.discovery.DiscoveryService {
-	
-	private static final Logger log = LoggerFactory.getLogger(DiscoveryServiceImpl.class);
+
+    private static final Logger log = LoggerFactory.getLogger(DiscoveryServiceImpl.class);
 
     public static final int DISCOVERY_PORT = 6142;
 
-	private static final String DISCOVER_SERVER_REQUEST = "DISCOVER_SERVER_REQUEST";
-	private static final String DISCOVER_SERVER_RESPONSE = "DISCOVER_SERVER_RESPONSE";
+    private static final String DISCOVER_SERVER_REQUEST = "DISCOVER_SERVER_REQUEST";
+    private static final String DISCOVER_SERVER_RESPONSE = "DISCOVER_SERVER_RESPONSE";
 
     private int httpPort;
 
@@ -60,56 +60,58 @@ public class DiscoveryServiceImpl extends Thread implements br.com.criativasoft.
     }
 
     @Override
-	public void run() {
-		try {
-			// Keep a socket open to listen to all the UDP trafic that is
-			// destined for this port
+    public void run() {
+        try {
+            // Keep a socket open to listen to all the UDP trafic that is
+            // destined for this port
             socket = new DatagramSocket(DISCOVERY_PORT, InetAddress.getByName("0.0.0.0"));
-			socket.setBroadcast(true);
-			log.debug("Listen for requests at:" + DISCOVERY_PORT);
-			
-			while (!isInterrupted()) {
+            socket.setBroadcast(true);
+            log.debug("Listen for requests at:" + DISCOVERY_PORT);
 
-				// Receive a packet
-				byte[] recvBuf = new byte[100];
-				DatagramPacket packet = new DatagramPacket(recvBuf,recvBuf.length);
-				socket.receive(packet);
+            while (!isInterrupted()) {
 
-				// Packet received
-				log.debug("Received packet: <<"+ packet.getAddress().getHostAddress() + ">> : " +  new String(packet.getData()));
+                // Receive a packet
+                byte[] recvBuf = new byte[100];
+                DatagramPacket packet = new DatagramPacket(recvBuf, recvBuf.length);
+                socket.receive(packet);
 
-				// See if the packet holds the right command (message)
-				String message = new String(packet.getData()).trim();
-				
-				if (message.contains(DISCOVER_SERVER_REQUEST)) {
-					String response = DISCOVER_SERVER_RESPONSE + "={port:"+httpPort+"}";  // TODO: Adicionar informações da porta.
-					byte[] sendData = response.getBytes();
-					DatagramPacket sendPacket = new DatagramPacket(sendData,sendData.length, packet.getAddress(),packet.getPort());
-					socket.send(sendPacket);
+                // Packet received
+                log.debug("Received packet: <<" + packet.getAddress().getHostAddress() + ">> : " + new String(packet.getData()));
 
-					log.debug("Sent response to: "+ sendPacket.getAddress().getHostAddress());
-				}
-			}
+                // See if the packet holds the right command (message)
+                String message = new String(packet.getData()).trim();
+
+                if (message.contains(DISCOVER_SERVER_REQUEST)) {
+                    String response = DISCOVER_SERVER_RESPONSE + "={port:" + httpPort + "}";  // TODO: Adicionar informações da porta.
+                    byte[] sendData = response.getBytes();
+                    DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, packet.getAddress(), packet.getPort());
+                    socket.send(sendPacket);
+
+                    log.debug("Sent response to: " + sendPacket.getAddress().getHostAddress());
+                }
+            }
         } catch (SocketTimeoutException ex) {
             log.debug("Discovery timedout");
-		} catch (IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
-		}
-	}
+        }
+    }
 
 
     /**
      * Start the service discovery. It allows clients to find this server
+     *
      * @see DiscoveryServiceImpl
      */
     @Override
-    public void listen(){
+    public void listen() {
         start();
     }
 
     /**
      * Scans the network for devices. Sync Mode
-     * @param timeout Max timeout
+     *
+     * @param timeout    Max timeout
      * @param deviceName (optional) NULL returns all devices
      * @return
      * @throws IOException
@@ -123,17 +125,17 @@ public class DiscoveryServiceImpl extends Thread implements br.com.criativasoft.
 
     /**
      * Scans the network for devices. Async Mode
-     * @param timeout Max timeout
+     *
+     * @param timeout    Max timeout
      * @param deviceName (optional) NULL returns all devices
      * @param listener
      * @return
      */
     @Override
-    public void scan(long timeout, String deviceName, DiscoveryListener listener){
+    public void scan(long timeout, String deviceName, DiscoveryListener listener) {
         DiscoveryClientService service = new DiscoveryClientService(timeout, deviceName, listener, socket);
         new Thread(service).start();
     }
-
 
 
 }

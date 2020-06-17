@@ -32,35 +32,35 @@ public abstract class GenericCategory extends DeviceCategory {
 
     public abstract void loadProperties();
 
-    public PropertyDef add(String name, String group){
+    public PropertyDef add(String name, String group) {
         int code = nextCode();
         PropertyDef def = new PropertyDef(name, code).group(group);
         properties.add(def);
         return def;
     }
 
-    public PropertyDef add(String name){
+    public PropertyDef add(String name) {
         return add(name, PropertyDef.GROUP_GENERAL);
     }
 
-    public ActionDef action(String name){
+    public ActionDef action(String name) {
         int code = nextActionCode();
         ActionDef def = new ActionDef(name, code);
         actions.add(def);
         return def;
     }
 
-    public int nextCode(){
-        return actions.size()+1;
+    public int nextCode() {
+        return actions.size() + 1;
     }
 
-    public int nextActionCode(){
-        return actions.size()+1;
+    public int nextActionCode() {
+        return actions.size() + 1;
     }
 
-    public PropertyDef getProperty(int code){
+    public PropertyDef getProperty(int code) {
         for (PropertyDef property : properties) {
-            if(property.getCode() == code){
+            if (property.getCode() == code) {
                 return property;
             }
         }
@@ -70,7 +70,7 @@ public abstract class GenericCategory extends DeviceCategory {
 
     public PropertyDef getProperty(String property) {
         for (PropertyDef def : properties) {
-            if(def.getName().equals(property)){
+            if (def.getName().equals(property)) {
                 return def;
             }
         }
@@ -80,7 +80,7 @@ public abstract class GenericCategory extends DeviceCategory {
 
     public ActionDef getAction(String action) {
         for (ActionDef def : actions) {
-            if(def.getName().equals(action)){
+            if (def.getName().equals(action)) {
                 return def;
             }
         }

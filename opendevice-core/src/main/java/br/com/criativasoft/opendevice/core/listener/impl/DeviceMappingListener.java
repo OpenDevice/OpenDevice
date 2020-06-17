@@ -22,6 +22,7 @@ import java.util.Collection;
 /**
  * It maps the value of the current device to the ID of another registered device. </br>
  * Example, it is possible to map the values read by a radio frequency sensor to the corresponding devices.
+ *
  * @author Ricardo JL Rufino
  * @date 09/01/16
  */
@@ -42,11 +43,11 @@ public class DeviceMappingListener implements OnDeviceChangeListener {
 
         for (Device found : devices) {
 
-            if( device.getUid()!= found.getUid()){
+            if (device.getUid() != found.getUid()) {
 
-                if(mappingType == MAP_VALUE_TO_ID && found.getUid() == device.getValue()){
-                    found.setValue(found.getValue()+1);
-                }else if(mappingType == MAP_VALUE_TO_VALUE && found.getValue() == device.getValue()){
+                if (mappingType == MAP_VALUE_TO_ID && found.getUid() == device.getValue()) {
+                    found.setValue(found.getValue() + 1);
+                } else if (mappingType == MAP_VALUE_TO_VALUE && found.getValue() == device.getValue()) {
                     found.notifyListeners(true);
                 }
 

@@ -35,7 +35,7 @@ public class GetDevicesRequest extends SimpleCommand implements Request {
     }
 
     /**
-     * @param filter Filter type, like {@link #FILTER_BY_ID}
+     * @param filter      Filter type, like {@link #FILTER_BY_ID}
      * @param filterValue
      */
     public GetDevicesRequest(int filter, Object filterValue) {
@@ -74,7 +74,7 @@ public class GetDevicesRequest extends SimpleCommand implements Request {
     public boolean isForceSync() {
         return forceSync;
     }
-    
+
     @Override
     public int getRetry() {
         return 3;

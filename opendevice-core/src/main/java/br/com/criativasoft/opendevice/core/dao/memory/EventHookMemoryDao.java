@@ -17,10 +17,14 @@ import br.com.criativasoft.opendevice.core.TenantProvider;
 import br.com.criativasoft.opendevice.core.dao.EventHookDao;
 import br.com.criativasoft.opendevice.core.event.EventHook;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * EventHookMemoryDao
+ *
  * @author Ricardo JL Rufino
  * @date 29/08/15.
  */
@@ -28,15 +32,15 @@ public class EventHookMemoryDao implements EventHookDao {
 
     private static Map<String, List<EventHook>> EventHookMap = new HashMap<String, List<EventHook>>();
 
-    public static List<EventHook> getCurrentEventHooks(){
+    public static List<EventHook> getCurrentEventHooks() {
 
         String currentID = TenantProvider.getCurrentID();
 
-        if(currentID == null) throw new IllegalStateException("TenantProvider.getCurrentID() is NULL");
+        if (currentID == null) throw new IllegalStateException("TenantProvider.getCurrentID() is NULL");
 
         List<EventHook> hooks = EventHookMap.get(TenantProvider.getCurrentID());
 
-        if(hooks == null){
+        if (hooks == null) {
             hooks = new LinkedList<EventHook>();
             EventHookMap.put(currentID, hooks);
         }
@@ -49,8 +53,8 @@ public class EventHookMemoryDao implements EventHookDao {
 
         List<EventHook> list = getCurrentEventHooks();
 
-        for (EventHook current : list){
-            if(current.getId() == id){
+        for (EventHook current : list) {
+            if (current.getId() == id) {
                 return current;
             }
         }
@@ -58,15 +62,15 @@ public class EventHookMemoryDao implements EventHookDao {
         return null;
     }
 
-    private boolean exist(EventHook entity){
-        if(entity.getId() > 0){
+    private boolean exist(EventHook entity) {
+        if (entity.getId() > 0) {
             EventHook find = getById(entity.getId());
             return find != null;
-        }else{
+        } else {
             List<EventHook> list = getCurrentEventHooks();
 
-            for (EventHook find : list){
-                if(entity == find || entity.equals(find)){ // check if same instance.
+            for (EventHook find : list) {
+                if (entity == find || entity.equals(find)) { // check if same instance.
                     return true;
                 }
             }
@@ -79,7 +83,7 @@ public class EventHookMemoryDao implements EventHookDao {
     public void persist(EventHook entity) {
         List<EventHook> list = getCurrentEventHooks();
 
-        if(!exist(entity)){
+        if (!exist(entity)) {
             list.add(entity);
         }
 
@@ -96,14 +100,14 @@ public class EventHookMemoryDao implements EventHookDao {
 
         List<EventHook> list = getCurrentEventHooks();
 
-        if(list.isEmpty()) return;
+        if (list.isEmpty()) return;
 
         boolean removed = list.remove(entity); // remove by instance
 
         // remove by ID.
-        if(!removed && entity.getId() > 0){
+        if (!removed && entity.getId() > 0) {
             EventHook find = getById(entity.getId());
-            if(find != null){
+            if (find != null) {
                 list.remove(find);
             }
         }
@@ -126,11 +130,11 @@ public class EventHookMemoryDao implements EventHookDao {
         List<EventHook> foundList = new LinkedList<EventHook>();
 
         List<EventHook> list = getCurrentEventHooks();
-        if(list.isEmpty()) return foundList;
+        if (list.isEmpty()) return foundList;
 
-        for (EventHook current : list){
+        for (EventHook current : list) {
 
-            if(current.getDeviceIDs().contains(id)){
+            if (current.getDeviceIDs().contains(id)) {
                 foundList.add(current);
             }
 

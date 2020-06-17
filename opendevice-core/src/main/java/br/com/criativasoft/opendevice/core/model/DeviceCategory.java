@@ -22,51 +22,53 @@ import java.io.Serializable;
 
 /**
  * Represento um tipo de dispositivo .
+ *
  * @author Ricardo JL Rufino
  * @date 04/09/2011 12:44:44
  */
 @Entity
-@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="code")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "code")
 public class DeviceCategory implements Serializable {
-	
-	private static final long serialVersionUID = 1L;
 
-	@Id
-	private int code;
+    private static final long serialVersionUID = 1L;
 
-	private String description;
+    @Id
+    private int code;
 
-	public static DeviceCategory LAMP = new DeviceCategory(1, "Lâmpada");
-	public static DeviceCategory FAN = new DeviceCategory(2, "Ventilador");
-	public static DeviceCategory GENERIC = new DeviceCategory(3, "Genérico");
-	public static DeviceCategory POWER_SOURCE = new DeviceCategory(4, "Tomada");
-	public static DeviceCategory GENERIC_SENSOR = new DeviceCategory(100, "Generic Sensor");
-	public static DeviceCategory GENERIC_BOARD = new DeviceCategory(101, "Generic Board");
+    private String description;
 
-    public static DeviceCategory[] DEFAULT_VALUES = {  LAMP, FAN, GENERIC, POWER_SOURCE, GENERIC_SENSOR, GENERIC_BOARD};
+    public static DeviceCategory LAMP = new DeviceCategory(1, "Lâmpada");
+    public static DeviceCategory FAN = new DeviceCategory(2, "Ventilador");
+    public static DeviceCategory GENERIC = new DeviceCategory(3, "Genérico");
+    public static DeviceCategory POWER_SOURCE = new DeviceCategory(4, "Tomada");
+    public static DeviceCategory GENERIC_SENSOR = new DeviceCategory(100, "Generic Sensor");
+    public static DeviceCategory GENERIC_BOARD = new DeviceCategory(101, "Generic Board");
 
-    public DeviceCategory(){
+    public static DeviceCategory[] DEFAULT_VALUES = {LAMP, FAN, GENERIC, POWER_SOURCE, GENERIC_SENSOR, GENERIC_BOARD};
+
+    public DeviceCategory() {
 
     }
 
-	/**
-	 * Create new DeviceCategory (or use static constants like #GENERIC)
-	 * @param code - Device type code. MAX 127.
-	 * @param description
-	 */
-	public DeviceCategory(int code, String description) {
-		super();
-		this.code = (byte) code;
-		this.description = description;
-	}
+    /**
+     * Create new DeviceCategory (or use static constants like #GENERIC)
+     *
+     * @param code        - Device type code. MAX 127.
+     * @param description
+     */
+    public DeviceCategory(int code, String description) {
+        super();
+        this.code = (byte) code;
+        this.description = description;
+    }
 
 
-	public int getCode() {
-		return code;
-	}
+    public int getCode() {
+        return code;
+    }
 
-	public String getDescription() {
-		return description;
-	}
-	
+    public String getDescription() {
+        return description;
+    }
+
 }

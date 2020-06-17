@@ -20,6 +20,7 @@ import java.util.List;
 
 /**
  * TenantContext acts as a kind of cache data for each client / application / tenant
+ *
  * @author Ricardo JL Rufino
  * @date 12/10/16
  */
@@ -35,6 +36,7 @@ public interface TenantContext {
 
     /**
      * Return the context ID
+     *
      * @return
      */
     public String getId();
@@ -47,6 +49,7 @@ public interface TenantContext {
 
     /**
      * Return the list used for Sync devices (from GetDevicesResponse)
+     *
      * @return
      */
     List<Device> getDevicesInSync();

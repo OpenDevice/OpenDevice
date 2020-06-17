@@ -19,17 +19,18 @@ public class OutputConnections {
     /**
      * Create a USB connection with first serial port available
      */
-    public <T extends DeviceConnection> T  usb(){
+    public <T extends DeviceConnection> T usb() {
         return usb(null);
     }
 
     /**
      * Create a USB connection.
+     *
      * @param port - The serial port like: "COM3", "/dev/ttyUSB0", "/dev/ttyACM0"
      */
-    public <T extends DeviceConnection> T  usb(String port){
+    public <T extends DeviceConnection> T usb(String port) {
         IUsbConnection connection = load(IUsbConnection.class);
-        if(connection != null) connection.setConnectionURI(port);
+        if (connection != null) connection.setConnectionURI(port);
         return (T) connection;
     }
 
@@ -37,7 +38,7 @@ public class OutputConnections {
      * Create a bluetooth connection with first device available. <br/>
      * Do not forget that you must pair with the PC first.
      */
-    public <T extends DeviceConnection> T  bluetooth(){
+    public <T extends DeviceConnection> T bluetooth() {
         return bluetooth(null);
     }
 
@@ -45,19 +46,20 @@ public class OutputConnections {
     /**
      * Create a bluetooth connection. <br/>
      * Do not forget that you must pair with the PC first.
+     *
      * @param uri bluetooth address:
      */
-    public <T extends DeviceConnection> T  bluetooth(String uri){
+    public <T extends DeviceConnection> T bluetooth(String uri) {
         IBluetoothConnection connection = load(IBluetoothConnection.class);
-        if(connection != null) connection.setConnectionURI(uri);
+        if (connection != null) connection.setConnectionURI(uri);
         return (T) connection;
     }
 
-    public <T extends DeviceConnection> T tcp(String address){
+    public <T extends DeviceConnection> T tcp(String address) {
         ITcpConnection connection = load(ITcpConnection.class);
-        if(connection != null){
-            BaseDeviceManager deviceManager =  BaseDeviceManager.getInstance();
-            if(deviceManager != null){
+        if (connection != null) {
+            BaseDeviceManager deviceManager = BaseDeviceManager.getInstance();
+            if (deviceManager != null) {
                 connection.setDiscoveryService(deviceManager.getDiscoveryService());
             }
             connection.setConnectionURI(address);
@@ -67,21 +69,22 @@ public class OutputConnections {
 
     /**
      * Create a WebSocket Client Connection.
+     *
      * @param address Server IP or Host (ex.: localhost:8181), for SSL use wss://server.com.br:port
      * @return Return a connection.
      */
-    public <T extends DeviceConnection> T  websocket(String address){
+    public <T extends DeviceConnection> T websocket(String address) {
         IWSConnection connection = load(IWSConnection.class);
-        if(connection != null) connection.setConnectionURI(address);
+        if (connection != null) connection.setConnectionURI(address);
         return (T) connection;
     }
 
 
-    private <T> T load(Class<T> klass){
+    private <T> T load(Class<T> klass) {
 
-        try{
+        try {
             Class.forName("java.util.ServiceLoader");
-        }catch(ClassNotFoundException ex){
+        } catch (ClassNotFoundException ex) {
             throw new RuntimeException("This java version don't support dynamic loading (ServiceLoader), you need use direct class ex: new BluetoothConnection(addr)");
         }
 
@@ -90,9 +93,9 @@ public class OutputConnections {
 
         Iterator<T> iterator = service.iterator();
 
-        if(iterator.hasNext()){
+        if (iterator.hasNext()) {
             T connection = iterator.next();
-            if(connection instanceof StreamConnection){
+            if (connection instanceof StreamConnection) {
                 StreamConnection conn = (StreamConnection) connection;
                 conn.setSerializer(new CommandStreamSerializer()); // for de/serialization..
                 conn.setStreamReader(new CommandStreamReader());   // for reading streams

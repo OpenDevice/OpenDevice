@@ -17,7 +17,7 @@ package br.com.criativasoft.opendevice.core.command;
  * Command to notify start firmware update.
  * The path is relative to configured server IP on device.
  */
-public class FirmwareUpdateCommand extends Command implements ExtendedCommand{
+public class FirmwareUpdateCommand extends Command implements ExtendedCommand {
 
     private String path;
 

@@ -22,6 +22,7 @@ import javax.persistence.Id;
 
 /**
  * DeviceHistory represents the device status at any given time
+ *
  * @author Ricardo JL Rufino on 05/05/15.
  */
 @Entity
@@ -36,17 +37,21 @@ public class DeviceHistory {
 
     private double value;
 
-    /** Device database ID*/
+    /**
+     * Device database ID
+     */
     private long deviceID;
 
-    /** If this must syncronized with server */
+    /**
+     * If this must syncronized with server
+     */
     @JsonIgnore
     private boolean needSync;
 
     @JsonIgnore
     private String applicationID;
 
-    public DeviceHistory(){
+    public DeviceHistory() {
     }
 
     public DeviceHistory(long timestamp, double value) {

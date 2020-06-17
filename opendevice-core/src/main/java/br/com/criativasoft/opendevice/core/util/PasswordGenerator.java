@@ -32,7 +32,7 @@ public class PasswordGenerator {
         int pwCharacters = 0;
         int preallocatedCharacters = 0;
         List<PasswordCharacterSet> pwSets = new ArrayList<PasswordCharacterSet>(origPwSets.size());
-        for(PasswordCharacterSet origpwSet : origPwSets) {
+        for (PasswordCharacterSet origpwSet : origPwSets) {
             PasswordCharacterSet newPwSet = new PwSet(origpwSet);
             pwSets.add(newPwSet);
             pwCharacters += newPwSet.getCharacters().length;
@@ -50,7 +50,7 @@ public class PasswordGenerator {
         // Copy all characters into single array so we can evenly access all members when accessing this array
         char[] allChars = new char[pwCharacters];
         int currentIndex = 0;
-        for(PasswordCharacterSet pwSet : pwSets) {
+        for (PasswordCharacterSet pwSet : pwSets) {
             char[] chars = pwSet.getCharacters();
             System.arraycopy(chars, 0, allChars, currentIndex, chars.length);
             currentIndex += chars.length;
@@ -69,13 +69,13 @@ public class PasswordGenerator {
 
         // Place each index in an array then remove them randomly to assign positions in the pw array
         List<Integer> remainingIndexes = new ArrayList<Integer>(pwLength);
-        for(int i=0; i < pwLength; ++i) {
+        for (int i = 0; i < pwLength; ++i) {
             remainingIndexes.add(i);
         }
 
         // Fill pw array
         char[] pw = new char[pwLength];
-        for(PasswordCharacterSet pwSet : pwSets) {
+        for (PasswordCharacterSet pwSet : pwSets) {
             addRandomCharacters(pw, pwSet.getCharacters(), pwSet.getMinCharacters(), remainingIndexes, rand);
         }
         addRandomCharacters(pw, allCharacters, randomCharacterCount, remainingIndexes, rand);
@@ -83,8 +83,8 @@ public class PasswordGenerator {
     }
 
     private static void addRandomCharacters(char[] pw, char[] characterSet,
-            int numCharacters, List<Integer> remainingIndexes, Random rand) {
-        for(int i=0; i < numCharacters; ++i) {
+                                            int numCharacters, List<Integer> remainingIndexes, Random rand) {
+        for (int i = 0; i < numCharacters; ++i) {
             // Get and remove random index from the remaining indexes
             int pwIndex = remainingIndexes.remove(rand.nextInt(remainingIndexes.size()));
 
@@ -96,6 +96,7 @@ public class PasswordGenerator {
 
     public static interface PasswordCharacterSet {
         char[] getCharacters();
+
         int getMinCharacters();
     }
 

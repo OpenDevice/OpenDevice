@@ -15,6 +15,7 @@ package br.com.criativasoft.opendevice.core;
 
 /**
  * TenantProvider with holds TenantID/AccountUUID in ThreadLocal
+ *
  * @author Ricardo JL Rufino
  * @date 29/08/15.
  */
@@ -23,11 +24,11 @@ public class ThreadLocalTenantProvider extends TenantProvider {
 
     private static InheritableThreadLocal<String> threadLocal = new InheritableThreadLocal<String>();
 
-    public void  setTenantID(String appID){
+    public void setTenantID(String appID) {
         threadLocal.set(appID);
     }
 
-    public String getTenantID(){
+    public String getTenantID() {
         return threadLocal.get();
     }
 

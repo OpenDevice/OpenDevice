@@ -19,20 +19,20 @@ import java.util.UUID;
 // @XmlRootElement
 //@JsonFilter("PropertyFilterMixIn")
 public class ResponseCommand extends Command {
-	
-	private static final long serialVersionUID = 1891204618345540528L;
+
+    private static final long serialVersionUID = 1891204618345540528L;
 
     public ResponseCommand(CommandType type) {
         super(type);
     }
 
-    public ResponseCommand(){
+    public ResponseCommand() {
         super(CommandType.DEVICE_COMMAND_RESPONSE);
     }
 
-	public ResponseCommand(CommandStatus status) {
-		this(CommandType.DEVICE_COMMAND_RESPONSE, status, null);
-	}
+    public ResponseCommand(CommandStatus status) {
+        this(CommandType.DEVICE_COMMAND_RESPONSE, status, null);
+    }
 
     public ResponseCommand(CommandStatus status, String connectionUUID) {
         this(CommandType.DEVICE_COMMAND_RESPONSE, status, connectionUUID);
@@ -42,13 +42,13 @@ public class ResponseCommand extends Command {
         this(type, status, null);
     }
 
-	public ResponseCommand(CommandType type, CommandStatus status, String connectionUUID) {
-		super(type, UUID.randomUUID().toString(), connectionUUID);
-		this.setStatus(status);
-	}
+    public ResponseCommand(CommandType type, CommandStatus status, String connectionUUID) {
+        super(type, UUID.randomUUID().toString(), connectionUUID);
+        this.setStatus(status);
+    }
 
     @Override
     public String toString() {
-        return "ResponseCommand[type="+getType()+", status="+getStatus()+"]";
+        return "ResponseCommand[type=" + getType() + ", status=" + getStatus() + "]";
     }
 }

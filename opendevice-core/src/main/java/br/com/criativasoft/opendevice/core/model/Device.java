@@ -36,20 +36,21 @@ import java.util.Set;
  * Device is an abstraction of a physical device, which may be a lamp, socket, sensor, robot, or even a logical device. <br/>
  * These devices are managed and controlled by a hardware like Arduino, Raspberry and others (see list) or can be built <br/>
  * in an embedded own equipment, this is the proposal of the internet of things. <br/>
+ *
  * @author Ricardo JL Rufino
  * @date 04/09/2011 12:40:01
  */
 @Entity
 //@Inheritance(strategy=JOINED)
-@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="name")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
 public class Device implements Serializable {
 
     protected static final Logger log = LoggerFactory.getLogger(Device.class);
 
-	private static final long serialVersionUID = 1L;
-	
-	public static final int VALUE_HIGH = 1;
-	public static final int VALUE_LOW = 0;
+    private static final long serialVersionUID = 1L;
+
+    public static final int VALUE_HIGH = 1;
+    public static final int VALUE_LOW = 0;
 
     public static final int ON = 1;
     public static final int OFF = 0;
@@ -65,10 +66,10 @@ public class Device implements Serializable {
     @JsonIgnore
     private long id; // Database ID (internal)
 
-	private int uid; // Logic level user ID (remote ID)
-	private String name;
+    private int uid; // Logic level user ID (remote ID)
+    private String name;
     private String title;
-	private DeviceType type;
+    private DeviceType type;
     private long lastUpdate;
     private Date dateCreated;
     private double value = VALUE_LOW;
@@ -77,7 +78,7 @@ public class Device implements Serializable {
 
     @OneToOne(cascade = CascadeType.MERGE)
     @JsonIdentityReference(alwaysAsId = true)
-	private DeviceCategory category = DeviceCategory.GENERIC;
+    private DeviceCategory category = DeviceCategory.GENERIC;
 
     @JsonIgnore
     private String applicationID;
@@ -89,12 +90,13 @@ public class Device implements Serializable {
     @Transient
     private transient boolean managed; // Already been linked to the Manager
 
-    public Device(){
+    public Device() {
 
     }
 
     /**
      * Create new Device with type  {@link DeviceType#DIGITAL}
+     *
      * @param uid Must match with 'id' configured in the physical module
      */
     public Device(int uid) {
@@ -103,15 +105,17 @@ public class Device implements Serializable {
 
     /**
      * Create new Device
-     * @param uid Must match with 'id' configured in the physical module
+     *
+     * @param uid  Must match with 'id' configured in the physical module
      * @param type Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}
      */
-    public Device(int uid,DeviceType type) {
+    public Device(int uid, DeviceType type) {
         this(uid, null, type, DeviceCategory.GENERIC);
     }
 
     /**
      * Create new Device
+     *
      * @param name Must match with 'name' configured in the physical module
      * @param type Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}
      */
@@ -121,8 +125,9 @@ public class Device implements Serializable {
 
     /**
      * Create new Device
+     *
      * @param name Logical name of device
-     * @param uid Must match with 'id' configured in the physical module
+     * @param uid  Must match with 'id' configured in the physical module
      * @param type Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}
      */
     public Device(int uid, String name, DeviceType type) {
@@ -131,35 +136,37 @@ public class Device implements Serializable {
 
     /**
      * Create new Device
-     * @param uid Must match with 'id' configured in the physical module
-     * @param name Logical name of device
-     * @param type Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}
+     *
+     * @param uid      Must match with 'id' configured in the physical module
+     * @param name     Logical name of device
+     * @param type     Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}
      * @param category Does not influence the communication logic, only the GUIs
      */
-	public Device(int uid, String name, DeviceType type, DeviceCategory category) {
+    public Device(int uid, String name, DeviceType type, DeviceCategory category) {
         this(uid, name, type, category, (type == Device.DIGITAL ? VALUE_LOW : -1));
-	}
+    }
 
 
     /**
      * Create new Device
-     * @param uid Must match with 'id' configured in the physical module
-     * @param name Logical name of device
-     * @param type Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}
+     *
+     * @param uid      Must match with 'id' configured in the physical module
+     * @param name     Logical name of device
+     * @param type     Use a of constants: {@link DeviceType#DIGITAL} , {@link DeviceType#ANALOG}
      * @param category - Does not influence the communication logic, only the GUIs
      * @param value
      */
-	public Device(int uid, String name, DeviceType type, DeviceCategory category, double value) {
-		super();
-		this.uid = uid;
+    public Device(int uid, String name, DeviceType type, DeviceCategory category, double value) {
+        super();
+        this.uid = uid;
         this.name = name;
         this.type = type;
         this.category = category;
         this.value = value;
 
         BaseDeviceManager manager = BaseDeviceManager.getInstance();
-        if(manager != null && manager instanceof LocalDeviceManager && !manager.isTenantsEnabled()){
-            ((LocalDeviceManager)manager).autoRegisterDevice(this);
+        if (manager != null && manager instanceof LocalDeviceManager && !manager.isTenantsEnabled()) {
+            ((LocalDeviceManager) manager).autoRegisterDevice(this);
         }
     }
 
@@ -173,36 +180,38 @@ public class Device implements Serializable {
     }
 
     public int getUid() {
-		return uid;
-	}
+        return uid;
+    }
 
     public void setUID(int uid) {
         this.uid = uid;
     }
 
-	public String getName() {
-        if(name == null) return "NULL:"+hashCode();
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        if (name == null) return "NULL:" + hashCode();
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public void setTitle(String title) {
         this.title = title;
     }
 
     public String getTitle() {
-        if(title == null) return getName();
+        if (title == null) return getName();
         return title;
     }
 
     public DeviceType getType() {
-		return type;
-	}
-	public void setType(DeviceType type) {
-		this.type = type;
-	}
+        return type;
+    }
+
+    public void setType(DeviceType type) {
+        this.type = type;
+    }
 
 
     public void setValue(double value) {
@@ -210,20 +219,19 @@ public class Device implements Serializable {
     }
 
     /**
-     *
      * @param value
-     * @param sync - sync state with server
+     * @param sync  - sync state with server
      */
-	public void setValue(double value, boolean sync) {
+    public void setValue(double value, boolean sync) {
 
         // fire the event 'onChange' every time a reading is taken
-        if(type == NUMERIC || value != this.value){
+        if (type == NUMERIC || value != this.value) {
             setLastUpdate(System.currentTimeMillis());
             this.value = value;
             notifyListeners(sync);
         }
 
-	}
+    }
 
     public void setIcon(String icon) {
         this.icon = icon;
@@ -235,19 +243,21 @@ public class Device implements Serializable {
 
     /**
      * Check if the value is high
+     *
      * @return true if value > 0
      */
     @JsonIgnore
-    public boolean isON(){
+    public boolean isON() {
         return getValue() > 0;
     }
 
     /**
      * Check if the value is LOW
+     *
      * @return true if value > 0
      */
     @JsonIgnore
-    public boolean isOFF(){
+    public boolean isOFF() {
         return getValue() == 0;
     }
 
@@ -256,8 +266,8 @@ public class Device implements Serializable {
      * shorthand call to setValue(HIGH)
      */
     @JsonIgnore
-    public void on(){
-       this.setValue(Device.VALUE_HIGH);
+    public void on() {
+        this.setValue(Device.VALUE_HIGH);
     }
 
     /**
@@ -265,13 +275,13 @@ public class Device implements Serializable {
      * shorthand call to setValue(LOW)
      */
     @JsonIgnore
-    public void off(){
+    public void off() {
         this.setValue(Device.VALUE_LOW);
     }
-    
-    public void toggle(){
-        if(getType() == DeviceType.DIGITAL){
-            if(isON()) off();
+
+    public void toggle() {
+        if (getType() == DeviceType.DIGITAL) {
+            if (isON()) off();
             else on();
         }
     }
@@ -281,37 +291,37 @@ public class Device implements Serializable {
     }
 
     public void setCategory(DeviceCategory category) {
-		this.category = category;
-	}
+        this.category = category;
+    }
 
     public void setCategoryClass(Class<DeviceCategory> klass) {
 
         DeviceManager manager = BaseDeviceManager.getInstance();
-        if(manager != null){
+        if (manager != null) {
             this.category = manager.getCategory(klass);
         }
 
     }
-	
-	public DeviceCategory getCategory() {
-		return category;
-	}
-	
-	public void setLastUpdate(long lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
-	
-	public long getLastUpdate() {
-		return lastUpdate;
-	}
-	
-	public void setDateCreated(Date dateCreated) {
-		this.dateCreated = dateCreated;
-	}
-	
-	public Date getDateCreated() {
-		return dateCreated;
-	}
+
+    public DeviceCategory getCategory() {
+        return category;
+    }
+
+    public void setLastUpdate(long lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+
+    public long getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
 
     public boolean addListener(OnDeviceChangeListener e) {
         return listeners.add(e);
@@ -334,9 +344,9 @@ public class Device implements Serializable {
 
         // On device change notify listeners
         // isManaged() used to avoid fire listeners on deserialization...
-        if(manager != null && isManaged()) manager.notifyListeners(this, sync);
-        else{
-            if(log.isWarnEnabled()) log.warn("None DeviceManager registered for this device: " + this.toString());
+        if (manager != null && isManaged()) manager.notifyListeners(this, sync);
+        else {
+            if (log.isWarnEnabled()) log.warn("None DeviceManager registered for this device: " + this.toString());
         }
 
     }
@@ -383,26 +393,28 @@ public class Device implements Serializable {
 
     /**
      * Create {@link br.com.criativasoft.opendevice.core.command.DeviceCommand} of type {@link CommandType#DIGITAL} with value HIGH
+     *
      * @param deviceID
      * @return
      */
-    public static DeviceCommand ON(int deviceID){
+    public static DeviceCommand ON(int deviceID) {
         return new DeviceCommand(CommandType.DIGITAL, deviceID, Device.VALUE_HIGH);
     }
 
     /**
      * Create {@link br.com.criativasoft.opendevice.core.command.DeviceCommand} of type {@link CommandType#DIGITAL} with value LOW
+     *
      * @param deviceID
      * @return
      */
-    public static DeviceCommand OFF(int deviceID){
+    public static DeviceCommand OFF(int deviceID) {
         return new DeviceCommand(CommandType.DIGITAL, deviceID, Device.VALUE_LOW);
     }
 
 
     @Override
     public String toString() {
-        return "Device[UID:"+uid+", Name:"+getName()+", Value:"+getValue()+", Type:" + getType()+"]";
+        return "Device[UID:" + uid + ", Name:" + getName() + ", Value:" + getValue() + ", Type:" + getType() + "]";
     }
 
 

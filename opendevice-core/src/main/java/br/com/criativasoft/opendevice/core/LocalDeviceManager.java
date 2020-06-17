@@ -32,15 +32,15 @@ import java.util.Set;
 
 /**
  * Use this class to develop local applications, local servers or clients for OpenDevice.<br/><br/>
- *
+ * <p>
  * <p>You should override the method {@link #start()} and create main method:</p>
  * <code>
- *    public static void main(String[] args) { launch(args); }
+ * public static void main(String[] args) { launch(args); }
  * </code>
  *
- * @see <a href="https://opendevice.atlassian.net/wiki/display/DOC/Getting+started">Getting Started</a> for more info.
  * @author Ricardo JL Rufino
  * @date 24/08/14.
+ * @see <a href="https://opendevice.atlassian.net/wiki/display/DOC/Getting+started">Getting Started</a> for more info.
  */
 public class LocalDeviceManager extends BaseDeviceManager {
 
@@ -54,12 +54,11 @@ public class LocalDeviceManager extends BaseDeviceManager {
     protected InputContections in = Connections.in;
 
 
-    public LocalDeviceManager(){
+    public LocalDeviceManager() {
         super();
         setDataManager(new LocalDataManager());
         TenantProvider.setProvider(new LocalTenantProvider());
     }
-
 
 
     public void setApiKey(String key) {
@@ -67,8 +66,8 @@ public class LocalDeviceManager extends BaseDeviceManager {
     }
 
     /**
-     * @deprecated use setApiKey
      * @param applicationID
+     * @deprecated use setApiKey
      */
     public void setApplicationID(String applicationID) {
         setApiKey(applicationID);
@@ -81,7 +80,7 @@ public class LocalDeviceManager extends BaseDeviceManager {
 
     @Override
     public void addInput(DeviceConnection connection) {
-        if(connection.getApplicationID() == null) {
+        if (connection.getApplicationID() == null) {
             connection.setApplicationID(getApplicationID());
         }
         super.addInput(connection);
@@ -89,7 +88,7 @@ public class LocalDeviceManager extends BaseDeviceManager {
 
     @Override
     public void addOutput(DeviceConnection connection) {
-        if(connection.getApplicationID() == null) {
+        if (connection.getApplicationID() == null) {
             connection.setApplicationID(getApplicationID());
         }
         super.addOutput(connection);
@@ -97,7 +96,7 @@ public class LocalDeviceManager extends BaseDeviceManager {
 
     @Override
     public void send(Command command) throws IOException {
-        if(command.getApplicationID() == null){
+        if (command.getApplicationID() == null) {
             command.setApplicationID(getApplicationID());
         }
         super.send(command);
@@ -119,12 +118,13 @@ public class LocalDeviceManager extends BaseDeviceManager {
     /**
      * This method is called from {@link Device} constructor, to auto-register devices if enabled. <br/>
      * This allow local application registar devices without call addDevice
-     * @see OpenDeviceConfig#setBindLocalVariables(boolean)
+     *
      * @param device
+     * @see OpenDeviceConfig#setBindLocalVariables(boolean)
      */
     public void autoRegisterDevice(Device device) {
 
-        if(getConfig().getBindLocalVariables()){
+        if (getConfig().getBindLocalVariables()) {
 
             StackTraceElement[] stack = Thread.currentThread().getStackTrace();
             int maxint = 10;
@@ -142,7 +142,7 @@ public class LocalDeviceManager extends BaseDeviceManager {
                 try {
                     Class<?> aClass = Class.forName(className);
 
-                    if(LocalDeviceManager.class.isAssignableFrom(aClass) && ( methodName.equals("<init>") || methodName.equals("start"))){
+                    if (LocalDeviceManager.class.isAssignableFrom(aClass) && (methodName.equals("<init>") || methodName.equals("start"))) {
                         register = true;
                         break;
                     }
@@ -151,9 +151,9 @@ public class LocalDeviceManager extends BaseDeviceManager {
                 }
             }
 
-            if(register){
+            if (register) {
                 log.info("Registring the device in context : " + device + " ! (may slow down app initialization )");
-                if(device.getUid() <= 0) device.setUID(getDeviceDao().getNextUID());
+                if (device.getUid() <= 0) device.setUID(getDeviceDao().getNextUID());
                 addDevice(device);
             }
         }
@@ -173,6 +173,7 @@ public class LocalDeviceManager extends BaseDeviceManager {
 
     /**
      * Alias to {@link #findDeviceByUID(int)}
+     *
      * @param deviceUID
      * @return Device
      */
@@ -183,9 +184,9 @@ public class LocalDeviceManager extends BaseDeviceManager {
     @Override
     public Device findDeviceByUID(int deviceUID) {
 
-        if(!runtimeDevices.isEmpty()){
+        if (!runtimeDevices.isEmpty()) {
             for (Device runtimeDevice : runtimeDevices) {
-                if(runtimeDevice.getUid() == deviceUID){
+                if (runtimeDevice.getUid() == deviceUID) {
                     return runtimeDevice;
                 }
             }
@@ -197,9 +198,9 @@ public class LocalDeviceManager extends BaseDeviceManager {
     @Override
     public Device findDeviceByName(String name) {
 
-        if(!runtimeDevices.isEmpty()){
+        if (!runtimeDevices.isEmpty()) {
             for (Device runtimeDevice : runtimeDevices) {
-                if(runtimeDevice.getName() != null && runtimeDevice.getName().equals(name)){
+                if (runtimeDevice.getName() != null && runtimeDevice.getName().equals(name)) {
                     return runtimeDevice;
                 }
             }
@@ -211,12 +212,12 @@ public class LocalDeviceManager extends BaseDeviceManager {
     @Override
     public DeviceDao getValidDeviceDao() {
 
-        if(TenantProvider.getCurrentID() == null){
+        if (TenantProvider.getCurrentID() == null) {
             TenantProvider.setCurrentID(getApplicationID());
         }
 
         // Check if tenant is valid.
-        if(TenantProvider.getCurrentID() != null && getConfig().isTenantsEnabled() && OpenDeviceConfig.LOCAL_APP_ID.equals(TenantProvider.getCurrentID())){
+        if (TenantProvider.getCurrentID() != null && getConfig().isTenantsEnabled() && OpenDeviceConfig.LOCAL_APP_ID.equals(TenantProvider.getCurrentID())) {
             throw new IllegalStateException("In Multi-Tenant support don't allow '*' in applicationID !");
         }
 
@@ -289,7 +290,7 @@ public class LocalDeviceManager extends BaseDeviceManager {
             log.info("Type [CTRL+C] to stop the server");
             log.info("========================================================");
 
-            while(true){
+            while (true) {
                 Thread.sleep(60000);
             }
 
@@ -303,6 +304,7 @@ public class LocalDeviceManager extends BaseDeviceManager {
 
     /**
      * This method is called automatically when you start the application without using a main method.
+     *
      * @throws IOException
      */
     public void start() throws IOException {

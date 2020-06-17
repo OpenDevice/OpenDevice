@@ -31,12 +31,12 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
  * @date 11/07/14.
  */
 
-public class CommandJacksonMapper  {
+public class CommandJacksonMapper {
 
     private ObjectMapper mapper;
 
     public ObjectMapper getMapper() {
-        if(mapper == null){
+        if (mapper == null) {
             mapper = new ObjectMapper();
 
 

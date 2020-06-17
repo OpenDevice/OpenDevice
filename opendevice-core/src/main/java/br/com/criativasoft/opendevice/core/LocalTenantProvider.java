@@ -17,6 +17,7 @@ import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 
 /**
  * Provider that is used for local applications <b>without</b> support muti-tenant
+ *
  * @author Ricardo JL Rufino
  * @date 29/08/15.
  */
@@ -31,9 +32,9 @@ public class LocalTenantProvider extends TenantProvider {
     @Override
     public synchronized void setTenantID(String appID) {
 
-        if(avoidChanges) return;  // Ignore
+        if (avoidChanges) return;  // Ignore
 
-        LocalTenantProvider.tenantID  = appID;
+        LocalTenantProvider.tenantID = appID;
     }
 
     @Override
@@ -51,8 +52,8 @@ public class LocalTenantProvider extends TenantProvider {
         return getStaticContext();
     }
 
-    private TenantContext getStaticContext(){
-        if(context == null) context = new LocalTenantContext(getTenantID());
+    private TenantContext getStaticContext() {
+        if (context == null) context = new LocalTenantContext(getTenantID());
         return context;
     }
 

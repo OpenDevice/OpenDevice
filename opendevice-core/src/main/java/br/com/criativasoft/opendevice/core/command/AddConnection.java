@@ -19,7 +19,7 @@ import br.com.criativasoft.opendevice.core.connection.ConnectionType;
  * @author Ricardo JL Rufino
  * @date 02/11/15
  */
-public class AddConnection extends ConnectionCommand implements  ExtendedCommand {
+public class AddConnection extends ConnectionCommand implements ExtendedCommand {
 
     private ConnectionType type;
 

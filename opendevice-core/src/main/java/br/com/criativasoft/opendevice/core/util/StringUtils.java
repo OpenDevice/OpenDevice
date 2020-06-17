@@ -76,14 +76,15 @@ public class StringUtils {
 
     }
 
-    public static String join(List<String> array , String sep ) {
+    public static String join(List<String> array, String sep) {
         return join(array.toArray(new String[0]), sep.charAt(0));
     }
 
-    public static String join( String[] array , String sep ) {
+    public static String join(String[] array, String sep) {
         return join(array, sep.charAt(0));
     }
-    public static String join( String[] array , char sep ) {
+
+    public static String join(String[] array, char sep) {
         StringBuilder sbStr = new StringBuilder();
         for (int i = 0, il = array.length; i < il; i++) {
             if (i > 0) sbStr.append(sep);
@@ -98,9 +99,10 @@ public class StringUtils {
 
     /**
      * Remove os caracteres especiais da string. Por padrão tambem remove os espaços em branco.
+     *
      * @see #removeSpecialChars(String, boolean)
      */
-    public static String removeSpecialChars( String s ) {
+    public static String removeSpecialChars(String s) {
         return removeSpecialChars(s, true);
     }
 
@@ -108,7 +110,7 @@ public class StringUtils {
     /**
      * Remove Caracteres especiais como !,@,#,$,%,^,& e substitue os Acentos.
      */
-    public static String removeSpecialChars( String s , boolean removeBlank ) {
+    public static String removeSpecialChars(String s, boolean removeBlank) {
         if (removeBlank) s = s.replaceAll(" ", "");
         s = StringUtils.replace(s, specials);
         s = StringUtils.replace(s, alphabetics);
@@ -116,7 +118,7 @@ public class StringUtils {
     }
 
 
-    public static String replace( String strIn , Map<Character, String> dirt ) {
+    public static String replace(String strIn, Map<Character, String> dirt) {
         if (isEmpty(strIn)) return "";
 
         StringBuilder outBuffer = new StringBuilder();

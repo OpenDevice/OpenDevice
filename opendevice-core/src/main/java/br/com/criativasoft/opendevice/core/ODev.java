@@ -22,15 +22,17 @@ import java.util.concurrent.ExecutorService;
 /**
  * Class for obtaining the main features of the OpenDevice.
  * Note: Many of the features are still concentrated in class: {@link BaseDeviceManager}
- * @see #getDeviceManager()
+ *
  * @author Ricardo JL Rufino
  * @date 04/11/16
+ * @see #getDeviceManager()
  */
 public final class ODev {
 
-    private ODev(){}
+    private ODev() {
+    }
 
-    public static BaseDeviceManager getDeviceManager(){
+    public static BaseDeviceManager getDeviceManager() {
         return BaseDeviceManager.getInstance();
     }
 
@@ -42,7 +44,7 @@ public final class ODev {
         return OpenDeviceConfig.get();
     }
 
-    public static Device findDevice(int uid){
+    public static Device findDevice(int uid) {
         return BaseDeviceManager.getInstance().findDeviceByUID(uid);
     }
 

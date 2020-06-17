@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
  * @author Ricardo JL Rufino
  * @date 02/11/15
  */
@@ -26,29 +25,29 @@ public class CommandRegistry {
     // extra commands
     private static final Map<Integer, Class<? extends Command>> map = new HashMap<Integer, Class<? extends Command>>();
 
-    public static void addCommand(int code, Class<? extends Command> kclass){
+    public static void addCommand(int code, Class<? extends Command> kclass) {
 
         CommandType[] values = CommandType.values();
         for (CommandType value : values) {
-            if(code == value.getCode()) throw new IllegalArgumentException("command already registred : " + value);
+            if (code == value.getCode()) throw new IllegalArgumentException("command already registred : " + value);
         }
 
         map.put(code, kclass);
 
     }
 
-    public static Command getCommand(int code) throws CommandException{
+    public static Command getCommand(int code) throws CommandException {
 
         CommandType type = CommandType.getByCode(code);
-        Class<? extends Command> kclass =  null;
+        Class<? extends Command> kclass = null;
 
-        if(type != null){
+        if (type != null) {
             kclass = type.getCommandClass();
         }
 
-        if(kclass == null) kclass = map.get(code);
+        if (kclass == null) kclass = map.get(code);
 
-        if(kclass == null) return null;
+        if (kclass == null) return null;
 
         try {
             return kclass.newInstance();

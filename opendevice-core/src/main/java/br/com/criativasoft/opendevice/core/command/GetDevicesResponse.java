@@ -22,15 +22,15 @@ import java.util.List;
 
 public class GetDevicesResponse extends ResponseCommand implements ExtendedCommand {
 
-	public static final CommandType TYPE = CommandType.GET_DEVICES_RESPONSE;
+    public static final CommandType TYPE = CommandType.GET_DEVICES_RESPONSE;
 
     private int index;
 
     private int length;
 
-	private Collection<Device> devices = new LinkedList<Device>();
+    private Collection<Device> devices = new LinkedList<Device>();
 
-	private static final long serialVersionUID = -1023397181880070237L;
+    private static final long serialVersionUID = -1023397181880070237L;
 
     public GetDevicesResponse() {
         super(TYPE, CommandStatus.CREATED);
@@ -43,19 +43,19 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
         this.length = length;
     }
 
-	public GetDevicesResponse(Collection<? extends Device> devices, String connectionUUID) {
-		super(TYPE, CommandStatus.CREATED, connectionUUID);
-		this.devices.addAll(devices);
+    public GetDevicesResponse(Collection<? extends Device> devices, String connectionUUID) {
+        super(TYPE, CommandStatus.CREATED, connectionUUID);
+        this.devices.addAll(devices);
         this.length = devices.size();
         this.index = devices.size();
-	}
+    }
 
-	public Collection<Device> getDevices() {
-		return devices;
-	}
+    public Collection<Device> getDevices() {
+        return devices;
+    }
 
-	@Override
-	public void deserializeExtraData(String extradata) {
+    @Override
+    public void deserializeExtraData(String extradata) {
 
         String[] split = extradata.split(Command.DELIMITER);
 
@@ -66,45 +66,45 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
         length = Integer.parseInt(split[1]);
 
         for (int i = 2; i < split.length; i++) {
-            String deviceStr = split[i].substring(1, split[i].length()-1);
+            String deviceStr = split[i].substring(1, split[i].length() - 1);
             String[] deviceSplit = deviceStr.split(",");
             String name = deviceSplit[0];
             int uid = Integer.parseInt(deviceSplit[1]);
             double value = Double.parseDouble(deviceSplit[3]);
             boolean isSensor = Integer.parseInt(deviceSplit[5]) > 0;
 
-            DeviceType deviceType =  DeviceType.getByCode(Integer.parseInt(deviceSplit[6]));
+            DeviceType deviceType = DeviceType.getByCode(Integer.parseInt(deviceSplit[6]));
 
-            if(deviceType == DeviceType.BOARD) {
+            if (deviceType == DeviceType.BOARD) {
                 if (StringUtils.isEmpty(name)) name = "Board " + uid;
                 board = new Board(uid, name, deviceType, DeviceCategory.GENERIC, 1);
-            } else if(isSensor){
-                if(StringUtils.isEmpty(name)) name = "Sensor " + uid;
+            } else if (isSensor) {
+                if (StringUtils.isEmpty(name)) name = "Sensor " + uid;
                 Sensor sensor = new Sensor(uid, name, deviceType, DeviceCategory.GENERIC, value);
                 deviceList.add(sensor);
-            }else{
-                if(StringUtils.isEmpty(name)) name = "Device " + uid;
+            } else {
+                if (StringUtils.isEmpty(name)) name = "Device " + uid;
                 deviceList.add(new PhysicalDevice(uid, name, deviceType, DeviceCategory.GENERIC, value));
             }
         }
 
-        if(board != null){
+        if (board != null) {
             board.addDevices(deviceList);
             for (Device device : deviceList) {
-                if(device instanceof PhysicalDevice){
+                if (device instanceof PhysicalDevice) {
                     ((PhysicalDevice) device).setBoard(board);
                 }
             }
         }
 
-        if(board != null) devices.add(board);
+        if (board != null) devices.add(board);
         devices.addAll(deviceList);
 
-	}
+    }
 
-	@Override
-	public String serializeExtraData() {
-		StringBuffer sb = new StringBuffer();
+    @Override
+    public String serializeExtraData() {
+        StringBuffer sb = new StringBuffer();
         // [ID, PIN, VALUE, TARGET, SENSOR?, TYPE]
 
         sb.append(index);
@@ -117,14 +117,14 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
             sb.append(device.getName()).append(",");
             sb.append(device.getUid()).append(",");
 
-            if(device instanceof PhysicalDevice){
+            if (device instanceof PhysicalDevice) {
                 GpioInfo gpio = ((PhysicalDevice) device).getGpio();
-                if(gpio != null){
+                if (gpio != null) {
                     sb.append(gpio.getPin()).append(",");
-                }else {
+                } else {
                     sb.append(0).append(",");
                 }
-            }else {
+            } else {
                 sb.append(0).append(",");
             }
 
@@ -136,12 +136,12 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
             sb.append(";");
         }
 
-        if(! devices.isEmpty()){
-            sb.deleteCharAt(sb.length()-1);
+        if (!devices.isEmpty()) {
+            sb.deleteCharAt(sb.length() - 1);
         }
 
-		return sb.toString();
-	}
+        return sb.toString();
+    }
 
     public int getLength() {
         return length;
@@ -151,23 +151,23 @@ public class GetDevicesResponse extends ResponseCommand implements ExtendedComma
         return index;
     }
 
-    public boolean isLast(){
+    public boolean isLast() {
         return index == length;
     }
 
-    public static Board resolveParents(Collection<Device> devices){
+    public static Board resolveParents(Collection<Device> devices) {
 
         Board board = null;
 
         for (Device device : devices) {
-            if(device instanceof Board){
+            if (device instanceof Board) {
                 board = (Board) device;
             }
         }
 
-        if(board != null){
+        if (board != null) {
             for (Device device : devices) {
-                if(device != board){
+                if (device != board) {
                     board.addDevice(device);
                 }
             }

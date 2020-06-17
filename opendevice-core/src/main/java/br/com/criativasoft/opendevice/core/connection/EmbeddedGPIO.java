@@ -29,12 +29,14 @@ public interface EmbeddedGPIO extends DeviceConnection {
     /**
      * Function used to link a device with this connection. </br>
      * Note that in some implementations of DeviceManager this function is called automatically
+     *
      * @param device
      */
     void attach(Device device);
 
     /**
      * Return Bord information for this connection.
+     *
      * @return
      */
     Board getBoardInfo();

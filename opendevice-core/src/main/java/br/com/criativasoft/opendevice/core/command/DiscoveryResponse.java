@@ -17,6 +17,7 @@ import br.com.criativasoft.opendevice.connection.discovery.NetworkDeviceInfo;
 
 /**
  * Discovery Network Devices response. Used with: DiscoveryServiceImpl
+ *
  * @author Ricardo JL Rufino
  * @date 04/11/15
  */

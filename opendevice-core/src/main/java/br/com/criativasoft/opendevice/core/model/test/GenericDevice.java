@@ -25,10 +25,11 @@ import java.util.List;
 /**
  * TODO: Add docs.
  * // TODO: lembar de mudar o DeviceVO
+ *
  * @author Ricardo JL Rufino
  * @date 13/01/16
  */
-public class GenericDevice extends Device  {
+public class GenericDevice extends Device {
 
     private List<Property> properties = new ArrayList<Property>();
 
@@ -42,29 +43,29 @@ public class GenericDevice extends Device  {
         super(uid, null, DeviceType.DIGITAL, DeviceCategory.GENERIC);
     }
 
-    public void execute(String action, Object param){
+    public void execute(String action, Object param) {
         ActionDef def = getCategory().getAction(action);
-        if(def == null) throw new IllegalArgumentException("Action '" + action + "' not defined in " +  getCategory());
+        if (def == null) throw new IllegalArgumentException("Action '" + action + "' not defined in " + getCategory());
         execute(def, param);
     }
 
-    public void execute(ActionDef action, Object param){
+    public void execute(ActionDef action, Object param) {
         List<Object> params = new ArrayList<Object>();
-        if(param != null) params.add(param);
+        if (param != null) params.add(param);
         notityActionExecution(action, params);
     }
 
-    public void setProperty(String property, Object value){
+    public void setProperty(String property, Object value) {
         PropertyDef def = getCategory().getProperty(property);
         setProperty(def.getCode(), value);
     }
 
-    public void setProperty(int propertyCode, Object value){
+    public void setProperty(int propertyCode, Object value) {
 
         Property property = getProperty(propertyCode);
 
         // not found, but exist in specification
-        if(property == null) {
+        if (property == null) {
             PropertyDef def = getCategory().getProperty(propertyCode);
             if (def != null) {
                 Property newProp = new Property();
@@ -74,8 +75,8 @@ public class GenericDevice extends Device  {
             }
         }
 
-        if(property != null){
-            if(value != null && value.equals(property.getValue())){
+        if (property != null) {
+            if (value != null && value.equals(property.getValue())) {
                 property.setValue(value);
                 notityPropertyChange(property);
             }
@@ -84,10 +85,10 @@ public class GenericDevice extends Device  {
 
     }
 
-    public Property getProperty(int code){
+    public Property getProperty(int code) {
 
         for (Property property : properties) {
-            if (property.getDefinition().getCode() == code){
+            if (property.getDefinition().getCode() == code) {
                 return property;
             }
         }
@@ -95,10 +96,10 @@ public class GenericDevice extends Device  {
         return null;
     }
 
-    public Property getProperty(PropertyDef def){
+    public Property getProperty(PropertyDef def) {
 
         for (Property property : properties) {
-            if (property.getDefinition().getCode() == def.getCode()){
+            if (property.getDefinition().getCode() == def.getCode()) {
                 return property;
             }
         }
@@ -108,14 +109,14 @@ public class GenericDevice extends Device  {
 
 
     // FIXME: mover logica de notificação para BaseDeviceManager..  para evitar bloqueios
-    public void notityPropertyChange(Property property){
+    public void notityPropertyChange(Property property) {
         for (PropertyChangeListener listener : propertyListeners) {
             listener.onPropertyChange(this, property);
         }
     }
 
     // FIXME: mover logica de notificação para BaseDeviceManager.. para evitar bloqueios
-    public void notityActionExecution(ActionDef action, List<Object> params){
+    public void notityActionExecution(ActionDef action, List<Object> params) {
         for (ActionCommandListener listener : actionListeners) {
             listener.onExecuteAction(this, action, params);
         }
@@ -134,7 +135,7 @@ public class GenericDevice extends Device  {
         return properties;
     }
 
-    public void addProperty(Property property){
+    public void addProperty(Property property) {
         properties.add(property);
     }
 

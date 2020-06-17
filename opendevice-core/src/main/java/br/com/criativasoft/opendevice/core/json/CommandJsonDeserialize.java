@@ -28,7 +28,7 @@ import java.io.IOException;
 
 /**
  * (for JSON, change NAME ??!!!)
- * TODO: PENDING DOC 
+ * TODO: PENDING DOC
  *
  * @author Ricardo JL Rufino
  * @date 27/07/14.
@@ -51,15 +51,15 @@ public class CommandJsonDeserialize extends StdDeserializer<Command> {
 
         CommandType commandType = CommandType.getByCode(type);
 
-        if(commandType == null) throw new IllegalArgumentException("type of command must be provided !");
+        if (commandType == null) throw new IllegalArgumentException("type of command must be provided !");
 
-        if(DeviceCommand.isCompatible(commandType)){
+        if (DeviceCommand.isCompatible(commandType)) {
             return mapper.readValue(root.toString(), DeviceCommand.class);
-        }else{
+        } else {
 
             Class<? extends Command> cmdClass = commandType.getCommandClass();
 
-            if(cmdClass == null) {
+            if (cmdClass == null) {
                 throw new IllegalArgumentException("Command type not supported!! You need configure in CommandJsonDeserialize");
             }
 

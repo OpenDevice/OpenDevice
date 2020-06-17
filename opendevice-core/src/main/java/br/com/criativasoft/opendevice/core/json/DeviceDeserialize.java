@@ -48,11 +48,11 @@ public class DeviceDeserialize extends JsonDeserializer<Device> {
 
         Class<? extends Device> beanClass = null;
 
-        if(type != null){
+        if (type != null) {
             beanClass = type.getKlass();
         }
 
-        if(beanClass == null){
+        if (beanClass == null) {
             log.debug("Using default class for device type = " + type);
             beanClass = Device.class;
         }

@@ -27,13 +27,13 @@ import java.io.IOException;
 import java.util.*;
 
 public class MultipleConnection implements DeviceConnection, ConnectionListener {
-	
-	private static final Logger log = LoggerFactory.getLogger(MultipleConnection.class);
-	
-	private Set<DeviceConnection> connections = new LinkedHashSet<DeviceConnection>();
-	private Set<ConnectionListener> listeners = new HashSet<ConnectionListener>();
-	
-	private ConnectionStatus status = ConnectionStatus.DISCONNECTED;
+
+    private static final Logger log = LoggerFactory.getLogger(MultipleConnection.class);
+
+    private Set<DeviceConnection> connections = new LinkedHashSet<DeviceConnection>();
+    private Set<ConnectionListener> listeners = new HashSet<ConnectionListener>();
+
+    private ConnectionStatus status = ConnectionStatus.DISCONNECTED;
 
     private ConnectionManager manager;
 
@@ -44,168 +44,168 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
     /**
      * Broadcast the received commands to other connections
      */
-    public void enableBroadcast(){
+    public void enableBroadcast() {
         broadcast = true;
     }
-	  
-	public synchronized boolean addListener(ConnectionListener e) {
-		boolean value = false;
 
-        if(!listeners.contains(e)){
+    public synchronized boolean addListener(ConnectionListener e) {
+        boolean value = false;
+
+        if (!listeners.contains(e)) {
             listeners.add(e);
         }
 
-		for (DeviceConnection connection : connections) {
-			if(connection.addListener(e)){
-				value = true;
-			}
-		}
-		
-		return value;
-	}
-	
-	@Override
-	public synchronized boolean removeListener(ConnectionListener e) {
-		boolean value = false;
+        for (DeviceConnection connection : connections) {
+            if (connection.addListener(e)) {
+                value = true;
+            }
+        }
 
-		synchronized (listeners) {
-			listeners.remove(e);
-		}
+        return value;
+    }
 
-		for (DeviceConnection connection : connections) {
-			if(connection.removeListener(e)){
-				value = true;
-			}
-		}
-		
-		return value;
-	}
+    @Override
+    public synchronized boolean removeListener(ConnectionListener e) {
+        boolean value = false;
 
-	public void connect() throws ConnectionException {
-		ConnectionException lastException = null;
-	
-		for (DeviceConnection connection : connections) {
-			if(connection != null && ! connection.isConnected()){
-				try{
-					connection.connect();
-				}catch(ConnectionException e){
-					lastException = e;
-				}
-			}
-		}
+        synchronized (listeners) {
+            listeners.remove(e);
+        }
 
-		if(lastException != null) throw lastException;
-		
-	}
+        for (DeviceConnection connection : connections) {
+            if (connection.removeListener(e)) {
+                value = true;
+            }
+        }
 
-	public void disconnect() throws ConnectionException{
-		for (DeviceConnection connection : connections) {
-			if(connection != null && connection.isConnected()){
-				connection.disconnect();
-			}
-		}
-	}
+        return value;
+    }
 
-	public boolean isConnected() {
-		
-		for (DeviceConnection connection : connections) {
-			if(connection.isConnected()){
-				return true;
-			}
-		}
+    public void connect() throws ConnectionException {
+        ConnectionException lastException = null;
 
-		return false;
-	}
-	
-	@Override
-	public ConnectionStatus getStatus() {
-		return status;
-	}
-	
-	public boolean isAllConnected() {
-		
-		for (DeviceConnection connection : connections) {
-			if(!connection.isConnected()){
-				return false;
-			}
-		}
-		
-		return true;		
-	}
-	
-	public void send(Message message) throws IOException {
+        for (DeviceConnection connection : connections) {
+            if (connection != null && !connection.isConnected()) {
+                try {
+                    connection.connect();
+                } catch (ConnectionException e) {
+                    lastException = e;
+                }
+            }
+        }
 
-		for (DeviceConnection connection : connections) {
-			if(connection != null && connection.isConnected()){
-				connection.send(message);
-			}
-		}
-	}
-	
+        if (lastException != null) throw lastException;
 
-	public DeviceConnection addConnection(DeviceConnection connection) {
+    }
 
-		for (ConnectionListener listener : listeners) {
-			connection.addListener(listener);
-		}
-		connection.addListener(this); // only to broadcast.
-		connections.add(connection);
-		return connection;
-	}
+    public void disconnect() throws ConnectionException {
+        for (DeviceConnection connection : connections) {
+            if (connection != null && connection.isConnected()) {
+                connection.disconnect();
+            }
+        }
+    }
 
-	public void addAllConnections(Collection<? extends DeviceConnection> connection) {
+    public boolean isConnected() {
 
-		for (DeviceConnection deviceConnection : connection) {
-			addConnection(deviceConnection);
-		}
-		
-	}
+        for (DeviceConnection connection : connections) {
+            if (connection.isConnected()) {
+                return true;
+            }
+        }
 
-	public Set<DeviceConnection> getConnections() {
-		return connections;
-	}
-	
-	public <T> T getConnection(Class<T> klass){
-		for (DeviceConnection connection : connections) {
+        return false;
+    }
 
-			if(connection.getClass().equals(klass) || klass.isAssignableFrom(connection.getClass())){
-				return (T) connection;
-			}
-			
-		}
-		
-		return null;
-	}
+    @Override
+    public ConnectionStatus getStatus() {
+        return status;
+    }
 
-	public DeviceConnection findConnection(String uid){
+    public boolean isAllConnected() {
 
-		for (DeviceConnection connection : connections) {
+        for (DeviceConnection connection : connections) {
+            if (!connection.isConnected()) {
+                return false;
+            }
+        }
 
-			if(uid.equals(connection.getUID())){
-				return connection;
-			}
+        return true;
+    }
 
-		}
+    public void send(Message message) throws IOException {
 
-		return null;
-	}
-	
-	public boolean exist(DeviceConnection conn){
-		
-		if(conn == this) return true;
-		
-		return connections.contains(conn);
-		
-	}
-	
-	/**
-	 * returns the number of connections added
-	 */
-	public int getSize(){
-		return getConnections().size();
-	}
+        for (DeviceConnection connection : connections) {
+            if (connection != null && connection.isConnected()) {
+                connection.send(message);
+            }
+        }
+    }
 
-    public boolean hasConnections(){
+
+    public DeviceConnection addConnection(DeviceConnection connection) {
+
+        for (ConnectionListener listener : listeners) {
+            connection.addListener(listener);
+        }
+        connection.addListener(this); // only to broadcast.
+        connections.add(connection);
+        return connection;
+    }
+
+    public void addAllConnections(Collection<? extends DeviceConnection> connection) {
+
+        for (DeviceConnection deviceConnection : connection) {
+            addConnection(deviceConnection);
+        }
+
+    }
+
+    public Set<DeviceConnection> getConnections() {
+        return connections;
+    }
+
+    public <T> T getConnection(Class<T> klass) {
+        for (DeviceConnection connection : connections) {
+
+            if (connection.getClass().equals(klass) || klass.isAssignableFrom(connection.getClass())) {
+                return (T) connection;
+            }
+
+        }
+
+        return null;
+    }
+
+    public DeviceConnection findConnection(String uid) {
+
+        for (DeviceConnection connection : connections) {
+
+            if (uid.equals(connection.getUID())) {
+                return connection;
+            }
+
+        }
+
+        return null;
+    }
+
+    public boolean exist(DeviceConnection conn) {
+
+        if (conn == this) return true;
+
+        return connections.contains(conn);
+
+    }
+
+    /**
+     * returns the number of connections added
+     */
+    public int getSize() {
+        return getConnections().size();
+    }
+
+    public boolean hasConnections() {
         return getSize() > 0;
     }
 
@@ -226,59 +226,59 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
     }
 
     /**
-	 * Repassa o comando que foi recebido, para as outras conexões.
-	 */
-	private void broadcastCommand(Message message, DeviceConnection fromConnection){
-		Set<DeviceConnection> connections = this.getConnections();
-		
-		if(fromConnection != null){
-			
-			for (DeviceConnection deviceConnection : connections) {
-				
-				if(deviceConnection != fromConnection){
-					try {
-						log.debug("broadcastCommand to connection: " + deviceConnection);
-						deviceConnection.send(message);
-					} catch (IOException e) {
-						log.error(e.getMessage(), e);
-					}
-				}
-				
-			}
-			
-		}
-	}
+     * Repassa o comando que foi recebido, para as outras conexões.
+     */
+    private void broadcastCommand(Message message, DeviceConnection fromConnection) {
+        Set<DeviceConnection> connections = this.getConnections();
+
+        if (fromConnection != null) {
+
+            for (DeviceConnection deviceConnection : connections) {
+
+                if (deviceConnection != fromConnection) {
+                    try {
+                        log.debug("broadcastCommand to connection: " + deviceConnection);
+                        deviceConnection.send(message);
+                    } catch (IOException e) {
+                        log.error(e.getMessage(), e);
+                    }
+                }
+
+            }
+
+        }
+    }
 
     @Override
     public void onMessageReceived(Message command, DeviceConnection connection) {
-        if(broadcast){
+        if (broadcast) {
             broadcastCommand(command, connection);
         }
-	}
-
-	@Override
-	public void notifyListeners(Message command) {
-		for (DeviceConnection connection : connections) {
-			connection.notifyListeners(command);
-		}
-	}
+    }
 
     @Override
-	public void connectionStateChanged(DeviceConnection connection, ConnectionStatus status) {
-		
-		// UPDATE STATUS;
-		Set<DeviceConnection> connections = getConnections();
-		
-		boolean connected = false;
-		
-		for (DeviceConnection deviceConnection : connections) {
-			if(deviceConnection.isConnected()) connected = true;
-		}
-		
-		if(connected) status = ConnectionStatus.CONNECTED;
-		if(!connected) status = ConnectionStatus.DISCONNECTED;
-		
-	}
+    public void notifyListeners(Message command) {
+        for (DeviceConnection connection : connections) {
+            connection.notifyListeners(command);
+        }
+    }
+
+    @Override
+    public void connectionStateChanged(DeviceConnection connection, ConnectionStatus status) {
+
+        // UPDATE STATUS;
+        Set<DeviceConnection> connections = getConnections();
+
+        boolean connected = false;
+
+        for (DeviceConnection deviceConnection : connections) {
+            if (deviceConnection.isConnected()) connected = true;
+        }
+
+        if (connected) status = ConnectionStatus.CONNECTED;
+        if (!connected) status = ConnectionStatus.DISCONNECTED;
+
+    }
 
 
     @Override
@@ -301,44 +301,44 @@ public class MultipleConnection implements DeviceConnection, ConnectionListener 
         return this.manager;
     }
 
-	public boolean removeConnection(DeviceConnection connection) {
+    public boolean removeConnection(DeviceConnection connection) {
 
-		if(connection != null){
+        if (connection != null) {
 
-			boolean remove = connections.remove(connection);
+            boolean remove = connections.remove(connection);
 
-			if(remove){
+            if (remove) {
 
-				connection.removeListener(this);
+                connection.removeListener(this);
 
-				for (ConnectionListener listener : listeners) {
-					connection.removeListener(listener);
-				}
+                for (ConnectionListener listener : listeners) {
+                    connection.removeListener(listener);
+                }
 
-				if(connection.isConnected()) {
-					try {
-						connection.disconnect();
-					} catch (ConnectionException e) {
-						e.printStackTrace();
-					}
-				}
-			}
+                if (connection.isConnected()) {
+                    try {
+                        connection.disconnect();
+                    } catch (ConnectionException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
 
-			return remove;
+            return remove;
 
-		}
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public Date getFistConnectionDate() {
-		return null;
-	}
+    @Override
+    public Date getFistConnectionDate() {
+        return null;
+    }
 
-	@Override
-	public Date getLastConnectionDate() {
-		return null;
-	}
+    @Override
+    public Date getLastConnectionDate() {
+        return null;
+    }
 }
 

@@ -23,44 +23,45 @@ import java.util.regex.Pattern;
 /**
  * Class responsible for scan events from files. <br/>
  * Files must have the following header: <pre>
-     @name NameOfEvent
-     @devices 1,2,3
-     @description User Description
-     @type JavaScript
- </pre>
+ * @name NameOfEvent
+ * @devices 1, 2, 3
+ * @description User Description
+ * @type JavaScript
+ * </pre>
+ *
  * @author Ricardo JL Rufino
  * @date 29/08/15.
  */
 public class FileHookScanner {
 
-    private static final Pattern REGEX_NAME =  Pattern.compile("@name\\s(.*)");
-    private static final Pattern REGEX_DESC =  Pattern.compile("@description\\s(.*)");
-    private static final Pattern REGEX_DEVs =  Pattern.compile("@devices\\s(.*)");
-    private static final Pattern REGEX_TYPE =  Pattern.compile("@type\\s(.*)");
-    private static final Pattern REGEX_END =  Pattern.compile("/*/\\s*$");
+    private static final Pattern REGEX_NAME = Pattern.compile("@name\\s(.*)");
+    private static final Pattern REGEX_DESC = Pattern.compile("@description\\s(.*)");
+    private static final Pattern REGEX_DEVs = Pattern.compile("@devices\\s(.*)");
+    private static final Pattern REGEX_TYPE = Pattern.compile("@type\\s(.*)");
+    private static final Pattern REGEX_END = Pattern.compile("/*/\\s*$");
 
     public FileHookScanner() {
 
     }
 
-    protected EventHook parse(File file){
+    protected EventHook parse(File file) {
 
         EventHook hook = new EventHook();
 
         try {
 
             Scanner input = new Scanner(file);
-            StringBuffer code = new StringBuffer((int)file.length());
+            StringBuffer code = new StringBuffer((int) file.length());
             boolean cancelMatcher = false;
 
-            while(input.hasNext()) {
+            while (input.hasNext()) {
                 String nextLine = input.nextLine();
                 code.append(nextLine).append("\n");
-                if(!cancelMatcher){
+                if (!cancelMatcher) {
 
-                    if(hook.getName() == null) hook.setName(getValue(REGEX_NAME, nextLine));
-                    if(hook.getDescription() == null)  hook.setDescription(getValue(REGEX_DESC, nextLine));
-                    if(hook.getType() == null) hook.setType(getValue(REGEX_TYPE, nextLine));
+                    if (hook.getName() == null) hook.setName(getValue(REGEX_NAME, nextLine));
+                    if (hook.getDescription() == null) hook.setDescription(getValue(REGEX_DESC, nextLine));
+                    if (hook.getType() == null) hook.setType(getValue(REGEX_TYPE, nextLine));
 
                     Matcher matcher = REGEX_DEVs.matcher(nextLine);
                     if (matcher.find()) {
@@ -93,7 +94,7 @@ public class FileHookScanner {
 
     }
 
-    private String getValue(Pattern pattern, String line){
+    private String getValue(Pattern pattern, String line) {
         Matcher matcher = pattern.matcher(line);
         if (matcher.find()) {
             String group = matcher.group(1);

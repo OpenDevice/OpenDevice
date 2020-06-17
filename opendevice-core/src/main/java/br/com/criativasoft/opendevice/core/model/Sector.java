@@ -18,38 +18,43 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class Sector implements Serializable {
-	
-	private static final long serialVersionUID = 1L;
-	
-	private long id;
-	private String name;
-	private Set<Device> devices = new LinkedHashSet<Device>();
-	
-	public Sector() {
-	}
-	
-	public Sector(String name) {
-		super();
-		this.name = name;
-	}
-	
-	public long getId() {
-		return id;
-	}
-	public void setId(long id) {
-		this.id = id;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public Set<Device> getDevices() {
-		return devices;
-	}
-	public void setDevices(Set<Device> devices) {
-		this.devices = devices;
-	}
+
+    private static final long serialVersionUID = 1L;
+
+    private long id;
+    private String name;
+    private Set<Device> devices = new LinkedHashSet<Device>();
+
+    public Sector() {
+    }
+
+    public Sector(String name) {
+        super();
+        this.name = name;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Set<Device> getDevices() {
+        return devices;
+    }
+
+    public void setDevices(Set<Device> devices) {
+        this.devices = devices;
+    }
 
 }

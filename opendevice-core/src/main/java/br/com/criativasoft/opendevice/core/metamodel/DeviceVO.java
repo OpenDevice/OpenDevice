@@ -22,69 +22,69 @@ import br.com.criativasoft.opendevice.core.model.test.Property;
 import java.util.*;
 
 public class DeviceVO {
-	
-	private int id; // Mapped to UID on Device.class
-	private String name;
-	private String title;
-	private String icon;
-	private int type;
-	private int category;
-	private double value;
-	private int parentID;
-    private boolean sensor=false;
-	
-	private long lastUpdate;
-	private Date dateCreated;
 
-	private List<String> actions = new LinkedList<String>();
+    private int id; // Mapped to UID on Device.class
+    private String name;
+    private String title;
+    private String icon;
+    private int type;
+    private int category;
+    private double value;
+    private int parentID;
+    private boolean sensor = false;
+
+    private long lastUpdate;
+    private Date dateCreated;
+
+    private List<String> actions = new LinkedList<String>();
     private List<Integer> devices = new LinkedList<Integer>();
 
-	private Map<String, Object> properties = new HashMap<String, Object>();
+    private Map<String, Object> properties = new HashMap<String, Object>();
 
-	public DeviceVO() {
+    public DeviceVO() {
 
-	}
-	
-	public DeviceVO(Device device) {
-		this(device.getUid(), device.getName(), device.getType().getCode(),
-				(device.getCategory() == null ? DeviceCategory.GENERIC.getCode() : device.getCategory().getCode()),
-		     device.getValue(), device.getLastUpdate(), device.getDateCreated());
+    }
+
+    public DeviceVO(Device device) {
+        this(device.getUid(), device.getName(), device.getType().getCode(),
+                (device.getCategory() == null ? DeviceCategory.GENERIC.getCode() : device.getCategory().getCode()),
+                device.getValue(), device.getLastUpdate(), device.getDateCreated());
 
         this.title = device.getTitle();
         this.icon = device.getIcon();
 
-        if(device instanceof Sensor){
+        if (device instanceof Sensor) {
             setSensor(true);
         }
 
-		if(device instanceof PhysicalDevice){
+        if (device instanceof PhysicalDevice) {
             Board board = ((PhysicalDevice) device).getBoard();
-            if(board != null) setParentID(board.getUid());
-		}
+            if (board != null) setParentID(board.getUid());
+        }
 
-		if(device instanceof Board){
-			Set<PhysicalDevice> devices = ((Board) device).getDevices();
+        if (device instanceof Board) {
+            Set<PhysicalDevice> devices = ((Board) device).getDevices();
             for (Device current : devices) {
                 this.devices.add(current.getUid());
             }
         }
 
-		// FIXME: remove later
-		if(device instanceof GenericDevice){
+        // FIXME: remove later
+        if (device instanceof GenericDevice) {
 
-			GenericDevice generic = (GenericDevice) device;
-			GenericCategory category = generic.getCategory();
+            GenericDevice generic = (GenericDevice) device;
+            GenericCategory category = generic.getCategory();
 
-			for (ActionDef actionDef : category.getActions()) {
-				actions.add(actionDef.getName());
-			}
+            for (ActionDef actionDef : category.getActions()) {
+                actions.add(actionDef.getName());
+            }
 
-			for (Property property : generic.getProperties()) {
-				properties.put(property.getName(), property.getValue());
-			}
+            for (Property property : generic.getProperties()) {
+                properties.put(property.getName(), property.getValue());
+            }
 
-		}
-	}
+        }
+    }
 
     public DeviceVO(int id, String name, DeviceType type, DeviceCategory category, long value) {
         this(id, name, type.getCode(), category.getCode(), value);
@@ -94,76 +94,89 @@ public class DeviceVO {
         this(id, name, type, category, value, 0, null);
     }
 
-	public DeviceVO(int id, String name, int type, int category, double value,long lastUpdate, Date dateCreated) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.type = type;
-		this.category = category;
-		this.value = value;
-		this.lastUpdate = lastUpdate;
-		this.dateCreated = dateCreated;
-	}
+    public DeviceVO(int id, String name, int type, int category, double value, long lastUpdate, Date dateCreated) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.category = category;
+        this.value = value;
+        this.lastUpdate = lastUpdate;
+        this.dateCreated = dateCreated;
+    }
 
 
-	public int getId() {
-		return id;
-	}
+    public int getId() {
+        return id;
+    }
+
     public void setId(int id) {
-		this.id = id;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public int getType() {
-		return type;
-	}
-	public void setType(int type) {
-		this.type = type;
-	}
-	public int getCategory() {
-		return category;
-	}
-	public void setCategory(int category) {
-		this.category = category;
-	}
-	public double getValue() {
-		return value;
-	}
-	public void setValue(double value) {
-		this.value = value;
-	}
-	public long getLastUpdate() {
-		return lastUpdate;
-	}
-	public void setLastUpdate(long lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
-	public Date getDateCreated() {
-		return dateCreated;
-	}
-	public void setDateCreated(Date dateCreated) {
-		this.dateCreated = dateCreated;
-	}
+        this.id = id;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setParentID(int parentID) {
-		this.parentID = parentID;
-	}
+    public int getType() {
+        return type;
+    }
 
-	public int getParentID() {
-		return parentID;
-	}
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public int getCategory() {
+        return category;
+    }
+
+    public void setCategory(int category) {
+        this.category = category;
+    }
+
+    public double getValue() {
+        return value;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
+    }
+
+    public long getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(long lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setParentID(int parentID) {
+        this.parentID = parentID;
+    }
+
+    public int getParentID() {
+        return parentID;
+    }
 
     public void setDevices(List<Integer> devices) {
         this.devices = devices;
@@ -181,27 +194,27 @@ public class DeviceVO {
         return sensor;
     }
 
-	public void setProperties(Map<String, Object> properties) {
-		this.properties = properties;
-	}
+    public void setProperties(Map<String, Object> properties) {
+        this.properties = properties;
+    }
 
-	public Map<String, Object> getProperties() {
-		return properties;
-	}
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
 
-	public void setActions(List<String> actions) {
-		this.actions = actions;
-	}
+    public void setActions(List<String> actions) {
+        this.actions = actions;
+    }
 
-	public List<String> getActions() {
-		return actions;
-	}
+    public List<String> getActions() {
+        return actions;
+    }
 
-	public void setIcon(String icon) {
-		this.icon = icon;
-	}
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
 
-	public String getIcon() {
-		return icon;
-	}
+    public String getIcon() {
+        return icon;
+    }
 }

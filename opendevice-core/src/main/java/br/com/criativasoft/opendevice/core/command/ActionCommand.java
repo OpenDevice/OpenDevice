@@ -20,6 +20,7 @@ import java.util.List;
 
 /**
  * FIXME: conflito de logica com o USAR ACTOIN, no novo protocolo: ver CommandType
+ *
  * @author Ricardo JL Rufino
  * @date 11/01/16
  */
@@ -62,7 +63,7 @@ public class ActionCommand extends Command {
     }
 
     public <T> T getParam(int index, Class<T> klass) {
-        if(params == null) return null;
+        if (params == null) return null;
         return TypeConverter.convert(klass, params.get(index));
     }
 

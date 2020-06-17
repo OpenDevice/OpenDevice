@@ -16,16 +16,16 @@ package br.com.criativasoft.opendevice.core.dao;
 import java.util.List;
 
 public interface Dao<T> {
-  
-  T getById(long id);
 
-  void persist(T entity);
+    T getById(long id);
 
-  T  update(T entity);
+    void persist(T entity);
 
-  void delete(T entity);
+    T update(T entity);
 
-  void refresh(T entity);
+    void delete(T entity);
 
-  List<T> listAll();
+    void refresh(T entity);
+
+    List<T> listAll();
 }

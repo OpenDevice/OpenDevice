@@ -18,6 +18,7 @@ import java.util.Map;
 
 /**
  * Extension Point to add new JPA Entities
+ *
  * @author Ricardo JL Rufino
  * @date 24/01/16
  */
@@ -27,6 +28,7 @@ public interface PersistenceExtension {
 
     /**
      * Get Entity DAO
+     *
      * @return Map<Interface, Implementation>
      */
     Map<Class, Class> getDaoClasses();

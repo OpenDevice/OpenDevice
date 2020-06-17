@@ -17,8 +17,9 @@ import br.com.criativasoft.opendevice.core.model.Device;
 
 /**
  * TODO: Add docs.
+ *
  * @author Ricardo JL Rufino
- * Date: 10/05/17
+ *         Date: 10/05/17
  */
 public class SaveDeviceCommand extends Command implements ExtendedCommand {
 

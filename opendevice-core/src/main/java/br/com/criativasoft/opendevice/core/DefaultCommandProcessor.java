@@ -33,7 +33,6 @@ import java.util.Set;
 
 
 /**
- *
  * @author Ricardo JL Rufino
  *         Date: 13/05/17
  */
@@ -47,13 +46,13 @@ public class DefaultCommandProcessor {
         this.manager = manager;
     }
 
-    public void onMessageReceived(Message message, DeviceConnection connection){
+    public void onMessageReceived(Message message, DeviceConnection connection) {
 
         Command command = (Command) message;
 
         OpenDeviceConfig config = OpenDeviceConfig.get();
 
-        if(command.getApplicationID() == null || command.getApplicationID().length() == 0){
+        if (command.getApplicationID() == null || command.getApplicationID().length() == 0) {
             command.setApplicationID(connection.getApplicationID());
         }
 
@@ -62,7 +61,8 @@ public class DefaultCommandProcessor {
 
         CommandType type = command.getType();
 
-        if(log.isDebugEnabled()) log.debug("Command Received - Type: {} (from: " + connection.toString() + ")", type.toString());
+        if (log.isDebugEnabled())
+            log.debug("Command Received - Type: {} (from: " + connection.toString() + ")", type.toString());
 
         // Comandos de DIGITAL e similares..
         if (DeviceCommand.isCompatible(type) || type == CommandType.INFRA_RED) {
@@ -74,14 +74,14 @@ public class DefaultCommandProcessor {
 
             Device device = manager.findDeviceByUID(deviceID);
 
-            if(log.isDebugEnabled()) log.debug("Device Change. ID:{}, Value:{}", deviceID, value);
+            if (log.isDebugEnabled()) log.debug("Device Change. ID:{}, Value:{}", deviceID, value);
 
-            if(device != null){
-                if(device.getType() == Device.NUMERIC){ // fire the event 'onChange' every time a reading is taken
+            if (device != null) {
+                if (device.getType() == Device.NUMERIC) { // fire the event 'onChange' every time a reading is taken
                     device.setValue(value, false);
-                }else if (device.getValue() != value){ // for ANALOG, DIGITAL.
+                } else if (device.getValue() != value) { // for ANALOG, DIGITAL.
                     device.setValue(value, false);
-                }else{ // not changed
+                } else { // not changed
                     return;
                 }
             }
@@ -90,7 +90,7 @@ public class DefaultCommandProcessor {
             // just be sent to client conenctions ..
             if (outputConnections != null && outputConnections.exist(connection)) {
                 try {
-                    if(inputConnections != null && inputConnections.getSize() > 0){
+                    if (inputConnections != null && inputConnections.getSize() > 0) {
                         log.debug("Sending to input connections...");
                         inputConnections.send(command);
                     }
@@ -103,8 +103,8 @@ public class DefaultCommandProcessor {
             // It must be sent to the physical module, and monitor the response.
             if (inputConnections != null && inputConnections.exist(connection)) {
 
-                if(outputConnections.hasConnections()){
-                    log.debug("Sending to output connections ("+outputConnections.getSize()+")...");
+                if (outputConnections.hasConnections()) {
+                    log.debug("Sending to output connections (" + outputConnections.getSize() + ")...");
                     try {
                         manager.sendTo(deviceCommand, outputConnections);
                     } catch (IOException e) {
@@ -112,11 +112,11 @@ public class DefaultCommandProcessor {
                     }
                 }
 
-                if(config.isBroadcastInputs()){
+                if (config.isBroadcastInputs()) {
                     try {
                         Set<DeviceConnection> inputs = inputConnections.getConnections();
                         for (DeviceConnection input : inputs) {
-                            if(input != connection) inputConnections.send(deviceCommand);
+                            if (input != connection) inputConnections.send(deviceCommand);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -176,24 +176,24 @@ public class DefaultCommandProcessor {
             GetDevicesRequest request = (GetDevicesRequest) message;
 
             // Received GET_DEVICES with ForceSync ( broadcast to output devices )
-            if(request.isForceSync() && inputConnections.exist(connection)){
+            if (request.isForceSync() && inputConnections.exist(connection)) {
 
-                if(outputConnections.hasConnections()){
+                if (outputConnections.hasConnections()) {
                     log.debug("Sending to output connections...");
                     manager.syncDevices(outputConnections, request);
                 }
 
-            }else{
+            } else {
                 List<Device> devices = new LinkedList<Device>();
 
                 // No filter
-                if(request.getFilter() <= 0) devices.addAll(manager.getDevices());
+                if (request.getFilter() <= 0) devices.addAll(manager.getDevices());
 
-                if(request.getFilter() == GetDevicesRequest.FILTER_BY_ID){
+                if (request.getFilter() == GetDevicesRequest.FILTER_BY_ID) {
                     Object id = request.getFilterValue();
-                    if(id instanceof Integer || id instanceof Long){
-                        Device device =  manager.findDeviceByUID((Integer) id);
-                        if(device != null) devices.add(device);
+                    if (id instanceof Integer || id instanceof Long) {
+                        Device device = manager.findDeviceByUID((Integer) id);
+                        if (device != null) devices.add(device);
                     }
                 }
 
@@ -221,7 +221,7 @@ public class DefaultCommandProcessor {
 
             ResponseCommand response = (ResponseCommand) command;
 
-            if(response.getStatus() == CommandStatus.UNAUTHORIZED){
+            if (response.getStatus() == CommandStatus.UNAUTHORIZED) {
                 try {
                     log.info("The access information is invalid or are not configured (Authorization Required)");
                     connection.disconnect();
@@ -229,7 +229,7 @@ public class DefaultCommandProcessor {
                 }
             }
 
-        // When received from microcontrollers, this will received multiple times (1 for device)
+            // When received from microcontrollers, this will received multiple times (1 for device)
         } else if (type == CommandType.GET_DEVICES_RESPONSE) {
 
             // note if connection is IRemoteClientConnection, is a client not the 'server' running
@@ -246,7 +246,7 @@ public class DefaultCommandProcessor {
 
             partialDevices.addAll(response.getDevices());
 
-            if(!response.isLast()){
+            if (!response.isLast()) {
                 return;
             }
 
@@ -263,35 +263,35 @@ public class DefaultCommandProcessor {
             for (Device device : loadDevices) {
                 log.debug(" - " + device.toString());
 
-                Device found =  manager.findDeviceByUID(device.getUid());
+                Device found = manager.findDeviceByUID(device.getUid());
 
                 // Fallback, recovery previous device cleared/replaced
                 // If the name/id does not match, the name has priority
-                if(found == null || !found.getName().equals(device.getName())){
-                    found =  manager.findDeviceByName(device.getName());
-                    if(fromClientOrDevice) device.setUID(0); // clear, need resyc
+                if (found == null || !found.getName().equals(device.getName())) {
+                    found = manager.findDeviceByName(device.getName());
+                    if (fromClientOrDevice) device.setUID(0); // clear, need resyc
                 }
 
-                if(found == null){
+                if (found == null) {
 
                     // Device not have ID, Get next ID from database
-                    if(device.getUid() <= 0 && !config.isRemoteIDGeneration()){
-                        if(nextID == -1) nextID = dao.getNextUID();
+                    if (device.getUid() <= 0 && !config.isRemoteIDGeneration()) {
+                        if (nextID == -1) nextID = dao.getNextUID();
                         syncIds = true;
                         device.setUID(nextID++);
                         // TODO: Notify Client Applications ???
                     }
 
                     device.setApplicationID(response.getApplicationID());
-                    if(device.getCategory() != null) {
+                    if (device.getCategory() != null) {
                         device.setCategory(dao.getCategoryByCode(device.getCategory().getCode())); // update reference
                     }
 
                     // Adding new device to existing Board
-                    if(device instanceof PhysicalDevice){
+                    if (device instanceof PhysicalDevice) {
                         PhysicalDevice physical = (PhysicalDevice) device;
                         Board board = physical.getBoard();
-                        if(board != null){
+                        if (board != null) {
                             board = (Board) manager.findDeviceByName(board.getName());
                             physical.setBoard(board);
                         }
@@ -299,26 +299,26 @@ public class DefaultCommandProcessor {
                     }
 
                     manager.addDevice(device);
-                }else{
+                } else {
 
                     // For devices (check if need send/sync IDs to devices)
-                    if(fromClientOrDevice){
+                    if (fromClientOrDevice) {
 
                         // Firmware has ben cleared/replaced
                         // This will help recover IDs.
-                        if(device.getUid() <= 0 || device.getUid() != found.getUid()){
+                        if (device.getUid() <= 0 || device.getUid() != found.getUid()) {
                             device.setUID(found.getUid());
                             syncIds = true;
                         }
 
-                    // For Clientes (update DeviceID on Local)
-                    }else{
+                        // For Clientes (update DeviceID on Local)
+                    } else {
 
                         //  NOTE: probably found a device with the same name on the server, so we should update the client
                         found.setUID(device.getUid());
 
                         // Runtime devices from LocalDeviceManager (see addDevice)
-                        if(!found.isManaged()){
+                        if (!found.isManaged()) {
                             found.setManaged(true);
                         }
 
@@ -330,16 +330,16 @@ public class DefaultCommandProcessor {
 
             }
 
-            if(syncIds){
+            if (syncIds) {
                 try {
 
                     // If command received from a client application
-                    if(connection instanceof ServerConnection){
+                    if (connection instanceof ServerConnection) {
                         GetDevicesResponse devicesResponse = new GetDevicesResponse(new LinkedList<Device>(loadDevices), command.getConnectionUUID());
                         devicesResponse.setApplicationID(command.getApplicationID());
                         manager.sendTo(devicesResponse, connection);
-                     // If from microcontrollers/device send only IDs
-                    }else{
+                        // If from microcontrollers/device send only IDs
+                    } else {
                         SyncDevicesIdCommand syncDevicesIdCommand = new SyncDevicesIdCommand(new LinkedList<Device>(loadDevices));
                         syncDevicesIdCommand.setApplicationID(command.getApplicationID());
                         manager.sendTo(syncDevicesIdCommand, connection);
@@ -369,22 +369,22 @@ public class DefaultCommandProcessor {
 
             Device device = saveDeviceCommand.getDevice();
 
-            if(device != null){
+            if (device != null) {
 
-                Device found =  manager.findDeviceByUID(device.getUid());
+                Device found = manager.findDeviceByUID(device.getUid());
 
-                if(found != null){
+                if (found != null) {
 
-                    found =  manager.getDeviceDao().getById(found.getId()); // sync with database
+                    found = manager.getDeviceDao().getById(found.getId()); // sync with database
 
                     found.setTitle(device.getTitle());
                     found.setIcon(device.getIcon());
-                    if(device.getCategory() != null){
+                    if (device.getCategory() != null) {
                         found.setCategory(device.getCategory());
                     }
 
                     // HACK: force initialize LAZY properties...
-                    if(found instanceof PhysicalDevice){
+                    if (found instanceof PhysicalDevice) {
                         Board board = ((PhysicalDevice) found).getBoard();
                         board.getUid(); //
                     }
@@ -393,12 +393,12 @@ public class DefaultCommandProcessor {
 
                 }
 
-            }else{
+            } else {
                 throw new IllegalStateException("Device with UID dont exist ! At this time it is not possible to create devices.");
             }
 
 
-        // Sync offline data from clients
+            // Sync offline data from clients
         } else if (type == CommandType.SYNC_HISTORY) {
 
             SyncHistoryCommand syncHistoryCommand = (SyncHistoryCommand) command;
@@ -410,7 +410,7 @@ public class DefaultCommandProcessor {
                 Device device = manager.findDeviceByUID((int) history.getDeviceID());
 
                 // Replace to real/database ID
-                if(device != null){
+                if (device != null) {
                     history.setDeviceID(device.getId());
                     history.setNeedSync(false);
                 }

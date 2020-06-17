@@ -13,8 +13,6 @@
 
 package br.com.criativasoft.opendevice.core.event;
 
-import br.com.criativasoft.opendevice.core.metamodel.PeriodType;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +34,9 @@ public class EventHook {
 
     private String handler;
 
-    /** JavaScript, JavaScript-ServerSide , Python, Shell, JavaClass */
+    /**
+     * JavaScript, JavaScript-ServerSide , Python, Shell, JavaClass
+     */
     private String type;
 
 //    /**
@@ -45,8 +45,6 @@ public class EventHook {
 //    private int timeInterval;
 //
 //    private PeriodType period;
-
-
 
 
     public String getHandler() {

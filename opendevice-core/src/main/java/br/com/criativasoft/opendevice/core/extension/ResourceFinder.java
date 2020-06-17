@@ -25,7 +25,7 @@ import java.util.jar.JarFile;
 /**
  * @author David Blevins
  * @version $Rev$ $Date$
- * Used in {@link PluginLoader}
+ *          Used in {@link PluginLoader}
  */
 public class ResourceFinder {
 
@@ -51,7 +51,7 @@ public class ResourceFinder {
     }
 
     public ResourceFinder(String path, ClassLoader classLoader, URL... urls) {
-        if (path == null){
+        if (path == null) {
             path = "";
         } else if (path.length() > 0 && !path.endsWith("/")) {
             path += "/";
@@ -73,7 +73,7 @@ public class ResourceFinder {
             } catch (MalformedURLException e) {
             }
         }
-        this.urls = (urls == null || urls.length == 0)? null : urls;
+        this.urls = (urls == null || urls.length == 0) ? null : urls;
     }
 
     private static boolean isDirectory(URL url) {
@@ -229,7 +229,7 @@ public class ResourceFinder {
     public Map<String, String> mapAllStrings(String uri) throws IOException {
         Map<String, String> strings = new HashMap<String, String>();
         Map<String, URL> resourcesMap = getResourcesMap(uri);
-        for (Iterator iterator = resourcesMap.entrySet().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = resourcesMap.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry entry = (Map.Entry) iterator.next();
             String name = (String) entry.getKey();
             URL url = (URL) entry.getValue();
@@ -268,7 +268,7 @@ public class ResourceFinder {
         resourcesNotLoaded.clear();
         Map<String, String> strings = new HashMap<String, String>();
         Map<String, URL> resourcesMap = getResourcesMap(uri);
-        for (Iterator iterator = resourcesMap.entrySet().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = resourcesMap.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry entry = (Map.Entry) iterator.next();
             String name = (String) entry.getKey();
             URL url = (URL) entry.getValue();
@@ -375,7 +375,7 @@ public class ResourceFinder {
     public Map<String, Class> mapAllClasses(String uri) throws IOException, ClassNotFoundException {
         Map<String, Class> classes = new HashMap<String, Class>();
         Map<String, String> map = mapAllStrings(uri);
-        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry entry = (Map.Entry) iterator.next();
             String string = (String) entry.getKey();
             String className = (String) entry.getValue();
@@ -412,7 +412,7 @@ public class ResourceFinder {
         resourcesNotLoaded.clear();
         Map<String, Class> classes = new HashMap<String, Class>();
         Map<String, String> map = mapAvailableStrings(uri);
-        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry entry = (Map.Entry) iterator.next();
             String string = (String) entry.getKey();
             String className = (String) entry.getValue();
@@ -570,7 +570,7 @@ public class ResourceFinder {
     public Map<String, Class> mapAllImplementations(Class interfase) throws IOException, ClassNotFoundException {
         Map<String, Class> implementations = new HashMap<String, Class>();
         Map<String, String> map = mapAllStrings(interfase.getName());
-        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry entry = (Map.Entry) iterator.next();
             String string = (String) entry.getKey();
             String className = (String) entry.getValue();
@@ -610,7 +610,7 @@ public class ResourceFinder {
         resourcesNotLoaded.clear();
         Map<String, Class> implementations = new HashMap<String, Class>();
         Map<String, String> map = mapAvailableStrings(interfase.getName());
-        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry entry = (Map.Entry) iterator.next();
             String string = (String) entry.getKey();
             String className = (String) entry.getValue();
@@ -753,7 +753,7 @@ public class ResourceFinder {
     public Map<String, Properties> mapAllProperties(String uri) throws IOException {
         Map<String, Properties> propertiesMap = new HashMap<String, Properties>();
         Map<String, URL> map = getResourcesMap(uri);
-        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry entry = (Map.Entry) iterator.next();
             String string = (String) entry.getKey();
             URL url = (URL) entry.getValue();
@@ -789,7 +789,7 @@ public class ResourceFinder {
         resourcesNotLoaded.clear();
         Map<String, Properties> propertiesMap = new HashMap<String, Properties>();
         Map<String, URL> map = getResourcesMap(uri);
-        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry entry = (Map.Entry) iterator.next();
             String string = (String) entry.getKey();
             URL url = (URL) entry.getValue();
@@ -921,7 +921,7 @@ public class ResourceFinder {
     }
 
     private URL getResource(String fullUri) {
-        if (urls == null){
+        if (urls == null) {
             return classLoader.getResource(fullUri);
         }
         return findResource(fullUri, urls);
@@ -934,7 +934,7 @@ public class ResourceFinder {
         Vector<URL> resources = new Vector();
         for (URL url : urls) {
             URL resource = findResource(fulluri, url);
-            if (resource != null){
+            if (resource != null) {
                 resources.add(resource);
             }
         }
@@ -946,7 +946,7 @@ public class ResourceFinder {
             URL currentUrl = search[i];
             if (currentUrl == null) {
                 continue;
-            }            
+            }
 
             try {
                 String protocol = currentUrl.getProtocol();
@@ -969,7 +969,7 @@ public class ResourceFinder {
                     }
 
                     try {
-                        juc = (JarURLConnection) new URL("jar", "", jarURL.toExternalForm() + "!/").openConnection();                        
+                        juc = (JarURLConnection) new URL("jar", "", jarURL.toExternalForm() + "!/").openConnection();
                         jarFile = juc.getJarFile();
                         String entryName;
                         if (currentUrl.getFile().endsWith("!/")) {
@@ -1002,7 +1002,7 @@ public class ResourceFinder {
                             }
                         }
                     }
-                    
+
                 } else if (protocol.equals("file")) {
                     String baseFile = currentUrl.getFile();
                     String host = currentUrl.getHost();

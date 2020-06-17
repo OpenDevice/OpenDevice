@@ -32,10 +32,10 @@ import java.util.Set;
  * @date 12/10/16
  */
 @Entity
-@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="name")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
 public class Board extends Device {
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch= FetchType.EAGER)
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     //@JsonIdentityReference(alwaysAsId = true)
     @JsonIgnore
     private Set<PhysicalDevice> devices = new LinkedHashSet<PhysicalDevice>();
@@ -74,16 +74,16 @@ public class Board extends Device {
 
     public void addDevices(List<Device> devices) {
         for (Device device : devices) {
-            if(device instanceof PhysicalDevice) {
+            if (device instanceof PhysicalDevice) {
                 this.devices.add((PhysicalDevice) device);
-            }else{
+            } else {
                 log.warn("This is not a PhysicalDevice device");
             }
         }
     }
 
     public void addDevice(Device device) {
-        if(device instanceof PhysicalDevice) {
+        if (device instanceof PhysicalDevice) {
             ((PhysicalDevice) device).setBoard(this);
             this.devices.add((PhysicalDevice) device);
         }
@@ -101,7 +101,7 @@ public class Board extends Device {
 
     @Override
     public String toString() {
-        return "Board[UID:"+getUid()+", Name:"+getName()+", Value:"+getValue()+", Type:" + getType()+"]";
+        return "Board[UID:" + getUid() + ", Name:" + getName() + ", Value:" + getValue() + ", Type:" + getType() + "]";
     }
 
 }

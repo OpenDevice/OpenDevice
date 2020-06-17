@@ -23,7 +23,7 @@ import java.util.LinkedList;
  * Send IDs to save on physical side.
  * The ids must be in order of received;
  */
-public class SyncDevicesIdCommand extends Command implements ExtendedCommand{
+public class SyncDevicesIdCommand extends Command implements ExtendedCommand {
 
     private static final long serialVersionUID = -2155798878419286601L;
 
@@ -43,7 +43,7 @@ public class SyncDevicesIdCommand extends Command implements ExtendedCommand{
 
 
     @Override
-    public void deserializeExtraData( String extradata ) {
+    public void deserializeExtraData(String extradata) {
 
         throw new IllegalStateException("Not implemented ");
 
@@ -51,18 +51,18 @@ public class SyncDevicesIdCommand extends Command implements ExtendedCommand{
 
     @Override
     public String serializeExtraData() {
-        
+
         StringBuilder sb = new StringBuilder();
         Iterator<Device> it = devices.iterator();
-        
+
         sb.append(devices.size());
         sb.append(DELIMITER);
-        
+
         while (it.hasNext()) {
-            Device device =  it.next();
+            Device device = it.next();
             sb.append(device.getUid());
-            if(it.hasNext()) sb.append(DELIMITER);
-            
+            if (it.hasNext()) sb.append(DELIMITER);
+
         }
         return sb.toString();
     }

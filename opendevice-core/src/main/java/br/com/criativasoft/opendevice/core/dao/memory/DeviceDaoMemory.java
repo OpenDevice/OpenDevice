@@ -32,7 +32,7 @@ public class DeviceDaoMemory implements DeviceDao {
 
     private Map<String, List<Device>> deviceMap = new HashMap<String, List<Device>>();
 
-    private List<Device> getCurrentDevices(){
+    private List<Device> getCurrentDevices() {
 
         return deviceMap.get(TenantProvider.getCurrentID());
 
@@ -46,14 +46,14 @@ public class DeviceDaoMemory implements DeviceDao {
     @Override
     public Device getById(long id) {
 
-        if(id == 0) return null;
+        if (id == 0) return null;
 
         List<Device> devices = getCurrentDevices();
 
-        if(devices == null) return null;
+        if (devices == null) return null;
 
-        for (Device device : devices){
-            if(device.getId() == id){
+        for (Device device : devices) {
+            if (device.getId() == id) {
                 return device;
             }
         }
@@ -63,14 +63,14 @@ public class DeviceDaoMemory implements DeviceDao {
 
     public Device getByUID(int uid) {
 
-        if(uid <= 0) return null;
+        if (uid <= 0) return null;
 
         List<Device> devices = getCurrentDevices();
 
-        if(devices == null) return null;
+        if (devices == null) return null;
 
-        for (Device device : devices){
-            if(device.getUid() == uid){
+        for (Device device : devices) {
+            if (device.getUid() == uid) {
                 return device;
             }
         }
@@ -80,14 +80,14 @@ public class DeviceDaoMemory implements DeviceDao {
 
     @Override
     public Device getByName(String name) {
-        if(name == null) return null;
+        if (name == null) return null;
 
         List<Device> devices = getCurrentDevices();
 
-        if(devices == null) return null;
+        if (devices == null) return null;
 
-        for (Device device : devices){
-            if(device.getName() != null && device.getName().equals(name)){
+        for (Device device : devices) {
+            if (device.getName() != null && device.getName().equals(name)) {
                 return device;
             }
         }
@@ -97,30 +97,30 @@ public class DeviceDaoMemory implements DeviceDao {
 
     @Override
     public int getNextUID() {
-        if(deviceMap.isEmpty()) return 1;
+        if (deviceMap.isEmpty()) return 1;
 
         int max = 0;
 
         List<Device> devices = getCurrentDevices();
 
         for (Device device : devices) {
-            if(device.getUid() > max) max = device.getUid();
+            if (device.getUid() > max) max = device.getUid();
         }
 
         return max + 1;
     }
 
-    private boolean exist(Device device){
-        if(device.getId() > 0){
+    private boolean exist(Device device) {
+        if (device.getId() > 0) {
             Device find = getById(device.getId());
             return find != null;
-        }else{
+        } else {
             List<Device> devices = getCurrentDevices();
-            if(devices == null) return false;
+            if (devices == null) return false;
 
-            for (Device find : devices){
-                if(device == find || device.equals(find) ||
-                        (device.getName() != null && device.getName().equals(find.getName()))){ // check if same instance.
+            for (Device find : devices) {
+                if (device == find || device.equals(find) ||
+                        (device.getName() != null && device.getName().equals(find.getName()))) { // check if same instance.
                     return true;
                 }
             }
@@ -133,9 +133,9 @@ public class DeviceDaoMemory implements DeviceDao {
     public void persist(Device entity) {
         List<Device> devices = getCurrentDevices();
 
-        if(!exist(entity)){
+        if (!exist(entity)) {
 
-            if(devices == null){ // init context
+            if (devices == null) { // init context
                 devices = new LinkedList<Device>();
                 deviceMap.put(TenantProvider.getCurrentID(), devices);
             }
@@ -161,23 +161,23 @@ public class DeviceDaoMemory implements DeviceDao {
 
         List<Device> devices = getCurrentDevices();
 
-        if(devices == null || devices.isEmpty()) return;
+        if (devices == null || devices.isEmpty()) return;
 
         boolean removed = devices.remove(entity); // remove by instance
 
         // remove by ID.
-        if(!removed && entity.getId() > 0){
+        if (!removed && entity.getId() > 0) {
             Device find = getById(entity.getId());
-            if(find != null){
+            if (find != null) {
                 devices.remove(find);
                 return;
             }
         }
 
         // remove by Name.
-        if(!removed && entity.getName() != null){
+        if (!removed && entity.getName() != null) {
             Device find = getByName(entity.getName());
-            if(find != null){
+            if (find != null) {
                 devices.remove(find);
                 return;
             }
@@ -193,7 +193,7 @@ public class DeviceDaoMemory implements DeviceDao {
     @Override
     public List<Device> listAll() {
         List<Device> devices = getCurrentDevices();
-        if(devices == null) return new ArrayList<Device>();
+        if (devices == null) return new ArrayList<Device>();
         return devices;
     }
 

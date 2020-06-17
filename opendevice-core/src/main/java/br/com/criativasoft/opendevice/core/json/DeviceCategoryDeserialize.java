@@ -28,7 +28,7 @@ import java.io.IOException;
  * @author Ricardo JL Rufino
  * @date 19/10/16
  */
-public class DeviceCategoryDeserialize  extends JsonDeserializer<DeviceCategory> {
+public class DeviceCategoryDeserialize extends JsonDeserializer<DeviceCategory> {
     @Override
     public DeviceCategory deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
 

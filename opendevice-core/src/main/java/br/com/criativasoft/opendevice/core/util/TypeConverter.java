@@ -21,32 +21,33 @@ package br.com.criativasoft.opendevice.core.util;
  */
 public class TypeConverter {
 
-    private TypeConverter(){}
+    private TypeConverter() {
+    }
 
     public static <T> T convert(Class<T> klass, Object value) {
 
-        if(value == null) return null;
+        if (value == null) return null;
 
-        if(klass.isAssignableFrom(value.getClass())){
+        if (klass.isAssignableFrom(value.getClass())) {
             return (T) value;
         }
 
-        if(value instanceof String){
+        if (value instanceof String) {
 
-            if (klass == Integer.class){
+            if (klass == Integer.class) {
                 return (T) new Integer(value.toString());
             }
 
-            if (klass == Double.class){
+            if (klass == Double.class) {
                 return (T) new Double(value.toString());
             }
 
-            if (klass == Boolean.class){
+            if (klass == Boolean.class) {
                 return (T) new Boolean(value.toString());
             }
         }
 
-        if(value instanceof Integer && klass == Boolean.class){
+        if (value instanceof Integer && klass == Boolean.class) {
             return (T) new Boolean((1 == ((Integer) value).intValue()));
 
         }

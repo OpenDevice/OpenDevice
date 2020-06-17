@@ -46,7 +46,7 @@ public abstract class TenantProvider {
      */
     protected abstract TenantContext createContext(String id);
 
-    public abstract void  setTenantID(String appID);
+    public abstract void setTenantID(String appID);
 
     public abstract String getTenantID();
 
@@ -61,14 +61,15 @@ public abstract class TenantProvider {
 
     /**
      * Create a new {@link TenantContext} with provied ID
+     *
      * @throws IllegalArgumentException if ID already exists
      */
-    public TenantContext addNewContext(String id){
-        if(!exist(id)){
+    public TenantContext addNewContext(String id) {
+        if (!exist(id)) {
             TenantContext context = createContext(id);
-            tenants.put(id,context);
+            tenants.put(id, context);
             return context;
-        }else{
+        } else {
             throw new IllegalArgumentException("Context with ID already exists");
         }
     }
@@ -101,15 +102,21 @@ public abstract class TenantProvider {
         TenantProvider.provider = provider;
     }
 
-    public static synchronized void setCurrentID(String appID){
+    public static synchronized void setCurrentID(String appID) {
         provider.setTenantID(appID);
     }
 
-    public static String getCurrentID(){
+    public static String getCurrentID() {
         return provider.getTenantID();
     }
 
-    /** Get current tenant context */
-    public static TenantContext getCurrentContext(){ return provider.getTenantContext(); };
+    /**
+     * Get current tenant context
+     */
+    public static TenantContext getCurrentContext() {
+        return provider.getTenantContext();
+    }
+
+    ;
 
 }

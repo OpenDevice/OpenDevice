@@ -40,14 +40,14 @@ public abstract class EnumCodeDeserialize<T extends EnumCode> extends JsonDeseri
     public abstract T getByCode(int code);
 
 
-    static class CommandTypeDeserialize extends EnumCodeDeserialize<CommandType>{
+    static class CommandTypeDeserialize extends EnumCodeDeserialize<CommandType> {
         @Override
         public CommandType getByCode(int code) {
             return CommandType.getByCode(code);
         }
     }
 
-    static class DeviceTypeDeserialize extends EnumCodeDeserialize<DeviceType>{
+    static class DeviceTypeDeserialize extends EnumCodeDeserialize<DeviceType> {
         @Override
         public DeviceType getByCode(int code) {
             return DeviceType.getByCode(code);

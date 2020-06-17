@@ -51,11 +51,11 @@ public class CategoryIPCam extends GenericCategory {
     public static PropertyDef infrared;
 
 
-    public String getDescription(){
+    public String getDescription() {
         return CategoryIPCam.class.getSimpleName();
     }
 
-    public void loadProperties(){
+    public void loadProperties() {
 
         alias = add("alias").mode(PropertyDef.Mode.READ_WRITE);
         cameraID = add("cameraID").mode(PropertyDef.Mode.READ_ONLY);

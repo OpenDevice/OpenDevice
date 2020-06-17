@@ -15,6 +15,7 @@ package br.com.criativasoft.opendevice.core.command;
 
 /**
  * Base class for connection commands
+ *
  * @author Ricardo JL Rufino
  * @date 02/11/15
  */
@@ -28,7 +29,7 @@ public class ConnectionCommand extends Command {
         super(type, uid, connectionUUID);
     }
 
-    public static boolean isCompatible(CommandType type){
+    public static boolean isCompatible(CommandType type) {
         return false;
     }
 

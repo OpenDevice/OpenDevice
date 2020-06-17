@@ -17,20 +17,19 @@ import java.util.EnumSet;
 import java.util.HashSet;
 
 /**
- *
  * @author Ricardo JL Rufino
  * @date 13/11/16
  */
-public class DefaultPasswordGenerator extends PasswordGenerator{
+public class DefaultPasswordGenerator extends PasswordGenerator {
 
-    private static final char[] ALPHA_UPPER_CHARACTERS = { 'A', 'B', 'C', 'D',
+    private static final char[] ALPHA_UPPER_CHARACTERS = {'A', 'B', 'C', 'D',
             'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
-            'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
-    private static final char[] ALPHA_LOWER_CHARACTERS = { 'a', 'b', 'c', 'd',
+            'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+    private static final char[] ALPHA_LOWER_CHARACTERS = {'a', 'b', 'c', 'd',
             'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
-            'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
-    private static final char[] NUMERIC_CHARACTERS = { '0', '1', '2', '3', '4',
-            '5', '6', '7', '8', '9' };
+            'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+    private static final char[] NUMERIC_CHARACTERS = {'0', '1', '2', '3', '4',
+            '5', '6', '7', '8', '9'};
 
     public DefaultPasswordGenerator() {
         super(new HashSet<PasswordCharacterSet>(EnumSet.allOf(SummerCharacterSets.class)), 10, 14);

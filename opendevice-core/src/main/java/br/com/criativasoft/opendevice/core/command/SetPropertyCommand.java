@@ -16,7 +16,6 @@ package br.com.criativasoft.opendevice.core.command;
 import br.com.criativasoft.opendevice.core.util.TypeConverter;
 
 /**
- *
  * @author Ricardo JL Rufino
  * @date 11/01/16
  */

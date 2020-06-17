@@ -25,7 +25,7 @@ public class PropertyDef {
 
     public static String GROUP_GENERAL = "General";
 
-    public enum Mode{
+    public enum Mode {
         READ_WRITE, WRITE_ONLY, READ_ONLY
     }
 
@@ -132,6 +132,6 @@ public class PropertyDef {
 
     @Override
     public String toString() {
-        return "PropertyDef[name:"+name+", type:"+type.name()+"]";
+        return "PropertyDef[name:" + name + ", type:" + type.name() + "]";
     }
 }

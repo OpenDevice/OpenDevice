@@ -18,6 +18,7 @@ import br.com.criativasoft.opendevice.core.DeviceManager;
 /**
  * OpenDevice Extension Point Interface.
  * The extension system (plugins) of OpenDevice is using SPI
+ *
  * @author Ricardo JL Rufino
  * @date 30/08/15.
  */
@@ -25,7 +26,11 @@ public abstract class OpenDeviceExtension {
 
     public abstract String getName();
 
-    public String getDescription(){ return null; };
+    public String getDescription() {
+        return null;
+    }
+
+    ;
 
     public abstract String getVersion();
 
@@ -37,11 +42,19 @@ public abstract class OpenDeviceExtension {
     // Extension points
     //
 
-    public ViewExtension getViewExtension() {return null;};
+    public ViewExtension getViewExtension() {
+        return null;
+    }
 
-    public PersistenceExtension getPersistenceExtension() {return null;}
+    ;
+
+    public PersistenceExtension getPersistenceExtension() {
+        return null;
+    }
 
     /* Return a list of classes used to add providers, filters and rest resources to WebServer */
-    public Class<?>[] getRestConfigClasses() {return null;}
+    public Class<?>[] getRestConfigClasses() {
+        return null;
+    }
 
 }

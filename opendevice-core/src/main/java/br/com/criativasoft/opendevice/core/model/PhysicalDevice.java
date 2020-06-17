@@ -23,19 +23,18 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 /**
- *
  * @author Ricardo JL Rufino
  * @date 12/10/16
  */
 @Entity
-@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="name")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
 public class PhysicalDevice extends Device {
 
     @Transient
     @JsonIgnore
     protected volatile GpioInfo gpio;
 
-    @ManyToOne(fetch= FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     //@JsonIdentityReference(alwaysAsId = true)
     @JsonIgnore
     private Board board;
@@ -67,10 +66,11 @@ public class PhysicalDevice extends Device {
      * Configure GPIO for this device. <br/>
      * This type of configuration is ideal for devices like the Raspberry.<br/>
      * Or when it is used to save the settings in the EPROM of low processing power devices
+     *
      * @param pin
      * @return
      */
-    public Device gpio(int pin){
+    public Device gpio(int pin) {
         this.gpio = new GpioInfo(pin);
         return this;
     }
@@ -89,6 +89,6 @@ public class PhysicalDevice extends Device {
 
     @Override
     public String toString() {
-        return "Physical[UID:"+getUid()+", Name:"+getName()+", Value:"+getValue()+", Type:" + getType()+"]";
+        return "Physical[UID:" + getUid() + ", Name:" + getName() + ", Value:" + getValue() + ", Type:" + getType() + "]";
     }
 }

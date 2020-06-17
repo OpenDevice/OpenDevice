@@ -18,8 +18,8 @@ import br.com.criativasoft.opendevice.core.dao.memory.EventHookMemoryDao;
 import br.com.criativasoft.opendevice.core.event.impl.JavaDelegateEventHandler;
 import br.com.criativasoft.opendevice.core.event.impl.SystemEventHandler;
 import br.com.criativasoft.opendevice.core.filter.OnlyFilesWithExtension;
-import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.listener.DeviceListener;
+import br.com.criativasoft.opendevice.core.model.Device;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,9 +51,9 @@ public class EventHookManager implements DeviceListener {
         registerHandler(SystemEventHandler.class);
     }
 
-    public static void registerHandler(Class<? extends EventHandler> handler){
+    public static void registerHandler(Class<? extends EventHandler> handler) {
         try {
-            if(handlers == null) handlers = new LinkedList<EventHandler>();
+            if (handlers == null) handlers = new LinkedList<EventHandler>();
             handlers.add(handler.newInstance());
         } catch (Exception e) {
             e.printStackTrace();
@@ -68,7 +68,7 @@ public class EventHookManager implements DeviceListener {
         EventContext context = new EventContext();
         context.put("device", device);
 
-        if(! hooks.isEmpty()){
+        if (!hooks.isEmpty()) {
 
             for (EventHook hook : hooks) {
                 try {
@@ -95,7 +95,7 @@ public class EventHookManager implements DeviceListener {
 
         final EventHandler eventHandler = getEventHandler(hook.getType());
 
-        if(eventHandler != null){
+        if (eventHandler != null) {
 
             executor.execute(new Runnable() {
                 @Override
@@ -110,7 +110,7 @@ public class EventHookManager implements DeviceListener {
             });
 
 
-        }else{
+        } else {
 
             throw new EventException("Handler Implementation for type: " + hook.getType() + " not found ! Hook: " + hook.getName());
 
@@ -122,7 +122,7 @@ public class EventHookManager implements DeviceListener {
 
         List<EventHook> hooks = new LinkedList<EventHook>();
 
-        if(folder.isDirectory()){
+        if (folder.isDirectory()) {
 
             File[] list = folder.listFiles(new OnlyFilesWithExtension(ext));
 
@@ -138,9 +138,9 @@ public class EventHookManager implements DeviceListener {
 
         EventHook hook = new FileHookScanner().parse(file);
 
-        if(hook.getName() != null && hook.getType() != null){
+        if (hook.getName() != null && hook.getType() != null) {
             getDao().persist(hook);
-        }else{
+        } else {
             throw new EventException("The EventHook doesn't have name or type : " + file.getPath());
         }
 
@@ -150,11 +150,10 @@ public class EventHookManager implements DeviceListener {
     }
 
 
-
-    protected EventHandler getEventHandler(String handlerType){
+    protected EventHandler getEventHandler(String handlerType) {
 
         for (EventHandler handler : handlers) {
-            if(handler.getHandlerType().equals(handlerType)) return handler;
+            if (handler.getHandlerType().equals(handlerType)) return handler;
         }
 
         return null;
@@ -167,7 +166,6 @@ public class EventHookManager implements DeviceListener {
     public void setDao(EventHookDao dao) {
         this.dao = dao;
     }
-
 
 
 }

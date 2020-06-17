@@ -43,28 +43,33 @@ import java.util.*;
  * This is the base class for device management and input and output connections. <br/>
  * After adding devices ({@link #addDevice(br.com.criativasoft.opendevice.core.model.Device)}) and connections {@link #addOutput(br.com.criativasoft.opendevice.connection.DeviceConnection)},
  * you can monitor the changes by adding a DeviceListener {@link #addListener(DeviceListener)}.
- * @since 0.1.2
+ *
  * @date 23/06/2013
+ * @since 0.1.2
  */
 public abstract class BaseDeviceManager implements DeviceManager {
 
     private static DeviceManager instance;
-	
-	private static final Logger log = LoggerFactory.getLogger(BaseDeviceManager.class);
 
-    private List<OpenDeviceExtension> extensions  = new LinkedList<OpenDeviceExtension>();
+    private static final Logger log = LoggerFactory.getLogger(BaseDeviceManager.class);
+
+    private List<OpenDeviceExtension> extensions = new LinkedList<OpenDeviceExtension>();
 
     private volatile Set<DeviceListener> listeners = new HashSet<DeviceListener>();
 
-	/** Client connections: Websockets, http, rest, etc ...*/
-	private MultipleConnection inputConnections = new MultipleConnection();
-	
-	/** Connection with the physical modules (middleware) or a proxy  */
-	private MultipleConnection outputConnections = new MultipleConnection();
+    /**
+     * Client connections: Websockets, http, rest, etc ...
+     */
+    private MultipleConnection inputConnections = new MultipleConnection();
+
+    /**
+     * Connection with the physical modules (middleware) or a proxy
+     */
+    private MultipleConnection outputConnections = new MultipleConnection();
 
     private Set<CommandFilter> filters = new LinkedHashSet<CommandFilter>();
-	
-	private CommandDelivery delivery = new CommandDelivery(this);
+
+    private CommandDelivery delivery = new CommandDelivery(this);
 
     private DiscoveryService discoveryService = new DiscoveryServiceImpl();
 
@@ -79,7 +84,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     protected DefaultCommandProcessor commandProcessor = new DefaultCommandProcessor(this);
 
-    public BaseDeviceManager(){
+    public BaseDeviceManager() {
         instance = this;
         eventManager = new EventHookManager();
 
@@ -93,11 +98,11 @@ public abstract class BaseDeviceManager implements DeviceManager {
     /**
      * @see OpenDeviceExtension
      */
-    protected void loadExtensions(){
+    protected void loadExtensions() {
 
-        try{
+        try {
             Class.forName("java.util.ServiceLoader");
-        }catch(ClassNotFoundException ex){
+        } catch (ClassNotFoundException ex) {
             log.error("This java version don't support dynamic loading (ServiceLoader), you need use direct class ex: new BluetoothConnection(addr)");
         }
 
@@ -114,7 +119,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
             try {
                 extension.init(this);
                 extensions.add(extension);
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
@@ -123,6 +128,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     /**
      * Get shared global instance of DevinceManager.
+     *
      * @return
      */
     public static BaseDeviceManager getInstance() {
@@ -148,23 +154,21 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
             T found = null;
 
-            if(ViewExtension.class.isAssignableFrom(kclass)){
+            if (ViewExtension.class.isAssignableFrom(kclass)) {
                 found = (T) extension.getViewExtension();
             }
 
-            if(PersistenceExtension.class.isAssignableFrom(kclass)){
+            if (PersistenceExtension.class.isAssignableFrom(kclass)) {
                 found = (T) extension.getPersistenceExtension();
             }
 
-            if(found != null){
-                list.add((T)found);
+            if (found != null) {
+                list.add((T) found);
             }
 
         }
         return list;
     }
-
-
 
 
     public CommandDelivery getCommandDelivery() {
@@ -185,6 +189,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     /**
      * Find by UID or Name
+     *
      * @param device
      * @return
      */
@@ -195,7 +200,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
     @Override
     public Device findDeviceByUID(int deviceUID) {
 
-        if(deviceUID <= 0) return null;
+        if (deviceUID <= 0) return null;
 
         Device device = getCurrentContext().getDeviceByUID(deviceUID);
 
@@ -205,11 +210,11 @@ public abstract class BaseDeviceManager implements DeviceManager {
     @Override
     public Device findDeviceByName(String name) {
 
-        if(name == null || name.length() == 0) return null;
+        if (name == null || name.length() == 0) return null;
 
         Device device = getCurrentContext().getDeviceByName(name);
 
-        if(device == null) getValidDeviceDao().getByName(name);
+        if (device == null) getValidDeviceDao().getByName(name);
 
         return device;
     }
@@ -251,30 +256,32 @@ public abstract class BaseDeviceManager implements DeviceManager {
     }
 
     /**
-     *
      * @return true if transaction already active by another thread/component
      */
-    public boolean transactionBegin(){ return false; }
+    public boolean transactionBegin() {
+        return false;
+    }
 
-    public void transactionEnd(){}
+    public void transactionEnd() {
+    }
 
 
-    public TenantContext getCurrentContext(){
+    public TenantContext getCurrentContext() {
         return TenantProvider.getCurrentContext();
     }
 
     public DeviceDao getValidDeviceDao() {
-        if(getDataManager().getDeviceDao() == null) throw new IllegalStateException("deviceDao is NULL !");
+        if (getDataManager().getDeviceDao() == null) throw new IllegalStateException("deviceDao is NULL !");
         return getDataManager().getDeviceDao();
     }
 
     @Override
     public void addDevice(Device device) {
-        if(device == null) throw new IllegalArgumentException("Device is null");
+        if (device == null) throw new IllegalArgumentException("Device is null");
 
         Device found = findDevice(device);
 
-        if(found == null) {
+        if (found == null) {
             getValidDeviceDao().persist(device);
             getCurrentContext().addDevice(device); // add to cache.
             bindDevice(device);
@@ -282,10 +289,10 @@ public abstract class BaseDeviceManager implements DeviceManager {
     }
 
     public void bindDevice(Device device) {
-        if(device == null) throw new IllegalArgumentException("Device is null");
-        if(!device.isManaged()){
+        if (device == null) throw new IllegalArgumentException("Device is null");
+        if (!device.isManaged()) {
             device.setManaged(true);
-            for(DeviceListener listener: listeners){
+            for (DeviceListener listener : listeners) {
                 listener.onDeviceRegistred(device);
             }
         }
@@ -293,6 +300,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     /**
      * Remove existing and add new device
+     *
      * @param existing
      * @param device
      */
@@ -303,16 +311,16 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     @Override
     public void updateDevice(Device device) {
-        if(device == null) throw new IllegalArgumentException("Device is null");
+        if (device == null) throw new IllegalArgumentException("Device is null");
         getValidDeviceDao().update(device);
         getCurrentContext().updateDevice(device); // add to cache.
     }
 
     @Override
     public void removeDevice(Device device) {
-        if(device == null) throw new IllegalArgumentException("Device is null");
+        if (device == null) throw new IllegalArgumentException("Device is null");
 
-        if(device instanceof Board){
+        if (device instanceof Board) {
             Set<PhysicalDevice> devices = ((Board) device).getDevices();
             for (Device physicalDevice : devices) {
                 removeDevice(physicalDevice);
@@ -320,7 +328,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
         }
 
         // force load persistent state from database
-        if(device.getId() > 0){
+        if (device.getId() > 0) {
             device = getValidDeviceDao().getById(device.getId());
         }
         getValidDeviceDao().delete(device);
@@ -329,7 +337,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     @Override
     public void addDevices(Collection<Device> devices) {
-        for (Device device : devices){
+        for (Device device : devices) {
             addDevice(device);
         }
     }
@@ -361,24 +369,25 @@ public abstract class BaseDeviceManager implements DeviceManager {
     }
 
     public void addConnectionListener(ConnectionListener e) {
-        if(inputConnections != null) inputConnections.addListener(e);
-        if(outputConnections != null) outputConnections.addListener(e);
+        if (inputConnections != null) inputConnections.addListener(e);
+        if (outputConnections != null) outputConnections.addListener(e);
     }
 
     public void removeConnectionListener(ConnectionListener e) {
-        if(inputConnections != null) inputConnections.removeListener(e);
-        if(outputConnections != null) outputConnections.removeListener(e);
+        if (inputConnections != null) inputConnections.removeListener(e);
+        if (outputConnections != null) outputConnections.removeListener(e);
     }
 
     /**
      * Notify All Listeners about device change
+     *
      * @param sync - sync state with server
      */
     public synchronized void notifyListeners(Device device, boolean sync) {
 
         TenantContext currentContext = TenantProvider.getCurrentContext();
 
-        if(!currentContext.isDevicesInSync()) { // ignore events from device syncronization/initialization  (GET_DEVICES_RESPONSE)...
+        if (!currentContext.isDevicesInSync()) { // ignore events from device syncronization/initialization  (GET_DEVICES_RESPONSE)...
 
             boolean alreadyExist = transactionBegin();
 
@@ -394,13 +403,13 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
             if (sync) {
                 try {
-                    if(device.getUid() > 0) {
+                    if (device.getUid() > 0) {
                         CommandType type = DeviceCommand.getCommandType(device.getType());
                         DeviceCommand cmd = new DeviceCommand(type, device.getUid(), device.getValue());
                         if (device.getApplicationID() != null) cmd.setApplicationID(device.getApplicationID());
                         send(cmd);
-                    }else{
-                        log.debug("Can't sync device with UID = 0 ("+device.getName()+") ! Need sync with server or enable local id generation");
+                    } else {
+                        log.debug("Can't sync device with UID = 0 (" + device.getName() + ") ! Need sync with server or enable local id generation");
                     }
                 } catch (IOException ex) {
                     log.error(ex.getMessage(), ex);
@@ -414,7 +423,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
             listener.onDeviceChanged(device);
         }
 
-        if(listeners.isEmpty()) return;
+        if (listeners.isEmpty()) return;
 
         // Global Listeners
         for (final DeviceListener listener : listeners) {
@@ -422,13 +431,13 @@ public abstract class BaseDeviceManager implements DeviceManager {
         }
     }
 
-    protected void initInputConnections(){
-		inputConnections.addListener(connectionListener);
-	}
-	
-	protected void initOutputConnections(){
-		outputConnections.addListener(connectionListener);
-	}
+    protected void initInputConnections() {
+        inputConnections.addListener(connectionListener);
+    }
+
+    protected void initOutputConnections() {
+        outputConnections.addListener(connectionListener);
+    }
 
     @Override
     public void connect() throws IOException {
@@ -450,8 +459,8 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     @Override
     public void disconnect() throws IOException {
-        if(outputConnections != null) outputConnections.disconnect();
-        if(inputConnections != null) inputConnections.disconnect();
+        if (outputConnections != null) outputConnections.disconnect();
+        if (inputConnections != null) inputConnections.disconnect();
     }
 
     @Override
@@ -460,27 +469,28 @@ public abstract class BaseDeviceManager implements DeviceManager {
         connectAll();
     }
 
-    protected void connectAll() throws ConnectionException{
+    protected void connectAll() throws ConnectionException {
 
-        if(outputConnections != null) outputConnections.connect();
-        if(inputConnections != null) inputConnections.connect();
+        if (outputConnections != null) outputConnections.connect();
+        if (inputConnections != null) inputConnections.connect();
 
-	}
+    }
 
     /**
      * Get remote devices and synchronize (embedded) devices with connections that require additional information such as GPIO. <br/>
      * (An example is the raspberry that already has support built GPIO)
+     *
      * @param connection
      * @param request
      */
-    protected void syncDevices(DeviceConnection connection, GetDevicesRequest request){
+    protected void syncDevices(DeviceConnection connection, GetDevicesRequest request) {
 
-        if(connection instanceof EmbeddedGPIO){
+        if (connection instanceof EmbeddedGPIO) {
             EmbeddedGPIO gpioConn = (EmbeddedGPIO) connection;
 
             // TODO: this may cause problems if devices is not related to GPIO, like devices from atached microcontrolers (raspberry <-usb-> arduino)
             // This is a convenient way to register devices instantiated but not attached to "Embedded Connection"
-            if(getConfig().getBindLocalVariables()) {
+            if (getConfig().getBindLocalVariables()) {
                 Collection<Device> devices = getDevices();
                 if (devices != null) {
                     for (Device device : devices) {
@@ -493,7 +503,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
             // Sync dynamic devices generated on-the-fly by connection
             Board board = gpioConn.getBoardInfo();
-            if(board != null){
+            if (board != null) {
                 List<Device> devices = new LinkedList<Device>();
                 devices.add(board);
                 devices.addAll(board.getDevices());
@@ -504,22 +514,22 @@ public abstract class BaseDeviceManager implements DeviceManager {
                 DeviceDao dao = getDeviceDao();
 
                 for (Device device : devices) {
-                    if(!device.isManaged()){
+                    if (!device.isManaged()) {
 
                         // Check if exist a device with same name (2th connection) !
                         Device found = findDeviceByName(device.getName());
-                        if(found != null){
+                        if (found != null) {
                             device.setUID(found.getUid());
                             replaceDevice(found, device);
-                        }else{
+                        } else {
 
                             // Device not have ID, Get next ID from database
-                            if(device.getUid() <= 0 && !config.isRemoteIDGeneration()){
-                                if(nextID == -1) nextID = dao.getNextUID();
+                            if (device.getUid() <= 0 && !config.isRemoteIDGeneration()) {
+                                if (nextID == -1) nextID = dao.getNextUID();
                                 device.setUID(nextID++);
                             }
 
-                            if(device.getCategory() != null) {
+                            if (device.getCategory() != null) {
                                 device.setCategory(dao.getCategoryByCode(device.getCategory().getCode())); // update reference
                             }
                             addDevice(device);
@@ -531,14 +541,15 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
         }
 
-        if((connection instanceof StreamConnection || connection instanceof IRemoteClientConnection  /* << ws/rest clients */ )
-                && outputConnections.exist(connection)){
+        if ((connection instanceof StreamConnection || connection instanceof IRemoteClientConnection  /* << ws/rest clients */)
+                && outputConnections.exist(connection)) {
             try {
                 sendTo(request, connection);
-            } catch (IOException e) {}
+            } catch (IOException e) {
+            }
         }
 
-        if(connection instanceof MultipleConnection){
+        if (connection instanceof MultipleConnection) {
             Set<DeviceConnection> connections = ((MultipleConnection) connection).getConnections();
             for (DeviceConnection current : connections) {
                 syncDevices(current, request);
@@ -548,34 +559,32 @@ public abstract class BaseDeviceManager implements DeviceManager {
     }
 
 
+    public void addInput(DeviceConnection connection) {
 
+        if (inputConnections.getSize() == 0) initInputConnections();
 
-    public void addInput(DeviceConnection connection){
-		
-		if(inputConnections.getSize() == 0) initInputConnections();
-
-        if(inputConnections.exist(connection)){
-            log.info("Connection with ID: " + connection.getUID()+ " already exist !");
+        if (inputConnections.exist(connection)) {
+            log.info("Connection with ID: " + connection.getUID() + " already exist !");
             return;
         }
 
-        if(connection instanceof StreamConnection){
+        if (connection instanceof StreamConnection) {
             StreamConnection streamConnection = (StreamConnection) connection;
-            if(! (streamConnection.getSerializer() instanceof CommandStreamSerializer)){
+            if (!(streamConnection.getSerializer() instanceof CommandStreamSerializer)) {
                 streamConnection.setStreamReader(new CommandStreamReader()); // data protocol..
             }
         }
 
-        if(connection instanceof DeviceListener){
+        if (connection instanceof DeviceListener) {
             addListener((DeviceListener) connection);
         }
 
         connection.setSerializer(new CommandStreamSerializer()); // data conversion..
         connection.setConnectionManager(this);
         connection.setApplicationID(TenantProvider.getCurrentID());
-		inputConnections.addConnection(connection);
-		
-	}
+        inputConnections.addConnection(connection);
+
+    }
 
     @Override
     public void removeInput(DeviceConnection connection) {
@@ -601,66 +610,66 @@ public abstract class BaseDeviceManager implements DeviceManager {
         removeInput(connection);
     }
 
-    public void addOutput(DeviceConnection connection){
-		
-		if(outputConnections.getSize() == 0) initOutputConnections();
+    public void addOutput(DeviceConnection connection) {
 
-        if(connection.getApplicationID() == null) {
+        if (outputConnections.getSize() == 0) initOutputConnections();
+
+        if (connection.getApplicationID() == null) {
             connection.setApplicationID(TenantProvider.getCurrentID());
         }
 
-        if(outputConnections.exist(connection)){
-            log.info("Connection with ID: " + connection.getUID()+ " already exist !");
+        if (outputConnections.exist(connection)) {
+            log.info("Connection with ID: " + connection.getUID() + " already exist !");
             return;
         }
 
-        if(connection instanceof StreamConnection){
+        if (connection instanceof StreamConnection) {
             StreamConnection streamConnection = (StreamConnection) connection;
-            if(! (streamConnection.getSerializer() instanceof CommandStreamSerializer)){
+            if (!(streamConnection.getSerializer() instanceof CommandStreamSerializer)) {
                 streamConnection.setStreamReader(new CommandStreamReader()); // data protocol..
             }
         }
 
-        if(connection instanceof ITcpConnection){
+        if (connection instanceof ITcpConnection) {
             ((ITcpConnection) connection).setDiscoveryService(discoveryService);
         }
 
-        if(connection instanceof DeviceListener){
+        if (connection instanceof DeviceListener) {
             addListener((DeviceListener) connection);
         }
 
         delivery.addConnection(connection);
 
-        if(connection.getSerializer() == null){
+        if (connection.getSerializer() == null) {
             connection.setSerializer(new CommandStreamSerializer()); // data conversion..
         }
 
         connection.setConnectionManager(this);
-		outputConnections.addConnection(connection);
-	}
+        outputConnections.addConnection(connection);
+    }
 
 
-	protected void sendTo(Command command, DeviceConnection connection) throws  IOException {
-		if(connection != null && connection.isConnected()){
-            if(command.getApplicationID() == null) command.setApplicationID(connection.getApplicationID());
-			delivery.sendTo(command, connection);
-		}
-	}
+    protected void sendTo(Command command, DeviceConnection connection) throws IOException {
+        if (connection != null && connection.isConnected()) {
+            if (command.getApplicationID() == null) command.setApplicationID(connection.getApplicationID());
+            delivery.sendTo(command, connection);
+        }
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see br.com.criativasoft.opendevice.core.DeviceManager#send(br.com.criativasoft.opendevice.core.command.Command)
-	 */
-	@Override
-	public void send(Command command) throws IOException {
+    /*
+     * (non-Javadoc)
+     * @see br.com.criativasoft.opendevice.core.DeviceManager#send(br.com.criativasoft.opendevice.core.command.Command)
+     */
+    @Override
+    public void send(Command command) throws IOException {
         send(command, true, true);
-	}
+    }
 
     public void send(Command command, boolean output, boolean input) throws IOException {
 
-        if(command.getApplicationID() == null) command.setApplicationID(TenantProvider.getCurrentID());
+        if (command.getApplicationID() == null) command.setApplicationID(TenantProvider.getCurrentID());
 
-        if(output && outputConnections.hasConnections()){
+        if (output && outputConnections.hasConnections()) {
 
             Set<DeviceConnection> connections = outputConnections.getConnections();
             for (DeviceConnection connection : connections) {
@@ -669,7 +678,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
         }
 
-        if(input && inputConnections.hasConnections()){
+        if (input && inputConnections.hasConnections()) {
 
             Set<DeviceConnection> connections = inputConnections.getConnections();
             for (DeviceConnection connection : connections) {
@@ -680,22 +689,23 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
     }
 
-	/*
-	 * (non-Javadoc)
-	 * @see br.com.criativasoft.opendevice.core.DeviceManager#sendCommand(java.lang.String, java.lang.Object[])
-	 */
-	@Override
-    public void sendCommand( String commandName , Object ... params ) throws IOException {
+    /*
+     * (non-Javadoc)
+     * @see br.com.criativasoft.opendevice.core.DeviceManager#sendCommand(java.lang.String, java.lang.Object[])
+     */
+    @Override
+    public void sendCommand(String commandName, Object... params) throws IOException {
         send(new UserCommand(commandName, params));
     }
 
     /**
      * Causes the currently executing thread to sleep (temporarily cease
      * execution)
+     *
      * @param millis
      * @see Thread#sleep(long)
      */
-    public void delay(int millis){
+    public void delay(int millis) {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
@@ -708,13 +718,13 @@ public abstract class BaseDeviceManager implements DeviceManager {
      * Checks whether a connection has been added
      */
     @Override
-    public boolean hasConnections(){
+    public boolean hasConnections() {
         int size = inputConnections.getSize();
         size += outputConnections.getSize();
         return size > 0;
     }
 
-    public boolean isTenantsEnabled(){
+    public boolean isTenantsEnabled() {
         return OpenDeviceConfig.get().isTenantsEnabled();
     }
 
@@ -722,12 +732,12 @@ public abstract class BaseDeviceManager implements DeviceManager {
      * Checks if a connection is active. Considers the input and output
      */
     @Override
-    public boolean isConnected(){
+    public boolean isConnected() {
 
-        if(hasConnections()){
+        if (hasConnections()) {
 
-            if(inputConnections.isConnected()) return true;
-            if(outputConnections.isConnected()) return true;
+            if (inputConnections.isConnected()) return true;
+            if (outputConnections.isConnected()) return true;
 
         }
 
@@ -758,19 +768,19 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
         DeviceConnection connection = outputConnections.findConnection(uid);
 
-        if(connection != null) return connection;
+        if (connection != null) return connection;
 
         return inputConnections.findConnection(uid);
     }
 
-    protected void saveDeviceHistory(Device device, DeviceHistory history){
+    protected void saveDeviceHistory(Device device, DeviceHistory history) {
 //        transactionBegin();
         history.setApplicationID(device.getApplicationID());
         getDeviceDao().persistHistory(history);
 //        transactionEnd();
     }
 
-    protected OpenDeviceConfig getConfig(){
+    protected OpenDeviceConfig getConfig() {
         return OpenDeviceConfig.get();
     }
 
@@ -779,10 +789,10 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
         @Override
         public void connectionStateChanged(DeviceConnection connection, ConnectionStatus status) {
-            log.debug("connectionStateChanged :: "+ connection.getClass().getSimpleName() + ", status = " + status);
+            log.debug("connectionStateChanged :: " + connection.getClass().getSimpleName() + ", status = " + status);
 
             // Force sync devices with physical modules on connect.
-            if(status == ConnectionStatus.CONNECTED && outputConnections.exist(connection)){
+            if (status == ConnectionStatus.CONNECTED && outputConnections.exist(connection)) {
                 GetDevicesRequest request = new GetDevicesRequest();
                 request.setApplicationID(TenantProvider.getCurrentID());
                 syncDevices(connection, request);
@@ -793,7 +803,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
         @Override
         public void onMessageReceived(Message message, DeviceConnection connection) {
 
-            if(message == null) return;
+            if (message == null) return;
 
             lastMessage = message;
 
@@ -804,22 +814,23 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
             transactionBegin();
 
-            try{
+            try {
 
                 Command command = (Command) message;
 
-                if(command.getApplicationID() == null || command.getApplicationID().length() == 0){
+                if (command.getApplicationID() == null || command.getApplicationID().length() == 0) {
                     command.setApplicationID(connection.getApplicationID());
                 }
 
                 boolean filtred = false;
 
-                if(!filters.isEmpty()){
+                if (!filters.isEmpty()) {
 
                     for (CommandFilter filter : filters) {
 
-                        if(!filter.filter(command, connection)){
-                            if(log.isTraceEnabled()) log.debug("Message blocked by filter: " + filter.getClass().getSimpleName());
+                        if (!filter.filter(command, connection)) {
+                            if (log.isTraceEnabled())
+                                log.debug("Message blocked by filter: " + filter.getClass().getSimpleName());
                             filtred = true;
                         }
 
@@ -827,7 +838,7 @@ public abstract class BaseDeviceManager implements DeviceManager {
 
                 }
 
-                if(! filtred ) commandProcessor.onMessageReceived(message, connection);
+                if (!filtred) commandProcessor.onMessageReceived(message, connection);
 
             } finally {
                 transactionEnd();

@@ -35,10 +35,10 @@ public enum ConnectionType implements EnumCode {
         return code;
     }
 
-    public static ConnectionType getByCode(int code){
+    public static ConnectionType getByCode(int code) {
         EnumCode[] values = ConnectionType.values();
         for (EnumCode enumCode : values) {
-            if(enumCode.getCode() == code){
+            if (enumCode.getCode() == code) {
                 return (ConnectionType) enumCode;
             }
         }

@@ -15,9 +15,9 @@ package br.com.criativasoft.opendevice.core.command;
 
 /**
  * Command used to send user-defined events / notifications.<br/>
- *
+ * <p>
  * Using JS API, you can use:
- *
+ * <p>
  * <pre>{@code
  * ODev.on("ui_notification", function(message){
  *      // logic

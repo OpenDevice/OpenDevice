@@ -22,10 +22,11 @@ import br.com.criativasoft.opendevice.core.model.Device;
  * @author Ricardo JL Rufino
  * @date 24/08/14.
  */
-public interface DeviceListener extends OnDeviceChangeListener{
+public interface DeviceListener extends OnDeviceChangeListener {
 
     /**
      * Invoked when new device found
+     *
      * @param device
      */
     void onDeviceRegistred(Device device);

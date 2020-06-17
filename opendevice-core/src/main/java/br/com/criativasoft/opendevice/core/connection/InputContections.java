@@ -15,29 +15,29 @@ import java.util.ServiceLoader;
  */
 public class InputContections {
 
-    public IRestServerConnection rest(int port){
+    public IRestServerConnection rest(int port) {
         IRestServerConnection connection = load(IRestServerConnection.class);
-        if(connection != null) connection.setPort(port);
+        if (connection != null) connection.setPort(port);
         return connection;
     }
 
-    public IWSServerConnection websocket(int port){
+    public IWSServerConnection websocket(int port) {
         IWSServerConnection connection = load(IWSServerConnection.class);
-        if(connection != null) connection.setPort(port);
+        if (connection != null) connection.setPort(port);
         return connection;
     }
 
-    public ITcpServerConnection tcp(int port){
+    public ITcpServerConnection tcp(int port) {
         ITcpServerConnection connection = load(ITcpServerConnection.class);
-        if(connection != null) connection.setPort(port);
+        if (connection != null) connection.setPort(port);
         return connection;
     }
 
-    private <T> T load(Class<T> klass){
+    private <T> T load(Class<T> klass) {
 
-        try{
+        try {
             Class.forName("java.util.ServiceLoader");
-        }catch(ClassNotFoundException ex){
+        } catch (ClassNotFoundException ex) {
             throw new RuntimeException("This java version don't support dynamic loading (ServiceLoader), you need use direct class ex: new BluetoothConnection(addr)");
         }
 
@@ -46,7 +46,7 @@ public class InputContections {
 
         Iterator<T> iterator = service.iterator();
 
-        if(iterator.hasNext()){
+        if (iterator.hasNext()) {
             return iterator.next();
         }
 

@@ -17,19 +17,19 @@ import br.com.criativasoft.opendevice.connection.ConnectionListener;
 import br.com.criativasoft.opendevice.connection.ConnectionManager;
 import br.com.criativasoft.opendevice.connection.DeviceConnection;
 import br.com.criativasoft.opendevice.core.command.Command;
-import br.com.criativasoft.opendevice.core.filter.CommandFilter;
 import br.com.criativasoft.opendevice.core.dao.DeviceDao;
+import br.com.criativasoft.opendevice.core.filter.CommandFilter;
+import br.com.criativasoft.opendevice.core.listener.DeviceListener;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceHistoryQuery;
 import br.com.criativasoft.opendevice.core.model.Device;
 import br.com.criativasoft.opendevice.core.model.DeviceCategory;
 import br.com.criativasoft.opendevice.core.model.DeviceHistory;
-import br.com.criativasoft.opendevice.core.listener.DeviceListener;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-public interface DeviceManager extends ConnectionManager{
+public interface DeviceManager extends ConnectionManager {
 
     public void setDeviceDao(DeviceDao deviceDao);
 
@@ -39,9 +39,9 @@ public interface DeviceManager extends ConnectionManager{
 
     public DeviceDao getDeviceDao();
 
-	public Collection<Device> getDevices();
-	
-	public Device findDeviceByUID(int deviceUID);
+    public Collection<Device> getDevices();
+
+    public Device findDeviceByUID(int deviceUID);
 
     public Device findDeviceByName(String name);
 
@@ -50,6 +50,7 @@ public interface DeviceManager extends ConnectionManager{
     /**
      * Resgister the device to this Manager context.
      * NOTE: Called from {@link #addDevice(Device)}. This will add default listeners.
+     *
      * @param device
      */
     public void bindDevice(Device device);
@@ -63,18 +64,19 @@ public interface DeviceManager extends ConnectionManager{
      * NOTE: You don't need call this for changes in VALUE
      */
     public void updateDevice(Device device);
-	
-	public void send(Command command) throws IOException;
 
-	
-	/**
-	 * This will call a user-defined command, allowing you to perform custom method calls directly on device. <br/>
-	 * This is an easy way to extend OpenDevice protocol, but note that in some situations it is best to implement 
-	 * a new device class and work with objects instead of separate functions.
-	 * @param commandName - name command informed the device side
-	 * @param params (Optional) - Parameters to be sent to the function
-	 */
-	public void sendCommand( String commandName , Object ... params ) throws IOException;
+    public void send(Command command) throws IOException;
+
+
+    /**
+     * This will call a user-defined command, allowing you to perform custom method calls directly on device. <br/>
+     * This is an easy way to extend OpenDevice protocol, but note that in some situations it is best to implement
+     * a new device class and work with objects instead of separate functions.
+     *
+     * @param commandName - name command informed the device side
+     * @param params      (Optional) - Parameters to be sent to the function
+     */
+    public void sendCommand(String commandName, Object... params) throws IOException;
 
     public void connect() throws IOException;
 
@@ -88,6 +90,7 @@ public interface DeviceManager extends ConnectionManager{
     /**
      * Connect to a single output connection. <br/>
      * That way you do not need to call addOutput
+     *
      * @param connection
      * @throws IOException
      */
@@ -117,6 +120,7 @@ public interface DeviceManager extends ConnectionManager{
 
     /**
      * Notify All Listeners about device change
+     *
      * @param sync - sync state with server
      */
     public void notifyListeners(Device device, boolean sync);

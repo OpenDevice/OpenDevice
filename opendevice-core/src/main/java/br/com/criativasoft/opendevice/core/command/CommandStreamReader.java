@@ -23,42 +23,43 @@ import java.util.Arrays;
 
 /**
  * Parser to convert byte[] into {@link Command}
+ *
  * @author Ricardo JL Rufino
  * @date 18/06/2014
  */
 public class CommandStreamReader extends DefaultSteamReader {
 
     private Logger log = LoggerFactory.getLogger(CommandStreamReader.class);
-    boolean processing =  false;
+    boolean processing = false;
 
     @Override
-    protected boolean checkEndOfMessage(byte lastByte,ByteArrayOutputStream readBuffer) {
+    protected boolean checkEndOfMessage(byte lastByte, ByteArrayOutputStream readBuffer) {
         return lastByte == Command.ACK_FLAG || lastByte == '\n';
     }
 
-    public void processPacketRead(byte read[], int length){
+    public void processPacketRead(byte read[], int length) {
 
-        if(log.isTraceEnabled()) {
-            log.trace("processPacketRead: " + new String(Arrays.copyOf(read, length-1)) + ", size: " + length);
+        if (log.isTraceEnabled()) {
+            log.trace("processPacketRead: " + new String(Arrays.copyOf(read, length - 1)) + ", size: " + length);
         }
 
         for (int i = 0; i < length; i++) {
 
             // NOTE: Start bit is equals to the SEPARATOR
-            if(read[i] == Command.START_FLAG && !processing){
+            if (read[i] == Command.START_FLAG && !processing) {
                 processing = true;
             } else if (checkEndOfMessage(read[i], inputBuffer)) {
 
                 byte[] array = inputBuffer.toByteArray();
 
                 Message event = parse(array);
-                if(event != null){
+                if (event != null) {
                     notifyOnDataRead(event);
                 }
                 inputBuffer.reset();
                 processing = false;
 
-            }else if(processing){
+            } else if (processing) {
                 inputBuffer.write(read[i]);
             }
 

@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 /**
- *
  * @author Ricardo JL Rufino
  *         Date: 24/06/17
  */

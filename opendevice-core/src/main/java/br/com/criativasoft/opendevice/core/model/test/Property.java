@@ -52,7 +52,7 @@ public class Property {
         this.value = value;
     }
 
-    public String getName(){
+    public String getName() {
         return definition.getName();
     }
 }

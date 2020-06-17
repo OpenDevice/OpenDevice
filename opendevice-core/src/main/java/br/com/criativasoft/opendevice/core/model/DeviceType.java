@@ -18,6 +18,7 @@ import br.com.criativasoft.opendevice.core.metamodel.EnumCode;
 
 /**
  * Represento um tipo de dispositivo  .
+ *
  * @author Ricardo JL Rufino
  * @date 04/09/2011 12:44:44
  */
@@ -37,43 +38,43 @@ public enum DeviceType implements EnumCode {
     MANAGER(11, "MANAGER", null) // Middleware/Server
     ;
 
-	private int code;
-	private String description;
+    private int code;
+    private String description;
     private Class klass;
-		
-	/**
-	 *  @param code - Device type code. MAX 127.
-	 * @param description
+
+    /**
+     * @param code        - Device type code. MAX 127.
+     * @param description
      * @param klass
      */
-	private DeviceType(int code, String description, Class klass) {
-		this.code = (byte) code;
-		this.description = description;
+    private DeviceType(int code, String description, Class klass) {
+        this.code = (byte) code;
+        this.description = description;
         this.klass = klass;
     }
 
 
-	public int getCode() {
-		return code;
-	}
+    public int getCode() {
+        return code;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getDescription() {
+        return description;
+    }
 
     public Class getKlass() {
         return klass;
     }
 
-    public static DeviceType getByCode(int code){
+    public static DeviceType getByCode(int code) {
         DeviceType[] values = DeviceType.values();
         for (DeviceType type : values) {
-            if(type.getCode() == code){
+            if (type.getCode() == code) {
                 return type;
             }
         }
 
         return null;
     }
-	
+
 }

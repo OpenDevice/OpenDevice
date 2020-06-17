@@ -21,13 +21,13 @@ import java.util.List;
  * Ref: https://stackoverflow.com/a/7237152
  *
  * @author Ricardo JL Rufino
- * Date: 24/06/18
+ *         Date: 24/06/18
  */
 public class PluginLoader {
 
-    public static List<OpenDeviceExtension> load(){
+    public static List<OpenDeviceExtension> load() {
         List<OpenDeviceExtension> extenions = new LinkedList<>();
-        try{
+        try {
             ResourceFinder finder = new ResourceFinder("META-INF/services/");
             List<Class> impls = finder.findAllImplementations(OpenDeviceExtension.class);
 
@@ -35,11 +35,11 @@ public class PluginLoader {
                 extenions.add((OpenDeviceExtension) impl.newInstance());
             }
 
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        return  extenions;
+        return extenions;
     }
 
 }

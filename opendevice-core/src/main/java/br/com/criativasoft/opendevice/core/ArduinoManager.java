@@ -32,11 +32,11 @@ import java.io.IOException;
  */
 public abstract class ArduinoManager extends LocalDeviceManager {
 
-    public ArduinoManager(){
+    public ArduinoManager() {
         super();
 
         DeviceConnection connection = this.setup();
-        if(connection == null) throw new NullPointerException("Connection is NULL !");
+        if (connection == null) throw new NullPointerException("Connection is NULL !");
 
         addOutput(connection);
         connection.addListener(listener);
@@ -47,11 +47,11 @@ public abstract class ArduinoManager extends LocalDeviceManager {
 
             int max = 5;
             for (int i = 1; i <= max; i++) {
-                if(!connection.isConnected()){
+                if (!connection.isConnected()) {
                     log.debug("Waiting connection...");
                     Thread.sleep(1000);
-                    if(! connection.isConnected()){
-                        log.debug("try reconnect ["+(i)+"/"+max+"]");
+                    if (!connection.isConnected()) {
+                        log.debug("try reconnect [" + (i) + "/" + max + "]");
                         connect();
                     }
 
@@ -77,8 +77,8 @@ public abstract class ArduinoManager extends LocalDeviceManager {
     private ConnectionListener listener = new ConnectionListener() {
         @Override
         public void connectionStateChanged(DeviceConnection connection, ConnectionStatus status) {
-            if(status == ConnectionStatus.CONNECTED){
-                while(true){
+            if (status == ConnectionStatus.CONNECTED) {
+                while (true) {
                     loop();
                 }
             }

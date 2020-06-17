@@ -14,5 +14,5 @@
 package br.com.criativasoft.opendevice.core.metamodel;
 
 public enum OrderType {
-        ASC, DESC;
+    ASC, DESC;
 }

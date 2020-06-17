@@ -23,7 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- *
  * @author Ricardo JL Rufino
  * @date 12/10/16
  */
@@ -69,10 +68,10 @@ public class LocalTenantContext implements TenantContext {
     @Override
     public Device getDeviceByUID(int uid) {
 
-        if(uid <= 0) return null;
+        if (uid <= 0) return null;
 
         for (Device device : devices.values()) {
-            if(device.getUid() == uid) return device;
+            if (device.getUid() == uid) return device;
         }
 
         return null;
@@ -82,13 +81,13 @@ public class LocalTenantContext implements TenantContext {
     public Device getDeviceByName(String name) {
 
         for (Device device : devices.values()) {
-            if(device.getName() != null && device.getName().equals(name)) return device;
+            if (device.getName() != null && device.getName().equals(name)) return device;
         }
 
         return null;
     }
 
-    public Collection<Device> getDevices(){
+    public Collection<Device> getDevices() {
         return devices.values();
     }
 

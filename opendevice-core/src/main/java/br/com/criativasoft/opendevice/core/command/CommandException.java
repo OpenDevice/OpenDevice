@@ -15,21 +15,21 @@ package br.com.criativasoft.opendevice.core.command;
 
 public class CommandException extends RuntimeException {
 
-	private static final long serialVersionUID = -2468282760776324863L;
+    private static final long serialVersionUID = -2468282760776324863L;
 
-	public CommandException() {
-		super();
-	}
+    public CommandException() {
+        super();
+    }
 
-	public CommandException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public CommandException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public CommandException(String message) {
-		super(message);
-	}
+    public CommandException(String message) {
+        super(message);
+    }
 
-	public CommandException(Throwable cause) {
-		super(cause);
-	}
+    public CommandException(Throwable cause) {
+        super(cause);
+    }
 }

@@ -41,10 +41,11 @@ public class ActionDef {
     /**
      * Set parameters names for this action. </br>
      * Shortcut for: #setParamNames
+     *
      * @param params
      * @return
      */
-    private ActionDef params(String ...params){
+    private ActionDef params(String... params) {
         this.paramNames.addAll(Arrays.asList(params));
         return this;
     }
@@ -52,25 +53,26 @@ public class ActionDef {
     /**
      * Set parameters types for this action. </br>
      * Shortcut for: #setParamTypes
+     *
      * @param types
      * @return
      */
-    private ActionDef types(PropertyType ...types){
+    private ActionDef types(PropertyType... types) {
         this.paramTypes.addAll(Arrays.asList(types));
         return this;
     }
 
     /**
-     * @see #params(String...)
      * @param paramNames
+     * @see #params(String...)
      */
     public void setParamNames(List<String> paramNames) {
         this.paramNames = paramNames;
     }
 
     /**
-     * @see #types(PropertyType...)
      * @param paramTypes
+     * @see #types(PropertyType...)
      */
     public void setParamTypes(List<PropertyType> paramTypes) {
         this.paramTypes = paramTypes;
@@ -99,7 +101,7 @@ public class ActionDef {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if(o instanceof String && o.toString().equals(this.name)) return true;
+        if (o instanceof String && o.toString().equals(this.name)) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         ActionDef actionDef = (ActionDef) o;

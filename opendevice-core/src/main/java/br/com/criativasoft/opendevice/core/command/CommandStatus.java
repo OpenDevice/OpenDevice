@@ -16,8 +16,8 @@ package br.com.criativasoft.opendevice.core.command;
 import br.com.criativasoft.opendevice.core.metamodel.EnumCode;
 
 public enum CommandStatus implements EnumCode {
-	
-	CREATED(1),
+
+    CREATED(1),
     DELIVERED(2),
     RECEIVED(3),
     FAIL(4),
@@ -42,12 +42,14 @@ public enum CommandStatus implements EnumCode {
         return code;
     }
 
-    public String getDescription() {return name();}
+    public String getDescription() {
+        return name();
+    }
 
-    public static CommandStatus getByCode(int code){
+    public static CommandStatus getByCode(int code) {
         EnumCode[] values = CommandStatus.values();
         for (EnumCode enumCode : values) {
-            if(enumCode.getCode() == code){
+            if (enumCode.getCode() == code) {
                 return (CommandStatus) enumCode;
             }
         }

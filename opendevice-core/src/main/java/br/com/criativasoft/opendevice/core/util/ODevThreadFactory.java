@@ -42,7 +42,7 @@ public class ODevThreadFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(Runnable r) {
-        Thread t = new Thread(r, ("ODev-"+name+"-" + count.getAndIncrement()));
+        Thread t = new Thread(r, ("ODev-" + name + "-" + count.getAndIncrement()));
         t.setDaemon(true);
         return t;
     }

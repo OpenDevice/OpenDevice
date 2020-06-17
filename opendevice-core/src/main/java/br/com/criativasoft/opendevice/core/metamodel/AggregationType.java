@@ -13,16 +13,16 @@
 
 package br.com.criativasoft.opendevice.core.metamodel;
 
-public enum AggregationType{
-        NONE("none"), COUNT("count"), SUM("sum"), AVERAGE("avg"), STANDARD_DEVIATION("stdev"), MIN("min"), MAX("max");
+public enum AggregationType {
+    NONE("none"), COUNT("count"), SUM("sum"), AVERAGE("avg"), STANDARD_DEVIATION("stdev"), MIN("min"), MAX("max");
 
-        AggregationType(String function) {
-                this.function = function;
-        }
+    AggregationType(String function) {
+        this.function = function;
+    }
 
-        String function;
+    String function;
 
-        public String getFunction() {
-                return function;
-        }
+    public String getFunction() {
+        return function;
+    }
 }

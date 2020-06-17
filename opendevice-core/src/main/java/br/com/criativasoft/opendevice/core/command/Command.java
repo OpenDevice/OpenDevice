@@ -22,7 +22,7 @@ import java.util.UUID;
  * @author Ricardo JL Rufino
  * @date 04/09/2011 13:48:57
  */
-public abstract class Command implements Message{
+public abstract class Command implements Message {
 
     public static int DEFAULT_TIMEOUT = 3000;
 
@@ -30,62 +30,64 @@ public abstract class Command implements Message{
     public static final char ACK_FLAG = '\r';
     public static final char DELIMITER_FLAG = '/'; // used to separate data strings
     public static final String DELIMITER = "/"; // used to separate data strings
-    
-	private static final long serialVersionUID = 676280722282919715L;
 
-	private String uid;            // Logic level user ID.
-	private String connectionUUID; // id of connection/channel that requested the command
+    private static final long serialVersionUID = 676280722282919715L;
+
+    private String uid;            // Logic level user ID.
+    private String connectionUUID; // id of connection/channel that requested the command
     private String applicationID;  // id of client (for Multitenancy support)
     private volatile int trackingID = 0; // To monitor execution of commands, is usually a sequential number and managed by CommandDelivery
-	
-	private CommandType type;
-	private Date timestamp;
-	private int timeout = DEFAULT_TIMEOUT;
-	private int retry = 0;
-	private CommandStatus status = CommandStatus.CREATED;
+
+    private CommandType type;
+    private Date timestamp;
+    private int timeout = DEFAULT_TIMEOUT;
+    private int retry = 0;
+    private CommandStatus status = CommandStatus.CREATED;
     private ResponseCommand response;
 
     public Command() {
         this(CommandType.DIGITAL, UUID.randomUUID().toString(), null);
     }
 
-	public Command(CommandType type) {
-		this(type, UUID.randomUUID().toString(), null);
-	}
+    public Command(CommandType type) {
+        this(type, UUID.randomUUID().toString(), null);
+    }
 
-	public Command(CommandType type, String uid, String connectionUUID) {
-		super();
-		this.uid = uid;
-		this.connectionUUID = connectionUUID;
-		this.type = type;
-		this.setTimestamp(new Date());
-	}
+    public Command(CommandType type, String uid, String connectionUUID) {
+        super();
+        this.uid = uid;
+        this.connectionUUID = connectionUUID;
+        this.type = type;
+        this.setTimestamp(new Date());
+    }
 
 
-	public void setTimestamp(Date timestamp) {
-		this.timestamp = timestamp;
-	}
-	
-	public Date getTimestamp() {
-		return timestamp;
-	}
-	
-	public CommandType getType() {
-		return type;
-	}
-	
-	public String getUid() {
-		return uid;
-	}
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
 
-    /** CAUTION: It should not be called directly by clients*/
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public CommandType getType() {
+        return type;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    /**
+     * CAUTION: It should not be called directly by clients
+     */
     public void setUid(String uid) {
         this.uid = uid;
     }
 
     public void setConnectionUUID(String connectionUUID) {
-		this.connectionUUID = connectionUUID;
-	}
+        this.connectionUUID = connectionUUID;
+    }
 
     public void setApplicationID(String applicationID) {
         this.applicationID = applicationID;
@@ -96,19 +98,19 @@ public abstract class Command implements Message{
     }
 
     /**
-	 * Can be the id of client that requested the command
-	 */
-	public String getConnectionUUID() {
-		return connectionUUID;
-	}
-	
-	public void setStatus(CommandStatus status) {
-		this.status = status;
-	}
-	
-	public CommandStatus getStatus() {
-		return status;
-	}
+     * Can be the id of client that requested the command
+     */
+    public String getConnectionUUID() {
+        return connectionUUID;
+    }
+
+    public void setStatus(CommandStatus status) {
+        this.status = status;
+    }
+
+    public CommandStatus getStatus() {
+        return status;
+    }
 
     public void setTrackingID(int trackingID) {
         this.trackingID = trackingID;
@@ -129,17 +131,19 @@ public abstract class Command implements Message{
     public void setResponse(ResponseCommand response) {
         this.response = response;
     }
-    
+
     /**
      * See {@link #getRetry()}
+     *
      * @param retry
      */
-    public void setRetry( int retry ) {
+    public void setRetry(int retry) {
         this.retry = retry;
     }
-    
+
     /**
      * Returns the number of retries after a time out
+     *
      * @return
      */
     public int getRetry() {
@@ -149,14 +153,15 @@ public abstract class Command implements Message{
     /**
      * Returns the response associated with the command. By default commands are executed in asynchronous way,
      * and managed by {@link br.com.criativasoft.opendevice.core.CommandDelivery}, this method will force the synchronous mode (using a timeout).
+     *
      * @param <T>
      * @return
      */
     public <T> T getResponse() {
 
-        if(response == null){
+        if (response == null) {
             try {
-                synchronized(this) {
+                synchronized (this) {
                     this.wait(this.getTimeout() + 100);
                 }
             } catch (InterruptedException e) {
@@ -169,8 +174,8 @@ public abstract class Command implements Message{
     }
 
     @Override
-	public String toString() {
-		return this.getClass().getSimpleName() + "["+hashCode()+"]";
-	}
-	
+    public String toString() {
+        return this.getClass().getSimpleName() + "[" + hashCode() + "]";
+    }
+
 }

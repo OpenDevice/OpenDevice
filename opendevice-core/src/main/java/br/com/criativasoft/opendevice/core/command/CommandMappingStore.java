@@ -17,41 +17,43 @@ import br.com.criativasoft.opendevice.core.model.Device;
 
 public class CommandMappingStore {
 
-	private long id;
-	
-	private Command command;
-	private Device device;
-	
-	public CommandMappingStore() {
-	}
-	
-	public CommandMappingStore(Command command, Device device) {
-		super();
-		this.command = command;
-		this.device = device;
-	}
+    private long id;
 
-	public void setId(long id) {
-		this.id = id;
-	}
-	
-	public long getId() {
-		return id;
-	}
-	
-	public Command getCommand() {
-		return command;
-	}
-	public void setCommand(Command command) {
-		this.command = command;
-	}
-	public Device getDevice() {
-		return device;
-	}
-	public void setDevice(Device device) {
-		this.device = device;
-	}
-	
-	
-	
+    private Command command;
+    private Device device;
+
+    public CommandMappingStore() {
+    }
+
+    public CommandMappingStore(Command command, Device device) {
+        super();
+        this.command = command;
+        this.device = device;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public Command getCommand() {
+        return command;
+    }
+
+    public void setCommand(Command command) {
+        this.command = command;
+    }
+
+    public Device getDevice() {
+        return device;
+    }
+
+    public void setDevice(Device device) {
+        this.device = device;
+    }
+
+
 }

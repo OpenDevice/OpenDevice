@@ -25,6 +25,7 @@ public interface OnDeviceChangeListener {
 
     /**
      * Invoked when any changes occur in the value of the device
+     *
      * @param device
      */
     void onDeviceChanged(Device device);

@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author Ricardo JL Rufino
  * @date 13/01/16
  */
@@ -36,14 +35,14 @@ public class DeviceCategoryRegistry {
 
     }
 
-    public void add(DeviceCategory category){
+    public void add(DeviceCategory category) {
         this.categories.add(category);
     }
 
     public void add(Class<? extends DeviceCategory> klass) {
         try {
             DeviceCategory category = klass.newInstance();
-            if(category instanceof  GenericCategory){
+            if (category instanceof GenericCategory) {
                 ((GenericCategory) category).loadProperties();
             }
             add(category);
@@ -60,8 +59,8 @@ public class DeviceCategoryRegistry {
 
     public DeviceCategory getCategory(Class<? extends DeviceCategory> klass) {
 
-        for (DeviceCategory category : categories){
-            if(category.getClass() == klass){
+        for (DeviceCategory category : categories) {
+            if (category.getClass() == klass) {
                 return category;
             }
         }
@@ -72,8 +71,8 @@ public class DeviceCategoryRegistry {
 
     public DeviceCategory getCategory(int code) {
 
-        for (DeviceCategory category : categories){
-            if(category.getCode() == code){
+        for (DeviceCategory category : categories) {
+            if (category.getCode() == code) {
                 return category;
             }
         }

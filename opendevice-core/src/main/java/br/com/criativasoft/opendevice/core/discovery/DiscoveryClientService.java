@@ -43,7 +43,7 @@ public class DiscoveryClientService implements Runnable {
 
     final CommandStreamSerializer serializer = new CommandStreamSerializer();
 
-    public DiscoveryClientService(long timeout, String deviceName, DiscoveryListener listener , DatagramSocket socket) {
+    public DiscoveryClientService(long timeout, String deviceName, DiscoveryListener listener, DatagramSocket socket) {
         this.timeout = timeout;
         this.deviceName = deviceName;
         this.listener = listener;
@@ -53,7 +53,7 @@ public class DiscoveryClientService implements Runnable {
 
     @Override
     public void run() {
-        try{
+        try {
             scan();
         } catch (IOException e) {
             log.error("Could not send discovery request", e);
@@ -61,7 +61,7 @@ public class DiscoveryClientService implements Runnable {
     }
 
     public void scan() throws IOException {
-        if(socket == null) {
+        if (socket == null) {
             socket = new DatagramSocket(DISCOVERY_PORT);
             socket.setBroadcast(true);
             socket.setSoTimeout((int) timeout);
@@ -79,15 +79,14 @@ public class DiscoveryClientService implements Runnable {
     private void sendDiscoveryRequest(DatagramSocket socket) throws IOException {
         byte[] bytes = serializer.serialize(new SimpleCommand(CommandType.DISCOVERY_REQUEST, 0));
         log.debug("Send discover request... ");
-        DatagramPacket packet = new DatagramPacket(bytes, bytes.length ,getBroadcastAddress(), DISCOVERY_PORT);
+        DatagramPacket packet = new DatagramPacket(bytes, bytes.length, getBroadcastAddress(), DISCOVERY_PORT);
         socket.send(packet);
     }
 
     /**
      * Listen on socket for responses, timing out after timeout
      *
-     * @param socket
-     *          socket on which the announcement request was sent
+     * @param socket socket on which the announcement request was sent
      * @throws IOException
      */
     private void listenForResponses(DatagramSocket socket) throws IOException {
@@ -100,19 +99,19 @@ public class DiscoveryClientService implements Runnable {
 
                 log.debug("Received response from <<" + packet.getAddress().getHostAddress() + ">> " + new String(packet.getData()));
 
-                if(!isLocalIP(packet.getAddress())){
+                if (!isLocalIP(packet.getAddress())) {
                     final DiscoveryResponse response = (DiscoveryResponse) serializer.parse(packet.getData());
                     NetworkDeviceInfo deviceInfo = response.getDeviceInfo();
                     deviceInfo.setIp(packet.getAddress().getHostAddress());
 
                     log.info("Found Device: " + deviceInfo);
 
-                    if(deviceName == null || "*".equals(deviceName) || deviceName.equals(deviceInfo.getName())) {
+                    if (deviceName == null || "*".equals(deviceName) || deviceName.equals(deviceInfo.getName())) {
                         devices.add(deviceInfo);
                         notifyListeners(deviceInfo);
                     }
 
-                    if (deviceName != null && deviceInfo.getName().equals(deviceName)){
+                    if (deviceName != null && deviceInfo.getName().equals(deviceName)) {
                         break;
                     }
                 }
@@ -125,7 +124,7 @@ public class DiscoveryClientService implements Runnable {
         }
 
 
-        if(this.closeOnFinish) {
+        if (this.closeOnFinish) {
             socket.close();
         }
     }
@@ -146,7 +145,7 @@ public class DiscoveryClientService implements Runnable {
         while (interfaces.hasMoreElements()) {
             NetworkInterface network = interfaces.nextElement();
 
-            if (network.isLoopback() || ! network.isUp())
+            if (network.isLoopback() || !network.isUp())
                 continue;
 
             for (InterfaceAddress interfaceAddress : network.getInterfaceAddresses()) {
@@ -168,7 +167,7 @@ public class DiscoveryClientService implements Runnable {
         while (interfaces.hasMoreElements()) {
             NetworkInterface network = interfaces.nextElement();
 
-            if (network.isLoopback() || ! network.isUp()) {
+            if (network.isLoopback() || !network.isUp()) {
                 continue;
             }
 
@@ -188,7 +187,7 @@ public class DiscoveryClientService implements Runnable {
 
     private void notifyListeners(NetworkDeviceInfo deviceInfo) {
 
-        if(listener != null) listener.onDiscoveryDevice(deviceInfo);
+        if (listener != null) listener.onDiscoveryDevice(deviceInfo);
 
     }
 

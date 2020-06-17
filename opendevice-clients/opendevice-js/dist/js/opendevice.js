@@ -457,14 +457,16 @@ od.DeviceConnection = function(config){
 
     function setConnectionStatus(status){
 
-        _this.status = status;
-
-        for(var i = 0; i<listeners.length; i++){
-            var listener = listeners[i]["connectionStateChanged"];
-            if (typeof listener === "function") {
-                listener(_this, status, _this.status);
+        if(_this.status != status){
+            for(var i = 0; i<listeners.length; i++){
+                var listener = listeners[i]["connectionStateChanged"];
+                if (typeof listener === "function") {
+                    listener(_this, status, _this.status);
+                }
             }
         }
+
+        _this.status = status;
 
     }
 
@@ -557,6 +559,8 @@ od.DeviceManager = function(connection){
 
         var device = _this.findDevice(deviceID);
 
+        if(device == null) console.warn("can't find deviceID = " + deviceID);
+
         if(device){
             device.setValue(value);
         }
@@ -567,6 +571,9 @@ od.DeviceManager = function(connection){
 
         var device = _this.findDevice(deviceID);
 
+        if(device == null) console.warn("can't find deviceID = " + deviceID);
+
+        // jjhjhss
         if(device && ! device.sensor){
             device.toggle();
         }
@@ -1163,6 +1170,10 @@ return {
 
     connect : function(_conn){
         if(_conn) connection = _conn;
+        if(od.appID == "*"){
+            od.appID = OpenDevice.findAppID()
+            console.log("Using APP.ID:", od.appID);
+        }
         connection.connect();
     },
 
@@ -1257,19 +1268,20 @@ return {
         }
 
 
-        od.appID = getQueryParam(od.SESSION_ID);
+        var appID = getQueryParam(od.SESSION_ID);
 
-        if(od.appID != null) return od.appID;
+        if(appID != null) return appID;
 
-        od.appID = getCookie(od.SESSION_ID);
+        appID = getCookie(od.SESSION_ID);
 
-        if(od.appID != null) return od.appID;
+        if(appID != null) return appID;
 
         if( window.localStorage ){
-            od.appID = window.localStorage.getItem(od.SESSION_ID)
+            appID = window.localStorage.getItem(od.SESSION_ID)
+            if(appID != null) return appID;
         }
 
-        return od.appID;
+        return "*"; // APPID for Local/Single user mode
     }
 
 

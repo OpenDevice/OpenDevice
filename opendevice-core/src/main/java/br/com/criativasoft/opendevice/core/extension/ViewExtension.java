@@ -21,9 +21,27 @@ package br.com.criativasoft.opendevice.core.extension;
  */
 public interface ViewExtension {
 
+    enum ViewExtensionType {
+
+        ONLY_STATIC_FILES,
+
+        /* Allow add UI extensions to existing admin interface (use getLoadScript)*/
+        UI_EXTENSION_POINT,
+
+        /* Add a new Admin interface */
+//        NEW_ADMIN_INTERFACE,
+
+//        REPLACE_ADMIN_INTERFACE
+
+    }
+
     String getLoadScript();
 
-    /** Return single path name used for directory and url */
+    /**
+     * Return single path name used for directory and url
+     */
     String getPathName();
+
+    ViewExtensionType getType();
 
 }

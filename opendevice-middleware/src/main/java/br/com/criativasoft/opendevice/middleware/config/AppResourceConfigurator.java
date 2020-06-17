@@ -15,7 +15,9 @@
 
 package br.com.criativasoft.opendevice.middleware.config;
 
+import br.com.criativasoft.opendevice.core.BaseDeviceManager;
 import br.com.criativasoft.opendevice.core.ODev;
+import br.com.criativasoft.opendevice.core.extension.OpenDeviceExtension;
 import br.com.criativasoft.opendevice.core.model.OpenDeviceConfig;
 import br.com.criativasoft.opendevice.middleware.persistence.LocalEntityManagerFactory;
 import br.com.criativasoft.opendevice.middleware.persistence.PersistenceContextInjectableProvider;
@@ -26,6 +28,7 @@ import com.sun.jersey.api.core.ResourceConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Set;
 
 // from : /src/main/resources/META-INF/services/jersey-server-components
@@ -58,6 +61,19 @@ public class AppResourceConfigurator implements ResourceConfigurator {
             sb.append(" - " + aClass).append("\n");
         }
         log.debug("Configured Resources and Filters : \n {}", sb);
+
+        // Load Rest from Extensions
+        List<OpenDeviceExtension> extensions = BaseDeviceManager.getInstance().getExtensions();
+        for (OpenDeviceExtension extension : extensions) {
+            Class<?>[] restClasses = extension.getRestConfigClasses();
+            if(restClasses != null){
+                log.debug("Rest Resources/Config from extension:" + extension.getName());
+                for (Class resource : restClasses) {
+                    log.debug(" - " + resource);
+                    classes.add(resource);
+                }
+            }
+        }
 
         //config.add(new MainApplication());
 

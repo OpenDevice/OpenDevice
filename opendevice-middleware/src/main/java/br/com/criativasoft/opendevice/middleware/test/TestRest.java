@@ -22,9 +22,11 @@ import br.com.criativasoft.opendevice.core.dao.DeviceDao;
 import br.com.criativasoft.opendevice.core.metamodel.DeviceVO;
 import br.com.criativasoft.opendevice.core.model.Board;
 import br.com.criativasoft.opendevice.core.model.Device;
+import br.com.criativasoft.opendevice.core.model.DeviceHistory;
 import br.com.criativasoft.opendevice.core.model.PhysicalDevice;
 import br.com.criativasoft.opendevice.middleware.tools.SimulationService;
 import br.com.criativasoft.opendevice.restapi.resources.DeviceRest;
+import org.hibernate.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +38,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -113,49 +117,123 @@ public class TestRest {
     @Produces(MediaType.APPLICATION_JSON)
     public String teste1() {
 
-        Set<Device> devices = new HashSet();
+        DateFormat sdf = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
 
-//        TypedQuery<PhysicalDevice> query = em.createQuery("select x from PhysicalDevice x JOIN x.board where  x.applicationID = :TENANT", PhysicalDevice.class);
-//
-//        query.setParameter("TENANT", TenantProvider.getCurrentID());
-//
-//        devices.addAll(query.getResultList());
-//
-//
-//        TypedQuery<Board> boardQR = em.createQuery("select  x from Board x JOIN FETCH x.devices WHERE x.applicationID = :TENANT", Board.class);
-//
-//        boardQR.setParameter("TENANT", TenantProvider.getCurrentID());
-//
-//        devices.addAll(boardQR.getResultList());
+        Calendar calendar  =  Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.MONTH, Calendar.OCTOBER);
+
+        int lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+        Session session = ((Session) em.getDelegate()).getSessionFactory().openSession();
+
+        System.out.println("Runing...");
+
+        for (int i = 0; i < 31; i++) {
+
+            // Set MIN
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            long min = calendar.getTimeInMillis();
+
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
+            calendar.set(Calendar.SECOND, 59);
+            calendar.set(Calendar.MILLISECOND, 999);
+            long max = calendar.getTimeInMillis();
 
 
-        TypedQuery<Device> anotherQR = em.createQuery("select x from Device x where  x.applicationID = ?1", Device.class);
+            Query query = session.createQuery("select min(value), max(value) from DeviceHistory where deviceID = 82815 and timestamp between "+min+" and " + max);
 
-        anotherQR.setParameter(1, TenantProvider.getCurrentID());
+            Object[] result = (Object[]) query.uniqueResult();
 
-        devices.addAll(anotherQR.getResultList());
-
-
-        System.out.println("Devices : " + devices.size());
-
-        for (Device device : devices) {
-
-            if(device instanceof PhysicalDevice){
-                System.out.println("Device: " + device);
-                System.out.println(":: is Phy.ParantID:" + ((PhysicalDevice) device).getBoard());
+            if(result[0] != null){
+                int rMin = (int) Double.parseDouble(result[0].toString());
+                int rMax = (int) Double.parseDouble(result[1].toString());
+                float calc = ((rMax - rMin) / 1600f);
+                System.out.println(sdf.format(calendar.getTime())  + ";" + rMin +";" + rMax +";" + (calc+"").replace(".", ","));
             }
 
-            if(device instanceof Board){
-                System.out.println("Board : " + device.getName() + ", devices: " + ((Board) device).getDevices());
 
-//                TypedQuery<PhysicalDevice> anotherQR = em.createQuery("from PhysicalDevice where board.uid = " + device.getUid(), PhysicalDevice.class);
-//                List<PhysicalDevice> resultList = anotherQR.getResultList();
-//                System.out.println(" >> " + resultList);
-            }
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+
         }
+
+
+//        StatelessSession session = ((Session) em.getDelegate()).getSessionFactory().openStatelessSession();
+//
+//        double lastValue = 0;
+//
+//        Query query = session.createQuery("SELECT a FROM DeviceHistory a where a.deviceID = 82815 ORDER BY timestamp");
+//        query.setFetchSize(Integer.valueOf(100));
+//        query.setReadOnly(true);
+//        query.setLockMode("a", LockMode.NONE);
+//        ScrollableResults results = query.scroll(ScrollMode.FORWARD_ONLY);
+//
+//        DateFormat sdf = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+//
+//        System.out.println("Running ....");
+//
+//        while (results.next()) {
+//            DeviceHistory addr = (DeviceHistory) results.get(0);
+//
+//            double value = addr.getValue();
+//
+//            // Report breaks
+//            if( (value - lastValue) < -1){
+//                System.out.println("Break in:" +  lastValue + ", to: " + value + ", at: " + sdf.format(new Date(addr.getTimestamp())));
+//            }
+//
+//            lastValue = value;
+//
+//            // Do stuff
+//        }
+//        results.close();
+        session.close();
 
         return "OK";
     }
 
+//
+//    @GET
+//    @Path("/medidor-problemas")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public String medidorProblemas() {
+//
+//        StatelessSession session = ((Session) em.getDelegate()).getSessionFactory().openStatelessSession();
+//
+//        double lastValue = 0;
+//
+//        Query query = session.createQuery("SELECT a FROM DeviceHistory a where a.deviceID = 82815 ORDER BY timestamp");
+//        query.setFetchSize(Integer.valueOf(100));
+//        query.setReadOnly(true);
+//        query.setLockMode("a", LockMode.NONE);
+//        ScrollableResults results = query.scroll(ScrollMode.FORWARD_ONLY);
+//
+//        DateFormat sdf = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+//
+//        System.out.println("Running ....");
+//
+//        while (results.next()) {
+//            DeviceHistory addr = (DeviceHistory) results.get(0);
+//
+//            double value = addr.getValue();
+//
+//            // Report breaks
+//            if( (value - lastValue) < -1){
+//                System.out.println("Break in:" +  lastValue + ", to: " + value + ", at: " + sdf.format(new Date(addr.getTimestamp())));
+//            }
+//
+//            lastValue = value;
+//
+//            // Do stuff
+//        }
+//        results.close();
+//        session.close();
+//
+//        return "OK";
+//    }
 
 }

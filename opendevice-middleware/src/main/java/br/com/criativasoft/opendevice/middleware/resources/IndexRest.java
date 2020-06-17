@@ -38,6 +38,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Index Controller
@@ -109,7 +110,14 @@ public class IndexRest {
     @Produces({MediaType.APPLICATION_JSON})
     public List<ViewExtension> viewExtensions() throws Exception {
         BaseDeviceManager deviceManager = BaseDeviceManager.getInstance();
-        return deviceManager.getExtensions(ViewExtension.class);
+
+        List<ViewExtension> extensions = deviceManager.getExtensions(ViewExtension.class);
+
+        extensions = extensions.stream()
+                .filter(p -> ViewExtension.ViewExtensionType.UI_EXTENSION_POINT == p.getType())
+                .collect(Collectors.toList());
+
+        return extensions;
     }
 
     private Response resource(String location) throws FileNotFoundException {

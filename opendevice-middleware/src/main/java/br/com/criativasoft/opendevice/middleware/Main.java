@@ -42,6 +42,7 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import org.h2.tools.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.script.SimpleBindings;
 import java.io.*;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -71,6 +73,7 @@ public class Main extends LocalDeviceManager {
         setApiKey(OpenDeviceConfig.LOCAL_APP_ID); // Only for Startup
 
         OpenDeviceConfig config = ODev.getConfig();
+        String profile = config.getProfile();
 
         configLogging(config);
 
@@ -101,6 +104,16 @@ public class Main extends LocalDeviceManager {
 
         if(config.isDatabaseEnabled()){
             webscoket.addResource(DashboardRest.class);
+
+            // H2 DAtabase, WebServer (http://localhost:8082)
+            if(profile.equals(OpenDeviceConfig.PROFILE_DEV)){
+                try {
+                    Server server =  Server.createWebServer().start();
+                    log.info("Database browser started in: " + server.getURL());
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         // Extract resources from JARS
@@ -309,7 +322,10 @@ public class Main extends LocalDeviceManager {
             log.info("Additional user interface extension: ");
 
             for (ViewExtension extension : extensions) {
-                log.info(" - " + extension.getClass());
+                String path = extension.getPathName();
+                String script = extension.getLoadScript();
+
+                log.info(" - " + extension.getClass().getName() + " [path:"+path+", script:"+script+"]");
                 // Copy resources for webapp folder...
                 extractResources(extension.getClass(), extension, destPath);
             }
@@ -328,9 +344,28 @@ public class Main extends LocalDeviceManager {
         log.debug("Extracting contents to: " + destPath);
         log.debug("Source: " + jarSource);
 
-        if(!jarSource.endsWith(".jar") && !jarSource.endsWith(".war")) return false;
+        // if(destPath == null &&)
+
+        // is not running from JAR, may be run from IDE
+        if(!jarSource.endsWith(".jar") && !jarSource.endsWith(".war")){
+
+            File extensionTargetStatic = new File(jarSource, "static");
+            if(extensionTargetStatic.exists()){
+
+                String path = extensionTargetStatic.getPath();
+
+                path = path.replaceAll("/target/classes", "/src/main/resources");
+
+                log.info("Extract Fail !. Running from IDE, add extension src as web resource: " + path);
+
+                addWebResource(path);
+            }
+
+            return false;
+        }
 
         // Check if has extracted
+        // TODO: Verificar se o arquivo deve ser atualizado, pois pode ter atualização...
         File extensionMarker = new File(destPath, "webapp/ext/." + klass.getSimpleName()+".properties");
         if(extensionMarker.exists()){
             log.debug("Ignoring webapp content for extension: " + klass);

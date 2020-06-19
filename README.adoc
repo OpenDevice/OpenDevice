@@ -1,6 +1,7 @@
 image:https://travis-ci.org/OpenDevice/OpenDevice.svg?branch=master[Build Status, link="https://travis-ci.org/OpenDevice/OpenDevice"]
 
-== What is OpenDevice?
+image:https://opendevice.atlassian.net/wiki/download/attachments/491525/Overview-Simplificado.png[Overview]
+
 
 OpenDevice is a set of tools and APIs to build solutions for the *"Internet of Things"* like home automations systems, robotics, smart city, energy monitoring, security, sensor monitoring. +
 Provide an open and unified framework to interconnect IoT devices, data, and applications over the Web,

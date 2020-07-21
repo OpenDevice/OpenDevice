@@ -544,7 +544,9 @@ public abstract class BaseDeviceManager implements DeviceManager {
         if ((connection instanceof StreamConnection || connection instanceof IRemoteClientConnection  /* << ws/rest clients */)
                 && outputConnections.exist(connection)) {
             try {
+                
                 sendTo(request, connection);
+                
             } catch (IOException e) {
             }
         }
@@ -742,6 +744,15 @@ public abstract class BaseDeviceManager implements DeviceManager {
         }
 
         return false;
+    }
+    
+    /**
+     * Check if is a {@link GetDevicesResponse} in last response.
+     * @param message
+     * @return
+     */
+    public boolean isCommandSyncDone( Message message ) {
+        return DefaultCommandProcessor.isSyncDone(message);
     }
 
     @Override

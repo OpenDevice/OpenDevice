@@ -149,6 +149,15 @@ public abstract class Command implements Message {
     public int getRetry() {
         return retry;
     }
+    
+    /**
+     * Check if response is set.
+     * See {@link #getResponse()}
+     */
+    public boolean hasResponse() {
+        return response != null;
+    }
+    
 
     /**
      * Returns the response associated with the command. By default commands are executed in asynchronous way,
@@ -156,6 +165,7 @@ public abstract class Command implements Message {
      *
      * @param <T>
      * @return
+     * @deprecated TODO: NEED CREATE waitResponse..
      */
     public <T> T getResponse() {
 

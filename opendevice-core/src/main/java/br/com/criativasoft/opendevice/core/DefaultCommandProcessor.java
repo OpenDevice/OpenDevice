@@ -215,7 +215,8 @@ public class DefaultCommandProcessor {
         } else if (type == CommandType.DEVICE_COMMAND_RESPONSE) {
 
 //                ResponseCommand responseCommand = (ResponseCommand) command;
-            // log.debug("ResponseStatus: " + responseCommand.getStatus());
+//             log.debug("ResponseStatus: " + responseCommand.getStatus());
+            
 
         } else if (type == CommandType.CONNECT_RESPONSE) {
 
@@ -419,6 +420,22 @@ public class DefaultCommandProcessor {
 
 
         }
+    }
+    
+    /**
+     * Check if is a {@link GetDevicesResponse} in last response.
+     * @param message
+     * @return
+     */
+    public static final boolean isSyncDone( Message message ) {
+        if (message instanceof GetDevicesResponse) {
+            GetDevicesResponse responseCommand = (GetDevicesResponse) message;
+            if (responseCommand.isLast()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

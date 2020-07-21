@@ -26,7 +26,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class FormController extends JFrame implements ConnectionListener, ActionListener {
+public abstract class FormController extends JFrame implements ConnectionListener, ActionListener {
 	
 	private DeviceConnection connection;
 	private JTextArea text;
@@ -141,11 +141,6 @@ public class FormController extends JFrame implements ConnectionListener, Action
 			ex.printStackTrace();
 		}
 		
-	}
-	
-	public static void main(String[] args) {
-		FormController formAction = new FormController();
-		formAction.setVisible(true);
 	}
 	
 }

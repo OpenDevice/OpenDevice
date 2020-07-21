@@ -31,11 +31,17 @@ import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 // Test GetDevicesRequest between multiples re-connections
-public class GetDevicesTests extends LocalDeviceManager implements ConnectionListener {
+public class GetDevicesTestsLoop extends LocalDeviceManager implements ConnectionListener {
 
     private List<Command> receivedPartial = new LinkedList<Command>();
 
-    public static void main( String[] args ) {
+    private AtomicInteger successCount = new AtomicInteger();
+    
+    private Timer timer;
+
+    private static final int MAX = 10;
+
+    public static void main(String[] args) {
         launch(args);
     }
 
@@ -43,35 +49,58 @@ public class GetDevicesTests extends LocalDeviceManager implements ConnectionLis
     public void start() throws IOException {
 
         addConnectionListener(this);
-
-        CommandLogViewer log = new CommandLogViewer();
-
-        AbstractStreamConnection usb = out.usb();
-
-        log.monitor(usb);
-
-        connect(usb);
-
-//        connect(out.bluetooth("00:11:06:14:04:57"));
+        
+        connect(out.usb());
 
     }
 
     @Override
-    public void connectionStateChanged( final DeviceConnection connection , ConnectionStatus status ) {
+    public void connectionStateChanged(final DeviceConnection connection, ConnectionStatus status) {
 
     }
 
     @Override
-    public void onMessageReceived( Message message , DeviceConnection connection ) {
+    public void onMessageReceived(Message message, DeviceConnection connection) {
 
-        if (message instanceof GetDevicesResponse) {
+        if(message instanceof GetDevicesResponse){
             GetDevicesResponse response = (GetDevicesResponse) message;
 
             receivedPartial.add(response);
-            System.err.println("Sync: " + receivedPartial.size() + "/" + response.getLength() + " ||| devices: " + getDevices().size());
+            System.err.println("Sync: " + receivedPartial.size() + "/" + response.getLength() + " ||| devices: " + getDevices().size() + ", run: " + successCount + "/"+MAX );
 
+            if(receivedPartial.size() == response.getLength() ) {
+                
+                System.err.println("INTERACTION :" + successCount + " - DONE");
+                
+                receivedPartial.clear();
+                int count = successCount.incrementAndGet();
+
+                if(count == MAX) {
+                    stop();
+                    return;
+                }
+                
+                restarTest();
+                
+            }
+            
         }
 
     }
-
+    
+    private void restarTest() {
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    disconnect();
+                    delay(2000);
+                    connect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 1000);
+    }
 }

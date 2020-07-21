@@ -23,7 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
-public class OnOffController  implements ConnectionListener {
+public class OnOffController extends FormController  implements ConnectionListener {
 
 	private FormController form;
 	private static StreamConnection connection;
@@ -38,10 +38,9 @@ public class OnOffController  implements ConnectionListener {
 		//USE: samples/arduino/BluetoothConnection
 		// connection = StreamConnectionFactory.createBluetooth("20:13:01:24:01:93");
 
-
 		connection.addListener(this);
 
-		form = new FormController();
+		form = this;
 		form.setConnection(connection);
 		form.addButton("ON", btnListener);
 		form.addButton("OFF", btnListener);

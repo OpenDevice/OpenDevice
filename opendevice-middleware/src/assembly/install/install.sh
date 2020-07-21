@@ -77,7 +77,7 @@ install_java() {
   export DEBIAN_FRONTEND=noninteractive
   ## TODO: install -- sudo add-apt-repository ppa:openjdk-r/ppa
   ## download from: https://github.com/frekele/oracle-java/releases
-  apt -y -q install openjdk-8-jdk || result=1
+  apt -y -q install openjdk-8-jdk unzip wget || result=1
 
   #  Not found try repository 2
   if [[ $result > 0 ]]; then

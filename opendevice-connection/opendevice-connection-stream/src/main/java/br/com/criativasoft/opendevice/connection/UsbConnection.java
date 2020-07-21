@@ -14,14 +14,21 @@
 package br.com.criativasoft.opendevice.connection;
 
 
-import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
-import jssc.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import br.com.criativasoft.opendevice.connection.exception.ConnectionException;
+import jssc.SerialPort;
+import jssc.SerialPortEvent;
+import jssc.SerialPortEventListener;
+import jssc.SerialPortException;
+import jssc.SerialPortList;
 
 /**
  * Handle connection with usb-serial devices. Default baudrate is 115200 <br/>
@@ -52,7 +59,7 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
 	
 	/** Tempo necessário para o arduino inicializar a USB  */
 	// TODO: Verificar se isso é necessário no windows/mac (pois o auto reset só ocorre no windows.)
-	private static int ARDUINO_BOOT_TIME = 1200;
+	private static int ARDUINO_BOOT_TIME = 2000;
 
     private int deviceBootTime = ARDUINO_BOOT_TIME;
 	
@@ -110,7 +117,6 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
 
 	@Override
 	public synchronized void connect() throws ConnectionException {
-		
 		if(deviceURI != null){
 			serialPort = new SerialPort(deviceURI);
 		}else{
@@ -128,24 +134,28 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
 			// open serial port, and use class name for the appName.
 			serialPort.openPort();
 			
-			// set port parameters
-			serialPort.setParams(BAUDRATE, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-			
-			 serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
-			
-			// add event listeners
-			int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS + SerialPort.MASK_DSR + SerialPort.MASK_ERR + SerialPort.MASK_RING + SerialPort.MASK_BREAK;//Prepare mask
-			serialPort.setEventsMask(mask);
-                        serialPort.addEventListener(this);
-			// serialPort.notifyOnDataAvailable(true);
+      // set port parameters
+      serialPort.setParams(BAUDRATE, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 
-			// Wait a while to boot the Arduino.
-            // NOTE: Perhaps this is only required for Arduino
-            if(deviceBootTime > 0)  Thread.sleep(deviceBootTime);
+      serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
 
-            log.info("Connected ! " + serialPort.getPortName());
+      // add event listeners
+      // int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS + SerialPort.MASK_DSR + SerialPort.MASK_ERR
+      //           + SerialPort.MASK_RING + SerialPort.MASK_BREAK;//Prepare mask
+      //			serialPort.setEventsMask(mask);
 
-            setStatus(ConnectionStatus.CONNECTED);
+      serialPort.addEventListener(this);
+
+      // Wait a while to boot the Arduino.
+      // NOTE: Perhaps this is only required for Arduino
+      Timer timer = new Timer();
+      timer.schedule(new TimerTask() {
+        @Override
+        public void run() {
+          log.info("Connected ! " + serialPort.getPortName());
+          setStatus(ConnectionStatus.CONNECTED);
+        }
+      }, deviceBootTime);
 
 //          NOTE: No need, because the implementation of reading is already done in serialEvent
 //            if(reader instanceof DefaultSteamReader){
@@ -153,6 +163,13 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
 //            }
 			
 		} catch (Exception e) {
+		  
+		  List<String> listAvailable = listAvailable();
+		  
+		  // If conections has changed, it will clear to retry in next connect call..
+		  if(listAvailable.size() > 0 && automaticPort) deviceURI = null;
+		  
+		  log.info("Available ports: " + listAvailable());
 			throw new ConnectionException(e.getMessage(), e);
 		}
 	}
@@ -160,9 +177,9 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
     @Override
     public synchronized void disconnect() throws ConnectionException {
 
-        log.debug("Disconnect SerialPort: " + deviceURI);
-
         if (serialPort != null) {
+
+          log.debug("Disconnect SerialPort: " + serialPort.getPortName());
 
             try {
                 serialPort.closePort();
@@ -174,20 +191,19 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
             }
 
             if(automaticPort) deviceURI = null;
-            setStatus(ConnectionStatus.DISCONNECTED);
         }
     }
 	
 	
 	@Override
 	public void write(byte[] value) throws IOException {
-            if(!isConnected()) return;
-
-            try {
-                    serialPort.writeBytes(value);
-            } catch (SerialPortException e) {
-                    throw new ConnectionException(e);
-            }
+    if(!isConnected()) return;
+  
+    try {
+            serialPort.writeBytes(value);
+    } catch (SerialPortException e) {
+            throw new ConnectionException(e);
+    }
 	}
 
     /**
@@ -242,4 +258,5 @@ public class UsbConnection extends AbstractStreamConnection implements IUsbConne
     public String toString() {
         return "UsbConnection["+getConnectionURI()+"]";
     }
+
 }

@@ -19,7 +19,7 @@
         <!--<nettosphere-version>2.4.11-SNAPSHOT</nettosphere-version>-->
         <atmosphere-version>2.4.30</atmosphere-version>
         <atmosphere-extensions>2.4.21</atmosphere-extensions>
-        <shiro-version>1.4.0</shiro-version>
+        <shiro-version>1.6.0</shiro-version>
     </properties>
 
     <dependencies>

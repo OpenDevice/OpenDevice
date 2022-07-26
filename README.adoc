@@ -68,7 +68,7 @@ void loop() {
 
 The configured devices will be automatically synchronized with the Server using any available connection (usb, bluetooth, wifi, mqtt)
 
-image:https://api.media.atlassian.com/file/6205b909-9fd6-4123-b43a-1801638146aa/image?token=eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIyMTkwZGQ4Yy0wOWRlLTQzNzAtYTA4ZC03NDlhODI3OGRhNGUiLCJhY2Nlc3MiOnsidXJuOmZpbGVzdG9yZTpmaWxlOjYyMDViOTA5LTlmZDYtNDEyMy1iNDNhLTE4MDE2MzgxNDZhYSI6WyJyZWFkIl19LCJleHAiOjE2NTg4MzE4MzIsIm5iZiI6MTY1ODgyODgzMn0.b8Ww3hPYxz74zszuLXcakaVrw2NqIP42XqCItQe7ry0&client=2190dd8c-09de-4370-a08d-749a8278da4e&name=Selection_378.png&height=250[]
+image:https://user-images.githubusercontent.com/515675/180988184-85cfc500-e0ee-4753-a3e5-f4a3b48047f8.png[]
 
 
 == Running the Server

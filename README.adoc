@@ -17,32 +17,6 @@ link:https://opendevice.atlassian.net/wiki/spaces/DOC/overview[See overview]
 
 === Code Sample
 
-[source,java]
-.*Simple like this (Java/Android):*
-----
-    public class BlinkDeviceDemo extends LocalDeviceManager {
-
-        public static void main(String[] args) { launch(args); }
-
-        public void start() throws IOException {
-
-            Device led = new Device(1, Device.DIGITAL);
-
-            connect(out.usb()); // Connect to first USB port available
-
-            while(true){
-                led.on();
-                delay(500);
-                led.off();
-                delay(500);
-            }
-        }
-    }
-----
-
-But not only that... (You can also do in javascript and other languages.)
-
-
 [source,c++]
 .*Arduino Side:*
 ----
@@ -90,15 +64,52 @@ void loop() {
 }
 ----
 
+== Dashboards
+
+The configured devices will be automatically synchronized with the Server using any available connection (usb, bluetooth, wifi, mqtt)
+
+image:https://api.media.atlassian.com/file/6205b909-9fd6-4123-b43a-1801638146aa/image?token=eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIyMTkwZGQ4Yy0wOWRlLTQzNzAtYTA4ZC03NDlhODI3OGRhNGUiLCJhY2Nlc3MiOnsidXJuOmZpbGVzdG9yZTpmaWxlOjYyMDViOTA5LTlmZDYtNDEyMy1iNDNhLTE4MDE2MzgxNDZhYSI6WyJyZWFkIl19LCJleHAiOjE2NTg4MzE4MzIsIm5iZiI6MTY1ODgyODgzMn0.b8Ww3hPYxz74zszuLXcakaVrw2NqIP42XqCItQe7ry0&client=2190dd8c-09de-4370-a08d-749a8278da4e&name=Selection_378.png&height=250[]
+
+
 == Running the Server
 
-The server run as standalone application, and you can also run using docker
+The server run as standalone application, and you can also run using *docker*
 
 See more: https://opendevice.atlassian.net/wiki/display/DOC/Setting-up+the+Server
 
+== APIs
+
+You can use client libraries to controle devices directly (usb, bluetooth) or via server (MQTT) using Java/Android/Javascript or Rest
+
+[source,java]
+.*Simple like this (Java/Android):*
+----
+    public class BlinkDeviceDemo extends LocalDeviceManager {
+
+        public static void main(String[] args) { launch(args); }
+
+        public void start() throws IOException {
+
+            Device led = new Device(1, Device.DIGITAL);
+
+            connect(out.usb()); // Connect to first USB port available
+
+            while(true){
+                led.on();
+                delay(500);
+                led.off();
+                delay(500);
+            }
+        }
+    }
+----
+
+But not only that... (You can also do in javascript and other languages.)
+
 == Technology
 
-image:http://opendevice.criativasoft.com.br/images/site-technology.png[]
+image:https://opendevice-iot.web.app/img/opendevice-technology.png[]
+
 
 == Communications & Protocols
 
